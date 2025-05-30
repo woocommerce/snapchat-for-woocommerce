@@ -1,0 +1,12 @@
+{
+	"$schema": "https://schemas.wp.org/trunk/block.json",
+	"apiVersion": 3,
+	"name": "extension/snapchat-for-woocommerce",
+	"version": "0.1.0",
+	"title": "Snapchat For Woocommerce",
+	"category": "widgets",
+	"textdomain": "snapchat-for-woocommerce",
+	"editorScript": "file:./build/index.js",
+	"editorStyle": "file:./build/index.css",
+	"style": "file:./build/style-index.css"
+}
