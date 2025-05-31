@@ -15,15 +15,28 @@
  * @package snapchat-for-woocommerce
  */
 
+use SnapchatForWoocommerce\Admin\Setup;
+use SnapchatForWoocommerce\Config\AdPartnerConfig;
+use SnapchatForWoocommerce\Infrastructure\WcsClient;
+use SnapchatForWoocommerce\Infrastructure\JetpackAuthenticator;
+use SnapchatForWoocommerce\API\ConnectionService;
+use Automattic\Jetpack\Connection\Manager;
+
 defined( 'ABSPATH' ) || exit;
 
-if ( ! defined( 'SNAPCHAT_FOR_WOOCOMMERCE' ) ) {
-	define( 'SNAPCHAT_FOR_WOOCOMMERCE', __FILE__ );
+if ( ! defined( 'SNAPCHAT_FOR_WOOCOMMERCE_FILE' ) ) {
+	define( 'SNAPCHAT_FOR_WOOCOMMERCE_FILE', __FILE__ );
+}
+
+if ( ! defined( 'SNAPCHAT_ADS_PLUGIN_DIR' ) ) {
+	define( 'SNAPCHAT_ADS_PLUGIN_DIR', __FILE__ );
+}
+
+if ( ! defined( 'SNAPCHAT_ADS_PLUGIN_URL' ) ) {
+	define( 'SNAPCHAT_ADS_PLUGIN_URL', __FILE__ );
 }
 
 require_once plugin_dir_path( __FILE__ ) . '/vendor/autoload_packages.php';
-
-use SnapchatForWoocommerce\Admin\Setup;
 
 // phpcs:disable WordPress.Files.FileName
 
@@ -122,3 +135,13 @@ function snapchat_for_woocommerce_init() {
 	snapchat_for_woocommerce::instance();
 
 }
+
+add_action( 'rest_api_init', function () {
+	$config     = new AdPartnerConfig();
+	$wcs_client = new WcsClient( 'https://wcs-mock.mylocal' );
+	$manager    = new Manager( 'snapchat-for-woocommerce' );
+	$auth       = new JetpackAuthenticator( $manager );
+
+	$connection = new ConnectionService( $config, $wcs_client, $auth );
+	$connection->register_routes();
+} );

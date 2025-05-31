@@ -29,14 +29,14 @@ class Setup {
 		}
 
 		$script_path       = '/build/index.js';
-		$script_asset_path = dirname( SNAPCHAT_FOR_WOOCOMMERCE ) . '/build/index.asset.php';
+		$script_asset_path = dirname( SNAPCHAT_FOR_WOOCOMMERCE_FILE ) . '/build/index.asset.php';
 		$script_asset      = file_exists( $script_asset_path )
 		? require $script_asset_path
 		: array(
 			'dependencies' => array(),
 			'version'      => filemtime( $script_path ),
 		);
-		$script_url        = plugins_url( $script_path, SNAPCHAT_FOR_WOOCOMMERCE );
+		$script_url        = plugins_url( $script_path, SNAPCHAT_FOR_WOOCOMMERCE_FILE );
 
 		wp_register_script(
 			'snapchat-for-woocommerce',
@@ -48,10 +48,10 @@ class Setup {
 
 		wp_register_style(
 			'snapchat-for-woocommerce',
-			plugins_url( '/build/index.css', SNAPCHAT_FOR_WOOCOMMERCE ),
+			plugins_url( '/build/index.css', SNAPCHAT_FOR_WOOCOMMERCE_FILE ),
 			// Add any dependencies styles may have, such as wp-components.
 			array(),
-			filemtime( dirname( SNAPCHAT_FOR_WOOCOMMERCE ) . '/build/index.css' )
+			filemtime( dirname( SNAPCHAT_FOR_WOOCOMMERCE_FILE ) . '/build/index.css' )
 		);
 
 		wp_enqueue_script( 'snapchat-for-woocommerce' );
