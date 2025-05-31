@@ -10,6 +10,24 @@
 		"phpunit/phpunit": "^9.0",
 		"automattic/jetpack-autoloader": "^2"
 	},
+	"archive": {
+		"exclude": [
+			"!/assets",
+			"!/build",
+			"!/languages",
+			"node_modules",
+			"woocommerce-eu-vat-number.zip",
+			"README.md",
+			"composer.json",
+			"composer.lock",
+			"package.json",
+			"package-lock.json",
+			"phpcs.xml.dist",
+			"phpcs-compat.xml.dist",
+			"webpack.config.js",
+			".*"
+		]
+	},
 	"config": {
 		"allow-plugins": {
 			"automattic/jetpack-autoloader": true
