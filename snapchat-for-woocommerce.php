@@ -19,8 +19,11 @@ use SnapchatForWoocommerce\Admin\Setup;
 use SnapchatForWoocommerce\Config\AdPartnerConfig;
 use SnapchatForWoocommerce\Infrastructure\WcsClient;
 use SnapchatForWoocommerce\Infrastructure\JetpackAuthenticator;
-use SnapchatForWoocommerce\API\ConnectionService;
 use Automattic\Jetpack\Connection\Manager;
+use SnapchatForWoocommerce\Infrastructure\ServiceContainer;
+use SnapchatForWoocommerce\API\ConnectionService;
+use SnapchatForWoocommerce\API\PixelTrackingService;
+use SnapchatForWoocommerce\Config\OptionDefaults;
 
 defined( 'ABSPATH' ) || exit;
 
@@ -136,12 +139,13 @@ function snapchat_for_woocommerce_init() {
 
 }
 
-add_action( 'rest_api_init', function () {
-	$config     = new AdPartnerConfig();
-	$wcs_client = new WcsClient( 'https://wcs-mock.mylocal' );
-	$manager    = new Manager( 'snapchat-for-woocommerce' );
-	$auth       = new JetpackAuthenticator( $manager );
+$container = new ServiceContainer( 'snapchat_' );
 
-	$connection = new ConnectionService( $config, $wcs_client, $auth );
-	$connection->register_routes();
+add_action( 'rest_api_init', function () use ( $container ) {
+	$container->get( 'connection' )->register_routes();
+	$container->get( 'pixel' )->register_routes();
+} );
+
+add_action( 'init', function () use ( $container ) {
+	$container->get( 'pixel' )->maybe_inject_pixel();
 } );

@@ -6,7 +6,7 @@ use SnapchatForWoocommerce\Config\AdPartnerConfigInterface;
 use SnapchatForWoocommerce\Infrastructure\WcsClient;
 use SnapchatForWoocommerce\Infrastructure\JetpackAuthenticator;
 
-class ConnectionService {
+final class ConnectionService {
 
 	private AdPartnerConfigInterface $config;
 	private WcsClient $wcs;
