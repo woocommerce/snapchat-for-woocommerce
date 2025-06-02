@@ -15,6 +15,8 @@
  * @package snapchat-for-woocommerce
  */
 
+use SnapchatForWoocommerce\Admin\Plugin;
+
 defined( 'ABSPATH' ) || exit;
 
 if ( ! defined( 'SNAPCHAT_FOR_WOOCOMMERCE' ) ) {
@@ -22,8 +24,6 @@ if ( ! defined( 'SNAPCHAT_FOR_WOOCOMMERCE' ) ) {
 }
 
 require_once plugin_dir_path( __FILE__ ) . '/vendor/autoload_packages.php';
-
-use SnapchatForWoocommerce\Admin\Setup;
 
 // phpcs:disable WordPress.Files.FileName
 
@@ -51,59 +51,6 @@ function snapchat_for_woocommerce_activate() {
 	}
 }
 
-if ( ! class_exists( 'snapchat_for_woocommerce' ) ) :
-	/**
-	 * The snapchat_for_woocommerce class.
-	 */
-	class snapchat_for_woocommerce {
-		/**
-		 * This class instance.
-		 *
-		 * @var \snapchat_for_woocommerce single instance of this class.
-		 */
-		private static $instance;
-
-		/**
-		 * Constructor.
-		 */
-		public function __construct() {
-			if ( is_admin() ) {
-				new Setup();
-			}
-		}
-
-		/**
-		 * Cloning is forbidden.
-		 */
-		public function __clone() {
-			wc_doing_it_wrong( __FUNCTION__, __( 'Cloning is forbidden.', 'snapchat_for_woocommerce' ), $this->version );
-		}
-
-		/**
-		 * Unserializing instances of this class is forbidden.
-		 */
-		public function __wakeup() {
-			wc_doing_it_wrong( __FUNCTION__, __( 'Unserializing instances of this class is forbidden.', 'snapchat_for_woocommerce' ), $this->version );
-		}
-
-		/**
-		 * Gets the main instance.
-		 *
-		 * Ensures only one instance can be loaded.
-		 *
-		 * @return \snapchat_for_woocommerce
-		 */
-		public static function instance() {
-
-			if ( null === self::$instance ) {
-				self::$instance = new self();
-			}
-
-			return self::$instance;
-		}
-	}
-endif;
-
 add_action( 'plugins_loaded', 'snapchat_for_woocommerce_init', 10 );
 
 /**
@@ -112,13 +59,12 @@ add_action( 'plugins_loaded', 'snapchat_for_woocommerce_init', 10 );
  * @since 0.1.0
  */
 function snapchat_for_woocommerce_init() {
-	load_plugin_textdomain( 'snapchat_for_woocommerce', false, plugin_basename( dirname( __FILE__ ) ) . '/languages' );
+	load_plugin_textdomain( 'snapchat_for_woocommerce', false, plugin_basename( __DIR__ ) . '/languages' );
 
 	if ( ! class_exists( 'WooCommerce' ) ) {
 		add_action( 'admin_notices', 'snapchat_for_woocommerce_missing_wc_notice' );
 		return;
 	}
 
-	snapchat_for_woocommerce::instance();
-
+	Plugin::instance();
 }
