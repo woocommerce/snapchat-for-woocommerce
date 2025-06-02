@@ -34,8 +34,6 @@ if ( ! defined( 'SNAPCHAT_ADS_PLUGIN_URL' ) ) {
 
 require_once plugin_dir_path( __FILE__ ) . '/vendor/autoload_packages.php';
 
-// phpcs:disable WordPress.Files.FileName
-
 /**
  * WooCommerce fallback notice.
  *
