@@ -1,0 +1,28 @@
+{
+	"name": "snapchat-for-woocommerce",
+	"version": "0.1.0",
+	"author": "The WordPress Contributors",
+	"license": "GPL-3.0+",
+	"main": "build/index.js",
+	"scripts": {
+		"build": "wp-scripts build",
+		"format": "wp-scripts format",
+		"lint:css": "wp-scripts lint-style",
+		"lint:js": "wp-scripts lint-js",
+		"packages-update": "wp-scripts packages-update",
+		"plugin-zip": "wp-scripts plugin-zip",
+		"start": "wp-scripts start",
+		"postinstall": "composer install"
+	},
+	"dependencies": {
+		"@woocommerce/components": "^10.3.0",
+		"@wordpress/hooks": "^4.24.0",
+		"@wordpress/i18n": "^5.24.0"
+	},
+	"devDependencies": {
+		"@woocommerce/dependency-extraction-webpack-plugin": "^2.2.0",
+		"@woocommerce/eslint-plugin": "^2.2.0",
+		"@wordpress/prettier-config": "^4.24.0",
+		"@wordpress/scripts": "^24.6.0"
+	}
+}
