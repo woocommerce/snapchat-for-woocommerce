@@ -1,6 +1,7 @@
 {
-	"name": "extension/snapchat-for-woocommerce",
-	"description": "WooCommerce plugin",
+	"name": "woocommerce/snapchat-for-woocommerce",
+	"description": "Snapchat for WooCommerce",
+	"license": "GPL-3.0-or-later",
 	"autoload": {
 		"psr-4": {
 			"SnapchatForWoocommerce\\": "includes/"
@@ -8,7 +9,9 @@
 	},
 	"require-dev": {
 		"phpunit/phpunit": "^9.0",
-		"automattic/jetpack-autoloader": "^2"
+		"automattic/jetpack-autoloader": "^2",
+		"woocommerce/woocommerce-sniffs": "^1.0",
+		"sirbrillig/phpcs-changed": "^2.11"
 	},
 	"archive": {
 		"exclude": [
@@ -30,7 +33,8 @@
 	},
 	"config": {
 		"allow-plugins": {
-			"automattic/jetpack-autoloader": true
+			"automattic/jetpack-autoloader": true,
+			"dealerdirect/phpcodesniffer-composer-installer": true
 		}
 	}
 }
