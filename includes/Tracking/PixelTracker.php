@@ -3,6 +3,7 @@ namespace SnapchatForWoocommerce\Tracking;
 
 use SnapchatForWoocommerce\Infrastructure\WcsClient;
 use SnapchatForWoocommerce\Infrastructure\JetpackAuthenticator;
+use SnapchatForWoocommerce\Config\AdPartnerProxyPathProvider;
 
 class PixelTracker extends RemotePixelTracker {
 
@@ -17,7 +18,9 @@ class PixelTracker extends RemotePixelTracker {
 	}
 
 	protected function get_tracking_snippet(): ?string {
-		$url = $this->wcs->get_url_for( 'snapchat/snapchat-ads/adaccounts/' . $this->ad_account_id . '/pixels' );
+		$url = $this->wcs->get_url_for(
+			AdPartnerProxyPathProvider::get_path( 'pixel', [ 'ad_account_id' => $this->ad_account_id ] ),
+		);
 
 		$response = wp_remote_get( $url, [
 			'headers' => [
@@ -38,7 +41,7 @@ class PixelTracker extends RemotePixelTracker {
 		}
 
 		return sprintf(
-			"<script>(function(w,d,t){/* Snap Pixel Code */})(window,document,'script');snaptr('init', '%s');snaptr('track', 'PAGE_VIEW');</script>",
+			"%s",
 			esc_js( $pixel_script )
 		);
 	}
