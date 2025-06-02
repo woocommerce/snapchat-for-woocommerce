@@ -19,8 +19,16 @@ use SnapchatForWoocommerce\Admin\Plugin;
 
 defined( 'ABSPATH' ) || exit;
 
-if ( ! defined( 'SNAPCHAT_FOR_WOOCOMMERCE' ) ) {
-	define( 'SNAPCHAT_FOR_WOOCOMMERCE', __FILE__ );
+if ( ! defined( 'SNAPCHAT_FOR_WOOCOMMERCE_FILE' ) ) {
+	define( 'SNAPCHAT_FOR_WOOCOMMERCE_FILE', __FILE__ );
+}
+
+if ( ! defined( 'SNAPCHAT_ADS_PLUGIN_DIR' ) ) {
+	define( 'SNAPCHAT_ADS_PLUGIN_DIR', plugin_dir_path( __FILE__ ) );
+}
+
+if ( ! defined( 'SNAPCHAT_ADS_PLUGIN_URL' ) ) {
+	define( 'SNAPCHAT_ADS_PLUGIN_URL', plugin_dir_url( __FILE__ ) );
 }
 
 require_once plugin_dir_path( __FILE__ ) . '/vendor/autoload_packages.php';
