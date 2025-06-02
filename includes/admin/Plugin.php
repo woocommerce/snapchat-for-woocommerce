@@ -1,5 +1,12 @@
 <?php
+/**
+ * Plugin Admin: Main Plugin Class.
+ *
+ * @package SnapchatForWoocommerce\Admin
+ */
+
 namespace SnapchatForWoocommerce\Admin;
+
 /**
  * The Plugin class.
  */

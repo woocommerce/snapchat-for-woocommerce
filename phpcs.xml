@@ -7,7 +7,10 @@
 	<config name="testVersion" value="7.4-" />
 
 	<!-- Rules -->
-	<rule ref="WooCommerce-Core" />
+	<rule ref="WooCommerce-Core">
+		<exclude name="WordPress.Files.FileName.NotHyphenatedLowercase" />
+		<exclude name="WordPress.Files.FileName.InvalidClassFileName" />
+	</rule>
 
 	<rule ref="WordPress.WP.I18n">
 		<properties>

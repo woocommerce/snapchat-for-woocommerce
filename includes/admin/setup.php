@@ -1,4 +1,11 @@
 <?php
+/**
+ * Admin Setup Class.
+ *
+ * Registers admin scripts, styles, and WooCommerce Admin page for the plugin.
+ *
+ * @package SnapchatForWoocommerce\Admin
+ */
 
 namespace SnapchatForWoocommerce\Admin;
 
