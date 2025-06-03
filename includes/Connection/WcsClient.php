@@ -38,6 +38,8 @@ final class WcsClient {
 	/**
 	 * Sends a GET request to the WCS `/connection/status` endpoint.
 	 *
+	 * @since 0.1.0
+	 *
 	 * @param string $jetpack_token Jetpack authorization token.
 	 *
 	 * @return WP_REST_Response|WP_Error Connection status or error.
@@ -48,6 +50,8 @@ final class WcsClient {
 
 	/**
 	 * Sends a POST request to the WCS `/connection/connect` endpoint to initiate a connection.
+	 *
+	 * @since 0.1.0
 	 *
 	 * @param string $jetpack_token Jetpack authorization token.
 	 * @param string $return_url    URL to redirect the user to after authorization.
@@ -61,6 +65,8 @@ final class WcsClient {
 	/**
 	 * Sends a proxy GET request to an arbitrary WCS endpoint.
 	 *
+	 * @since 0.1.0
+	 *
 	 * @param string $token Jetpack authorization token.
 	 * @param string $path  Path within the WCS API (relative to service base).
 	 *
@@ -72,6 +78,8 @@ final class WcsClient {
 
 	/**
 	 * Sends a proxy POST request to an arbitrary WCS endpoint.
+	 *
+	 * @since 0.1.0
 	 *
 	 * @param string $token Jetpack authorization token.
 	 * @param string $path  Path within the WCS API (relative to service base).
@@ -88,6 +96,8 @@ final class WcsClient {
 	 *
 	 * Assembles the full URL, sets headers including the Jetpack token,
 	 * and sends the request using `wp_remote_request()`.
+	 *
+	 * @since 0.1.0
 	 *
 	 * @param string     $method         HTTP method (`GET` or `POST`).
 	 * @param string     $jetpack_token  Jetpack authorization token.
@@ -122,6 +132,8 @@ final class WcsClient {
 	 *
 	 * If the response is a valid 2xx response, returns a `WP_REST_Response`.
 	 * Otherwise, wraps the raw response inside a `WP_Error` object.
+	 *
+	 * @since 0.1.0
 	 *
 	 * @param mixed $response The result from `wp_remote_request()`.
 	 *

@@ -3,6 +3,10 @@ const WooCommerceDependencyExtractionWebpackPlugin = require('@woocommerce/depen
 
 module.exports = {
 	...defaultConfig,
+	entry: {
+		...defaultConfig.entry(),
+		'snap-pixel': './src/pixel-tracking/index.js'
+	},
 	plugins: [
 		...defaultConfig.plugins.filter(
 			(plugin) =>

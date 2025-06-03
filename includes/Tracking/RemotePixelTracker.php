@@ -66,7 +66,7 @@ final class RemotePixelTracker implements PixelTracker {
 	 * Only runs if tracking is enabled via plugin settings. Outputs the pixel script,
 	 * personalized if possible, and sanitized using `wp_kses`.
 	 *
-	 * @return void
+	 * @since 0.1.0
 	 */
 	public function maybe_inject_pixel(): void {
 		if ( ! OptionsStore::get( OptionDefaults::PIXEL_ENABLED ) ) {
@@ -81,6 +81,8 @@ final class RemotePixelTracker implements PixelTracker {
 	 *
 	 * If the user is logged in, injects their email address into the script for
 	 * more accurate audience tracking. If not logged in, removes placeholder elements.
+	 *
+	 * @since 0.1.0
 	 *
 	 * @param string $script Raw pixel JavaScript with placeholders.
 	 * @return string Personalized pixel script.
@@ -114,6 +116,8 @@ final class RemotePixelTracker implements PixelTracker {
 	 *
 	 * If not cached, it authenticates with Jetpack and queries the Snapchat Ads API for pixel info.
 	 * The result is cached in the options store and sanitized before being returned.
+	 *
+	 * @since 0.1.0
 	 *
 	 * @return string|null The sanitized pixel script, or null on failure.
 	 */

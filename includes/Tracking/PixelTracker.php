@@ -32,7 +32,7 @@ interface PixelTracker {
 	 * or called during template rendering. It should determine internally whether the
 	 * pixel should be output based on plugin settings, page context, or filters.
 	 *
-	 * @return void
+	 * @since 0.1.0
 	 */
 	public function maybe_inject_pixel(): void;
 }

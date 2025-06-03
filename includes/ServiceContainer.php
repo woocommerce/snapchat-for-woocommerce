@@ -37,6 +37,8 @@ final class ServiceContainer {
 	 *
 	 * If the service has not yet been created, it is resolved and cached internally.
 	 *
+	 * @since 0.1.0
+	 *
 	 * @param string $service Name of the service to retrieve (e.g., 'connection').
 	 *
 	 * @return object The resolved service instance.
@@ -52,6 +54,8 @@ final class ServiceContainer {
 	 * Resolves and instantiates a service based on its string identifier.
 	 *
 	 * This acts as the internal factory for all supported services.
+	 *
+	 * @since 0.1.0
 	 *
 	 * @param string $service The service name.
 	 *

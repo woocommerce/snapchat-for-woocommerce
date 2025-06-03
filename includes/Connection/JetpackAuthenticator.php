@@ -45,6 +45,8 @@ class JetpackAuthenticator {
 	 *
 	 * If token retrieval or structure validation fails, returns a `WP_Error`.
 	 *
+	 * @since 0.1.0
+	 *
 	 * @return string|WP_Error Authentication header string (e.g., "X_JP_Auth ...") or error.
 	 */
 	public function get_auth_header() {

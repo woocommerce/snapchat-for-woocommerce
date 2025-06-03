@@ -29,6 +29,8 @@ final class OAuthState {
 	 *
 	 * The input array is serialized to JSON, base64 encoded, and then URL encoded.
 	 *
+	 * @since 0.1.0
+	 *
 	 * @param array $data Associative array of state data (e.g., return URL, service name).
 	 *
 	 * @return string URL-safe encoded state string.
@@ -43,6 +45,8 @@ final class OAuthState {
 	 *
 	 * Performs raw URL decoding, base64 decoding, and JSON deserialization. If decoding fails,
 	 * returns a `WP_Error` indicating the issue.
+	 *
+	 * @since 0.1.0
 	 *
 	 * @param string $state Encoded state string from the OAuth redirect.
 	 *

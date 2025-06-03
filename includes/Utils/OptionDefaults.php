@@ -49,9 +49,9 @@ class OptionDefaults {
 	 *
 	 * This is useful for isolating keys from other plugins or instances.
 	 *
-	 * @param string $prefix String to use as the prefix (e.g., 'snapchat_').
+	 * @since 0.1.0
 	 *
-	 * @return void
+	 * @param string $prefix String to use as the prefix (e.g., 'snapchat_').
 	 */
 	public static function set_prefix( string $prefix ): void {
 		self::$prefix = rtrim( $prefix, '_' ) . '_';
@@ -59,6 +59,8 @@ class OptionDefaults {
 
 	/**
 	 * Gets the currently set prefix string.
+	 *
+	 * @since 0.1.0
 	 *
 	 * @return string The option key prefix.
 	 */
@@ -68,6 +70,8 @@ class OptionDefaults {
 
 	/**
 	 * Returns a full option key by appending the given suffix to the prefix.
+	 *
+	 * @since 0.1.0
 	 *
 	 * @param string $suffix Option key suffix (e.g., 'pixel_enabled').
 	 *
@@ -81,6 +85,8 @@ class OptionDefaults {
 	 * Returns an associative array of default option keys and their default values.
 	 *
 	 * These defaults are used when initializing or resetting plugin configuration.
+	 *
+	 * @since 0.1.0
 	 *
 	 * @return array Associative array of default key => value pairs.
 	 */

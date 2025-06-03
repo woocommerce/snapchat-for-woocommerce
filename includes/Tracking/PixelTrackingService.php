@@ -13,6 +13,8 @@ namespace SnapchatForWooCommerce\Tracking;
 
 use SnapchatForWooCommerce\Utils\OptionDefaults;
 use SnapchatForWooCommerce\Utils\OptionsStore;
+use SnapchatForWooCommerce\Config;
+use SnapchatForWooCommerce\Utils\AssetLoader;
 
 defined( 'ABSPATH' ) || exit;
 
@@ -40,6 +42,8 @@ final class PixelTrackingService {
 	/**
 	 * Constructor.
 	 *
+	 * @since 0.1.0
+	 *
 	 * @param PixelTracker $tracker Instance implementing the logic to inject the tracking pixel.
 	 */
 	public function __construct( PixelTracker $tracker ) {
@@ -52,7 +56,7 @@ final class PixelTrackingService {
 	 * - Hooks into `wp_footer` to optionally output the pixel on frontend pages.
 	 * - Hooks into `rest_api_init` (reserved for potential future tracking-related routes).
 	 *
-	 * @return void
+	 * @since 0.1.0
 	 */
 	public function register_hooks(): void {
 		if ( ! self::is_enabled() ) {
@@ -60,7 +64,7 @@ final class PixelTrackingService {
 		}
 
 		add_action( 'wp_footer', array( $this->tracker, 'maybe_inject_pixel' ) );
-		add_action( 'rest_api_init', array( $this, 'register_routes' ) );
+		add_action( 'wp_enqueue_scripts', array( $this, 'enqueue_tracking_scripts' ) );
 	}
 
 	/**
@@ -68,9 +72,20 @@ final class PixelTrackingService {
 	 *
 	 * This checks the persisted plugin option configured via the admin interface or defaults.
 	 *
+	 * @since 0.1.0
+	 *
 	 * @return bool True if pixel tracking is enabled; false otherwise.
 	 */
 	public static function is_enabled(): bool {
 		return (bool) OptionsStore::get( OptionDefaults::PIXEL_ENABLED );
+	}
+
+	/**
+	 * Enqueues script assets necessary to implement tracking.
+	 *
+	 * @since 0.1.0
+	 */
+	public function enqueue_tracking_scripts(): void {
+		AssetLoader::enqueue_script( 'pixel-tracking', 'snap-pixel.js' );
 	}
 }

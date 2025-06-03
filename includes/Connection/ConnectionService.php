@@ -75,6 +75,8 @@ final class ConnectionService {
 	 * - Checking connection status
 	 * - Starting a new OAuth connection
 	 * - Handling the authorization redirect
+	 *
+	 * @since 0.1.0
 	 */
 	public function register_routes() {
 		register_rest_route(
@@ -113,6 +115,8 @@ final class ConnectionService {
 	 *
 	 * Retrieves the token via the authenticator and queries the WCS client.
 	 *
+	 * @since 0.1.0
+	 *
 	 * @return WP_REST_Response|WP_Error Response with connection status or error if authentication fails.
 	 */
 	public function get_status() {
@@ -128,6 +132,8 @@ final class ConnectionService {
 	 * Starts the OAuth connection flow with the Ad Partner.
 	 *
 	 * Accepts an optional `returnUrl` parameter that defines the post-auth redirect.
+	 *
+	 * @since 0.1.0
 	 *
 	 * @param WP_REST_Request $request REST request object containing the return URL (optional).
 	 *
@@ -148,6 +154,8 @@ final class ConnectionService {
 	 *
 	 * Uses the `state` parameter to validate and reconstruct the original request context.
 	 * Returns a redirect response to the originating service or shows a failure.
+	 *
+	 * @since 0.1.0
 	 *
 	 * @param WP_REST_Request $request REST request object with query parameters (`state`, `code`, `error`).
 	 *

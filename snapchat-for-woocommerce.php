@@ -29,6 +29,14 @@ if ( ! defined( 'SNAPCHAT_ADS_PLUGIN_URL' ) ) {
 	define( 'SNAPCHAT_ADS_PLUGIN_URL', plugin_dir_url( __FILE__ ) );
 }
 
+if ( ! defined( 'SNAPCHAT_ADS_PLUGIN_BUILD_PATH' ) ) {
+	define( 'SNAPCHAT_ADS_PLUGIN_BUILD_PATH', SNAPCHAT_ADS_PLUGIN_DIR . 'build/' );
+}
+
+if ( ! defined( 'SNAPCHAT_ADS_PLUGIN_BUILD_URL' ) ) {
+	define( 'SNAPCHAT_ADS_PLUGIN_BUILD_URL', SNAPCHAT_ADS_PLUGIN_URL . 'build/' );
+}
+
 require_once plugin_dir_path( __FILE__ ) . '/vendor/autoload_packages.php';
 
 /**

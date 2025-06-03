@@ -28,10 +28,8 @@ final class Plugin {
 	 * Entry point for plugin initialization.
 	 *
 	 * Loads text domain and registers plugin-level hooks.
-	 *
-	 * @return void
 	 */
-	public static function init() {
+	public static function init(): void {
 		OptionDefaults::set_prefix( Config::OPTION_PREFIX );
 		self::load_textdomain();
 		self::register_hooks();
@@ -42,9 +40,9 @@ final class Plugin {
 	 *
 	 * This enables localization support via `.pot`/`.mo` files.
 	 *
-	 * @return void
+	 * @since 0.1.0
 	 */
-	private static function load_textdomain() {
+	private static function load_textdomain(): void {
 		load_plugin_textdomain( 'snapchat-for-woocommerce', false, dirname( plugin_basename( __FILE__ ) ) . '/../languages' );
 	}
 
@@ -55,9 +53,9 @@ final class Plugin {
 	 * - `rest_api_init` to load REST routes.
 	 * - `init` to initialize plugin features.
 	 *
-	 * @return void
+	 * @since 0.1.0
 	 */
-	private static function register_hooks() {
+	private static function register_hooks(): void {
 		add_action( 'rest_api_init', [ self::class, 'register_rest_routes' ] );
 		add_action( 'init', [ self::class, 'bootstrap_features' ] );
 	}
@@ -69,25 +67,27 @@ final class Plugin {
 	 * - Connection service
 	 * - Pixel tracking service
 	 *
+	 * @since 0.1.0
+	 *
 	 * @return void
 	 */
-	public static function register_rest_routes() {
+	public static function register_rest_routes(): void {
 		// Lazy-load only once per service
 		$connection = ServiceContainer::get( 'connection' );
 		$connection->register_routes();
 
 		$pixel = ServiceContainer::get( 'pixel_tracking' );
-		$pixel->register_routes();
+		$pixel->register_hooks();
 	}
 
 	/**
 	 * Initializes additional feature hooks during the `init` action.
 	 *
-	 * Currently boots pixel tracking hooks.
+	 * @since 0.1.0
 	 *
-	 * @return void
+	 * Currently boots pixel tracking hooks.
 	 */
-	public static function bootstrap_features() {
+	public static function bootstrap_features(): void {
 		ServiceContainer::get( 'pixel_tracking' )->register_hooks();
 	}
 }

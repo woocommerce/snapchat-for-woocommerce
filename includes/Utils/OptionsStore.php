@@ -20,6 +20,8 @@ class OptionsStore {
 	/**
 	 * Retrieves the value of a plugin option, falling back to the default if not set.
 	 *
+	 * @since 0.1.0
+	 *
 	 * @param string $key The option key (without prefix).
 	 *
 	 * @return mixed The option value or default.
@@ -34,10 +36,10 @@ class OptionsStore {
 	/**
 	 * Sets the value of a plugin option.
 	 *
+	 * @since 0.1.0
+	 *
 	 * @param string $key   The option key (without prefix).
 	 * @param mixed  $value The value to store.
-	 *
-	 * @return void
 	 */
 	public static function set( string $key, $value ): void {
 		update_option( OptionDefaults::get_prefix() . $key, $value );
@@ -46,9 +48,9 @@ class OptionsStore {
 	/**
 	 * Deletes a plugin option.
 	 *
-	 * @param string $key The option key (without prefix).
+	 * @since 0.1.0
 	 *
-	 * @return void
+	 * @param string $key The option key (without prefix).
 	 */
 	public static function delete( string $key ): void {
 		delete_option( OptionDefaults::get_prefix() . $key );
@@ -57,9 +59,9 @@ class OptionsStore {
 	/**
 	 * Ensures all default options are initialized if they are not already set.
 	 *
-	 * This is useful during plugin activation or upgrade processes.
+	 * @since 0.1.0
 	 *
-	 * @return void
+	 * This is useful during plugin activation or upgrade processes.
 	 */
 	public static function preload_defaults(): void {
 		foreach ( OptionDefaults::get_defaults() as $key => $value ) {
