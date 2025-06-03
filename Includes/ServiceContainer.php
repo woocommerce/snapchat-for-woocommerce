@@ -62,7 +62,11 @@ final class ServiceContainer {
 	private static function resolve( string $service ) {
 		switch ( $service ) {
 			case 'connection':
-				return new ConnectionService( self::get( 'wcs_client' ), self::get( 'jetpack_authenticator' ) );
+				return new ConnectionService(
+					self::get( 'wcs_client' ),
+					self::get( 'jetpack_authenticator' ),
+					Config::REST_NAMESPACE
+				);
 			case 'jetpack_authenticator':
 				return new JetpackAuthenticator();
 			case 'wcs_client':

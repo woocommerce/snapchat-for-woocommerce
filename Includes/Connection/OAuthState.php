@@ -34,6 +34,7 @@ final class OAuthState {
 	 * @return string URL-safe encoded state string.
 	 */
 	public static function encode( array $data ): string {
+		 // phpcs:ignore WordPress.PHP.DiscouragedPHPFunctions.obfuscation_base64_encode
 		return rawurlencode( base64_encode( wp_json_encode( $data ) ) );
 	}
 
@@ -48,6 +49,7 @@ final class OAuthState {
 	 * @return array|WP_Error Decoded state data array or error if decoding fails.
 	 */
 	public static function decode( string $state ) {
+		// phpcs:ignore WordPress.PHP.DiscouragedPHPFunctions.obfuscation_base64_decode
 		$decoded = base64_decode( rawurldecode( $state ), true );
 		$data    = json_decode( $decoded, true );
 

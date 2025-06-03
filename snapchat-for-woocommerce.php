@@ -71,6 +71,9 @@ function snapchat_for_woocommerce_init() {
 	}
 }
 
-add_action( 'woocommerce_loaded', function() {
-	\SnapchatForWooCommerce\Plugin::init();
-} );
+add_action(
+	'woocommerce_loaded',
+	function () {
+		\SnapchatForWooCommerce\Plugin::init();
+	}
+);

@@ -14,7 +14,7 @@
 
 	<rule ref="WordPress.WP.I18n">
 		<properties>
-			<property name="text_domain" type="array" value="snapchat_for_woocommerce" />
+			<property name="text_domain" type="array" value="snapchat-for-woocommerce" />
 		</properties>
 	</rule>
 

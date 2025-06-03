@@ -9,6 +9,9 @@
 
 namespace SnapchatForWooCommerce;
 
+use SnapchatForWooCommerce\Config;
+use SnapchatForWooCommerce\Utils\OptionDefaults;
+
 defined( 'ABSPATH' ) || exit;
 
 /**
@@ -29,6 +32,7 @@ final class Plugin {
 	 * @return void
 	 */
 	public static function init() {
+		OptionDefaults::set_prefix( Config::OPTION_PREFIX );
 		self::load_textdomain();
 		self::register_hooks();
 	}

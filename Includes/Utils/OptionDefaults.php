@@ -27,7 +27,7 @@ class OptionDefaults {
 	/**
 	 * Option key for the Ad Partner ad account ID.
 	 */
-	public const AD_ACCOUNT_ID   = 'ad_account_id';
+	public const AD_ACCOUNT_ID = 'ad_account_id';
 
 	/**
 	 * Option key for the Ad Partner organization ID.
@@ -37,12 +37,12 @@ class OptionDefaults {
 	/**
 	 * Option key for whether the pixel tracking script is enabled.
 	 */
-	public const PIXEL_ENABLED   = 'ads_pixel_enabled';
+	public const PIXEL_ENABLED = 'ads_pixel_enabled';
 
 	/**
 	 * Option key for the actual pixel tracking script content.
 	 */
-	public const PIXEL_SCRIPT    = 'ads_pixel_script';
+	public const PIXEL_SCRIPT = 'ads_pixel_script';
 
 	/**
 	 * Sets a custom prefix to namespace all option keys.
@@ -85,11 +85,11 @@ class OptionDefaults {
 	 * @return array Associative array of default key => value pairs.
 	 */
 	public static function get_defaults(): array {
-		return [
+		return array(
 			self::AD_ACCOUNT_ID   => '',
 			self::ORGANIZATION_ID => '',
 			self::PIXEL_ENABLED   => false,
 			self::PIXEL_SCRIPT    => '',
-		];
+		);
 	}
 }

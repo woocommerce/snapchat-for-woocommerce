@@ -7,6 +7,7 @@
  *
  * @package SnapchatForWooCommerce\Connection
  */
+
 namespace SnapchatForWooCommerce\Connection;
 
 use WP_REST_Response;
@@ -54,7 +55,7 @@ final class WcsClient {
 	 * @return WP_REST_Response|WP_Error Connection initiation response or error.
 	 */
 	public function start_connection( string $jetpack_token, string $return_url ) {
-		return $this->proxy_request( 'POST', $jetpack_token, 'connection/connect', [ 'returnUrl' => $return_url ] );
+		return $this->proxy_request( 'POST', $jetpack_token, 'connection/connect', array( 'returnUrl' => $return_url ) );
 	}
 
 	/**
@@ -98,17 +99,17 @@ final class WcsClient {
 	private function proxy_request( string $method, string $jetpack_token, string $path, $body = null ) {
 		$url = sprintf( '%s/%s/%s', self::WCS_BASE_URL, self::SERVICE_NAME, ltrim( $path, '/' ) );
 
-		$args = [
+		$args = array(
 			'method'  => strtoupper( $method ),
 			'timeout' => 15,
-			'headers' => [
+			'headers' => array(
 				'Authorization' => "Bearer $jetpack_token",
-			],
-		];
+			),
+		);
 
-		if ( $body !== null ) {
+		if ( null !== $body ) {
 			$args['headers']['Content-Type'] = 'application/json';
-			$args['body'] = wp_json_encode( $body );
+			$args['body']                    = wp_json_encode( $body );
 		}
 
 		$response = wp_remote_request( $url, $args );
@@ -141,7 +142,7 @@ final class WcsClient {
 		return new WP_Error(
 			'wcs_error',
 			__( 'WCS request failed', 'snapchat-for-woocommerce' ),
-			[ 'response' => $response ]
+			array( 'response' => $response )
 		);
 	}
 }

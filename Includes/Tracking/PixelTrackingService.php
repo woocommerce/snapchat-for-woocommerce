@@ -1,61 +1,76 @@
 <?php
+/**
+ * Service class for managing Snapchat Pixel tracking in WooCommerce.
+ *
+ * This class acts as the integration point between the WordPress/WooCommerce lifecycle
+ * and Snapchat pixel injection logic. It registers hooks to automatically inject
+ * the pixel when appropriate and provides runtime checks for whether tracking is enabled.
+ *
+ * @package SnapchatForWooCommerce\Tracking
+ */
 
 namespace SnapchatForWooCommerce\Tracking;
 
 use SnapchatForWooCommerce\Utils\OptionDefaults;
 use SnapchatForWooCommerce\Utils\OptionsStore;
-use WP_REST_Request;
-use WP_REST_Response;
-use WP_Error;
 
 defined( 'ABSPATH' ) || exit;
 
+/**
+ * Handles the registration of pixel-related hooks and provides access to tracking status.
+ *
+ * This service registers frontend and REST API hooks to support pixel injection behavior.
+ * Pixel rendering is delegated to a {@see PixelTracker} implementation. It also provides
+ * a utility method to check whether tracking is currently enabled via plugin settings.
+ *
+ * Dependencies:
+ * - {@see PixelTracker}: Determines if and how the pixel should be injected.
+ * - {@see OptionsStore} and {@see OptionDefaults}: Used to read tracking settings.
+ *
+ * @since 0.1.0
+ */
 final class PixelTrackingService {
-
+	/**
+	 * Instance of the pixel tracker responsible for rendering the pixel.
+	 *
+	 * @var PixelTracker
+	 */
 	private PixelTracker $tracker;
 
+	/**
+	 * Constructor.
+	 *
+	 * @param PixelTracker $tracker Instance implementing the logic to inject the tracking pixel.
+	 */
 	public function __construct( PixelTracker $tracker ) {
 		$this->tracker = $tracker;
 	}
 
 	/**
-	 * Hook into WordPress lifecycle.
+	 * Registers WordPress hooks used for pixel injection and route initialization.
+	 *
+	 * - Hooks into `wp_footer` to optionally output the pixel on frontend pages.
+	 * - Hooks into `rest_api_init` (reserved for potential future tracking-related routes).
+	 *
+	 * @return void
 	 */
 	public function register_hooks(): void {
-		add_action( 'wp_head', [ $this->tracker, 'maybe_inject_pixel' ] );
-		add_action( 'rest_api_init', [ $this, 'register_routes' ] );
+		if ( ! self::is_enabled() ) {
+			return;
+		}
+
+		add_action( 'wp_footer', array( $this->tracker, 'maybe_inject_pixel' ) );
+		add_action( 'rest_api_init', array( $this, 'register_routes' ) );
 	}
 
 	/**
-	 * Register REST routes for toggling pixel.
+	 * Determines whether Snapchat pixel tracking is currently enabled.
+	 *
+	 * This checks the persisted plugin option configured via the admin interface or defaults.
+	 *
+	 * @return bool True if pixel tracking is enabled; false otherwise.
 	 */
-	public function register_routes(): void {
-		register_rest_route( 'snapchat-ads/v1', '/tracking/pixel', [
-			'methods'             => 'POST',
-			'callback'            => [ $this, 'update_pixel_settings' ],
-			'permission_callback' => function () {
-				return current_user_can( 'manage_woocommerce' );
-			},
-		] );
-	}
-
-	/**
-	 * Store pixel tracking setting.
-	 */
-	public function update_pixel_settings( WP_REST_Request $request ) {
-		$enabled = (bool) $request->get_param( 'enabled' );
-
-		OptionsStore::set( OptionDefaults::PIXEL_ENABLED, $enabled );
-
-		return new WP_REST_Response( [
-			'enabled' => $enabled,
-		] );
-	}
-
-	/**
-	 * Get current pixel tracking state.
-	 */
-	public function is_enabled(): bool {
+	public static function is_enabled(): bool {
 		return (bool) OptionsStore::get( OptionDefaults::PIXEL_ENABLED );
 	}
 }

@@ -1,4 +1,13 @@
 <?php
+/**
+ * Implementation of PixelTracker that retrieves and injects the Snapchat Pixel script remotely.
+ *
+ * This tracker checks whether pixel tracking is enabled, and if so, either retrieves a cached script
+ * or fetches a fresh one from Snapchat via the WCS API. The script is optionally personalized
+ * with the logged-in user’s email address for audience matching.
+ *
+ * @package SnapchatForWooCommerce\Tracking
+ */
 
 namespace SnapchatForWooCommerce\Tracking;
 
@@ -7,16 +16,58 @@ use SnapchatForWooCommerce\Connection\JetpackAuthenticator;
 use SnapchatForWooCommerce\Utils\OptionsStore;
 use SnapchatForWooCommerce\Utils\OptionDefaults;
 
+/**
+ * Fetches and injects Snapchat pixel tracking code into WooCommerce frontend pages.
+ *
+ * Responsibilities:
+ * - Checks plugin option to determine if pixel tracking is enabled.
+ * - Retrieves pixel script from local cache or Snapchat Ads API.
+ * - Injects sanitized pixel JavaScript into the frontend via `wp_footer`.
+ * - Optionally personalizes the script using the logged-in user's email.
+ *
+ * Dependencies:
+ * - {@see WcsClient} for making remote API calls to fetch the pixel script.
+ * - {@see JetpackAuthenticator} for securely authenticating requests.
+ * - {@see OptionsStore} and {@see OptionDefaults} for managing plugin settings and cache.
+ *
+ * @see \SnapchatForWooCommerce\Tracking\PixelTracker
+ * @since 0.1.0
+ */
 final class RemotePixelTracker implements PixelTracker {
 
+	/**
+	 * Client for making authenticated proxy requests to Snapchat Ads API.
+	 *
+	 * @var WcsClient
+	 */
 	private WcsClient $wcs_client;
+
+	/**
+	 * Authenticator to generate secure headers for Snapchat API requests.
+	 *
+	 * @var JetpackAuthenticator
+	 */
 	private JetpackAuthenticator $auth;
 
+	/**
+	 * Constructor.
+	 *
+	 * @param WcsClient            $wcs_client WCS API client.
+	 * @param JetpackAuthenticator $auth       Authenticator for API access.
+	 */
 	public function __construct( WcsClient $wcs_client, JetpackAuthenticator $auth ) {
 		$this->wcs_client = $wcs_client;
 		$this->auth       = $auth;
 	}
 
+	/**
+	 * Conditionally injects the Snapchat Pixel script into the footer.
+	 *
+	 * Only runs if tracking is enabled via plugin settings. Outputs the pixel script,
+	 * personalized if possible, and sanitized using `wp_kses`.
+	 *
+	 * @return void
+	 */
 	public function maybe_inject_pixel(): void {
 		if ( ! OptionsStore::get( OptionDefaults::PIXEL_ENABLED ) ) {
 			return;
@@ -25,15 +76,24 @@ final class RemotePixelTracker implements PixelTracker {
 		echo $this->get_pixel_script(); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
 	}
 
+	/**
+	 * Adds personalization to the pixel script based on the current user.
+	 *
+	 * If the user is logged in, injects their email address into the script for
+	 * more accurate audience tracking. If not logged in, removes placeholder elements.
+	 *
+	 * @param string $script Raw pixel JavaScript with placeholders.
+	 * @return string Personalized pixel script.
+	 */
 	protected static function personalize_tracking_script( string $script ): string {
 		if ( is_user_logged_in() ) {
 			$user       = wp_get_current_user();
 			$user_email = $user->user_email;
 
-			// Escape the email for JS safety
+			// Escape the email for JS safety.
 			$escaped_email = esc_js( $user_email );
 
-			// Replace the placeholder with actual email
+			// Replace the placeholder with actual email.
 			return str_replace(
 				"'__INSERT_USER_EMAIL__'",
 				"'" . $escaped_email . "'",
@@ -41,7 +101,7 @@ final class RemotePixelTracker implements PixelTracker {
 			);
 		}
 
-		// If user is not logged in, replace with empty string or remove the key
+		// If user is not logged in, replace with empty string or remove the key.
 		return str_replace(
 			"'user_email': '__INSERT_USER_EMAIL__'",
 			'',
@@ -49,9 +109,17 @@ final class RemotePixelTracker implements PixelTracker {
 		);
 	}
 
+	/**
+	 * Retrieves the Snapchat Pixel script, either from cache or the remote API.
+	 *
+	 * If not cached, it authenticates with Jetpack and queries the Snapchat Ads API for pixel info.
+	 * The result is cached in the options store and sanitized before being returned.
+	 *
+	 * @return string|null The sanitized pixel script, or null on failure.
+	 */
 	private function get_pixel_script() {
 		$allowed_tags = array(
-			'script' => array(
+			'script'   => array(
 				'type'  => array(),
 				'src'   => array(),
 				'async' => array(),
