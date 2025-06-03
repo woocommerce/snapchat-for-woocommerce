@@ -39,7 +39,7 @@ final class ConnectionService {
 	}
 
 	public function get_status() {
-		$token = $this->authenticator->get_token();
+		$token = $this->authenticator->get_auth_header();
 		if ( is_wp_error( $token ) ) {
 			return $token;
 		}
@@ -48,7 +48,7 @@ final class ConnectionService {
 	}
 
 	public function post_connect( WP_REST_Request $request ) {
-		$token = $this->authenticator->get_token();
+		$token = $this->authenticator->get_auth_header();
 		if ( is_wp_error( $token ) ) {
 			return $token;
 		}
