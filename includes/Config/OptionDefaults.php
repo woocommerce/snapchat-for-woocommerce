@@ -4,9 +4,10 @@ namespace SnapchatForWoocommerce\Config;
 
 class OptionDefaults {
 	private static string $prefix = '';
-	public const AD_ACCOUNT_ID    = 'ad_account_id';
-	public const ORGANIZATION_ID  = 'organization_id';
-	public const PIXEL_ENABLED    = 'ads_pixel_enabled';
+	public const AD_ACCOUNT_ID   = 'ad_account_id';
+	public const ORGANIZATION_ID = 'organization_id';
+	public const PIXEL_ENABLED   = 'ads_pixel_enabled';
+	public const PIXEL_SCRIPT    = 'ads_pixel_script';
 
 	public static function set_prefix( string $prefix ): void {
 		self::$prefix = rtrim( $prefix, '_' ) . '_';
@@ -25,9 +26,10 @@ class OptionDefaults {
 	 */
 	public static function get_defaults(): array {
 		return [
-			self::AD_ACCOUNT_ID      => '',
+			self::AD_ACCOUNT_ID   => '',
 			self::ORGANIZATION_ID => '',
 			self::PIXEL_ENABLED   => false,
+			self::PIXEL_SCRIPT    => '',
 		];
 	}
 }

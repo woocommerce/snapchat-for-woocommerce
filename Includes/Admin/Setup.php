@@ -13,12 +13,7 @@ namespace SnapchatForWoocommerce\Admin;
  * SnapchatForWoocommerce Setup Class
  */
 class Setup {
-	/**
-	 * Constructor.
-	 *
-	 * @since 1.0.0
-	 */
-	public function __construct() {
+	public function init() {
 		add_action( 'admin_enqueue_scripts', array( $this, 'register_scripts' ) );
 		add_action( 'admin_menu', array( $this, 'register_page' ) );
 	}

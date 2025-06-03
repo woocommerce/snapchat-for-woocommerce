@@ -13,6 +13,12 @@ class JetpackAuthenticator {
 	}
 
 	public function get_auth_header(): string {
+		$token = apply_filters( 'ad_partner_jetpack_auth_token', null );
+
+		if ( $token ) {
+			return $token;
+		}
+
 		$token = $this->manager->get_tokens()->get_access_token();
 
 		if ( ! $token || ! isset( $token->secret ) ) {

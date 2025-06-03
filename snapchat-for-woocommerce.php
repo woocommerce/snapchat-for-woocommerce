@@ -54,7 +54,6 @@ register_activation_hook( __FILE__, 'snapchat_for_woocommerce_activate' );
 function snapchat_for_woocommerce_activate() {
 	if ( ! class_exists( 'WooCommerce' ) ) {
 		add_action( 'admin_notices', 'snapchat_for_woocommerce_missing_wc_notice' );
-		return;
 	}
 }
 

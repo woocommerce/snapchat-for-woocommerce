@@ -23,7 +23,7 @@ class Plugin {
 	 */
 	public function __construct() {
 		if ( is_admin() ) {
-			new Setup();
+			( new Setup() )->init();
 		}
 	}
 

@@ -37,8 +37,7 @@ final class ConnectionService {
 
 		$response = wp_remote_post( $url, [
 			'headers' => [
-				// 'X_JP_Auth'    => $this->auth->get_auth_header(), // TODO: Use this one.
-				'X_JP_Auth'    => '',
+				'X_JP_Auth'    => $this->auth->get_auth_header(),
 				'Content-Type' => 'application/json',
 			],
 			'body' => wp_json_encode( [
@@ -58,8 +57,7 @@ final class ConnectionService {
 
 		$response = wp_remote_get( $url, [
 			'headers' => [
-				// 'X_JP_Auth' => $this->auth->get_auth_header(), // TODO: Use this one.
-				'X_JP_Auth' => '', // mocking it.
+				'X_JP_Auth' => $this->auth->get_auth_header(),
 			],
 		] );
 
