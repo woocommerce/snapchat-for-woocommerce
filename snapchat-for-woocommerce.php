@@ -15,8 +15,6 @@
  * @package snapchat-for-woocommerce
  */
 
-use SnapchatForWoocommerce\Admin\Plugin;
-
 defined( 'ABSPATH' ) || exit;
 
 if ( ! defined( 'SNAPCHAT_FOR_WOOCOMMERCE_FILE' ) ) {
@@ -71,6 +69,8 @@ function snapchat_for_woocommerce_init() {
 		add_action( 'admin_notices', 'snapchat_for_woocommerce_missing_wc_notice' );
 		return;
 	}
-
-	Plugin::instance();
 }
+
+add_action( 'woocommerce_loaded', function() {
+	\SnapchatForWooCommerce\Plugin::init();
+} );
