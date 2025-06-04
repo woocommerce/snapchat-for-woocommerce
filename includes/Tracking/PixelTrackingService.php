@@ -13,7 +13,6 @@ namespace SnapchatForWooCommerce\Tracking;
 
 use SnapchatForWooCommerce\Utils\OptionDefaults;
 use SnapchatForWooCommerce\Utils\OptionsStore;
-use SnapchatForWooCommerce\Config;
 use SnapchatForWooCommerce\Utils\AssetLoader;
 
 defined( 'ABSPATH' ) || exit;
@@ -39,6 +38,8 @@ final class PixelTrackingService {
 	 */
 	private PixelTracker $tracker;
 
+	private GlobalSiteTag $global_site_tag;
+
 	/**
 	 * Constructor.
 	 *
@@ -46,8 +47,9 @@ final class PixelTrackingService {
 	 *
 	 * @param PixelTracker $tracker Instance implementing the logic to inject the tracking pixel.
 	 */
-	public function __construct( PixelTracker $tracker ) {
-		$this->tracker = $tracker;
+	public function __construct( PixelTracker $tracker, GlobalSiteTag $global_site_tag ) {
+		$this->tracker         = $tracker;
+		$this->global_site_tag = $global_site_tag;
 	}
 
 	/**
@@ -63,7 +65,10 @@ final class PixelTrackingService {
 			return;
 		}
 
-		add_action( 'wp_footer', array( $this->tracker, 'maybe_inject_pixel' ) );
+		add_action( 'wp_head', array( $this->tracker, 'maybe_inject_pixel' ) );
+
+		$this->global_site_tag->register();
+
 		add_action( 'wp_enqueue_scripts', array( $this, 'enqueue_tracking_scripts' ) );
 	}
 
@@ -86,6 +91,6 @@ final class PixelTrackingService {
 	 * @since 0.1.0
 	 */
 	public function enqueue_tracking_scripts(): void {
-		AssetLoader::enqueue_script( 'pixel-tracking', 'snap-pixel.js' );
+		AssetLoader::enqueue_script( 'pixel-tracking', 'snap-pixel' );
 	}
 }

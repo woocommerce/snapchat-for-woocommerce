@@ -34,7 +34,7 @@ class AssetLoader {
 	 */
 	public static function enqueue_script( $handle, $file_name ) {
 		$script_path       = SNAPCHAT_ADS_PLUGIN_BUILD_PATH . $file_name;
-		$script_url        = SNAPCHAT_ADS_PLUGIN_BUILD_URL . $file_name;
+		$script_url        = SNAPCHAT_ADS_PLUGIN_BUILD_URL . $file_name . '.js';
 		$script_asset_path = $script_path . '.asset.php';
 
 		if ( file_exists( $script_asset_path ) ) {
@@ -65,7 +65,7 @@ class AssetLoader {
 	 */
 	public static function enqueue_style( $handle, $file_name ) {
 		$style_path       = SNAPCHAT_ADS_PLUGIN_BUILD_PATH . $file_name;
-		$style_url        = SNAPCHAT_ADS_PLUGIN_BUILD_URL . $file_name;
+		$style_url        = SNAPCHAT_ADS_PLUGIN_BUILD_URL . $file_name . '.css';
 		$style_asset_path = $style_path . '.asset.php';
 
 		if ( file_exists( $style_asset_path ) ) {
@@ -82,6 +82,26 @@ class AssetLoader {
 			$style_url,
 			$asset_data['dependencies'],
 			$asset_data['version']
+		);
+	}
+
+	/**
+	 * Localize data for an enqueued script.
+	 *
+	 * This method allows passing PHP data to JavaScript using `wp_localize_script()`.
+	 * It must be called after the script has been enqueued using `enqueue_script()`.
+	 *
+	 * @since 0.1.0
+	 *
+	 * @param string $handle     The script handle used in `enqueue_script()` (without prefix).
+	 * @param string $object_name The name of the JavaScript object to contain the data.
+	 * @param array  $data        The data to localize.
+	 */
+	public static function localize_script( $handle, $object_name, array $data ) {
+		wp_localize_script(
+			Config::ASSET_HANDLE_PREFIX . $handle,
+			$object_name,
+			$data
 		);
 	}
 }

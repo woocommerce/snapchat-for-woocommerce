@@ -163,7 +163,6 @@ final class ConnectionService {
 	 */
 	public function handle_authorize_redirect( WP_REST_Request $request ) {
 		$state_param = $request->get_param( 'state' );
-		$code        = $request->get_param( 'code' );
 		$error       = $request->get_param( 'error' );
 
 		if ( empty( $state_param ) ) {

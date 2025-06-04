@@ -88,7 +88,7 @@ final class RemotePixelTracker implements PixelTracker {
 	 * @return string Personalized pixel script.
 	 */
 	protected static function personalize_tracking_script( string $script ): string {
-		if ( is_user_logged_in() ) {
+		if ( 0 && is_user_logged_in() ) { // for future use.
 			$user       = wp_get_current_user();
 			$user_email = $user->user_email;
 
