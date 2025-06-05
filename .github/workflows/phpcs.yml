@@ -37,7 +37,7 @@ jobs:
         with:
           files: |
             **/*.php
-          files-ignore: |
+          files_ignore: |
             tests/**
 
       - name: Install dependencies
