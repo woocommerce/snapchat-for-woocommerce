@@ -30,10 +30,10 @@ class ServiceContainerTest extends WP_UnitTestCase {
 	protected function tearDown(): void {
 		parent::tearDown();
 
-		$ref = new \ReflectionClass( ServiceContainer::class );
+		$ref  = new \ReflectionClass( ServiceContainer::class );
 		$prop = $ref->getProperty( 'instances' );
 		$prop->setAccessible( true );
-		$prop->setValue( [] );
+		$prop->setValue( array() );
 	}
 
 	/**
@@ -43,11 +43,11 @@ class ServiceContainerTest extends WP_UnitTestCase {
 	 * @param object $instance
 	 */
 	private function set_service( string $key, object $instance ): void {
-		$ref = new \ReflectionClass( ServiceContainer::class );
+		$ref  = new \ReflectionClass( ServiceContainer::class );
 		$prop = $ref->getProperty( 'instances' );
 		$prop->setAccessible( true );
 
-		$instances = $prop->getValue();
+		$instances         = $prop->getValue();
 		$instances[ $key ] = $instance;
 		$prop->setValue( $instances );
 	}

@@ -89,7 +89,7 @@ class AssetLoaderTest extends WP_UnitTestCase {
 	}
 
 	/**
-	 * Tests that localizing data with `AssetLoader::localize_script()` 
+	 * Tests that localizing data with `AssetLoader::localize_script()`
 	 * correctly attaches the data to the script tag.
 	 *
 	 * Asserts:

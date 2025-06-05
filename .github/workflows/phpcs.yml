@@ -37,6 +37,8 @@ jobs:
         with:
           files: |
             **/*.php
+          files-ignore: |
+            tests/**
 
       - name: Install dependencies
         if: ${{ steps.changed-files.outputs.any_changed == 'true' }}

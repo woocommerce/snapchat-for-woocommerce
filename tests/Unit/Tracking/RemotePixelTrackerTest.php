@@ -54,7 +54,7 @@ class RemotePixelTrackerTest extends WP_UnitTestCase {
 		OptionsStore::set( OptionDefaults::PIXEL_ENABLED, false );
 		OptionsStore::delete( OptionDefaults::PIXEL_SCRIPT );
 
-		$auth_mock = $this->createMock( JetpackAuthenticator::class );
+		$auth_mock   = $this->createMock( JetpackAuthenticator::class );
 		$client_mock = $this->createMock( WcsClient::class );
 
 		$tracker = new RemotePixelTracker( $client_mock, $auth_mock );
@@ -97,11 +97,13 @@ class RemotePixelTrackerTest extends WP_UnitTestCase {
 		$auth_mock->method( 'get_auth_header' )->willReturn( 'Bearer token' );
 
 		$response_mock = $this->createMock( \WP_REST_Response::class );
-		$response_mock->method( 'get_data' )->willReturn( [
-			'pixels' => [
-				[ 'pixel' => [ 'pixel_javascript' => '<script>remote pixel</script>' ] ],
-			],
-		] );
+		$response_mock->method( 'get_data' )->willReturn(
+			array(
+				'pixels' => array(
+					array( 'pixel' => array( 'pixel_javascript' => '<script>remote pixel</script>' ) ),
+				),
+			)
+		);
 
 		$client_mock = $this->createMock( WcsClient::class );
 		$client_mock->method( 'proxy_get' )->willReturn( $response_mock );
