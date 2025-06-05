@@ -56,8 +56,8 @@ final class Plugin {
 	 * @since 0.1.0
 	 */
 	private static function register_hooks(): void {
-		add_action( 'rest_api_init', [ self::class, 'register_rest_routes' ] );
-		add_action( 'init', [ self::class, 'bootstrap_features' ] );
+		add_action( 'rest_api_init', array( self::class, 'register_rest_routes' ) );
+		add_action( 'init', array( self::class, 'bootstrap_features' ) );
 	}
 
 	/**
@@ -72,12 +72,9 @@ final class Plugin {
 	 * @return void
 	 */
 	public static function register_rest_routes(): void {
-		// Lazy-load only once per service
-		$connection = ServiceContainer::get( 'connection' );
+		// Lazy-load only once per service.
+		$connection = ServiceContainer::get( ServiceKey::CONNECTION );
 		$connection->register_routes();
-
-		$pixel = ServiceContainer::get( 'pixel_tracking' );
-		$pixel->register_hooks();
 	}
 
 	/**
@@ -88,6 +85,6 @@ final class Plugin {
 	 * Currently boots pixel tracking hooks.
 	 */
 	public static function bootstrap_features(): void {
-		ServiceContainer::get( 'pixel_tracking' )->register_hooks();
+		ServiceContainer::get( ServiceKey::PIXEL_TRACKING )->register_hooks();
 	}
 }

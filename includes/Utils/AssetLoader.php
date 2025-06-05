@@ -30,7 +30,7 @@ class AssetLoader {
 	 * @since 0.1.0
 	 *
 	 * @param string $handle    The handle for the script.
-	 * @param string $file_name The relative path to the script file
+	 * @param string $file_name The script file name.
 	 */
 	public static function enqueue_script( $handle, $file_name ) {
 		$script_path       = SNAPCHAT_ADS_PLUGIN_BUILD_PATH . $file_name;
@@ -61,7 +61,7 @@ class AssetLoader {
 	 * @since 0.1.0
 	 *
 	 * @param string $handle    The handle for the style.
-	 * @param string $file_name The relative path to the style file.
+	 * @param string $file_name The script file name.
 	 */
 	public static function enqueue_style( $handle, $file_name ) {
 		$style_path       = SNAPCHAT_ADS_PLUGIN_BUILD_PATH . $file_name;

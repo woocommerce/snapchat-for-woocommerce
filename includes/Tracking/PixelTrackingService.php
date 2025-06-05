@@ -38,6 +38,16 @@ final class PixelTrackingService {
 	 */
 	private PixelTracker $tracker;
 
+	/**
+	 * Instance responsible for injecting the Ad Partner Global Site Tag into the site header.
+	 *
+	 * This service ensures the tracking events are added to the frontend when tracking
+	 * is enabled.
+	 *
+	 * @since 0.1.0
+	 *
+	 * @var GlobalSiteTag
+	 */
 	private GlobalSiteTag $global_site_tag;
 
 	/**
@@ -45,7 +55,8 @@ final class PixelTrackingService {
 	 *
 	 * @since 0.1.0
 	 *
-	 * @param PixelTracker $tracker Instance implementing the logic to inject the tracking pixel.
+	 * @param PixelTracker  $tracker          Instance implementing the logic to inject the tracking pixel.
+	 * @param GlobalSiteTag $global_site_tag  Instance responsible for injecting the Ad Partner Global Site Tag.
 	 */
 	public function __construct( PixelTracker $tracker, GlobalSiteTag $global_site_tag ) {
 		$this->tracker         = $tracker;

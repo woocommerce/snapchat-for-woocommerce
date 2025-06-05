@@ -31,7 +31,7 @@ final class ServiceContainer {
 	 *
 	 * @var array<string, object>
 	 */
-	private static $instances = [];
+	private static $instances = array();
 
 	/**
 	 * Retrieves a shared instance of a requested service.
@@ -66,29 +66,29 @@ final class ServiceContainer {
 	 */
 	private static function resolve( string $service ) {
 		switch ( $service ) {
-			case 'connection':
+			case ServiceKey::CONNECTION:
 				return new ConnectionService(
-					self::get( 'wcs_client' ),
-					self::get( 'jetpack_authenticator' ),
+					self::get( ServiceKey::WCS_CLIENT ),
+					self::get( ServiceKey::JETPACK_AUTHENTICATOR ),
 					Config::REST_NAMESPACE
 				);
-			case 'jetpack_authenticator':
+			case ServiceKey::JETPACK_AUTHENTICATOR:
 				return new JetpackAuthenticator();
-			case 'wcs_client':
+			case ServiceKey::WCS_CLIENT:
 				return new WcsClient();
-			case 'global_site_tag':
+			case ServiceKey::GLOBAL_SITE_TAG:
 				return new GlobalSiteTag();
-			case 'pixel_tracking':
+			case ServiceKey::PIXEL_TRACKING:
 				return new PixelTrackingService(
 					new RemotePixelTracker(
-						self::get( 'wcs_client' ),
-						self::get( 'jetpack_authenticator' )
+						self::get( ServiceKey::WCS_CLIENT ),
+						self::get( ServiceKey::JETPACK_AUTHENTICATOR )
 					),
-					self::get( 'global_site_tag' )
+					self::get( ServiceKey::GLOBAL_SITE_TAG )
 				);
 
 			default:
-				throw new \InvalidArgumentException( "Unknown service: $service" );
+				throw new \InvalidArgumentException( esc_html( "Unknown service: $service" ) );
 		}
 	}
 }

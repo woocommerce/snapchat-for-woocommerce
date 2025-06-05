@@ -7,6 +7,7 @@
  *
  * @package SnapchatForWooCommerce\Utils
  */
+
 namespace SnapchatForWooCommerce\Utils;
 
 /**
