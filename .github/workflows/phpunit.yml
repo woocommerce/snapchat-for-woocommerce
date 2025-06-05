@@ -41,6 +41,9 @@ jobs:
           extensions: mbstring, mysqli
           tools: composer, phpunit
 
+      - name: Install svn (used for installing WP versions)
+        run: sudo apt-get -y install subversion
+
       - name: Install Composer dependencies
         run: composer install --prefer-dist --no-progress
 
