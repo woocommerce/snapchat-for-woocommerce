@@ -20,8 +20,6 @@ use WC_Product;
 use function wc_get_price_to_display;
 use function wc_get_price_decimals;
 
-defined( 'ABSPATH' ) || exit;
-
 /**
  * Handles collection and localization of product/order metadata for the Ad Partner tracking.
  *

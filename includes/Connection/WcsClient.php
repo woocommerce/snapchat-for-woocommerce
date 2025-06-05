@@ -13,8 +13,6 @@ namespace SnapchatForWooCommerce\Connection;
 use WP_REST_Response;
 use WP_Error;
 
-defined( 'ABSPATH' ) || exit;
-
 /**
  * Performs authenticated API calls to the Ad Partner's WCS backend.
  *

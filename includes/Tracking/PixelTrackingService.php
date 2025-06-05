@@ -15,8 +15,6 @@ use SnapchatForWooCommerce\Utils\OptionDefaults;
 use SnapchatForWooCommerce\Utils\OptionsStore;
 use SnapchatForWooCommerce\Utils\AssetLoader;
 
-defined( 'ABSPATH' ) || exit;
-
 /**
  * Handles the registration of pixel-related hooks and provides access to tracking status.
  *

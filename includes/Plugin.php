@@ -12,8 +12,6 @@ namespace SnapchatForWooCommerce;
 use SnapchatForWooCommerce\Config;
 use SnapchatForWooCommerce\Utils\OptionDefaults;
 
-defined( 'ABSPATH' ) || exit;
-
 /**
  * Initializes and wires up core components of the Ad Partner for WooCommerce plugin.
  *

@@ -14,8 +14,6 @@ use WP_REST_Request;
 use WP_REST_Response;
 use WP_Error;
 
-defined( 'ABSPATH' ) || exit;
-
 /**
  * Service class to manage connection routes and operations for Snapchat integration.
  *

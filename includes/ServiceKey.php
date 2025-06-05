@@ -44,7 +44,7 @@ final class ServiceKey {
 	public const WCS_CLIENT = 'wcs_client';
 
 	/**
-	 * Identifier for the Global Site Tag tracking service.
+	 * Identifier for the Global Site Tag service.
 	 *
 	 * @since 0.1.0
 	 */

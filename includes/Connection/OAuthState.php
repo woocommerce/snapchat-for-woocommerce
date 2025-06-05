@@ -12,8 +12,6 @@ namespace SnapchatForWooCommerce\Connection;
 
 use WP_Error;
 
-defined( 'ABSPATH' ) || exit;
-
 /**
  * Handles encoding and decoding of state information used during OAuth authorization for Ad Partner services.
  *
