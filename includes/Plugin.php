@@ -28,9 +28,9 @@ final class Plugin {
 	 * Loads text domain and registers plugin-level hooks.
 	 */
 	public static function init(): void {
-		OptionDefaults::set_prefix( Config::OPTION_PREFIX );
 		self::load_textdomain();
 		self::register_hooks();
+		OptionDefaults::set_prefix( Config::OPTION_PREFIX );
 	}
 
 	/**
@@ -70,7 +70,6 @@ final class Plugin {
 	 * @return void
 	 */
 	public static function register_rest_routes(): void {
-		// Lazy-load only once per service.
 		$connection = ServiceContainer::get( ServiceKey::CONNECTION );
 		$connection->register_routes();
 	}
@@ -79,8 +78,6 @@ final class Plugin {
 	 * Initializes additional feature hooks during the `init` action.
 	 *
 	 * @since 0.1.0
-	 *
-	 * Currently boots pixel tracking hooks.
 	 */
 	public static function bootstrap_features(): void {
 		ServiceContainer::get( ServiceKey::PIXEL_TRACKING )->register_hooks();

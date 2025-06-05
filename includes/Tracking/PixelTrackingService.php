@@ -64,8 +64,9 @@ final class PixelTrackingService {
 	/**
 	 * Registers WordPress hooks used for pixel injection and route initialization.
 	 *
-	 * - Hooks into `wp_footer` to optionally output the pixel on frontend pages.
-	 * - Hooks into `rest_api_init` (reserved for potential future tracking-related routes).
+	 * - Hooks into `wp_head` to optionally output the pixel on frontend pages.
+	 * - Registers global site tag logic.
+	 * - Enqueues external tracking assets.
 	 *
 	 * @since 0.1.0
 	 */

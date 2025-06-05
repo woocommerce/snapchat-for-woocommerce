@@ -1,9 +1,9 @@
 <?php
 /**
- * Handles REST API routes and connection logic for Snapchat integration with WooCommerce.
+ * Handles REST API routes and connection logic for the Ad Partner integration with WooCommerce.
  *
  * This service class registers REST endpoints and manages authentication and connection status
- * between the WooCommerce store and Snapchat services.
+ * between the WooCommerce store and the Ad Partner services.
  *
  * @package SnapchatForWooCommerce\Connection
  */
@@ -15,7 +15,7 @@ use WP_REST_Response;
 use WP_Error;
 
 /**
- * Service class to manage connection routes and operations for Snapchat integration.
+ * Service class to manage connection routes and operations for the Ad Partner integration.
  *
  * This class exposes a RESTful interface under a defined namespace, enabling the frontend
  * or third-party systems to query connection status, initiate OAuth authorization, and handle
@@ -23,13 +23,9 @@ use WP_Error;
  * headers securely, and delegates core connection logic to `WcsClient`.
  *
  * Dependencies:
- * - {@see WcsClient} Handles the interaction with WooCommerce Snapchat backend APIs.
+ * - {@see WcsClient} Handles the interaction with the plugin's backend APIs.
  * - {@see JetpackAuthenticator} Provides authentication token (e.g. via Jetpack connection).
  * - {@see OAuthState} Decodes the OAuth `state` parameter passed during authorization flow.
- *
- * @see \SnapchatForWooCommerce\Connection\WcsClient
- * @see \SnapchatForWooCommerce\Connection\JetpackAuthenticator
- * @see \SnapchatForWooCommerce\Connection\OAuthState
  */
 final class ConnectionService {
 	/**
@@ -67,7 +63,7 @@ final class ConnectionService {
 	}
 
 	/**
-	 * Registers REST routes related to the Snapchat connection.
+	 * Registers REST routes related to the Ad Partner's connection.
 	 *
 	 * Each route maps to a public method in this class and exposes functionality like:
 	 * - Checking connection status

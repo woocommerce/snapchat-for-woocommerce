@@ -16,7 +16,7 @@ use WP_Error;
 /**
  * Performs authenticated API calls to the Ad Partner's WCS backend.
  *
- * The WCS backend is assumed to be a Jetpack-authenticated service that supports
+ * The WCS backend is a Jetpack-authenticated service that supports
  * OAuth-secured endpoints such as `/connection/status` and `/connection/connect`.
  *
  * This class includes helpers to send GET and POST requests using Jetpack tokens.

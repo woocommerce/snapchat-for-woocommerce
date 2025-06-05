@@ -7,10 +7,10 @@
  * Falls back to file modification time for versioning if asset metadata is not available.
  *
  * Usage:
- *     AssetLoader::enqueue_script( 'my-handle', 'assets/js/my-script.js', __FILE__ );
- *     AssetLoader::enqueue_style( 'my-style', 'assets/css/my-style.css', __FILE__ );
+ *     AssetLoader::enqueue_script( 'my-handle', 'my-script' );
+ *     AssetLoader::enqueue_style( 'my-style', 'my-stylesheet' );
  *
- * @package YourPluginNamespace\Utils
+ * @package SnapchatForWooCommerce\Utils
  */
 
 namespace SnapchatForWooCommerce\Utils;
@@ -80,7 +80,7 @@ class AssetLoader {
 		wp_enqueue_style(
 			Config::ASSET_HANDLE_PREFIX . $handle,
 			$style_url,
-			$asset_data['dependencies'],
+			array(),
 			$asset_data['version']
 		);
 	}

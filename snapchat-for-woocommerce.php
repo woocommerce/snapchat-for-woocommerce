@@ -15,6 +15,8 @@
  * @package snapchat-for-woocommerce
  */
 
+use SnapchatForWooCommerce\Utils\OptionsStore;
+
 defined( 'ABSPATH' ) || exit;
 
 if ( ! defined( 'SNAPCHAT_FOR_WOOCOMMERCE_FILE' ) ) {
@@ -78,6 +80,13 @@ function snapchat_for_woocommerce_init() {
 		return;
 	}
 }
+
+register_activation_hook(
+	__FILE__,
+	function () {
+		OptionsStore::preload_defaults();
+	}
+);
 
 add_action(
 	'woocommerce_loaded',

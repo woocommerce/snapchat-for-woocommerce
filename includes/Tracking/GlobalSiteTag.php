@@ -45,7 +45,7 @@ final class GlobalSiteTag {
 	/**
 	 * Meta key used to mark orders that have already been tracked.
 	 */
-	protected const ORDER_CONVERSION_META_KEY = '_snap_pixel_tracked';
+	protected const ORDER_CONVERSION_META_KEY = '_snapchat_pixel_tracked';
 
 	/**
 	 * Registers WordPress and WooCommerce hooks for product metadata collection

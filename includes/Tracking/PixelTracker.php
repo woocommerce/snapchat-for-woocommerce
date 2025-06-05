@@ -28,7 +28,7 @@ interface PixelTracker {
 	/**
 	 * Conditionally injects the tracking pixel into the page output.
 	 *
-	 * This method is expected to be hooked into WordPress actions (e.g., `wp_footer`)
+	 * This method is expected to be hooked into WordPress actions (e.g., `wp_head`)
 	 * or called during template rendering. It should determine internally whether the
 	 * pixel should be output based on plugin settings, page context, or filters.
 	 *

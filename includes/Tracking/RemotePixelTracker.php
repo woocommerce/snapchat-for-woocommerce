@@ -22,7 +22,7 @@ use SnapchatForWooCommerce\Utils\OptionDefaults;
  * Responsibilities:
  * - Checks plugin option to determine if pixel tracking is enabled.
  * - Retrieves pixel script from local cache or Snapchat Ads API.
- * - Injects sanitized pixel JavaScript into the frontend via `wp_footer`.
+ * - Injects sanitized pixel JavaScript into the frontend via `wp_head`.
  * - Optionally personalizes the script using the logged-in user's email.
  *
  * Dependencies:
@@ -61,19 +61,22 @@ final class RemotePixelTracker implements PixelTracker {
 	}
 
 	/**
-	 * Conditionally injects the Snapchat Pixel script into the footer.
-	 *
-	 * Only runs if tracking is enabled via plugin settings. Outputs the pixel script,
-	 * personalized if possible, and sanitized using `wp_kses`.
+	 * Injects the Snapchat Pixel script into the footer.
+	 * Personalized if possible, and sanitized using `wp_kses`.
 	 *
 	 * @since 0.1.0
 	 */
 	public function maybe_inject_pixel(): void {
-		if ( ! OptionsStore::get( OptionDefaults::PIXEL_ENABLED ) ) {
-			return;
-		}
+		$allowed_tags = array(
+			'script'   => array(
+				'type'  => array(),
+				'src'   => array(),
+				'async' => array(),
+			),
+			'#comment' => array(),
+		);
 
-		echo $this->get_pixel_script(); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
+		echo wp_kses( $this->get_pixel_script(), $allowed_tags );
 	}
 
 	/**
@@ -114,7 +117,7 @@ final class RemotePixelTracker implements PixelTracker {
 	/**
 	 * Retrieves the Snapchat Pixel script, either from cache or the remote API.
 	 *
-	 * If not cached, it authenticates with Jetpack and queries the Snapchat Ads API for pixel info.
+	 * If not cached, it authenticates with Jetpack and queries the Snapchat Ads API for pixel script.
 	 * The result is cached in the options store and sanitized before being returned.
 	 *
 	 * @since 0.1.0
@@ -122,19 +125,10 @@ final class RemotePixelTracker implements PixelTracker {
 	 * @return string|null The sanitized pixel script, or null on failure.
 	 */
 	private function get_pixel_script() {
-		$allowed_tags = array(
-			'script'   => array(
-				'type'  => array(),
-				'src'   => array(),
-				'async' => array(),
-			),
-			'#comment' => array(),
-		);
-
 		$pixel_script = OptionsStore::get( OptionDefaults::PIXEL_SCRIPT );
 
 		if ( $pixel_script ) {
-			return wp_kses( self::personalize_tracking_script( $pixel_script ), $allowed_tags );
+			return self::personalize_tracking_script( $pixel_script );
 		}
 
 		$token = $this->auth->get_auth_header();
@@ -165,6 +159,6 @@ final class RemotePixelTracker implements PixelTracker {
 
 		OptionsStore::set( OptionDefaults::PIXEL_SCRIPT, $pixel_script );
 
-		return wp_kses( self::personalize_tracking_script( $pixel_script ), $allowed_tags );
+		return self::personalize_tracking_script( $pixel_script );
 	}
 }

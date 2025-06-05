@@ -48,25 +48,6 @@ class RemotePixelTrackerTest extends WP_UnitTestCase {
 	}
 
 	/**
-	 * Test that no output is rendered if pixel tracking is disabled in settings.
-	 */
-	public function test_maybe_inject_pixel_does_not_output_when_disabled() {
-		OptionsStore::set( OptionDefaults::PIXEL_ENABLED, false );
-		OptionsStore::delete( OptionDefaults::PIXEL_SCRIPT );
-
-		$auth_mock   = $this->createMock( JetpackAuthenticator::class );
-		$client_mock = $this->createMock( WcsClient::class );
-
-		$tracker = new RemotePixelTracker( $client_mock, $auth_mock );
-
-		ob_start();
-		$tracker->maybe_inject_pixel();
-		$output = ob_get_clean();
-
-		$this->assertSame( '', $output );
-	}
-
-	/**
 	 * Test that the pixel script is rendered from cache if present.
 	 */
 	public function test_maybe_inject_pixel_outputs_cached_script() {
