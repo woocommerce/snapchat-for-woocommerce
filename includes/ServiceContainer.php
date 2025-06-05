@@ -48,6 +48,7 @@ final class ServiceContainer {
 		if ( ! isset( self::$instances[ $service ] ) ) {
 			self::$instances[ $service ] = self::resolve( $service );
 		}
+
 		return self::$instances[ $service ];
 	}
 

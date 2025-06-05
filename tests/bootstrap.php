@@ -1,38 +1,145 @@
 <?php
-/**
- * PHPUnit bootstrap file.
- *
- * @package Snapchat_For_Woocommerce
- */
+declare( strict_types=1 );
 
-$_tests_dir = getenv( 'WP_TESTS_DIR' );
+namespace Automattic\WooCommerce\GoogleListingsAndAds\Tests;
 
-if ( ! $_tests_dir ) {
-	$_tests_dir = rtrim( sys_get_temp_dir(), '/\\' ) . '/wordpress-tests-lib';
+use DG\BypassFinals;
+use WC_Install;
+
+define( 'AD_PARTNER_TESTS_DIR', __DIR__ );
+define( 'AD_PARTNER_TESTS_DATA_DIR', AD_PARTNER_TESTS_DIR . '/data' );
+
+global $ad_partner_dir;
+global $wp_plugins_dir;
+global $wc_dir;
+
+$wp_tests_dir = getenv( 'WP_TESTS_DIR' ) ?: path_join( sys_get_temp_dir(), '/wordpress-tests-lib' );
+validate_file_exits( "{$wp_tests_dir}/includes/functions.php" );
+
+$wp_core_dir    = getenv( 'WP_CORE_DIR' ) ?: path_join( sys_get_temp_dir(), '/wordpress' );
+$wp_plugins_dir = path_join( $wp_core_dir, '/wp-content/plugins' );
+
+$ad_partner_dir = dirname( __DIR__ ); // Parent directory
+
+$wc_dir = getenv( 'WC_DIR' );
+if ( ! $wc_dir ) {
+	// Check if WooCommerce exists in the core plugin folder. The `bin/install-wp-tests.sh` script clones a copy there.
+	$wc_dir = path_join( $wp_plugins_dir, '/woocommerce' );
+	if ( ! file_exists( "{$wc_dir}/woocommerce.php" ) ) {
+		// Check if WooCommerce exists in parent directory of the plugin (in case the plugin is located in a WordPress installation's `wp-content/plugins` folder)
+		$wc_dir = path_join( dirname( $ad_partner_dir ), '/woocommerce' );
+	}
 }
+validate_file_exits( "{$wc_dir}/woocommerce.php" );
 
-// Forward custom PHPUnit Polyfills configuration to PHPUnit bootstrap file.
-$_phpunit_polyfills_path = getenv( 'WP_TESTS_PHPUNIT_POLYFILLS_PATH' );
-if ( false !== $_phpunit_polyfills_path ) {
-	define( 'WP_TESTS_PHPUNIT_POLYFILLS_PATH', $_phpunit_polyfills_path );
-}
+// Require the composer autoloader.
+require_once dirname( __DIR__ ) . '/vendor/autoload.php';
 
-if ( ! file_exists( "{$_tests_dir}/includes/functions.php" ) ) {
-	echo "Could not find {$_tests_dir}/includes/functions.php, have you run bin/install-wp-tests.sh ?" . PHP_EOL; // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
-	exit( 1 );
-}
+// Enable this Library for avoiding errors mocking final Google API Classes.
+// @see https://github.com/googleads/google-ads-php/issues/1008
+BypassFinals::enable();
 
 // Give access to tests_add_filter() function.
-require_once "{$_tests_dir}/includes/functions.php";
+require_once "{$wp_tests_dir}/includes/functions.php";
 
-/**
- * Manually load the plugin being tested.
- */
-function _manually_load_plugin() {
-	require __DIR__ . '/../snapchat-for-woocommerce.php';
-}
+tests_add_filter(
+	'muplugins_loaded',
+	function () {
+		load_plugins();
+	}
+);
 
-tests_add_filter( 'muplugins_loaded', '_manually_load_plugin' );
+tests_add_filter(
+	'setup_theme',
+	function () {
+		install_woocommerce();
+	}
+);
 
 // Start up the WP testing environment.
-require "{$_tests_dir}/includes/bootstrap.php";
+require "{$wp_tests_dir}/includes/bootstrap.php";
+
+// Include WooCommerce test helpers
+$wc_tests_dir = $wc_dir . '/tests';
+if ( file_exists( $wc_dir . '/tests/legacy/bootstrap.php' ) ) {
+	$wc_tests_dir .= '/legacy';
+}
+
+require_once $wc_tests_dir . '/framework/helpers/class-wc-helper-coupon.php';
+require_once $wc_tests_dir . '/framework/helpers/class-wc-helper-product.php';
+require_once $wc_tests_dir . '/framework/helpers/class-wc-helper-shipping.php';
+require_once $wc_tests_dir . '/framework/helpers/class-wc-helper-customer.php';
+require_once $wc_tests_dir . '/framework/helpers/class-wc-helper-order.php';
+require_once $wc_tests_dir . '/framework/vendor/class-wp-test-spy-rest-server.php';
+
+/**
+ * Load WooCommerce for testing
+ *
+ * @global $wc_dir
+ */
+function install_woocommerce() {
+	global $wc_dir;
+
+	define( 'WP_UNINSTALL_PLUGIN', true );
+	define( 'WC_REMOVE_ALL_DATA', true );
+
+	include $wc_dir . '/uninstall.php';
+
+	WC_Install::install();
+
+	// Initialize the WC Admin extension.
+	if ( class_exists( '\Automattic\WooCommerce\Internal\Admin\Install' ) ) {
+		\Automattic\WooCommerce\Internal\Admin\Install::create_tables();
+		\Automattic\WooCommerce\Internal\Admin\Install::create_events();
+	} elseif ( class_exists( '\Automattic\WooCommerce\Admin\Install' ) ) {
+		\Automattic\WooCommerce\Admin\Install::create_tables();
+		\Automattic\WooCommerce\Admin\Install::create_events();
+	}
+
+	// Reload capabilities after install, see https://core.trac.wordpress.org/ticket/28374.
+	$GLOBALS['wp_roles'] = null; // phpcs:ignore WordPress.WP.GlobalVariablesOverride.Prohibited
+	wp_roles();
+
+	echo 'Installing WooCommerce...' . PHP_EOL;
+}
+
+/**
+ * Manually load plugins
+ *
+ * @global $ad_partner_dir
+ * @global $wc_dir
+ */
+function load_plugins() {
+	global $ad_partner_dir;
+	global $wc_dir;
+
+	require_once $wc_dir . '/woocommerce.php';
+	update_option( 'woocommerce_db_version', WC()->version );
+
+	// Be sure the WooCommerce features are loaded on the test environment
+	add_filter( 'woocommerce_admin_should_load_features', '__return_true' );
+
+	require $ad_partner_dir . '/snapchat-for-woocommerce.php';
+}
+
+/**
+ * Checks whether a file exists and throws an error if it doesn't.
+ *
+ * @param string $file_name
+ */
+function validate_file_exits( string $file_name ) {
+	if ( ! file_exists( $file_name ) ) {
+		echo "Could not find {$file_name}, have you run bin/install-wp-tests.sh ?" . PHP_EOL; // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
+		exit( 1 );
+	}
+}
+
+/**
+ * @param string $base
+ * @param string $path
+ *
+ * @return string
+ */
+function path_join( string $base, string $path ) {
+	return rtrim( $base, '/\\' ) . '/' . ltrim( $path, '/\\' );
+}
