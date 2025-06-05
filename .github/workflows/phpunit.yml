@@ -9,26 +9,15 @@ on:
 jobs:
   phpunit:
     runs-on: ubuntu-latest
-    services:
-      mysql:
-        image: mysql:5.7
-        env:
-          MYSQL_DATABASE: wordpress_test
-          MYSQL_ROOT_PASSWORD: root
-        ports: [ '3306:3306' ]
-        options: >-
-          --health-cmd="mysqladmin ping --silent"
-          --health-interval=10s
-          --health-timeout=5s
-          --health-retries=3
-
     env:
       WP_CORE_DIR: /tmp/wordpress
+      WP_TESTS_DIR: /tmp/wordpress-tests-lib
       DB_NAME: wordpress_test
       DB_USER: root
       DB_PASS: root
       DB_HOST: 127.0.0.1
       WP_VERSION: latest
+      CI: true
 
     steps:
       - name: Checkout code
@@ -41,13 +30,16 @@ jobs:
           extensions: mbstring, mysqli
           tools: composer, phpunit
 
+      - name: Prepare MySQL
+        uses: woocommerce/grow/prepare-mysql@actions-v2
+
       - name: Install svn (used for installing WP versions)
         run: sudo apt-get -y install subversion
 
       - name: Install Composer dependencies
         run: composer install --prefer-dist --no-progress
 
-      - name: Install WordPress test suite
+      - name: Install WordPress test suite (with WooCommerce)
         run: |
           bash bin/install-wp-tests.sh $DB_NAME $DB_USER $DB_PASS $DB_HOST $WP_VERSION
 
