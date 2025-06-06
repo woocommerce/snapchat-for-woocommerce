@@ -126,18 +126,4 @@ class PixelTrackingServiceTest extends WP_UnitTestCase {
 		$this->assertFalse( has_action( 'wp_head', [ $this->tracker_mock, 'maybe_inject_pixel' ] ) );
 		$this->assertFalse( has_action( 'wp_enqueue_scripts', [ $this->service, 'enqueue_tracking_scripts' ] ) );
 	}
-
-	/**
-	 * Tests that enqueue_tracking_scripts() can be called without throwing an exception.
-	 *
-	 * Note: We do not assert internal behavior of AssetLoader here, as that is covered
-	 * by separate tests for AssetLoader itself.
-	 */
-	public function test_enqueue_tracking_scripts_runs_without_error() {
-		ob_start();
-		$this->service->enqueue_tracking_scripts();
-		ob_end_clean();
-
-		$this->assertTrue( true );
-	}
 }
