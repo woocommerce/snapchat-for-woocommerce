@@ -35,10 +35,6 @@ class RemotePixelTrackerTest extends WP_UnitTestCase {
 		OptionsStore::set( OptionDefaults::AD_ACCOUNT_ID, 'fake-account-id' );
 	}
 
-
-	/**
-	 * Cleanup plugin options after each test.
-	 */
 	public function tear_down(): void {
 		OptionsStore::delete( OptionDefaults::PIXEL_ENABLED );
 		OptionsStore::delete( OptionDefaults::PIXEL_SCRIPT );

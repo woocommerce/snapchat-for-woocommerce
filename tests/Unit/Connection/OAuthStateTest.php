@@ -34,7 +34,7 @@ class OAuthStateTest extends WP_UnitTestCase {
 	 * Tests that decode returns a WP_Error for malformed state input.
 	 */
 	public function test_decode_returns_wp_error_for_invalid_data() {
-		$invalid_encoded = '%E0%A4%A'; // Invalid rawurlencoded base64 string.
+		$invalid_encoded = '%E0%A4%A';
 
 		$result = OAuthState::decode( $invalid_encoded );
 

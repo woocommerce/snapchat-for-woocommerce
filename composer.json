@@ -20,6 +20,7 @@
 			"!/assets",
 			"!/build",
 			"!/languages",
+			"tests",
 			"node_modules",
 			"woocommerce-eu-vat-number.zip",
 			"README.md",

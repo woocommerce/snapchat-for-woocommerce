@@ -20,6 +20,7 @@
 	<testsuites>
 		<testsuite name="Snapchat for WooCommerce Test Suite">
 			<directory suffix="Test.php">./tests/Unit</directory>
+			<directory suffix="Test.php">./tests/Integration</directory>
 		</testsuite>
 	</testsuites>
 	<logging/>

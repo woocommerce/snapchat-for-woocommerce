@@ -65,7 +65,6 @@ class OptionsStoreTest extends WP_UnitTestCase {
 	}
 
 	public function test_preload_defaults_only_sets_unset_options() {
-		// Preload should set all defaults.
 		OptionsStore::preload_defaults();
 		$defaults = OptionDefaults::get_defaults();
 

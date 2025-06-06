@@ -22,7 +22,6 @@ class AssetLoaderTest extends WP_UnitTestCase {
 	}
 
 	public function tear_down(): void {
-		// Cleanup test files.
 		@unlink( SNAPCHAT_ADS_PLUGIN_BUILD_PATH . 'js/test-script.js' );
 		@unlink( SNAPCHAT_ADS_PLUGIN_BUILD_PATH . 'js/test-script.js.asset.php' );
 		@unlink( SNAPCHAT_ADS_PLUGIN_BUILD_PATH . 'css/test-style.css' );

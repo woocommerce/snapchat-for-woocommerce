@@ -99,6 +99,7 @@ class ServiceContainerTest extends WP_UnitTestCase {
 	public function test_it_returns_same_instance_on_multiple_calls() {
 		$first  = ServiceContainer::get( ServiceKey::WCS_CLIENT );
 		$second = ServiceContainer::get( ServiceKey::WCS_CLIENT );
+
 		$this->assertSame( $first, $second );
 	}
 
