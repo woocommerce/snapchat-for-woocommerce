@@ -129,7 +129,7 @@ final class RemotePixelTracker implements PixelTracker {
 	 * @return bool True if valid, false if tampered.
 	 */
 	private static function is_valid_pixel_script( string $script ): bool {
-		return strpos( $script, 'https://sc-static.net/scevent.min.js' ) !== false;
+		return strpos( $script, PixelDefaults::EXPECTED_SCRIPT_URL ) !== false;
 	}
 
 	/**
