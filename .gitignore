@@ -13,6 +13,7 @@ project.properties
 *.sublime-project
 *.sublime-workspace
 .sublimelinterrc
+.phpunit.result.cache
 
 # Sass
 .sass-cache/

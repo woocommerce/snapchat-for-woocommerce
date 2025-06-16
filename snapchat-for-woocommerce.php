@@ -41,46 +41,6 @@ if ( ! defined( 'SNAPCHAT_ADS_PLUGIN_BUILD_URL' ) ) {
 
 require_once plugin_dir_path( __FILE__ ) . '/vendor/autoload_packages.php';
 
-/**
- * WooCommerce fallback notice.
- *
- * @since 0.1.0
- */
-function snapchat_for_woocommerce_missing_wc_notice() {
-	/* translators: %s WC download URL link. */
-	echo '<div class="error"><p><strong>' . sprintf( esc_html__( 'Snapchat For Woocommerce requires WooCommerce to be installed and active. You can download %s here.', 'snapchat_for_woocommerce' ), '<a href="https://woo.com/" target="_blank">WooCommerce</a>' ) . '</strong></p></div>';
-}
-
-register_activation_hook( __FILE__, 'snapchat_for_woocommerce_activate' );
-
-/**
- * Activation hook.
- *
- * @since 0.1.0
- */
-function snapchat_for_woocommerce_activate() {
-	if ( ! class_exists( 'WooCommerce' ) ) {
-		add_action( 'admin_notices', 'snapchat_for_woocommerce_missing_wc_notice' );
-		return;
-	}
-}
-
-add_action( 'plugins_loaded', 'snapchat_for_woocommerce_init', 10 );
-
-/**
- * Initialize the plugin.
- *
- * @since 0.1.0
- */
-function snapchat_for_woocommerce_init() {
-	load_plugin_textdomain( 'snapchat_for_woocommerce', false, plugin_basename( __DIR__ ) . '/languages' );
-
-	if ( ! class_exists( 'WooCommerce' ) ) {
-		add_action( 'admin_notices', 'snapchat_for_woocommerce_missing_wc_notice' );
-		return;
-	}
-}
-
 register_activation_hook(
 	__FILE__,
 	function () {

@@ -11,29 +11,35 @@
 namespace SnapchatForWooCommerce\Tests\Integration\Tracking;
 
 use WP_UnitTestCase;
+
 use SnapchatForWooCommerce\Tracking\GlobalSiteTag;
+use SnapchatForWooCommerce\Config;
+use WC_Helper_Product;
 
 /**
  * @covers \SnapchatForWooCommerce\Tracking\GlobalSiteTag
  */
 class GlobalSiteTagTest extends WP_UnitTestCase {
 
-	/**
-	 * Service under test.
-	 *
-	 * @var GlobalSiteTag
-	 */
-	private $service;
+	private GlobalSiteTag $service;
 
 	public function set_up(): void {
 		parent::set_up();
-
 		$this->service = new GlobalSiteTag();
 		$this->service->register();
 	}
 
+	public function tear_down(): void {
+		global $wp_scripts;
+		$wp_scripts = null; // Reset WP_Scripts for isolated tests.
+		parent::tear_down();
+	}
+
 	/**
-	 * Tests that GlobalSiteTag hooks are registered.
+	 * Tests that the expected WooCommerce and WordPress hooks are registered by GlobalSiteTag.
+	 *
+	 * This includes hooks for product data collection, single product view tracking,
+	 * order confirmation tracking, and data localization in the footer.
 	 */
 	public function test_hooks_are_registered() {
 		$this->assertNotFalse( has_filter( 'woocommerce_loop_add_to_cart_link' ) );
@@ -44,60 +50,92 @@ class GlobalSiteTagTest extends WP_UnitTestCase {
 	}
 
 	/**
-	 * Tests that track_view_content_event() runs without error.
+	 * Tests that the VIEW_CONTENT tracking event is added as an inline script
+	 * when viewing a single product page.
 	 *
-	 * Simulates a single product page view.
+	 * Verifies:
+	 * - The script is registered.
+	 * - The inline script contains the correct snaptr call with VIEW_CONTENT.
 	 */
-	public function test_track_view_content_event_runs_without_error() {
-		$product = \WC_Helper_Product::create_simple_product();
+	public function test_track_view_content_event_adds_inline_script() {
+		$product = WC_Helper_Product::create_simple_product();
 		$product_id = $product->get_id();
 
-		setup_postdata( get_post( $product_id ) );
+		global $post;
+		$post = get_post( $product_id );
 
-		ob_start();
+		wp_register_script( Config::ASSET_HANDLE_PREFIX . 'pixel-tracking', false );
 		$this->service->track_view_content_event();
-		ob_end_clean();
+		$scripts = wp_scripts();
+
+		$this->assertArrayHasKey( Config::ASSET_HANDLE_PREFIX . 'pixel-tracking', $scripts->registered );
+		$registered = $scripts->registered[ Config::ASSET_HANDLE_PREFIX . 'pixel-tracking' ];
+
+		$this->assertStringContainsString( 'snaptr("track", "VIEW_CONTENT"', implode( '', $registered->extra['after'] ?? [] ) );
 
 		wp_reset_postdata();
-
-		$this->assertTrue( true );
 	}
 
 	/**
-	 * Tests that track_purchase_event() runs without error.
+	 * Tests that the PURCHASE tracking event is added as an inline script
+	 * when the order confirmation page is viewed.
 	 *
-	 * Simulates an order confirmation scenario.
+	 * Verifies:
+	 * - The order is marked as tracked via meta.
+	 * - The inline script includes the PURCHASE event with correct product ID.
 	 */
-	public function test_track_purchase_event_runs_without_error() {
-		$order = wc_create_order();
+	public function test_track_purchase_event_sets_meta_and_adds_inline_script() {
 		$product = \WC_Helper_Product::create_simple_product();
 
+		$order = wc_create_order();
 		$order->add_product( $product, 2 );
 		$order->calculate_totals();
 		$order->save();
 
-		// Simulate order_received_page context.
-		add_filter( 'is_order_received_page', '__return_true' );
+		// Force WooCommerce to treat this as the order received page.
+		add_filter( 'woocommerce_is_order_received_page', '__return_true' );
 
-		ob_start();
+		wp_register_script( Config::ASSET_HANDLE_PREFIX . 'pixel-tracking', false );
+
 		$this->service->track_purchase_event( $order->get_id() );
-		ob_end_clean();
 
-		remove_filter( 'is_order_received_page', '__return_true' );
+		$order = wc_get_order( $order->get_id() ); // Refresh order to get updated meta
+		$this->assertEquals( 1, $order->get_meta( '_snapchat_pixel_tracked', true ) );
 
-		$this->assertTrue( true );
+		$scripts = wp_scripts();
+		$inline  = implode( '', $scripts->registered[ Config::ASSET_HANDLE_PREFIX . 'pixel-tracking' ]->extra['after'] ?? [] );
+
+		$this->assertStringContainsString( 'snaptr("track", "PURCHASE"', $inline );
+		$this->assertStringContainsString( (string) $product->get_id(), $inline );
+
+		remove_filter( 'woocommerce_is_order_received_page', '__return_true' );
 	}
 
 	/**
-	 * Tests that localize_data() runs without error.
+	 * Tests that the localized global JavaScript variable is printed to the footer.
 	 *
-	 * We do not assert on actual JS output here — that belongs in E2E test.
+	 * Verifies:
+	 * - The output contains the expected global variable name.
+	 * - The output contains `currency` and `products` keys used by the pixel script.
 	 */
-	public function test_localize_data_runs_without_error() {
+	public function test_localize_data_outputs_global_variable_script() {
+		$product    = \WC_Helper_Product::create_simple_product();
+		$product_id = $product->get_id();
+
+		global $post;
+		$post = get_post( $product_id );
+		setup_postdata( $post );
+
+		$this->service->track_view_content_event();
+
 		ob_start();
 		$this->service->localize_data();
-		ob_end_clean();
+		$output = ob_get_clean();
 
-		$this->assertTrue( true );
+		$this->assertStringContainsString( 'const ' . Config::AD_PARTNER_JS_GLOBAL, $output );
+		$this->assertStringContainsString( 'currency', $output );
+		$this->assertStringContainsString( 'products', $output );
+
+		wp_reset_postdata();
 	}
 }
