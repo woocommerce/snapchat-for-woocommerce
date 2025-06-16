@@ -66,7 +66,7 @@ final class Store {
 	 */
 	public function get( string $key ) {
 		$value = $this->strategy->get( $key );
-		return $value !== false ? $value : ( $this->defaults[ $key ] ?? null );
+		return false !== $value ? $value : ( $this->defaults[ $key ] ?? null );
 	}
 
 	/**
