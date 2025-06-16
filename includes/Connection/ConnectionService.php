@@ -80,6 +80,7 @@ final class ConnectionService {
 				'methods'             => 'GET',
 				'callback'            => array( $this, 'get_status' ),
 				'permission_callback' => '__return_true',
+				// @todo: Add resource and argument schema.
 			)
 		);
 
@@ -90,6 +91,7 @@ final class ConnectionService {
 				'methods'             => 'POST',
 				'callback'            => array( $this, 'post_connect' ),
 				'permission_callback' => '__return_true',
+				// @todo: Add resource and argument schema.
 			)
 		);
 
@@ -100,6 +102,7 @@ final class ConnectionService {
 				'methods'             => 'GET',
 				'callback'            => array( $this, 'handle_authorize_redirect' ),
 				'permission_callback' => '__return_true',
+				// @todo: Add resource and argument schema.
 			)
 		);
 	}
