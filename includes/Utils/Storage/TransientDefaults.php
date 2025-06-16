@@ -30,7 +30,7 @@ final class TransientDefaults {
 	 *
 	 * @since 0.1.0
 	 */
-	public const PIXEL_SCRIPT = 'pixel_script';
+	public const PIXEL_SCRIPT = 'ads_pixel_script';
 
 	/**
 	 * Returns TTLs for all known Ad Partner transients.

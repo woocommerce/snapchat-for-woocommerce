@@ -24,7 +24,6 @@ class OptionDefaultsTest extends TestCase {
 		$this->assertArrayHasKey( OptionDefaults::AD_ACCOUNT_ID, $defaults );
 		$this->assertArrayHasKey( OptionDefaults::ORGANIZATION_ID, $defaults );
 		$this->assertArrayHasKey( OptionDefaults::PIXEL_ENABLED, $defaults );
-		$this->assertArrayHasKey( OptionDefaults::PIXEL_SCRIPT, $defaults );
 	}
 
 	/**
@@ -36,7 +35,6 @@ class OptionDefaultsTest extends TestCase {
 		$this->assertSame( '', $defaults[ OptionDefaults::AD_ACCOUNT_ID ] );
 		$this->assertSame( '', $defaults[ OptionDefaults::ORGANIZATION_ID ] );
 		$this->assertFalse( $defaults[ OptionDefaults::PIXEL_ENABLED ] );
-		$this->assertSame( '', $defaults[ OptionDefaults::PIXEL_SCRIPT ] );
 	}
 
 	/**

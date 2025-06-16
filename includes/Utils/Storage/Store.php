@@ -36,7 +36,7 @@ final class Store {
 	/**
 	 * Map of default values for supported keys.
 	 *
-	 * @var array<string, mixed>
+	 * @var array<string,mixed>
 	 */
 	private array $defaults;
 

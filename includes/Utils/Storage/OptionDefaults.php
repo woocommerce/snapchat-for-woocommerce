@@ -48,13 +48,6 @@ final class OptionDefaults {
 	public const PIXEL_ENABLED = 'ads_pixel_enabled';
 
 	/**
-	 * Option key that holds the rendered pixel tracking script content.
-	 *
-	 * @since 0.1.0
-	 */
-	public const PIXEL_SCRIPT = 'ads_pixel_script';
-
-	/**
 	 * Returns default values for all known Ad Partner options.
 	 *
 	 * Used by {@see Options} to provide fallbacks when option values
@@ -69,7 +62,6 @@ final class OptionDefaults {
 			self::AD_ACCOUNT_ID   => '',
 			self::ORGANIZATION_ID => '',
 			self::PIXEL_ENABLED   => false,
-			self::PIXEL_SCRIPT    => '',
 		);
 	}
 }
