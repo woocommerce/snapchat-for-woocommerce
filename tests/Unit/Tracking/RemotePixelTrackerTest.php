@@ -11,8 +11,10 @@
 namespace SnapchatForWooCommerce\Tests\Integration\Tracking;
 
 use WP_UnitTestCase;
-use SnapchatForWooCommerce\Utils\OptionsStore;
-use SnapchatForWooCommerce\Utils\OptionDefaults;
+use SnapchatForWooCommerce\Utils\Storage\Options;
+use SnapchatForWooCommerce\Utils\Storage\OptionDefaults;
+use SnapchatForWooCommerce\Utils\Storage\Transients;
+use SnapchatForWooCommerce\Utils\Storage\TransientDefaults;
 use SnapchatForWooCommerce\Tracking\RemotePixelTracker;
 use SnapchatForWooCommerce\Connection\JetpackAuthenticator;
 use SnapchatForWooCommerce\Connection\WcsClient;
@@ -26,19 +28,19 @@ class RemotePixelTrackerTest extends WP_UnitTestCase {
 		parent::set_up();
 
 		// Enable pixel tracking.
-		OptionsStore::set( OptionDefaults::PIXEL_ENABLED, true );
+		Options::set( OptionDefaults::PIXEL_ENABLED, true );
 
 		// Provide a default pixel script.
-		OptionsStore::set( OptionDefaults::PIXEL_SCRIPT, '<script src="snap.js"></script>' );
+		Transients::set( TransientDefaults::PIXEL_SCRIPT, '<script src="https://sc-static.net/scevent.min.js"></script>' );
 
 		// Provide a dummy ad account ID for API path construction.
-		OptionsStore::set( OptionDefaults::AD_ACCOUNT_ID, 'fake-account-id' );
+		Options::set( OptionDefaults::AD_ACCOUNT_ID, 'fake-account-id' );
 	}
 
 	public function tear_down(): void {
-		OptionsStore::delete( OptionDefaults::PIXEL_ENABLED );
-		OptionsStore::delete( OptionDefaults::PIXEL_SCRIPT );
-		OptionsStore::delete( OptionDefaults::AD_ACCOUNT_ID );
+		Options::delete( OptionDefaults::PIXEL_ENABLED );
+		Transients::delete( TransientDefaults::PIXEL_SCRIPT );
+		Options::delete( OptionDefaults::AD_ACCOUNT_ID );
 
 		parent::tear_down();
 	}
@@ -47,8 +49,8 @@ class RemotePixelTrackerTest extends WP_UnitTestCase {
 	 * Test that the pixel script is rendered from cache if present.
 	 */
 	public function test_maybe_inject_pixel_outputs_cached_script() {
-		OptionsStore::set( OptionDefaults::PIXEL_ENABLED, true );
-		OptionsStore::set( OptionDefaults::PIXEL_SCRIPT, '<script src="snap.js"></script>' );
+		Options::set( OptionDefaults::PIXEL_ENABLED, true );
+		Transients::set( TransientDefaults::PIXEL_SCRIPT, '<script src="https://sc-static.net/scevent.min.js"></script>' );
 
 		$auth    = $this->createMock( JetpackAuthenticator::class );
 		$wcs     = $this->createMock( WcsClient::class );
@@ -59,7 +61,7 @@ class RemotePixelTrackerTest extends WP_UnitTestCase {
 		$output = ob_get_clean();
 
 		$this->assertStringContainsString( '<script', $output );
-		$this->assertStringContainsString( 'snap.js', $output );
+		$this->assertStringContainsString( 'scevent.min.js', $output );
 	}
 
 	/**
@@ -68,7 +70,7 @@ class RemotePixelTrackerTest extends WP_UnitTestCase {
 	 * It also asserts that the fetched script is cached for future use.
 	 */
 	public function test_pixel_script_fetched_from_wcs_and_cached() {
-		OptionsStore::delete( OptionDefaults::PIXEL_SCRIPT );
+		Transients::delete( TransientDefaults::PIXEL_SCRIPT );
 
 		$auth_mock = $this->createMock( JetpackAuthenticator::class );
 		$auth_mock->method( 'get_auth_header' )->willReturn( 'Bearer token' );
@@ -77,7 +79,7 @@ class RemotePixelTrackerTest extends WP_UnitTestCase {
 		$response_mock->method( 'get_data' )->willReturn(
 			array(
 				'pixels' => array(
-					array( 'pixel' => array( 'pixel_javascript' => '<script>remote pixel</script>' ) ),
+					array( 'pixel' => array( 'pixel_javascript' => '<script src="https://sc-static.net/scevent.min.js"></script>' ) ),
 				),
 			)
 		);
@@ -91,14 +93,14 @@ class RemotePixelTrackerTest extends WP_UnitTestCase {
 		$tracker->maybe_inject_pixel();
 		$output = ob_get_clean();
 
-		$this->assertStringContainsString( 'remote pixel', $output );
+		$this->assertStringContainsString( 'https://sc-static.net/scevent.min.js', $output );
 	}
 
 	/**
 	 * Test that nothing is output if authentication fails.
 	 */
 	public function test_returns_null_if_authentication_fails() {
-		OptionsStore::delete( OptionDefaults::PIXEL_SCRIPT );
+		Transients::delete( TransientDefaults::PIXEL_SCRIPT );
 
 		$auth_mock = $this->createMock( JetpackAuthenticator::class );
 		$auth_mock->method( 'get_auth_header' )->willReturn( new \WP_Error( 'auth_fail', 'failed' ) );

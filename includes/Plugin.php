@@ -10,7 +10,7 @@
 namespace SnapchatForWooCommerce;
 
 use SnapchatForWooCommerce\Config;
-use SnapchatForWooCommerce\Utils\OptionDefaults;
+use SnapchatForWooCommerce\Utils\Storage\OptionDefaults;
 
 /**
  * Initializes and wires up core components of the Ad Partner for WooCommerce plugin.
@@ -30,7 +30,6 @@ final class Plugin {
 	public static function init(): void {
 		self::load_textdomain();
 		self::register_hooks();
-		OptionDefaults::set_prefix( Config::OPTION_PREFIX );
 	}
 
 	/**

@@ -19,8 +19,8 @@ use WP_UnitTestCase;
 use SnapchatForWooCommerce\Tracking\PixelTrackingService;
 use SnapchatForWooCommerce\Tracking\PixelTracker;
 use SnapchatForWooCommerce\Tracking\GlobalSiteTag;
-use SnapchatForWooCommerce\Utils\OptionDefaults;
-use SnapchatForWooCommerce\Utils\OptionsStore;
+use SnapchatForWooCommerce\Utils\Storage\OptionDefaults;
+use SnapchatForWooCommerce\Utils\Storage\Options;
 
 /**
  * @covers \SnapchatForWooCommerce\Tracking\PixelTrackingService
@@ -71,7 +71,7 @@ class PixelTrackingServiceTest extends WP_UnitTestCase {
 	 * Cleans up any modified plugin options.
 	 */
 	public function tear_down(): void {
-		OptionsStore::delete( OptionDefaults::PIXEL_ENABLED );
+		Options::delete( OptionDefaults::PIXEL_ENABLED );
 
 		parent::tear_down();
 	}
@@ -80,7 +80,7 @@ class PixelTrackingServiceTest extends WP_UnitTestCase {
 	 * Tests that is_enabled() returns true when pixel tracking is enabled in options.
 	 */
 	public function test_is_enabled_returns_true_if_enabled() {
-		OptionsStore::set( OptionDefaults::PIXEL_ENABLED, true );
+		Options::set( OptionDefaults::PIXEL_ENABLED, true );
 
 		$this->assertTrue( PixelTrackingService::is_enabled() );
 	}
@@ -89,7 +89,7 @@ class PixelTrackingServiceTest extends WP_UnitTestCase {
 	 * Tests that is_enabled() returns false when pixel tracking is disabled in options.
 	 */
 	public function test_is_enabled_returns_false_if_disabled() {
-		OptionsStore::set( OptionDefaults::PIXEL_ENABLED, false );
+		Options::set( OptionDefaults::PIXEL_ENABLED, false );
 
 		$this->assertFalse( PixelTrackingService::is_enabled() );
 	}
@@ -100,7 +100,7 @@ class PixelTrackingServiceTest extends WP_UnitTestCase {
 	 * Also verifies that GlobalSiteTag::register() is invoked.
 	 */
 	public function test_register_hooks_when_enabled() {
-		OptionsStore::set( OptionDefaults::PIXEL_ENABLED, true );
+		Options::set( OptionDefaults::PIXEL_ENABLED, true );
 
 		$this->global_site_tag_mock->expects( $this->once() )->method( 'register' );
 
@@ -116,7 +116,7 @@ class PixelTrackingServiceTest extends WP_UnitTestCase {
 	 * Also verifies that GlobalSiteTag::register() is not invoked.
 	 */
 	public function test_register_hooks_when_disabled_does_not_register() {
-		OptionsStore::set( OptionDefaults::PIXEL_ENABLED, false );
+		Options::set( OptionDefaults::PIXEL_ENABLED, false );
 
 		// GlobalSiteTag::register() must NOT be called.
 		$this->global_site_tag_mock->expects( $this->never() )->method( 'register' );

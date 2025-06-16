@@ -13,8 +13,10 @@ namespace SnapchatForWooCommerce\Tracking;
 
 use SnapchatForWooCommerce\Connection\WcsClient;
 use SnapchatForWooCommerce\Connection\JetpackAuthenticator;
-use SnapchatForWooCommerce\Utils\OptionsStore;
-use SnapchatForWooCommerce\Utils\OptionDefaults;
+use SnapchatForWooCommerce\Utils\Storage\Options;
+use SnapchatForWooCommerce\Utils\Storage\OptionDefaults;
+use SnapchatForWooCommerce\Utils\Storage\Transients;
+use SnapchatForWooCommerce\Utils\Storage\TransientDefaults;
 
 /**
  * Fetches and injects Snapchat pixel tracking code into WooCommerce frontend pages.
@@ -141,7 +143,7 @@ final class RemotePixelTracker implements PixelTracker {
 	 * @return string|null The sanitized pixel script, or null on failure.
 	 */
 	private function get_pixel_script() {
-		$pixel_script = OptionsStore::get( OptionDefaults::PIXEL_SCRIPT );
+		$pixel_script = Transients::get( TransientDefaults::PIXEL_SCRIPT );
 
 		if ( $pixel_script && self::is_valid_pixel_script( $pixel_script ) ) {
 			return self::personalize_tracking_script( $pixel_script );
@@ -153,7 +155,7 @@ final class RemotePixelTracker implements PixelTracker {
 			return null;
 		}
 
-		$account_id = OptionsStore::get( OptionDefaults::AD_ACCOUNT_ID );
+		$account_id = Options::get( OptionDefaults::AD_ACCOUNT_ID );
 		$path       = sprintf( 'adaccounts/%s/pixels', $account_id );
 		$response   = $this->wcs_client->proxy_get( $token, $path );
 
@@ -173,7 +175,7 @@ final class RemotePixelTracker implements PixelTracker {
 			return null;
 		}
 
-		OptionsStore::set( OptionDefaults::PIXEL_SCRIPT, $pixel_script );
+		Transients::set( TransientDefaults::PIXEL_SCRIPT, $pixel_script );
 
 		return self::personalize_tracking_script( $pixel_script );
 	}

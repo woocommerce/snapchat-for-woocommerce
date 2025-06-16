@@ -11,8 +11,8 @@
 
 namespace SnapchatForWooCommerce\Tracking;
 
-use SnapchatForWooCommerce\Utils\OptionDefaults;
-use SnapchatForWooCommerce\Utils\OptionsStore;
+use SnapchatForWooCommerce\Utils\Storage\OptionDefaults;
+use SnapchatForWooCommerce\Utils\Storage\Options;
 use SnapchatForWooCommerce\Utils\AssetLoader;
 
 /**
@@ -92,7 +92,7 @@ final class PixelTrackingService {
 	 * @return bool True if pixel tracking is enabled; false otherwise.
 	 */
 	public static function is_enabled(): bool {
-		return (bool) OptionsStore::get( OptionDefaults::PIXEL_ENABLED );
+		return (bool) Options::get( OptionDefaults::PIXEL_ENABLED );
 	}
 
 	/**

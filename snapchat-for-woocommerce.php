@@ -15,7 +15,7 @@
  * @package snapchat-for-woocommerce
  */
 
-use SnapchatForWooCommerce\Utils\OptionsStore;
+use SnapchatForWooCommerce\Utils\Storage\Options;
 
 defined( 'ABSPATH' ) || exit;
 
@@ -44,7 +44,7 @@ require_once plugin_dir_path( __FILE__ ) . '/vendor/autoload_packages.php';
 register_activation_hook(
 	__FILE__,
 	function () {
-		OptionsStore::preload_defaults();
+		Options::preload_defaults();
 	}
 );
 

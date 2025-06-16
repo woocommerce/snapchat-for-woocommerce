@@ -30,14 +30,15 @@ final class Config {
 	const REST_NAMESPACE = 'snapchat-comms/v1';
 
 	/**
-	 * Prefix used for all WordPress option keys managed by this plugin.
+	 * Prefix used for all WordPress storage keys managed by this plugin.
 	 *
-	 * This prefix is prepended to all option names to group them under a consistent namespace.
+	 * This prefix is prepended to all storage names (options or transients) to group
+	 * them under a consistent namespace.
 	 * Example: `snapchat_pixel_enabled`, `snapchat_access_token`
 	 *
 	 * @since 0.1.0
 	 */
-	const OPTION_PREFIX = 'snapchat_';
+	const STORE_PREFIX = 'snapchat_';
 
 	/**
 	 * Prefix used for all asset handles registered or enqueued by this plugin.
