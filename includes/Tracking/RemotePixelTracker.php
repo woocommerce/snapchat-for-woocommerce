@@ -91,6 +91,7 @@ final class RemotePixelTracker implements PixelTracker {
 	 * @return string Personalized pixel script.
 	 */
 	protected static function personalize_tracking_script( string $script ): string {
+		// @todo: use this once we integrate with Consent API.
 		if ( 0 && is_user_logged_in() ) { // for future use.
 			$user       = wp_get_current_user();
 			$user_email = $user->user_email;
@@ -115,6 +116,21 @@ final class RemotePixelTracker implements PixelTracker {
 	}
 
 	/**
+	 * Validates that the pixel script includes the expected Ad Partner URL.
+	 *
+	 * This ensures the cached script hasn't been tampered with.
+	 *
+	 * @since 0.1.0
+	 *
+	 * @param string $script The script HTML string.
+	 *
+	 * @return bool True if valid, false if tampered.
+	 */
+	private static function is_valid_pixel_script( string $script ): bool {
+		return strpos( $script, 'https://sc-static.net/scevent.min.js' ) !== false;
+	}
+
+	/**
 	 * Retrieves the Snapchat Pixel script, either from cache or the remote API.
 	 *
 	 * If not cached, it authenticates with Jetpack and queries the Snapchat Ads API for pixel script.
@@ -127,7 +143,7 @@ final class RemotePixelTracker implements PixelTracker {
 	private function get_pixel_script() {
 		$pixel_script = OptionsStore::get( OptionDefaults::PIXEL_SCRIPT );
 
-		if ( $pixel_script ) {
+		if ( $pixel_script && self::is_valid_pixel_script( $pixel_script ) ) {
 			return self::personalize_tracking_script( $pixel_script );
 		}
 
