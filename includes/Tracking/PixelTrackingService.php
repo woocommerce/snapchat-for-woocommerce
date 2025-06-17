@@ -54,7 +54,7 @@ final class PixelTrackingService {
 	 * @since 0.1.0
 	 *
 	 * @param PixelTrackerInterface $tracker Instance implementing the logic to inject the tracking pixel.
-	 * @param GlobalSiteTag $global_site_tag Instance responsible for injecting the Ad Partner Global Site Tag.
+	 * @param GlobalSiteTag         $global_site_tag Instance responsible for injecting the Ad Partner Global Site Tag.
 	 */
 	public function __construct( PixelTrackerInterface $tracker, GlobalSiteTag $global_site_tag ) {
 		$this->tracker         = $tracker;
