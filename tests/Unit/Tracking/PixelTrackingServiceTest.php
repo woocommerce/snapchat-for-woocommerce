@@ -17,7 +17,7 @@ namespace SnapchatForWooCommerce\Tests\Unit\Tracking;
 
 use WP_UnitTestCase;
 use SnapchatForWooCommerce\Tracking\PixelTrackingService;
-use SnapchatForWooCommerce\Tracking\PixelTracker;
+use SnapchatForWooCommerce\Tracking\PixelTrackerInterface;
 use SnapchatForWooCommerce\Tracking\GlobalSiteTag;
 use SnapchatForWooCommerce\Utils\Storage\OptionDefaults;
 use SnapchatForWooCommerce\Utils\Storage\Options;
@@ -28,9 +28,9 @@ use SnapchatForWooCommerce\Utils\Storage\Options;
 class PixelTrackingServiceTest extends WP_UnitTestCase {
 
 	/**
-	 * Mocked PixelTracker instance.
+	 * Mocked PixelTrackerInterface instance.
 	 *
-	 * @var PixelTracker
+	 * @var PixelTrackerInterface
 	 */
 	private $tracker_mock;
 
@@ -56,7 +56,7 @@ class PixelTrackingServiceTest extends WP_UnitTestCase {
 	public function set_up(): void {
 		parent::set_up();
 
-		$this->tracker_mock = $this->createMock( PixelTracker::class );
+		$this->tracker_mock = $this->createMock( PixelTrackerInterface::class );
 		$this->global_site_tag_mock = $this->createMock( GlobalSiteTag::class );
 
 		$this->service = new PixelTrackingService(

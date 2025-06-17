@@ -22,9 +22,9 @@ namespace SnapchatForWooCommerce\Tracking;
  * Example implementations might inject JavaScript pixels on product or checkout pages
  * depending on configuration and user consent.
  *
- * @since 1.0.0
+ * @since 0.1.0
  */
-interface PixelTracker {
+interface PixelTrackerInterface {
 	/**
 	 * Conditionally injects the tracking pixel into the page output.
 	 *

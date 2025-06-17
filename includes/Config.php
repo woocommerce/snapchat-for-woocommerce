@@ -26,6 +26,8 @@ final class Config {
 	 * Example: `/wp-json/snapchat-comms/v1/track`
 	 *
 	 * @since 0.1.0
+	 *
+	 * @todo: Change this to the actual WCS endpoint.
 	 */
 	const REST_NAMESPACE = 'snapchat-comms/v1';
 

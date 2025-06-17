@@ -4,7 +4,7 @@
  *
  * This class abstracts the logic for reading, writing, and deleting
  * Ad Partner plugin settings across multiple storage backends (e.g., options, transients).
- * It delegates actual storage to a {@see StorageStrategy} implementation,
+ * It delegates actual storage to a {@see StorageStrategyInterface} implementation,
  * while providing fallback support using a map of predefined defaults.
  *
  * @package SnapchatForWooCommerce\Utils\Storage
@@ -16,7 +16,7 @@ namespace SnapchatForWooCommerce\Utils\Storage;
 /**
  * Storage abstraction layer for Ad Partner plugin configuration.
  *
- * Uses a {@see StorageStrategy} to handle interaction with the underlying
+ * Uses a {@see StorageStrategyInterface} to handle interaction with the underlying
  * persistence mechanism, such as options or transients. Also provides
  * fallback behavior by consulting a static map of default values.
  *
@@ -29,9 +29,9 @@ final class Store {
 	/**
 	 * Strategy used to interact with the underlying storage backend.
 	 *
-	 * @var StorageStrategy
+	 * @var StorageStrategyInterface
 	 */
-	private StorageStrategy $strategy;
+	private StorageStrategyInterface $strategy;
 
 	/**
 	 * Map of default values for supported keys.
@@ -45,10 +45,10 @@ final class Store {
 	 *
 	 * @since 0.1.0
 	 *
-	 * @param StorageStrategy     $strategy Storage backend implementation.
-	 * @param array<string,mixed> $defaults Map of default values keyed by storage keys.
+	 * @param StorageStrategyInterface $strategy Storage backend implementation.
+	 * @param array<string,mixed>      $defaults Map of default values keyed by storage keys.
 	 */
-	public function __construct( StorageStrategy $strategy, array $defaults ) {
+	public function __construct( StorageStrategyInterface $strategy, array $defaults ) {
 		$this->strategy = $strategy;
 		$this->defaults = $defaults;
 	}

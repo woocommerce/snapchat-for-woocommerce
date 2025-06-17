@@ -103,7 +103,7 @@ class AssetLoaderTest extends WP_UnitTestCase {
 		file_put_contents( SNAPCHAT_ADS_PLUGIN_BUILD_PATH . $script_name, '// js' );
 		file_put_contents(
 			SNAPCHAT_ADS_PLUGIN_BUILD_PATH . $script_name . '.asset.php',
-			'<?php return [ "dependencies" => [], "version" => "1.0.0" ];'
+			'<?php return [ "dependencies" => [], "version" => "0.1.0" ];'
 		);
 
 		AssetLoader::enqueue_script( $handle, $script_name );

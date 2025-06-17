@@ -32,10 +32,10 @@ use SnapchatForWooCommerce\Utils\Storage\TransientDefaults;
  * - {@see JetpackAuthenticator} for securely authenticating requests.
  * - {@see OptionsStore} and {@see OptionDefaults} for managing plugin settings and cache.
  *
- * @see \SnapchatForWooCommerce\Tracking\PixelTracker
+ * @see \SnapchatForWooCommerce\Tracking\PixelTrackerInterface
  * @since 0.1.0
  */
-final class RemotePixelTracker implements PixelTracker {
+final class RemotePixelTracker implements PixelTrackerInterface {
 
 	/**
 	 * Client for making authenticated proxy requests to Snapchat Ads API.

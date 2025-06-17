@@ -2,7 +2,7 @@
 /**
  * Option-based storage strategy for Ad Partner plugin settings.
  *
- * Implements the {@see StorageStrategy} interface using WordPress options
+ * Implements the {@see StorageStrategyInterface} interface using WordPress options
  * as the underlying persistence layer. This class ensures all keys are
  * consistently prefixed using {@see Config::STORE_PREFIX}.
  *
@@ -20,7 +20,7 @@ use SnapchatForWooCommerce\Config;
 /**
  * Stores Ad Partner plugin settings using the WordPress options API.
  *
- * This class implements {@see StorageStrategy} and persists values
+ * This class implements {@see StorageStrategyInterface} and persists values
  * in the `wp_options` table. All keys are automatically prefixed using
  * {@see Config::STORE_PREFIX} to avoid collisions.
  *
@@ -29,7 +29,7 @@ use SnapchatForWooCommerce\Config;
  *
  * @since 0.1.0
  */
-final class OptionStorage implements StorageStrategy {
+final class OptionStorage implements StorageStrategyInterface {
 
 	/**
 	 * Retrieves a value from the WordPress options table.

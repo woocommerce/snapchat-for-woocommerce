@@ -19,11 +19,11 @@ use SnapchatForWooCommerce\Utils\AssetLoader;
  * Handles the registration of pixel-related hooks and provides access to tracking status.
  *
  * This service registers frontend and REST API hooks to support pixel injection behavior.
- * Pixel rendering is delegated to a {@see PixelTracker} implementation. It also provides
+ * Pixel rendering is delegated to a {@see PixelTrackerInterface} implementation. It also provides
  * a utility method to check whether tracking is currently enabled via plugin settings.
  *
  * Dependencies:
- * - {@see PixelTracker}: Determines if and how the pixel should be injected.
+ * - {@see PixelTrackerInterface}: Determines if and how the pixel should be injected.
  * - {@see OptionsStore} and {@see OptionDefaults}: Used to read tracking settings.
  *
  * @since 0.1.0
@@ -32,9 +32,9 @@ final class PixelTrackingService {
 	/**
 	 * Instance of the pixel tracker responsible for rendering the pixel.
 	 *
-	 * @var PixelTracker
+	 * @var PixelTrackerInterface
 	 */
-	private PixelTracker $tracker;
+	private PixelTrackerInterface $tracker;
 
 	/**
 	 * Instance responsible for injecting the Ad Partner Global Site Tag into the site header.
@@ -53,10 +53,10 @@ final class PixelTrackingService {
 	 *
 	 * @since 0.1.0
 	 *
-	 * @param PixelTracker  $tracker          Instance implementing the logic to inject the tracking pixel.
-	 * @param GlobalSiteTag $global_site_tag  Instance responsible for injecting the Ad Partner Global Site Tag.
+	 * @param PixelTrackerInterface $tracker Instance implementing the logic to inject the tracking pixel.
+	 * @param GlobalSiteTag $global_site_tag Instance responsible for injecting the Ad Partner Global Site Tag.
 	 */
-	public function __construct( PixelTracker $tracker, GlobalSiteTag $global_site_tag ) {
+	public function __construct( PixelTrackerInterface $tracker, GlobalSiteTag $global_site_tag ) {
 		$this->tracker         = $tracker;
 		$this->global_site_tag = $global_site_tag;
 	}

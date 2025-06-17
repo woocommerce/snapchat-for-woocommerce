@@ -29,7 +29,7 @@ namespace SnapchatForWooCommerce\Utils\Storage;
  * @package SnapchatForWooCommerce\Utils\Storage
  * @since 0.1.0
  */
-interface StorageStrategy {
+interface StorageStrategyInterface {
 
 	/**
 	 * Retrieves a value from the storage backend.

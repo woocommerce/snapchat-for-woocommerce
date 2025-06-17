@@ -32,7 +32,7 @@ final class PixelDefaults {
 	 * never be exposed to end-users for editing.
 	 *
 	 * Used in:
-	 * - {@see \SnapchatForWooCommerce\Tracking\PixelTracker::is_valid_pixel_script}
+	 * - {@see \SnapchatForWooCommerce\Tracking\RemotePixelTracker::is_valid_pixel_script}
 	 *
 	 * @since 0.1.0
 	 */

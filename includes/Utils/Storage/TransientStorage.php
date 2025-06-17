@@ -2,7 +2,7 @@
 /**
  * Transient-based storage strategy for Ad Partner plugin settings.
  *
- * Implements the {@see StorageStrategy} interface using WordPress transients
+ * Implements the {@see StorageStrategyInterface} interface using WordPress transients
  * as the underlying persistence layer. All keys are prefixed using
  * {@see Config::STORE_PREFIX}, and expiration is determined via
  * {@see TransientDefaults::get_ttl()}.
@@ -22,7 +22,7 @@ use SnapchatForWooCommerce\Utils\Storage\TransientDefaults;
 /**
  * Stores Ad Partner plugin data using the WordPress transients API.
  *
- * This class implements {@see StorageStrategy} and caches values
+ * This class implements {@see StorageStrategyInterface} and caches values
  * in the transient system with automatic expiration. TTLs are resolved
  * via {@see TransientDefaults}, and all keys are prefixed consistently
  * to avoid collisions.
@@ -32,7 +32,7 @@ use SnapchatForWooCommerce\Utils\Storage\TransientDefaults;
  *
  * @since 0.1.0
  */
-final class TransientStorage implements StorageStrategy {
+final class TransientStorage implements StorageStrategyInterface {
 
 	/**
 	 * Retrieves a value from the WordPress transients API.

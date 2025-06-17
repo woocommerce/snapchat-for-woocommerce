@@ -9,7 +9,7 @@ namespace SnapchatForWooCommerce\Tests\Unit\Utils;
 
 use PHPUnit\Framework\TestCase;
 use SnapchatForWooCommerce\Utils\Storage\Store;
-use SnapchatForWooCommerce\Utils\Storage\StorageStrategy;
+use SnapchatForWooCommerce\Utils\Storage\StorageStrategyInterface;
 
 /**
  * @covers \SnapchatForWooCommerce\Utils\Storage\Store
@@ -22,7 +22,7 @@ class StoreTest extends TestCase {
 	protected function setUp(): void {
 		parent::setUp();
 
-		$this->mock_strategy = $this->createMock( StorageStrategy::class );
+		$this->mock_strategy = $this->createMock( StorageStrategyInterface::class );
 
 		$this->store = new Store(
 			$this->mock_strategy,
