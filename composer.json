@@ -4,14 +4,35 @@
 	"license": "GPL-3.0-or-later",
 	"autoload": {
 		"psr-4": {
-			"SnapchatForWoocommerce\\": "includes/"
+			"SnapchatForWooCommerce\\": "includes/"
 		}
 	},
 	"require-dev": {
 		"phpunit/phpunit": "^9.0",
 		"automattic/jetpack-autoloader": "^2",
 		"woocommerce/woocommerce-sniffs": "^1.0",
-		"sirbrillig/phpcs-changed": "^2.11"
+		"sirbrillig/phpcs-changed": "^2.11",
+		"yoast/phpunit-polyfills": "^4.0",
+		"dg/bypass-finals": "^1.9"
+	},
+	"archive": {
+		"exclude": [
+			"!/assets",
+			"!/build",
+			"!/languages",
+			"tests",
+			"node_modules",
+			"woocommerce-eu-vat-number.zip",
+			"README.md",
+			"composer.json",
+			"composer.lock",
+			"package.json",
+			"package-lock.json",
+			"phpcs.xml.dist",
+			"phpcs-compat.xml.dist",
+			"webpack.config.js",
+			".*"
+		]
 	},
 	"config": {
 		"allow-plugins": {

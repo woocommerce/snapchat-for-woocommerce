@@ -2,10 +2,10 @@
 /**
  * Plugin Admin: Main Plugin Class.
  *
- * @package SnapchatForWoocommerce\Admin
+ * @package SnapchatForWooCommerce\Admin
  */
 
-namespace SnapchatForWoocommerce\Admin;
+namespace SnapchatForWooCommerce\Admin;
 
 /**
  * The Plugin class.
@@ -31,14 +31,14 @@ class Plugin {
 	 * Cloning is forbidden.
 	 */
 	public function __clone() {
-		wc_doing_it_wrong( __FUNCTION__, __( 'Cloning is forbidden.', 'snapchat_for_woocommerce' ), $this->version );
+		wc_doing_it_wrong( __FUNCTION__, __( 'Cloning is forbidden.', 'snapchat-for-woocommerce' ), $this->version );
 	}
 
 	/**
 	 * Unserializing instances of this class is forbidden.
 	 */
 	public function __wakeup() {
-		wc_doing_it_wrong( __FUNCTION__, __( 'Unserializing instances of this class is forbidden.', 'snapchat_for_woocommerce' ), $this->version );
+		wc_doing_it_wrong( __FUNCTION__, __( 'Unserializing instances of this class is forbidden.', 'snapchat-for-woocommerce' ), $this->version );
 	}
 
 	/**
@@ -46,7 +46,7 @@ class Plugin {
 	 *
 	 * Ensures only one instance can be loaded.
 	 *
-	 * @return \snapchat_for_woocommerce
+	 * @return Plugin
 	 */
 	public static function instance() {
 

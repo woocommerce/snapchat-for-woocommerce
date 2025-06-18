@@ -4,13 +4,13 @@
  *
  * Registers admin scripts, styles, and WooCommerce Admin page for the plugin.
  *
- * @package SnapchatForWoocommerce\Admin
+ * @package SnapchatForWooCommerce\Admin
  */
 
-namespace SnapchatForWoocommerce\Admin;
+namespace SnapchatForWooCommerce\Admin;
 
 /**
- * SnapchatForWoocommerce Setup Class
+ * SnapchatForWooCommerce Setup Class
  */
 class Setup {
 	/**
@@ -79,7 +79,7 @@ class Setup {
 		wc_admin_register_page(
 			array(
 				'id'     => 'snapchat_for_woocommerce-example-page',
-				'title'  => __( 'Snapchat For Woocommerce', 'snapchat_for_woocommerce' ),
+				'title'  => __( 'Snapchat For Woocommerce', 'snapchat-for-woocommerce' ),
 				'parent' => 'woocommerce',
 				'path'   => '/snapchat-for-woocommerce',
 			)

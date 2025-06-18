@@ -1,0 +1,47 @@
+name: PHPUnit Tests
+
+on:
+  push:
+    branches: [ trunk ]
+  pull_request:
+    branches: [ trunk ]
+
+jobs:
+  phpunit:
+    runs-on: ubuntu-latest
+    env:
+      WP_CORE_DIR: /tmp/wordpress
+      WP_TESTS_DIR: /tmp/wordpress-tests-lib
+      DB_NAME: wordpress_test
+      DB_USER: root
+      DB_PASS: root
+      DB_HOST: 127.0.0.1
+      WP_VERSION: latest
+      CI: true
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set up PHP 7.4
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: 7.4
+          extensions: mbstring, mysqli
+          tools: composer, phpunit
+
+      - name: Prepare MySQL
+        uses: woocommerce/grow/prepare-mysql@actions-v2
+
+      - name: Install svn (used for installing WP versions)
+        run: sudo apt-get -y install subversion
+
+      - name: Install Composer dependencies
+        run: composer install --prefer-dist --no-progress
+
+      - name: Install WordPress test suite (with WooCommerce)
+        run: |
+          bash bin/install-wp-tests.sh $DB_NAME $DB_USER $DB_PASS $DB_HOST $WP_VERSION
+
+      - name: Run PHPUnit tests
+        run: ./vendor/bin/phpunit
