@@ -1,16 +1,27 @@
-<?xml version="1.0"?>
-<phpunit
+<?xml version="1.0" encoding="UTF-8"?>
+<phpunit xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
 	bootstrap="tests/bootstrap.php"
-	backupGlobals="false"
 	colors="true"
+	backupGlobals="false"
+	verbose="true"
 	convertErrorsToExceptions="true"
 	convertNoticesToExceptions="true"
 	convertWarningsToExceptions="true"
-	>
+	stopOnFailure="false"
+	processIsolation="false"
+	xsi:noNamespaceSchemaLocation="https://schema.phpunit.de/9.3/phpunit.xsd"
+>
+	<coverage>
+		<report>
+		<html outputDirectory="build/coverage-html"/>
+		<text outputFile="php://stdout" showUncoveredFiles="true"/>
+		</report>
+	</coverage>
 	<testsuites>
-		<testsuite name="testing">
-			<directory prefix="test-" suffix=".php">./tests/</directory>
-			<exclude>./tests/test-sample.php</exclude>
+		<testsuite name="Snapchat for WooCommerce Test Suite">
+			<directory suffix="Test.php">./tests/Unit</directory>
+			<directory suffix="Test.php">./tests/Integration</directory>
 		</testsuite>
 	</testsuites>
+	<logging/>
 </phpunit>
