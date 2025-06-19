@@ -31,18 +31,19 @@ final class UserIdentifier {
 	 * @return array<string,mixed> Associative array of user identifiers.
 	 */
 	public static function get_user_data(): array {
-		$data = [];
+		$data = array();
+		$ip   = '';
 
 		if ( isset( $_SERVER['HTTP_CF_CONNECTING_IP'] ) ) {
 			$ip = sanitize_text_field( $_SERVER['HTTP_CF_CONNECTING_IP'] );
 		} elseif ( isset( $_SERVER['HTTP_X_FORWARDED_FOR'] ) ) {
 			$ip_list = explode( ',', $_SERVER['HTTP_X_FORWARDED_FOR'] );
 			$ip = sanitize_text_field( trim( $ip_list[0] ) );
-		} else {
+		} else if ( isset( $_SERVER['REMOTE_ADDR'] ) ) {
 			$ip = sanitize_text_field( $_SERVER['REMOTE_ADDR'] );
 		}
 
-		if ( isset( $_SERVER['REMOTE_ADDR'] ) ) {
+		if ( $ip ) {
 			$data['client_ip_address'] = $ip;
 		}
 
