@@ -63,6 +63,10 @@ export const trackAddToCartEvent = ( product, quantity = 1 ) => {
 		data.user_email = snapchatAdsData.user_email;
 	}
 
+	if ( snapchatAdsData.products?.[ id ]?.event_id ) {
+		data.client_dedup_id = snapchatAdsData.products[ id ].event_id;
+	}
+
 	trackEvent( SnapchatEvent.ADD_CART, data );
 };
 

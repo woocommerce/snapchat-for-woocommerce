@@ -10,6 +10,7 @@
 
 namespace SnapchatForWooCommerce\Connection;
 
+use WpOrg\Requests\Requests;
 use WP_REST_Response;
 use WP_Error;
 
@@ -43,7 +44,7 @@ final class WcsClient {
 	 * @return WP_REST_Response|WP_Error Connection status or error.
 	 */
 	public function get_connection_status( string $jetpack_token ) {
-		return $this->proxy_request( 'GET', $jetpack_token, 'connection/status' );
+		return $this->proxy_request( Requests::GET, $jetpack_token, 'connection/status' );
 	}
 
 	/**
@@ -57,7 +58,7 @@ final class WcsClient {
 	 * @return WP_REST_Response|WP_Error Connection initiation response or error.
 	 */
 	public function start_connection( string $jetpack_token, string $return_url ) {
-		return $this->proxy_request( 'POST', $jetpack_token, 'connection/connect', array( 'returnUrl' => $return_url ) );
+		return $this->proxy_request( Requests::POST, $jetpack_token, 'connection/connect', array( 'returnUrl' => $return_url ) );
 	}
 
 	/**
@@ -70,8 +71,8 @@ final class WcsClient {
 	 *
 	 * @return WP_REST_Response|WP_Error API response or error.
 	 */
-	public function proxy_get( string $token, string $path ) {
-		return $this->proxy_request( 'GET', $token, $path );
+	public function proxy_get( string $token, string $path, string $target = 'ads' ) {
+		return $this->proxy_request( Requests::GET, $token, $path, null, $target );
 	}
 
 	/**
@@ -85,8 +86,8 @@ final class WcsClient {
 	 *
 	 * @return WP_REST_Response|WP_Error API response or error.
 	 */
-	public function proxy_post( string $token, string $path, $body ) {
-		return $this->proxy_request( 'POST', $token, $path, $body );
+	public function proxy_post( string $token, string $path, $body, string $target = 'ads' ) {
+		return $this->proxy_request( Requests::POST, $token, $path, $body, $target );
 	}
 
 	/**
@@ -104,16 +105,23 @@ final class WcsClient {
 	 *
 	 * @return WP_REST_Response|WP_Error Parsed response or error.
 	 */
-	private function proxy_request( string $method, string $jetpack_token, string $path, $body = null ) {
-		$url = sprintf( '%s/%s/%s', self::WCS_BASE_URL, self::SERVICE_NAME, ltrim( $path, '/' ) );
+	private function proxy_request( string $method, string $jetpack_token, string $path, $body = null, string $target = 'ads' ) {
+		$url = sprintf(
+			'%s/%s/%s/%s',
+			self::WCS_BASE_URL,
+			self::SERVICE_NAME,
+			rawurlencode( $target ),
+			ltrim( $path, '/' )
+		);
 
 		$args = array(
 			'method'  => strtoupper( $method ),
 			'timeout' => 15,
-			'headers' => array(
-				'Authorization' => "Bearer $jetpack_token",
-			),
 		);
+
+		if ( $jetpack_token ) {
+			$args['headers']['Authorization'] = "Bearer $jetpack_token";
+		}
 
 		if ( null !== $body ) {
 			$args['headers']['Content-Type'] = 'application/json';

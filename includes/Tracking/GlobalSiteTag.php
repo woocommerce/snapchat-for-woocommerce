@@ -45,7 +45,7 @@ final class GlobalSiteTag {
 	/**
 	 * Meta key used to mark orders that have already been tracked.
 	 */
-	protected const ORDER_CONVERSION_META_KEY = '_snapchat_pixel_tracked';
+	protected const ORDER_PIXEL_TRACKED_META_KEY = '_snapchat_pixel_tracked';
 
 	/**
 	 * Registers WordPress and WooCommerce hooks for product metadata collection
@@ -122,8 +122,11 @@ final class GlobalSiteTag {
 	 * @param WC_Product $product WooCommerce product object.
 	 */
 	protected function add_product_data( WC_Product $product ): void {
-		$this->products[ $product->get_id() ] = array(
-			'price' => wc_get_price_to_display( $product ),
+		$product_id = $product->get_id();
+
+		$this->products[ $product_id ] = array(
+			'price'    => wc_get_price_to_display( $product ),
+			'event_id' => EventIdRegistry::get_add_to_cart_id( $product_id ),
 		);
 	}
 
@@ -186,15 +189,15 @@ final class GlobalSiteTag {
 		$order = wc_get_order( $order_id );
 
 		// Make sure there is a valid order object and it is not already marked as tracked.
-		if ( ! $order || 1 === (int) $order->get_meta( self::ORDER_CONVERSION_META_KEY, true ) ) {
+		if ( ! $order || 1 === (int) $order->get_meta( self::ORDER_PIXEL_TRACKED_META_KEY, true ) ) {
 			return;
 		}
 
 		// Mark the order as tracked, to avoid double-reporting if the confirmation page is reloaded.
-		$order->update_meta_data( self::ORDER_CONVERSION_META_KEY, 1 );
+		$order->update_meta_data( self::ORDER_PIXEL_TRACKED_META_KEY, 1 );
 		$order->save_meta_data();
 
-		$transaction_id  = $order->get_order_number();
+		$order_key       = $order->get_order_key();
 		$total           = $order->get_total();
 		$currency        = $order->get_currency();
 		$item_ids        = array();
@@ -227,7 +230,7 @@ final class GlobalSiteTag {
 				array(
 					'price'          => $total,
 					'currency'       => $currency,
-					'transaction_id' => $transaction_id,
+					'transaction_id' => $order_key,
 					'item_ids'       => $item_ids,
 					'item_category'  => implode( ', ', array_unique( $item_categories ) ),
 					'number_items'   => $number_items,

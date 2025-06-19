@@ -48,6 +48,20 @@ final class OptionDefaults {
 	public const PIXEL_ENABLED = 'ads_pixel_enabled';
 
 	/**
+	 * Option key for the Ad Partner's Pixel ID.
+	 *
+	 * @since 0.1.0
+	 */
+	public const PIXEL_ID = 'pixel_id';
+
+	/**
+	 * Option key for the Ad Partner's Conversion Token.
+	 *
+	 * @since 0.1.0
+	 */
+	public const CONVERSION_ACCESS_TOKEN = 'conversion_access_token';
+
+	/**
 	 * Returns default values for all known Ad Partner options.
 	 *
 	 * Used by {@see Options} to provide fallbacks when option values
@@ -55,13 +69,15 @@ final class OptionDefaults {
 	 *
 	 * @since 0.1.0
 	 *
-	 * @return array<string, mixed> Map of option keys to their default values.
+	 * @return array<string,mixed> Map of option keys to their default values.
 	 */
 	public static function get_all(): array {
 		return array(
-			self::AD_ACCOUNT_ID   => '',
-			self::ORGANIZATION_ID => '',
-			self::PIXEL_ENABLED   => false,
+			self::AD_ACCOUNT_ID           => '',
+			self::ORGANIZATION_ID         => '',
+			self::PIXEL_ENABLED           => false,
+			self::PIXEL_ID                => '',
+			self::CONVERSION_ACCESS_TOKEN => '',
 		);
 	}
 }

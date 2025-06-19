@@ -20,6 +20,17 @@ namespace SnapchatForWooCommerce;
  */
 final class Config {
 	/**
+	 * Unique slug identifier for the Ad Partner plugin.
+	 *
+	 * Used for naming purposes such as Action Scheduler groups, admin page slugs,
+	 * and internal prefixing of action/filter hooks.
+	 * Example: `snapchat_for_woocommerce`
+	 *
+	 * @since 0.1.0
+	 */
+	const PLUGIN_SLUG = 'snapchat_for_woocommerce';
+
+	/**
 	 * The namespace used for all REST API endpoints exposed by this plugin.
 	 *
 	 * This value is appended to `/wp-json/` to form the full route base.

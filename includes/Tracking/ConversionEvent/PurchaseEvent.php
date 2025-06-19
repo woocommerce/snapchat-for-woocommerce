@@ -1,0 +1,90 @@
+<?php
+/**
+ * Server-side Ad Partner Conversion event representing a completed purchase.
+ *
+ * Builds a structured payload using WooCommerce order details
+ * to send to the Ad Partner's Conversions API.
+ *
+ * @package SnapchatForWooCommerce\Tracking\ConversionEvent
+ * @since 0.1.0
+ */
+
+namespace SnapchatForWooCommerce\Tracking\ConversionEvent;
+
+use WC_Order;
+use SnapchatForWooCommerce\Tracking\EventIdRegistry;
+
+/**
+ * Constructs a Conversion request payload for the PURCHASE event type.
+ *
+ * Extracts item details, order totals, and identifiers from
+ * the WooCommerce order object to track conversions accurately.
+ *
+ * @since 0.1.0
+ */
+final class PurchaseEvent implements ConversionEventInterface {
+
+	/**
+	 * WooCommerce order object.
+	 *
+	 * @since 0.1.0
+	 * @var WC_Order|null
+	 */
+	private $order;
+
+	/**
+	 * Constructor.
+	 *
+	 * @since 0.1.0
+	 *
+	 * @param int $order_id WooCommerce order ID.
+	 */
+	public function __construct( int $order_id ) {
+		$this->order = wc_get_order( $order_id );
+	}
+
+	/**
+	 * Builds the raw Conversion payload for the Ad Partner.
+	 *
+	 * Includes order totals, currency, line items, and metadata.
+	 *
+	 * @since 0.1.0
+	 *
+	 * @return array<string,mixed> Conversion event payload.
+	 */
+	public function build_payload(): array {
+		if ( ! $this->order ) {
+			return [];
+		}
+
+		$contents = [];
+
+		/** @var \WC_Order_Item_Product $item The order item product. */
+		foreach ( $this->order->get_items() as $item ) {
+			$product = $item->get_product();
+			if ( ! $product ) {
+				continue;
+			}
+
+			$contents[] = [
+				'id'         => (string) $product->get_id(),
+				'quantity'   => (string) $item->get_quantity(),
+				'item_price' => (string) $product->get_price(),
+			];
+		}
+
+		return [
+			'event_name'        => 'PURCHASE',
+			'event_time'        => time(),
+			'event_id'          => EventIdRegistry::get_purchase_id(),
+			'action_source'     => 'WEB',
+			'event_source_url'  => $this->order->get_checkout_order_received_url(),
+			'user_data'         => [],
+			'custom_data'       => [
+				'currency' => $this->order->get_currency(),
+				'value'    => $this->order->get_total(),
+				'contents' => $contents,
+			],
+		];
+	}
+}
