@@ -87,9 +87,14 @@ class ConnectionServiceTest extends WP_UnitTestCase {
 		$this->auth_mock->method( 'get_auth_header' )->willReturn( 'Bearer token' );
 
 		$this->wcs_client_mock->method( 'start_connection' )
-			->with( 'Bearer token', $this->callback( function ( $url ) {
-				return is_string( $url ); // ensure it's a URL
-			} ) )
+			->with(
+				'Bearer token',
+				$this->callback(
+					function ( $url ) {
+						return is_string( $url ); // ensure it's a URL
+					}
+				)
+			)
 			->willReturn(
 				array(
 					'oauthUrl' => 'https://snapchat.oauth.example.com',
@@ -128,7 +133,7 @@ class ConnectionServiceTest extends WP_UnitTestCase {
 	 */
 	public function test_handle_authorize_redirect_builds_redirect_url() {
 		// Provide a valid encoded state.
-		$state_array = array(
+		$state_array   = array(
 			'returnUrl' => 'https://example.com/success',
 			'service'   => 'snapchat-ads',
 		);

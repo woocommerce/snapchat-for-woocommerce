@@ -28,7 +28,7 @@ final class EventIdRegistryTest extends TestCase {
 
 		$cart_ids = $ref->getProperty( 'add_to_cart_ids' );
 		$cart_ids->setAccessible( true );
-		$cart_ids->setValue( [] );
+		$cart_ids->setValue( array() );
 
 		$purchase_id = $ref->getProperty( 'purchase_id' );
 		$purchase_id->setAccessible( true );

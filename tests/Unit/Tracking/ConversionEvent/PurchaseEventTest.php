@@ -48,10 +48,12 @@ class PurchaseEventTest extends WP_UnitTestCase {
 		$product_two->set_regular_price( 15 );
 		$product_two->save();
 
-		$order = wc_create_order([
-			'status' => 'pending',
-			'customer_id' => 1,
-		]);
+		$order = wc_create_order(
+			array(
+				'status'      => 'pending',
+				'customer_id' => 1,
+			)
+		);
 
 		$order->add_product( $product_one, 1 );
 		$order->add_product( $product_two, 2 );
@@ -104,6 +106,6 @@ class PurchaseEventTest extends WP_UnitTestCase {
 		$event   = new PurchaseEvent( 999999 ); // unlikely to exist
 		$payload = $event->build_payload();
 
-		$this->assertSame( [], $payload );
+		$this->assertSame( array(), $payload );
 	}
 }

@@ -67,7 +67,7 @@ final class AddToCartEventTest extends WP_UnitTestCase {
 		$this->assertArrayHasKey( 'event_id', $payload );
 		$this->assertMatchesRegularExpression( '/^[0-9a-f\\-]{36}$/i', $payload['event_id'] );
 
-		$this->assertSame( [], $payload['user_data'] );
+		$this->assertSame( array(), $payload['user_data'] );
 
 		$this->assertArrayHasKey( 'custom_data', $payload );
 		$this->assertArrayHasKey( 'contents', $payload['custom_data'] );

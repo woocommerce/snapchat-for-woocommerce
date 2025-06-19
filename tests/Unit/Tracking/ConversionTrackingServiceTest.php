@@ -46,7 +46,7 @@ class ConversionTrackingServiceTest extends WP_UnitTestCase {
 	 * Test that WooCommerce purchase hook is registered.
 	 */
 	public function test_woocommerce_thankyou_hook_is_registered(): void {
-		$callback = has_action( 'woocommerce_thankyou', [ $this->service, 'handle_purchase' ] );
+		$callback = has_action( 'woocommerce_thankyou', array( $this->service, 'handle_purchase' ) );
 		$this->assertNotFalse( $callback, 'Expected woocommerce_thankyou hook to be registered.' );
 	}
 
@@ -54,7 +54,7 @@ class ConversionTrackingServiceTest extends WP_UnitTestCase {
 	 * Test that WooCommerce add_to_cart hook is registered.
 	 */
 	public function test_woocommerce_add_to_cart_hook_is_registered(): void {
-		$callback = has_action( 'woocommerce_add_to_cart', [ $this->service, 'handle_add_to_cart' ] );
+		$callback = has_action( 'woocommerce_add_to_cart', array( $this->service, 'handle_add_to_cart' ) );
 		$this->assertNotFalse( $callback, 'Expected woocommerce_add_to_cart hook to be registered.' );
 	}
 
@@ -62,8 +62,8 @@ class ConversionTrackingServiceTest extends WP_UnitTestCase {
 	 * Test that action for async conversion event is registered.
 	 */
 	public function test_conversion_event_hook_is_registered(): void {
-		$hook = Helper::with_prefix( 'send_conversion_event' );
-		$callback = has_action( $hook, [ $this->tracker, 'send' ] );
+		$hook     = Helper::with_prefix( 'send_conversion_event' );
+		$callback = has_action( $hook, array( $this->tracker, 'send' ) );
 		$this->assertNotFalse( $callback, "Expected {$hook} to be registered with the tracker." );
 	}
 

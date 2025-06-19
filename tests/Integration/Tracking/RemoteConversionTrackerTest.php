@@ -54,7 +54,7 @@ class RemoteConversionTrackerTest extends WP_UnitTestCase {
 	 * Test that track_purchase schedules an async action.
 	 */
 	public function test_track_purchase_dispatches_async_action(): void {
-		$order = wc_create_order();
+		$order    = wc_create_order();
 		$order_id = $order->get_id();
 
 		$this->tracker->track_purchase( $order_id );
@@ -82,7 +82,7 @@ class RemoteConversionTrackerTest extends WP_UnitTestCase {
 
 		$this->client->expects( $this->never() )->method( 'proxy_post' );
 
-		$this->tracker->send( [ 'event_name' => 'test' ] );
+		$this->tracker->send( array( 'event_name' => 'test' ) );
 	}
 
 	/**
@@ -92,17 +92,24 @@ class RemoteConversionTrackerTest extends WP_UnitTestCase {
 		Options::set( OptionDefaults::CONVERSION_ACCESS_TOKEN, 'token_abc' );
 		Options::set( OptionDefaults::PIXEL_ID, 'pixel_456' );
 
+		$_SERVER['HTTP_X_FORWARDED_FOR'] = '203.0.113.55';
+		$_SERVER['HTTP_USER_AGENT']      = 'PHPUnitTestRunner';
+
 		$this->client->expects( $this->once() )
 			->method( 'proxy_post' )
 			->with(
 				'',
 				$this->callback( fn( $path ) => str_starts_with( $path, 'pixel_456/events?access_token=token_abc' ) ),
-				$this->callback( function ( $payload ) {
-					return isset( $payload['data'][0]['user_data']['client_ip_address'] );
-				}),
+				$this->callback(
+					function ( $payload ) {
+						return isset( $payload['data'][0]['user_data']['client_ip_address'] )
+						&& $payload['data'][0]['user_data']['client_ip_address'] === '203.0.113.55'
+						&& $payload['data'][0]['user_data']['client_user_agent'] === 'PHPUnitTestRunner';
+					}
+				),
 				'conversions'
 			);
 
-		$this->tracker->send( [ 'event_name' => 'Purchase' ] );
+		$this->tracker->send( array( 'event_name' => 'Purchase' ) );
 	}
 }

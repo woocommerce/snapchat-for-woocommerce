@@ -56,7 +56,7 @@ class PixelTrackingServiceTest extends WP_UnitTestCase {
 	public function set_up(): void {
 		parent::set_up();
 
-		$this->tracker_mock = $this->createMock( PixelTrackerInterface::class );
+		$this->tracker_mock         = $this->createMock( PixelTrackerInterface::class );
 		$this->global_site_tag_mock = $this->createMock( GlobalSiteTag::class );
 
 		$this->service = new PixelTrackingService(
@@ -106,8 +106,8 @@ class PixelTrackingServiceTest extends WP_UnitTestCase {
 
 		$this->service->register_hooks();
 
-		$this->assertSame( 10, has_action( 'wp_head', [ $this->tracker_mock, 'maybe_inject_pixel' ] ) );
-		$this->assertSame( 10, has_action( 'wp_enqueue_scripts', [ $this->service, 'enqueue_tracking_scripts' ] ) );
+		$this->assertSame( 10, has_action( 'wp_head', array( $this->tracker_mock, 'maybe_inject_pixel' ) ) );
+		$this->assertSame( 10, has_action( 'wp_enqueue_scripts', array( $this->service, 'enqueue_tracking_scripts' ) ) );
 	}
 
 	/**
@@ -123,7 +123,7 @@ class PixelTrackingServiceTest extends WP_UnitTestCase {
 
 		$this->service->register_hooks();
 
-		$this->assertFalse( has_action( 'wp_head', [ $this->tracker_mock, 'maybe_inject_pixel' ] ) );
-		$this->assertFalse( has_action( 'wp_enqueue_scripts', [ $this->service, 'enqueue_tracking_scripts' ] ) );
+		$this->assertFalse( has_action( 'wp_head', array( $this->tracker_mock, 'maybe_inject_pixel' ) ) );
+		$this->assertFalse( has_action( 'wp_enqueue_scripts', array( $this->service, 'enqueue_tracking_scripts' ) ) );
 	}
 }

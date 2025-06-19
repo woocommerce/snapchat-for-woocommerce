@@ -37,6 +37,8 @@ final class UserIdentifierTest extends TestCase {
 	 */
 	protected function tearDown(): void {
 		$_SERVER = $this->original_server;
+
+		unset( $_SERVER['REMOTE_ADDR'], $_SERVER['HTTP_USER_AGENT'] );
 		parent::tearDown();
 	}
 
@@ -53,14 +55,16 @@ final class UserIdentifierTest extends TestCase {
 		$this->assertArrayHasKey( 'client_user_agent', $data );
 		$this->assertSame( '192.168.0.1', $data['client_ip_address'] );
 		$this->assertSame( 'UnitTest UA', $data['client_user_agent'] );
+
+		$_SERVER['HTTP_CF_CONNECTING_IP'] = '192.168.1.40';
+		$data                             = UserIdentifier::get_user_data();
+		$this->assertSame( '192.168.1.40', $data['client_ip_address'] );
 	}
 
 	/**
 	 * Test that output is empty if no headers are present.
 	 */
 	public function test_get_user_data_returns_empty_array_when_headers_missing(): void {
-		unset( $_SERVER['REMOTE_ADDR'], $_SERVER['HTTP_USER_AGENT'] );
-
 		$data = UserIdentifier::get_user_data();
 
 		$this->assertIsArray( $data );

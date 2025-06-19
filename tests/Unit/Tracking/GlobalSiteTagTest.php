@@ -33,7 +33,7 @@ class GlobalSiteTagTest extends WP_UnitTestCase {
 		$product->save();
 
 		// Manually invoke add_product_data (protected method).
-		$ref = new \ReflectionClass( $tag );
+		$ref    = new \ReflectionClass( $tag );
 		$method = $ref->getMethod( 'add_product_data' );
 		$method->setAccessible( true );
 		$method->invoke( $tag, $product );

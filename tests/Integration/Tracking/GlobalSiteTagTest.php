@@ -58,7 +58,7 @@ class GlobalSiteTagTest extends WP_UnitTestCase {
 	 * - The inline script contains the correct snaptr call with VIEW_CONTENT.
 	 */
 	public function test_track_view_content_event_adds_inline_script() {
-		$product = WC_Helper_Product::create_simple_product();
+		$product    = WC_Helper_Product::create_simple_product();
 		$product_id = $product->get_id();
 
 		global $post;
@@ -71,7 +71,7 @@ class GlobalSiteTagTest extends WP_UnitTestCase {
 		$this->assertArrayHasKey( Config::ASSET_HANDLE_PREFIX . 'pixel-tracking', $scripts->registered );
 		$registered = $scripts->registered[ Config::ASSET_HANDLE_PREFIX . 'pixel-tracking' ];
 
-		$this->assertStringContainsString( 'snaptr("track", "VIEW_CONTENT"', implode( '', $registered->extra['after'] ?? [] ) );
+		$this->assertStringContainsString( 'snaptr("track", "VIEW_CONTENT"', implode( '', $registered->extra['after'] ?? array() ) );
 
 		wp_reset_postdata();
 	}
@@ -103,7 +103,7 @@ class GlobalSiteTagTest extends WP_UnitTestCase {
 		$this->assertEquals( 1, $order->get_meta( '_snapchat_pixel_tracked', true ) );
 
 		$scripts = wp_scripts();
-		$inline  = implode( '', $scripts->registered[ Config::ASSET_HANDLE_PREFIX . 'pixel-tracking' ]->extra['after'] ?? [] );
+		$inline  = implode( '', $scripts->registered[ Config::ASSET_HANDLE_PREFIX . 'pixel-tracking' ]->extra['after'] ?? array() );
 
 		$this->assertStringContainsString( 'snaptr("track", "PURCHASE"', $inline );
 		$this->assertStringContainsString( (string) $product->get_id(), $inline );
