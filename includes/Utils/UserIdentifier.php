@@ -33,8 +33,17 @@ final class UserIdentifier {
 	public static function get_user_data(): array {
 		$data = [];
 
+		if ( isset( $_SERVER['HTTP_CF_CONNECTING_IP'] ) ) {
+			$ip = sanitize_text_field( $_SERVER['HTTP_CF_CONNECTING_IP'] );
+		} elseif ( isset( $_SERVER['HTTP_X_FORWARDED_FOR'] ) ) {
+			$ip_list = explode( ',', $_SERVER['HTTP_X_FORWARDED_FOR'] );
+			$ip = sanitize_text_field( trim( $ip_list[0] ) );
+		} else {
+			$ip = sanitize_text_field( $_SERVER['REMOTE_ADDR'] );
+		}
+
 		if ( isset( $_SERVER['REMOTE_ADDR'] ) ) {
-			$data['client_ip_address'] = sanitize_text_field( $_SERVER['REMOTE_ADDR'] );
+			$data['client_ip_address'] = $ip;
 		}
 
 		if ( isset( $_SERVER['HTTP_USER_AGENT'] ) ) {
