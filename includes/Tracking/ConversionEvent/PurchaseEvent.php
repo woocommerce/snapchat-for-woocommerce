@@ -80,7 +80,7 @@ final class PurchaseEvent implements ConversionEventInterface {
 		return array(
 			'event_name'       => 'PURCHASE',
 			'event_time'       => time(),
-			'event_id'         => EventIdRegistry::get_purchase_id(),
+			'event_id'         => EventIdRegistry::get_purchase_id( $this->order->get_id() ),
 			'action_source'    => 'WEB',
 			'event_source_url' => $this->order->get_checkout_order_received_url(),
 			'user_data'        => array(),

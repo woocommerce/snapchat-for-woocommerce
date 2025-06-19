@@ -29,13 +29,6 @@ final class EventIdRegistry {
 	private static array $add_to_cart_ids = array();
 
 	/**
-	 * Cached event ID for the current purchase (if generated).
-	 *
-	 * @var string|null
-	 */
-	private static ?string $purchase_id = null;
-
-	/**
 	 * Returns a unique event ID for the given product's add to cart event.
 	 *
 	 * @since 0.1.0
@@ -52,18 +45,18 @@ final class EventIdRegistry {
 	}
 
 	/**
-	 * Returns a unique event ID for the given purchase event.
+	 * Returns a order key for the given purchase.
 	 *
 	 * Uses the WooCommerce order ID as the key.
 	 *
 	 * @since 0.1.0
 	 *
-	 * @return string Unique event ID.
+	 * @param int $order_id The Order ID.
+	 *
+	 * @return string Order key.
 	 */
-	public static function get_purchase_id(): string {
-		if ( null === self::$purchase_id ) {
-			self::$purchase_id = wp_generate_uuid4();
-		}
-		return self::$purchase_id;
+	public static function get_purchase_id( $order_id ): string {
+		$order = wc_get_order( $order_id );
+		return $order instanceof \WC_Order ? (string) $order->get_order_key() : '';
 	}
 }
