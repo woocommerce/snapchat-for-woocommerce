@@ -106,4 +106,18 @@ if ( typeof jQuery === 'function' ) {
 	);
 }
 
+/**
+ * Captures &ScCid from URL and stores it in a cookie for deduplication.
+ *
+ * Ensures the click ID is available for CAPI events sent from later pages.
+ */
+function persistSnapchatClickId() {
+	const params = new URLSearchParams( window.location.search );
+	const scCid = params.get( 'ScCid' );
 
+	if ( scCid ) {
+		document.cookie = `ScCid=${ encodeURIComponent( scCid ) }; path=/; max-age=172800`;
+	}
+}
+
+persistSnapchatClickId();
