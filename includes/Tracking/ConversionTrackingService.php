@@ -62,8 +62,8 @@ class ConversionTrackingService {
 	 * @return void
 	 */
 	public function register_hooks(): void {
-		add_action( 'woocommerce_thankyou', [ $this, 'handle_purchase' ] );
-		add_action( 'woocommerce_add_to_cart', [ $this, 'handle_add_to_cart' ], 10, 3 );
+		add_action( 'woocommerce_thankyou', array( $this, 'handle_purchase' ) );
+		add_action( 'woocommerce_add_to_cart', array( $this, 'handle_add_to_cart' ), 10, 3 );
 		add_action(
 			Helper::with_prefix( 'send_conversion_event' ),
 			array( $this->tracker, 'send' )

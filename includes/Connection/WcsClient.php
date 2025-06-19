@@ -66,13 +66,14 @@ final class WcsClient {
 	 *
 	 * @since 0.1.0
 	 *
-	 * @param string $token Jetpack authorization token.
-	 * @param string $path  Path within the WCS API (relative to service base).
+	 * @param string $token   Jetpack authorization token.
+	 * @param string $path    Path within the WCS API (relative to service base).
+	 * @param string $service The target service name used in the WCS proxy path (e.g., 'ads' or 'conversions').
 	 *
 	 * @return WP_REST_Response|WP_Error API response or error.
 	 */
-	public function proxy_get( string $token, string $path, string $target = 'ads' ) {
-		return $this->proxy_request( Requests::GET, $token, $path, null, $target );
+	public function proxy_get( string $token, string $path, string $service = 'ads' ) {
+		return $this->proxy_request( Requests::GET, $token, $path, null, $service );
 	}
 
 	/**
@@ -80,14 +81,15 @@ final class WcsClient {
 	 *
 	 * @since 0.1.0
 	 *
-	 * @param string $token Jetpack authorization token.
-	 * @param string $path  Path within the WCS API (relative to service base).
-	 * @param mixed  $body  Body payload to send in JSON format.
+	 * @param string $token   Jetpack authorization token.
+	 * @param string $path    Path within the WCS API (relative to service base).
+	 * @param mixed  $body    Body payload to send in JSON format.
+	 * @param string $service The target service name used in the WCS proxy path (e.g., 'ads' or 'conversions').
 	 *
 	 * @return WP_REST_Response|WP_Error API response or error.
 	 */
-	public function proxy_post( string $token, string $path, $body, string $target = 'ads' ) {
-		return $this->proxy_request( Requests::POST, $token, $path, $body, $target );
+	public function proxy_post( string $token, string $path, $body, string $service = 'ads' ) {
+		return $this->proxy_request( Requests::POST, $token, $path, $body, $service );
 	}
 
 	/**
@@ -102,15 +104,16 @@ final class WcsClient {
 	 * @param string     $jetpack_token  Jetpack authorization token.
 	 * @param string     $path           Endpoint path relative to the service root.
 	 * @param array|null $body           Optional request body (for POST).
+	 * @param string     $service        The target service name used in the WCS proxy path (e.g., 'ads' or 'conversions').
 	 *
 	 * @return WP_REST_Response|WP_Error Parsed response or error.
 	 */
-	private function proxy_request( string $method, string $jetpack_token, string $path, $body = null, string $target = 'ads' ) {
+	private function proxy_request( string $method, string $jetpack_token, string $path, $body = null, string $service = 'ads' ) {
 		$url = sprintf(
 			'%s/%s/%s/%s',
 			self::WCS_BASE_URL,
 			self::SERVICE_NAME,
-			rawurlencode( $target ),
+			rawurlencode( $service ),
 			ltrim( $path, '/' )
 		);
 

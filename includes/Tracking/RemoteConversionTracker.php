@@ -86,7 +86,7 @@ class RemoteConversionTracker implements ConversionTrackerInterface {
 
 		as_enqueue_async_action(
 			Helper::with_prefix( 'send_conversion_event' ),
-			[ 'event' => $payload ],
+			array( 'event' => $payload ),
 			Config::PLUGIN_SLUG
 		);
 	}
@@ -109,7 +109,7 @@ class RemoteConversionTracker implements ConversionTrackerInterface {
 
 		as_enqueue_async_action(
 			Helper::with_prefix( 'send_conversion_event' ),
-			[ 'event' => $payload ],
+			array( 'event' => $payload ),
 			Config::PLUGIN_SLUG
 		);
 	}
@@ -137,9 +137,9 @@ class RemoteConversionTracker implements ConversionTrackerInterface {
 
 		$event['user_data'] = UserIdentifier::get_user_data();
 
-		$query   = http_build_query( [ 'access_token' => $token ] );
+		$query   = http_build_query( array( 'access_token' => $token ) );
 		$path    = "{$pixel_id}/events?{$query}";
-		$payload = [ 'data' => [ $event ] ];
+		$payload = array( 'data' => array( $event ) );
 
 		$this->client->proxy_post( '', $path, $payload, 'conversions' );
 	}

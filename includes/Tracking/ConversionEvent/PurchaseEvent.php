@@ -54,37 +54,41 @@ final class PurchaseEvent implements ConversionEventInterface {
 	 */
 	public function build_payload(): array {
 		if ( ! $this->order ) {
-			return [];
+			return array();
 		}
 
-		$contents = [];
+		$contents = array();
 
-		/** @var \WC_Order_Item_Product $item The order item product. */
+		/**
+		 * Product from the Order Line Item.
+		 *
+		 * @var \WC_Order_Item_Product $item Product item.
+		 */
 		foreach ( $this->order->get_items() as $item ) {
 			$product = $item->get_product();
 			if ( ! $product ) {
 				continue;
 			}
 
-			$contents[] = [
+			$contents[] = array(
 				'id'         => (string) $product->get_id(),
 				'quantity'   => (string) $item->get_quantity(),
 				'item_price' => (string) $product->get_price(),
-			];
+			);
 		}
 
-		return [
-			'event_name'        => 'PURCHASE',
-			'event_time'        => time(),
-			'event_id'          => EventIdRegistry::get_purchase_id(),
-			'action_source'     => 'WEB',
-			'event_source_url'  => $this->order->get_checkout_order_received_url(),
-			'user_data'         => [],
-			'custom_data'       => [
+		return array(
+			'event_name'       => 'PURCHASE',
+			'event_time'       => time(),
+			'event_id'         => EventIdRegistry::get_purchase_id(),
+			'action_source'    => 'WEB',
+			'event_source_url' => $this->order->get_checkout_order_received_url(),
+			'user_data'        => array(),
+			'custom_data'      => array(
 				'currency' => $this->order->get_currency(),
 				'value'    => $this->order->get_total(),
 				'contents' => $contents,
-			],
-		];
+			),
+		);
 	}
 }

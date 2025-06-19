@@ -26,7 +26,7 @@ final class EventIdRegistry {
 	 *
 	 * @var array<int,string>
 	 */
-	private static array $add_to_cart_ids = [];
+	private static array $add_to_cart_ids = array();
 
 	/**
 	 * Cached event ID for the current purchase (if generated).
@@ -58,7 +58,6 @@ final class EventIdRegistry {
 	 *
 	 * @since 0.1.0
 	 *
-	 * @param int $order_id WooCommerce order ID.
 	 * @return string Unique event ID.
 	 */
 	public static function get_purchase_id(): string {

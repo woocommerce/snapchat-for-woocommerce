@@ -56,21 +56,21 @@ final class AddToCartEvent implements ConversionEventInterface {
 	 * @return array<string,mixed> Conversion event payload.
 	 */
 	public function build_payload(): array {
-		return [
-			'event_name'        => 'ADD_CART',
-			'event_time'        => time(),
-			'event_id'          => EventIdRegistry::get_add_to_cart_id( $this->product_id ),
-			'action_source'     => 'WEB',
-			'event_source_url'  => wc_get_raw_referer(),
-			'user_data'         => [],
-			'custom_data'       => [
-				'contents' => [
-					[
+		return array(
+			'event_name'       => 'ADD_CART',
+			'event_time'       => time(),
+			'event_id'         => EventIdRegistry::get_add_to_cart_id( $this->product_id ),
+			'action_source'    => 'WEB',
+			'event_source_url' => wc_get_raw_referer(),
+			'user_data'        => array(),
+			'custom_data'      => array(
+				'contents' => array(
+					array(
 						'id'       => (string) $this->product_id,
 						'quantity' => (string) $this->quantity,
-					],
-				],
-			],
-		];
+					),
+				),
+			),
+		);
 	}
 }

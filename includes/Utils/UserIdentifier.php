@@ -35,12 +35,13 @@ final class UserIdentifier {
 		$ip   = '';
 
 		if ( isset( $_SERVER['HTTP_CF_CONNECTING_IP'] ) ) {
-			$ip = sanitize_text_field( $_SERVER['HTTP_CF_CONNECTING_IP'] );
+			$ip = sanitize_text_field( wp_unslash( $_SERVER['HTTP_CF_CONNECTING_IP'] ) );
 		} elseif ( isset( $_SERVER['HTTP_X_FORWARDED_FOR'] ) ) {
-			$ip_list = explode( ',', $_SERVER['HTTP_X_FORWARDED_FOR'] );
-			$ip = sanitize_text_field( trim( $ip_list[0] ) );
-		} else if ( isset( $_SERVER['REMOTE_ADDR'] ) ) {
-			$ip = sanitize_text_field( $_SERVER['REMOTE_ADDR'] );
+			$raw  = sanitize_text_field( wp_unslash( $_SERVER['HTTP_X_FORWARDED_FOR'] ) );
+			$list = explode( ',', $raw );
+			$ip   = trim( $list[0] );
+		} elseif ( isset( $_SERVER['REMOTE_ADDR'] ) ) {
+			$ip = sanitize_text_field( wp_unslash( $_SERVER['REMOTE_ADDR'] ) );
 		}
 
 		if ( $ip ) {
@@ -48,7 +49,7 @@ final class UserIdentifier {
 		}
 
 		if ( isset( $_SERVER['HTTP_USER_AGENT'] ) ) {
-			$data['client_user_agent'] = sanitize_text_field( $_SERVER['HTTP_USER_AGENT'] );
+			$data['client_user_agent'] = sanitize_text_field( wp_unslash( $_SERVER['HTTP_USER_AGENT'] ) );
 		}
 
 		return $data;
