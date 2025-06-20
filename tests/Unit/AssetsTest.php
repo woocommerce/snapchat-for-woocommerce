@@ -21,8 +21,25 @@ final class AssetsTest extends WP_UnitTestCase {
 
 	public function set_up(): void {
 		parent::set_up();
-		wp_script_is( Config::ASSET_HANDLE_PREFIX . 'tracking', 'registered' ) &&
-			wp_deregister_script( Config::ASSET_HANDLE_PREFIX . 'tracking' );
+
+		wp_mkdir_p( SNAPCHAT_ADS_PLUGIN_BUILD_PATH );
+
+		file_put_contents( SNAPCHAT_ADS_PLUGIN_BUILD_PATH . 'tracking', '// fallback for filemtime' );
+		file_put_contents( SNAPCHAT_ADS_PLUGIN_BUILD_PATH . 'tracking.js', '// dummy script' );
+		file_put_contents(
+			SNAPCHAT_ADS_PLUGIN_BUILD_PATH . 'tracking.js.asset.php',
+			'<?php return [ "dependencies" => [], "version" => "1.0.0" ];'
+		);
+
+		wp_deregister_script( Config::ASSET_HANDLE_PREFIX . 'tracking' );
+	}
+
+
+	public function tear_down(): void {
+		@unlink( SNAPCHAT_ADS_PLUGIN_BUILD_PATH . 'tracking' );
+		@unlink( SNAPCHAT_ADS_PLUGIN_BUILD_PATH . 'tracking.js' );
+		@unlink( SNAPCHAT_ADS_PLUGIN_BUILD_PATH . 'tracking.js.asset.php' );
+		parent::tear_down();
 	}
 
 	public function test_scripts_not_enqueued_when_tracking_disabled(): void {
@@ -32,7 +49,9 @@ final class AssetsTest extends WP_UnitTestCase {
 		$assets = new Assets();
 		$assets->enqueue_scripts();
 
-		$this->assertFalse( wp_script_is( Config::ASSET_HANDLE_PREFIX . 'tracking', 'enqueued' ) );
+		$this->assertFalse(
+			wp_script_is( Config::ASSET_HANDLE_PREFIX . 'tracking', 'enqueued' )
+		);
 	}
 
 	public function test_scripts_enqueued_when_pixel_enabled(): void {
@@ -42,7 +61,9 @@ final class AssetsTest extends WP_UnitTestCase {
 		$assets = new Assets();
 		$assets->enqueue_scripts();
 
-		$this->assertTrue( wp_script_is( Config::ASSET_HANDLE_PREFIX . 'tracking', 'enqueued' ) );
+		$this->assertTrue(
+			wp_script_is( Config::ASSET_HANDLE_PREFIX . 'tracking', 'enqueued' )
+		);
 	}
 
 	public function test_scripts_enqueued_when_conversion_enabled(): void {
@@ -52,7 +73,9 @@ final class AssetsTest extends WP_UnitTestCase {
 		$assets = new Assets();
 		$assets->enqueue_scripts();
 
-		$this->assertTrue( wp_script_is( Config::ASSET_HANDLE_PREFIX . 'tracking', 'enqueued' ) );
+		$this->assertTrue(
+			wp_script_is( Config::ASSET_HANDLE_PREFIX . 'tracking', 'enqueued' )
+		);
 	}
 
 	public function test_localized_data_passed_correctly(): void {
