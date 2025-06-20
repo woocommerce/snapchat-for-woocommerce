@@ -5,8 +5,7 @@ module.exports = {
 	...defaultConfig,
 	entry: {
 		...defaultConfig.entry(),
-		'tracking': './src/tracking/index.js',
-		'snap-pixel': './src/pixel-tracking/index.js'
+		'tracking': './src/tracking/index.js'
 	},
 	plugins: [
 		...defaultConfig.plugins.filter(
