@@ -87,8 +87,7 @@ final class ServiceContainer {
 					new RemotePixelTracker(
 						self::get( ServiceKey::WCS_CLIENT ),
 						self::get( ServiceKey::JETPACK_AUTHENTICATOR )
-					),
-					self::get( ServiceKey::GLOBAL_SITE_TAG )
+					)
 				);
 			case ServiceKey::CONVERSION_TRACKING:
 				return new ConversionTrackingService(

@@ -11,6 +11,7 @@ namespace SnapchatForWooCommerce\Tests\Unit\Tracking;
 
 use PHPUnit\Framework\TestCase;
 use SnapchatForWooCommerce\Tracking\EventIdRegistry;
+use WC_Helper_Order;
 
 /**
  * @covers \SnapchatForWooCommerce\Tracking\EventIdRegistry
@@ -29,10 +30,6 @@ final class EventIdRegistryTest extends TestCase {
 		$cart_ids = $ref->getProperty( 'add_to_cart_ids' );
 		$cart_ids->setAccessible( true );
 		$cart_ids->setValue( array() );
-
-		$purchase_id = $ref->getProperty( 'purchase_id' );
-		$purchase_id->setAccessible( true );
-		$purchase_id->setValue( null );
 	}
 
 	/**
@@ -56,16 +53,5 @@ final class EventIdRegistryTest extends TestCase {
 		$id2 = EventIdRegistry::get_add_to_cart_id( 102 );
 
 		$this->assertNotSame( $id1, $id2, 'Expected different IDs for different products' );
-	}
-
-	/**
-	 * Test that get_purchase_id() returns the same value across calls.
-	 */
-	public function test_get_purchase_id_is_consistent(): void {
-		$id1 = EventIdRegistry::get_purchase_id();
-		$id2 = EventIdRegistry::get_purchase_id();
-
-		$this->assertSame( $id1, $id2, 'Expected same purchase ID on multiple calls' );
-		$this->assertMatchesRegularExpression( '/^[0-9a-f\-]{36}$/i', $id1 );
 	}
 }

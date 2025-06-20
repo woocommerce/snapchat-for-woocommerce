@@ -37,4 +37,16 @@ class Helper {
 	public static function with_prefix( string $suffix ): string {
 		return Config::PLUGIN_SLUG . '_' . ltrim( $suffix, '_' );
 	}
+
+	/**
+	 * Check if the current request is an asynchronous "Add to Cart" action.
+	 *
+	 * This method determines whether the request is being made via AJAX
+	 * or through a REST API endpoint, both of which are considered asynchronous.
+	 *
+	 * @return bool True if the request is asynchronous (AJAX or REST), false otherwise.
+	 */
+	public static function is_add_to_cart_async() {
+		return ( wp_doing_ajax() || wp_is_serving_rest_request() );
+	}
 }

@@ -100,7 +100,7 @@ class AssetLoader {
 	public static function localize_script( $handle, $object_name, array $data ) {
 		wp_localize_script(
 			Config::ASSET_HANDLE_PREFIX . $handle,
-			$object_name,
+			Config::AD_PARTNER_JS_VAR_PREFIX . $object_name,
 			$data
 		);
 	}

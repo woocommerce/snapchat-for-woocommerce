@@ -99,13 +99,15 @@ class RemoteConversionTracker implements ConversionTrackerInterface {
 	 *
 	 * @since 0.1.0
 	 *
-	 * @param int $product_id WooCommerce product ID.
-	 * @param int $quantity   Quantity added to cart.
+	 * @param int    $product_id WooCommerce product ID.
+	 * @param int    $quantity   Quantity added to cart.
+	 * @param string $event_id The unique event ID.
+	 *
 	 * @return void
 	 */
-	public function track_add_to_cart( int $product_id, int $quantity ): void {
+	public function track_add_to_cart( int $product_id, int $quantity, string $event_id = '' ): void {
 		$event   = new AddToCartEvent( $product_id, $quantity );
-		$payload = $event->build_payload();
+		$payload = $event->build_payload( array( 'event_id' => $event_id ) );
 
 		as_enqueue_async_action(
 			Helper::with_prefix( 'send_conversion_event' ),

@@ -1,9 +1,9 @@
 <?php
 /**
- * Service class for managing Snapchat Pixel tracking in WooCommerce.
+ * Service class for managing Ad Partner's Pixel tracking in WooCommerce.
  *
  * This class acts as the integration point between the WordPress/WooCommerce lifecycle
- * and Snapchat pixel injection logic. It registers hooks to automatically inject
+ * and Ad Partner pixel injection logic. It registers hooks to automatically inject
  * the pixel when appropriate and provides runtime checks for whether tracking is enabled.
  *
  * @package SnapchatForWooCommerce\Tracking
@@ -13,7 +13,8 @@ namespace SnapchatForWooCommerce\Tracking;
 
 use SnapchatForWooCommerce\Utils\Storage\OptionDefaults;
 use SnapchatForWooCommerce\Utils\Storage\Options;
-use SnapchatForWooCommerce\Utils\AssetLoader;
+use SnapchatForWooCommerce\Config;
+use WC_Product;
 
 /**
  * Handles the registration of pixel-related hooks and provides access to tracking status.
@@ -28,7 +29,14 @@ use SnapchatForWooCommerce\Utils\AssetLoader;
  *
  * @since 0.1.0
  */
-final class PixelTrackingService {
+final class PixelTrackingService implements ServiceStatusInterface {
+	/**
+	 * Collected product data for localization.
+	 *
+	 * @var array
+	 */
+	protected array $products = array();
+
 	/**
 	 * Instance of the pixel tracker responsible for rendering the pixel.
 	 *
@@ -37,28 +45,14 @@ final class PixelTrackingService {
 	private PixelTrackerInterface $tracker;
 
 	/**
-	 * Instance responsible for injecting the Ad Partner Global Site Tag into the site header.
-	 *
-	 * This service ensures the tracking events are added to the frontend when tracking
-	 * is enabled.
-	 *
-	 * @since 0.1.0
-	 *
-	 * @var GlobalSiteTag
-	 */
-	private GlobalSiteTag $global_site_tag;
-
-	/**
 	 * Constructor.
 	 *
 	 * @since 0.1.0
 	 *
 	 * @param PixelTrackerInterface $tracker Instance implementing the logic to inject the tracking pixel.
-	 * @param GlobalSiteTag         $global_site_tag Instance responsible for injecting the Ad Partner Global Site Tag.
 	 */
-	public function __construct( PixelTrackerInterface $tracker, GlobalSiteTag $global_site_tag ) {
-		$this->tracker         = $tracker;
-		$this->global_site_tag = $global_site_tag;
+	public function __construct( PixelTrackerInterface $tracker ) {
+		$this->tracker = $tracker;
 	}
 
 	/**
@@ -75,15 +69,55 @@ final class PixelTrackingService {
 			return;
 		}
 
-		add_action( 'wp_head', array( $this->tracker, 'maybe_inject_pixel' ) );
+		add_action(
+			'wp_head',
+			array( $this->tracker, 'maybe_inject_pixel' )
+		);
 
-		$this->global_site_tag->register();
+		add_action(
+			'wp_footer',
+			array(
+				$this,
+				'populate_tracking_data',
+			)
+		);
 
-		add_action( 'wp_enqueue_scripts', array( $this, 'enqueue_tracking_scripts' ) );
+		add_filter(
+			'woocommerce_loop_add_to_cart_link',
+			function ( $link, $product ) {
+				if ( $product instanceof WC_Product ) {
+					$this->add_product_data( $product );
+				}
+				return $link;
+			},
+			10,
+			2
+		);
+
+		add_action(
+			'woocommerce_after_add_to_cart_button',
+			function () {
+				global $product;
+
+				if ( $product instanceof WC_Product ) {
+					$this->add_product_data( $product );
+				}
+			}
+		);
+
+		add_action(
+			'woocommerce_after_single_product',
+			array( $this->tracker, 'track_view_content_event' )
+		);
+
+		add_action(
+			'woocommerce_before_thankyou',
+			array( $this->tracker, 'track_purchase_event' )
+		);
 	}
 
 	/**
-	 * Determines whether Snapchat pixel tracking is currently enabled.
+	 * Determines whether Pixel tracking is currently enabled.
 	 *
 	 * This checks the persisted plugin option configured via the admin interface or defaults.
 	 *
@@ -96,11 +130,66 @@ final class PixelTrackingService {
 	}
 
 	/**
-	 * Enqueues script assets necessary to implement tracking.
+	 * Returns the localized data structure to be passed to the frontend via JavaScript.
+	 *
+	 * Used by `localize_data()` to populate the `Config::AD_PARTNER_JS_GLOBAL` global object.
 	 *
 	 * @since 0.1.0
+	 *
+	 * @return array Associative array of currency settings and collected product data.
 	 */
-	public function enqueue_tracking_scripts(): void {
-		AssetLoader::enqueue_script( 'pixel-tracking', 'snap-pixel' );
+	public function get_pixel_data(): array {
+		$data = array(
+			'currency_minor_unit' => wc_get_price_decimals(),
+			'currency'            => get_woocommerce_currency(),
+			'products'            => $this->products,
+		);
+
+		return $data;
+	}
+
+	/**
+	 * Injects localized pixel tracking data into the page footer.
+	 *
+	 * This method outputs a `<script>` block that attaches collected pixel metadata
+	 * (currency, product prices, etc.) to a global JavaScript variable defined by the
+	 * plugin. This data is later used by frontend scripts to dispatch tne Ad Partner Pixel
+	 * tracking events.
+	 *
+	 * The output is injected via `wp_add_inline_script` and attached to the
+	 * pixel tracking script handle defined in {@see Config::ASSET_HANDLE_PREFIX}.
+	 *
+	 * @since 0.1.0
+	 *
+	 * @return void
+	 */
+	public function populate_tracking_data() {
+		wp_add_inline_script(
+			Config::ASSET_HANDLE_PREFIX . 'tracking',
+			'
+			window.snapchatAdsTrackingData = window.snapchatAdsTrackingData || {};
+			window.snapchatAdsTrackingData = Object.assign( window.snapchatAdsTrackingData, ' . wp_json_encode( array( 'pixel_data' => $this->get_pixel_data() ) ) . ' );
+			'
+		);
+	}
+
+	/**
+	 * Adds product-specific tracking metadata to the internal product list.
+	 *
+	 * This method is called during both loop rendering and single product display,
+	 * collecting price information for each product encountered. The data is later
+	 * localized for use by frontend tracking scripts via {@see get_pixel_data()}.
+	 *
+	 * @since 0.1.0
+	 *
+	 * @param WC_Product $product WooCommerce product instance whose data should be collected.
+	 * @return void
+	 */
+	protected function add_product_data( WC_Product $product ): void {
+		$product_id = $product->get_id();
+
+		$this->products[ $product_id ] = array(
+			'price' => wc_get_price_to_display( $product ),
+		);
 	}
 }

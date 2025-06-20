@@ -55,6 +55,13 @@ final class OptionDefaults {
 	public const PIXEL_ID = 'pixel_id';
 
 	/**
+	 * Option key that toggles whether Conversion tracking is enabled.
+	 *
+	 * @since 0.1.0
+	 */
+	public const CONVERSIONS_ENABLED = 'conversion_enabled';
+
+	/**
 	 * Option key for the Ad Partner's Conversion Token.
 	 *
 	 * @since 0.1.0
@@ -77,6 +84,7 @@ final class OptionDefaults {
 			self::ORGANIZATION_ID         => '',
 			self::PIXEL_ENABLED           => false,
 			self::PIXEL_ID                => '',
+			self::CONVERSIONS_ENABLED     => false,
 			self::CONVERSION_ACCESS_TOKEN => '',
 		);
 	}

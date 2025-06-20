@@ -72,4 +72,6 @@ final class Config {
 	 * @since 0.1.0
 	 */
 	const AD_PARTNER_JS_GLOBAL = 'snapchatAdsData';
+
+	const AD_PARTNER_JS_VAR_PREFIX = 'snapchatAds';
 }

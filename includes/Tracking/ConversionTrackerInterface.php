@@ -56,9 +56,10 @@ interface ConversionTrackerInterface {
 	 *
 	 * @since 0.1.0
 	 *
-	 * @param int $product_id WooCommerce product ID being added.
-	 * @param int $quantity   Quantity of the product added to cart.
+	 * @param int    $product_id WooCommerce product ID being added.
+	 * @param int    $quantity   Quantity of the product added to cart.
+	 * @param string $event_id   The unique event ID.
 	 * @return void
 	 */
-	public function track_add_to_cart( int $product_id, int $quantity ): void;
+	public function track_add_to_cart( int $product_id, int $quantity, string $event_id = '' ): void;
 }
