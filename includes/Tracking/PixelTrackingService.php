@@ -132,8 +132,6 @@ final class PixelTrackingService implements ServiceStatusInterface {
 	/**
 	 * Returns the localized data structure to be passed to the frontend via JavaScript.
 	 *
-	 * Used by `localize_data()` to populate the `Config::AD_PARTNER_JS_GLOBAL` global object.
-	 *
 	 * @since 0.1.0
 	 *
 	 * @return array Associative array of currency settings and collected product data.

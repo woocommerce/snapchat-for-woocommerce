@@ -114,7 +114,7 @@ class AssetLoaderTest extends WP_UnitTestCase {
 		$registered = wp_scripts()->registered[ Config::ASSET_HANDLE_PREFIX . $handle ];
 
 		$this->assertArrayHasKey( 'data', $registered->extra );
-		$this->assertStringContainsString( 'var MyObject =', $registered->extra['data'] );
+		$this->assertStringContainsString( 'var snapchatAdsMyObject =', $registered->extra['data'] );
 		$this->assertStringContainsString( '"foo":"bar"', $registered->extra['data'] );
 	}
 }

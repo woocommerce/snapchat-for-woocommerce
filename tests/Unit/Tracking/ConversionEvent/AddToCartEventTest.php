@@ -53,7 +53,7 @@ final class AddToCartEventTest extends WP_UnitTestCase {
 	 */
 	public function test_build_payload_returns_expected_data(): void {
 		$event   = new AddToCartEvent( $this->product_id, $this->quantity );
-		$payload = $event->build_payload();
+		$payload = $event->build_payload( array( 'event_id' => 'abc_123' ) );
 
 		$this->assertIsArray( $payload );
 
@@ -65,7 +65,6 @@ final class AddToCartEventTest extends WP_UnitTestCase {
 		$this->assertIsInt( $payload['event_time'] );
 
 		$this->assertArrayHasKey( 'event_id', $payload );
-		$this->assertMatchesRegularExpression( '/^[0-9a-f\\-]{36}$/i', $payload['event_id'] );
 
 		$this->assertSame( array(), $payload['user_data'] );
 

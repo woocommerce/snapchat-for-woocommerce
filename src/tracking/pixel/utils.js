@@ -65,7 +65,6 @@ export const addToCartClick = function ( event, eventId = '' ) {
 	const product = getProductObject( { id: data.product_id } );
 
 	trackAddToCartEvent( product, data.quantity || 1, eventId );
-	return product;
 };
 
 /**

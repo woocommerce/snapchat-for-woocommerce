@@ -14,7 +14,8 @@ document.addEventListener( 'DOMContentLoaded', () => {
 
 	onLoopAddToCartClick( ( event ) => {
 		const eventId = window.crypto.randomUUID();
-		const products = isPixelEnabled && addToCartClick( event, eventId );
-		isConversionEnabled && products?.id && triggerCAPI( eventId, products.id, 1 );
+		isPixelEnabled && addToCartClick( event, eventId );
+		const data = event.currentTarget.dataset;
+		isConversionEnabled && data?.product_id && triggerCAPI( eventId, data.product_id, 1 );
 	} );
 } );
