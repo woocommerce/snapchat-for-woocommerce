@@ -69,10 +69,7 @@ class ConversionTrackingService implements ServiceStatusInterface {
 		add_action( 'woocommerce_add_to_cart', array( $this, 'handle_single_product_add_to_cart' ), 10, 3 );
 		add_action( 'wp_ajax_' . Helper::with_prefix( 'add_to_cart' ), array( $this, 'handle_async_add_to_cart' ) );
 		add_action( 'woocommerce_after_add_to_cart_quantity', array( $this, 'render_event_id_field' ) );
-		add_action(
-			Helper::with_prefix( 'send_conversion_event' ),
-			array( $this->tracker, 'send' )
-		);
+		add_action( Helper::with_prefix( 'send_conversion_event' ), array( $this->tracker, 'send' ) );
 	}
 
 	/**
@@ -188,6 +185,35 @@ class ConversionTrackingService implements ServiceStatusInterface {
 	 * @return void
 	 */
 	public function handle_single_product_add_to_cart( string $cart_item_key, int $product_id, int $quantity ): void {
+		/**
+		 * We only track synchronous Add to Cart events in this handler.
+		 *
+		 * WooCommerce provides three ways for adding products to the cart:
+		 *   1. Form submission on single product pages – Standard POST to `?add-to-cart=ID`
+		 *   2. AJAX-based add to cart – Typically used in archive pages or custom JS
+		 *   3. REST API-based add to cart – Used by modern frontends or headless implementations
+		 *
+		 * All of these methods trigger the `woocommerce_add_to_cart` hook.
+		 * However, we must be careful *not* to process every add-to-cart action here blindly,
+		 * because this hook is also triggered for asynchronous flows (AJAX/REST) that are handled elsewhere.
+		 *
+		 * Snapchat's deduplication logic requires the Pixel (client-side) and CAPI (server-side) events
+		 * to share a *common* unique `event_id`. Without this shared ID, Snapchat will treat them
+		 * as duplicate events and discard one of them.
+		 *
+		 * For synchronous form submissions (on single product pages), we inject an `event_id` hidden field
+		 * via `render_event_id_field()`, and also add inline JavaScript that assigns a freshly generated
+		 * `crypto.randomUUID()` into the field. This ensures every click on the Add to Cart button
+		 * generates a new unique ID, even though the page reloads afterward.
+		 *
+		 * For asynchronous flows (AJAX or REST), this logic is different. There is *no* page reload,
+		 * so the same field-based injection strategy doesn't apply. In these cases, the frontend JS
+		 * is responsible for generating a new UUID and submitting it via an async request
+		 * to the `handle_async_add_to_cart()` method.
+		 *
+		 * To avoid double-tracking, we skip processing async add-to-cart actions here by checking
+		 * `Helper::is_add_to_cart_async()`. These are already handled in their dedicated async flow.
+		 */
 		if ( Helper::is_add_to_cart_async() ) {
 			return;
 		}
