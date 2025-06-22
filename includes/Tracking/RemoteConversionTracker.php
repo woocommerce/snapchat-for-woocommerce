@@ -20,6 +20,7 @@ use SnapchatForWooCommerce\Tracking\ConversionEvent\PurchaseEvent;
 use SnapchatForWooCommerce\Utils\Storage\Options;
 use SnapchatForWooCommerce\Utils\Storage\OptionDefaults;
 use SnapchatForWooCommerce\Utils\UserIdentifier;
+use SnapchatForWooCommerce\Tracking\Consent;
 
 /**
  * Handles conversion tracking by sending server-side events to the Ad Partner Conversions API.
@@ -70,6 +71,10 @@ class RemoteConversionTracker implements ConversionTrackerInterface {
 	 * @return void
 	 */
 	public function track_purchase( int $order_id ): void {
+		if ( ! Consent::has_marketing_consent() ) {
+			return;
+		}
+
 		$order = wc_get_order( $order_id );
 
 		// Make sure there is a valid order object and it is not already marked as tracked.
@@ -106,6 +111,10 @@ class RemoteConversionTracker implements ConversionTrackerInterface {
 	 * @return void
 	 */
 	public function track_add_to_cart( int $product_id, int $quantity, string $event_id = '' ): void {
+		if ( ! Consent::has_marketing_consent() ) {
+			return;
+		}
+
 		$event   = new AddToCartEvent( $product_id, $quantity );
 		$payload = $event->build_payload( array( 'event_id' => $event_id ) );
 

@@ -17,6 +17,7 @@ use SnapchatForWooCommerce\Utils\Storage\Options;
 use SnapchatForWooCommerce\Utils\Storage\OptionDefaults;
 use SnapchatForWooCommerce\Utils\Storage\Transients;
 use SnapchatForWooCommerce\Utils\Storage\TransientDefaults;
+use SnapchatForWooCommerce\Tracking\Consent;
 use SnapchatForWooCommerce\Config;
 use WC_Product;
 
@@ -75,6 +76,10 @@ final class RemotePixelTracker implements PixelTrackerInterface {
 	 * @since 0.1.0
 	 */
 	public function maybe_inject_pixel(): void {
+		if ( ! Consent::has_marketing_consent() ) {
+			return;
+		}
+
 		$allowed_tags = array(
 			'script'   => array(
 				'type'  => array(),
@@ -196,6 +201,10 @@ final class RemotePixelTracker implements PixelTrackerInterface {
 	 * @since 0.1.0
 	 */
 	public function track_view_content_event(): void {
+		if ( ! Consent::has_marketing_consent() ) {
+			return;
+		}
+
 		$product_id = get_the_ID();
 		$product    = wc_get_product( $product_id );
 
@@ -228,6 +237,10 @@ final class RemotePixelTracker implements PixelTrackerInterface {
 	 */
 	public function track_purchase_event( $order_id ) {
 		if ( ! is_order_received_page() ) {
+			return;
+		}
+
+		if ( ! Consent::has_marketing_consent() ) {
 			return;
 		}
 
