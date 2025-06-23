@@ -70,7 +70,8 @@ class ConversionTrackingService implements ServiceStatusInterface {
 		add_action( 'wp_ajax_' . Helper::with_prefix( 'add_to_cart' ), array( $this, 'handle_async_add_to_cart' ) );
 		add_action( 'wp_ajax_nopriv_' . Helper::with_prefix( 'add_to_cart' ), array( $this, 'handle_async_add_to_cart' ) );
 		add_action( 'woocommerce_after_add_to_cart_quantity', array( $this, 'render_event_id_field' ) );
-		add_action( Helper::with_prefix( 'send_conversion_event' ), array( $this->tracker, 'send' ) );
+		add_action( Helper::with_prefix( 'send_conversion_event' ), array( $this->tracker, 'send' ), 10, 2 );
+		add_action( Helper::with_prefix( 'conversion_sent' ), array( $this, 'mark_as_tracked' ), 10, 2 );
 	}
 
 	/**
@@ -242,5 +243,33 @@ class ConversionTrackingService implements ServiceStatusInterface {
 		$event_id   = sanitize_text_field( wp_unslash( $_POST['event_id'] ?? '' ) );
 
 		$this->tracker->track_add_to_cart( $product_id, $quantity, $event_id );
+	}
+
+	/**
+	 * Marks the given order as tracked to prevent duplicate conversion reporting.
+	 *
+	 * This should be called after a successful conversion event has been sent
+	 * to the Ad Partner. It updates the order meta with a flag to indicate
+	 * that the conversion has already been tracked.
+	 *
+	 * @since 0.1.0
+	 *
+	 * @param array $event_payload The payload that was sent to the Ad Partner.
+	 * @param array $args {
+	 *     Additional arguments passed to the tracking action.
+	 *
+	 *     @type int $order_id The ID of the WooCommerce order to mark as tracked.
+	 * }
+	 */
+	public function mark_as_tracked( $event_payload, $args ) {
+		if ( empty( $args['order_id'] ) ) {
+			return;
+		}
+
+		$order = wc_get_order( $args['order_id'] );
+
+		// Mark the order as tracked, to avoid double-reporting if the confirmation page is reloaded.
+		$order->update_meta_data( RemoteConversionTracker::ORDER_CONVERSION_TRACKED_META_KEY, 1 );
+		$order->save_meta_data();
 	}
 }
