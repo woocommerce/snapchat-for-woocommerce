@@ -21,6 +21,7 @@ use SnapchatForWooCommerce\Utils\Storage\Options;
 use SnapchatForWooCommerce\Utils\Storage\OptionDefaults;
 use SnapchatForWooCommerce\Utils\UserIdentifier;
 use SnapchatForWooCommerce\Tracking\Consent;
+use WP_REST_Response;
 
 /**
  * Handles conversion tracking by sending server-side events to the Ad Partner Conversions API.
@@ -38,7 +39,7 @@ class RemoteConversionTracker implements ConversionTrackerInterface {
 	/**
 	 * Meta key used to mark orders that have already been tracked.
 	 */
-	protected const ORDER_CONVERSION_TRACKED_META_KEY = '_snapchat_conversion_tracked';
+	public const ORDER_CONVERSION_TRACKED_META_KEY = '_snapchat_conversion_tracked';
 
 	/**
 	 * WCS client used to proxy API requests to the Ad Partner.
@@ -82,16 +83,16 @@ class RemoteConversionTracker implements ConversionTrackerInterface {
 			return;
 		}
 
-		// Mark the order as tracked, to avoid double-reporting if the confirmation page is reloaded.
-		$order->update_meta_data( self::ORDER_CONVERSION_TRACKED_META_KEY, 1 );
-		$order->save_meta_data();
-
 		$event   = new PurchaseEvent( $order_id );
 		$payload = $event->build_payload();
+		$args    = array( 'order_id' => $order_id );
 
 		as_enqueue_async_action(
 			Helper::with_prefix( 'send_conversion_event' ),
-			array( 'event' => $payload ),
+			array(
+				'event_payload' => $payload,
+				'args'          => $args,
+			),
 			Config::PLUGIN_SLUG
 		);
 	}
@@ -120,7 +121,10 @@ class RemoteConversionTracker implements ConversionTrackerInterface {
 
 		as_enqueue_async_action(
 			Helper::with_prefix( 'send_conversion_event' ),
-			array( 'event' => $payload ),
+			array(
+				'event_payload' => $payload,
+				'args'          => array(),
+			),
 			Config::PLUGIN_SLUG
 		);
 	}
@@ -135,10 +139,11 @@ class RemoteConversionTracker implements ConversionTrackerInterface {
 	 *
 	 * @since 0.1.0
 	 *
-	 * @param array<string,mixed> $event Single event payload.
+	 * @param array<string,mixed> $event_payload Single event payload.
+	 * @param array               $args          Additional args.
 	 * @return void
 	 */
-	public function send( array $event ): void {
+	public function send( array $event_payload, array $args ): void {
 		$token    = Options::get( OptionDefaults::CONVERSION_ACCESS_TOKEN );
 		$pixel_id = Options::get( OptionDefaults::PIXEL_ID );
 
@@ -146,12 +151,25 @@ class RemoteConversionTracker implements ConversionTrackerInterface {
 			return;
 		}
 
-		$event['user_data'] = UserIdentifier::get_user_data();
+		$event_payload['user_data'] = UserIdentifier::get_user_data();
 
 		$query   = http_build_query( array( 'access_token' => $token ) );
 		$path    = "{$pixel_id}/events?{$query}";
-		$payload = array( 'data' => array( $event ) );
+		$payload = array( 'data' => array( $event_payload ) );
 
 		$this->client->proxy_post( '', $path, $payload, 'conversions' );
+
+		/**
+		 * Fires after a conversion event has been sent to the Ad Partner.
+		 *
+		 * This hook allows other plugins or custom code to perform actions after the conversion payload
+		 * has been dispatched, such as logging, triggering additional integrations, or updating metadata.
+		 *
+		 * @since 0.1.0
+		 *
+		 * @param array $event_payload The payload that was sent to the Ad Partner.
+		 * @param array $args          Additional args.
+		 */
+		do_action( Helper::with_prefix( 'conversion_sent' ), $event_payload, $args );
 	}
 }

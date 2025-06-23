@@ -82,7 +82,7 @@ class RemoteConversionTrackerTest extends WP_UnitTestCase {
 
 		$this->client->expects( $this->never() )->method( 'proxy_post' );
 
-		$this->tracker->send( array( 'event_name' => 'test' ) );
+		$this->tracker->send( array( 'event_name' => 'test' ), array() );
 	}
 
 	/**
@@ -110,6 +110,6 @@ class RemoteConversionTrackerTest extends WP_UnitTestCase {
 				'conversions'
 			);
 
-		$this->tracker->send( array( 'event_name' => 'Purchase' ) );
+		$this->tracker->send( array( 'event_name' => 'Purchase' ), array() );
 	}
 }
