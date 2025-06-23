@@ -11,25 +11,19 @@ document.addEventListener( 'DOMContentLoaded', () => {
 	 * Check if marketing consent has been granted before running tracking logic.
 	 *
 	 * This guard ensures that no tracking (Pixel or Conversion API)
-	 * is executed unless the user has explicitly allowed it.
+	 * is executed if the user has explicitly denied consent for marketing.
 	 *
 	 * The check uses the WP Consent API's `wp_has_consent()` method, which returns:
-	 * - `true` if the user has granted consent for the specified category (e.g. 'marketing')
-	 * - `false` if consent is missing or denied
+	 * - `true` if the user has granted consent for the specified category (e.g., 'marketing')
+	 * - `false` if the user has explicitly denied it
 	 *
-	 * If the `wp_has_consent` function is not defined (e.g., the Consent API script failed to load),
-	 * the condition fails safely by skipping tracking.
-	 *
-	 * Example scenarios where this may skip:
-	 * - No cookie banner plugin is installed
-	 * - User has explicitly denied 'marketing' cookies
-	 * - Consent has not yet been set
+	 * If the `wp_has_consent` function is not defined (e.g., WP Consent API is not installed),
+	 * the condition assumes consent has been granted (fail-open).
 	 */
-	if (
-		typeof wp_has_consent !== 'function' ||
-		! wp_has_consent( 'marketing' )
-	) {
-		console.info( '[Snapchat] Marketing consent not given. Tracking skipped.' );
+	const hasConsent = 'function' !== typeof wp_has_consent || wp_has_consent( 'marketing' );
+
+	if ( ! hasConsent ) {
+		console.info( '[Snapchat] Marketing consent denied. Tracking skipped.' );
 		return;
 	}
 
