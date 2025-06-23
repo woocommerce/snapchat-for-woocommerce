@@ -1,28 +1,21 @@
 import { TRACKING_DATA_VAR } from './constants';
-import { onSingleAddToCartClick, onLoopAddToCartClick } from './utils';
+import { onSingleAddToCartClick, onLoopAddToCartClick, hasUserConsent, setSnapChatClickId } from './utils';
 import { singleAddToCartClick, addToCartClick } from './pixel/utils';
 import { triggerCAPI } from './conversions/utils';
 
 const isPixelEnabled = TRACKING_DATA_VAR.is_pixel_enabled;
 const isConversionEnabled = TRACKING_DATA_VAR.is_conversion_enabled;
 
-document.addEventListener( 'DOMContentLoaded', () => {
-	/**
-	 * Check if marketing consent has been granted before running tracking logic.
-	 *
-	 * This guard ensures that no tracking (Pixel or Conversion API)
-	 * is executed if the user has explicitly denied consent for marketing.
-	 *
-	 * The check uses the WP Consent API's `wp_has_consent()` method, which returns:
-	 * - `true` if the user has granted consent for the specified category (e.g., 'marketing')
-	 * - `false` if the user has explicitly denied it
-	 *
-	 * If the `wp_has_consent` function is not defined (e.g., WP Consent API is not installed),
-	 * the condition assumes consent has been granted (fail-open).
-	 */
-	const hasConsent = 'function' !== typeof wp_has_consent || wp_has_consent( 'marketing' );
+/**
+ * Immediately sets the ScCid cookie from the `sc_click_id` URL param,
+ * but only if the user has granted marketing consent via WP Consent API.
+ */
+if ( hasUserConsent() ) {
+	setSnapChatClickId();
+}
 
-	if ( ! hasConsent ) {
+document.addEventListener( 'DOMContentLoaded', () => {
+	if ( ! hasUserConsent() ) {
 		console.info( '[Snapchat] Marketing consent denied. Tracking skipped.' );
 		return;
 	}
