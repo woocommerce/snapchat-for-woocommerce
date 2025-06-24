@@ -62,4 +62,25 @@ interface ConversionTrackerInterface {
 	 * @return void
 	 */
 	public function track_add_to_cart( int $product_id, int $quantity, string $event_id = '' ): void;
+
+	/**
+	 * Sends a previously constructed conversion event payload to the Ad Partner’s Conversions API.
+	 *
+	 * This method is typically triggered asynchronously by background job processors such as
+	 * Action Scheduler. The implementing class is expected to retrieve necessary authentication
+	 * credentials (e.g., access token), contextual data (e.g., user identifiers), and construct
+	 * the full API request to the appropriate Ad Partner endpoint.
+	 *
+	 * The payload may represent events such as purchases or add-to-cart actions and should be
+	 * formatted according to the Ad Partner’s specification. This method should also handle
+	 * response parsing, error handling, and optionally trigger related WordPress hooks for
+	 * extensibility.
+	 *
+	 * @since 0.1.0
+	 *
+	 * @param array<string,mixed> $event_payload The event payload to transmit, including metadata and user data.
+	 * @param array               $args          Additional arguments passed alongside the payload (e.g., order ID).
+	 * @return void
+	 */
+	public function send( array $event_payload, array $args ): void;
 }

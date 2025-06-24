@@ -39,14 +39,17 @@ class Helper {
 	}
 
 	/**
-	 * Check if the current request is an asynchronous "Add to Cart" action.
+	 * Check if the current request is asynchronous.
 	 *
-	 * This method determines whether the request is being made via AJAX
-	 * or through a REST API endpoint, both of which are considered asynchronous.
+	 * Determines whether the current request is being made via AJAX or through a
+	 * REST API endpoint — both are considered asynchronous in the context of tracking
+	 * and background processing.
+	 *
+	 * @since 0.1.0
 	 *
 	 * @return bool True if the request is asynchronous (AJAX or REST), false otherwise.
 	 */
-	public static function is_add_to_cart_async() {
+	public static function is_request_async() {
 		return ( wp_doing_ajax() || wp_is_serving_rest_request() );
 	}
 }
