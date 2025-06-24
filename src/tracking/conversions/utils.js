@@ -8,7 +8,7 @@ export const triggerCAPI = async ( eventId, productId, quantity ) => {
 	formData.append( 'quantity', quantity );
 	formData.append( 'event_id', eventId );
 
-	await fetch( wc_add_to_cart_params.ajax_url, {
+	await fetch( TRACKING_DATA_VAR.ajax_url, {
 		method: 'POST',
 		credentials: 'same-origin',
 		body: formData,

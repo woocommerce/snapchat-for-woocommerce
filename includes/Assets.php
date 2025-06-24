@@ -90,6 +90,7 @@ class Assets {
 			apply_filters(
 				Helper::with_prefix( 'filter_tracking_data' ),
 				array(
+					'ajax_url'              => admin_url(),
 					'is_pixel_enabled'      => PixelTrackingService::is_enabled(),
 					'is_conversion_enabled' => ConversionTrackingService::is_enabled(),
 					'capi_nonce'            => wp_create_nonce( 'capi_nonce' ),
