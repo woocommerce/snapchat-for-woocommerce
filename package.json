@@ -16,14 +16,33 @@
 		"archive": "composer archive --file=$npm_package_name --format=zip"
 	},
 	"dependencies": {
-		"@woocommerce/components": "^10.3.0",
+		"@woocommerce/components": "^12.3.0",
 		"@wordpress/hooks": "^4.24.0",
 		"@wordpress/i18n": "^5.24.0"
 	},
 	"devDependencies": {
-		"@woocommerce/dependency-extraction-webpack-plugin": "^2.2.0",
+		"@woocommerce/dependency-extraction-webpack-plugin": "^3.0.1",
 		"@woocommerce/eslint-plugin": "^2.2.0",
 		"@wordpress/prettier-config": "^4.24.0",
-		"@wordpress/scripts": "^24.6.0"
+		"@wordpress/scripts": "^27.9.0",
+		"ajv": "^6.12.6",
+		"ajv-keywords": "^3.5.2",
+		"eslint": "^8.57.0",
+		"eslint-import-resolver-webpack": "^0.13.8",
+		"eslint-plugin-import": "^2.29.1",
+		"react": "^18",
+		"react-dom": "^18"
+	},
+	"overrides": {
+		"@woocommerce/eslint-plugin": {
+			"@wordpress/eslint-plugin@<18.1.0": "^18.1.0"
+		},
+		"@woocommerce/components": {
+			"@woocommerce/csv-export@<1.9.0": "^1.9.0"
+		}
+	},
+	"engines": {
+		"node": "^20",
+		"npm": "^10 || ^9"
 	}
 }
