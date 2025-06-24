@@ -22,29 +22,6 @@ namespace SnapchatForWooCommerce\Tracking;
 final class EventIdRegistry {
 
 	/**
-	 * Event IDs for each tracked product's Add to Cart event.
-	 *
-	 * @var array<int,string>
-	 */
-	private static array $add_to_cart_ids = array();
-
-	/**
-	 * Returns a unique event ID for the given product's add to cart event.
-	 *
-	 * @since 0.1.0
-	 *
-	 * @param int $product_id Product ID.
-	 * @return string Unique event ID.
-	 */
-	public static function get_add_to_cart_id( int $product_id ): string {
-		if ( ! isset( self::$add_to_cart_ids[ $product_id ] ) ) {
-			self::$add_to_cart_ids[ $product_id ] = wp_generate_uuid4();
-		}
-
-		return self::$add_to_cart_ids[ $product_id ];
-	}
-
-	/**
 	 * Returns a order key for the given purchase.
 	 *
 	 * Uses the WooCommerce order ID as the key.
