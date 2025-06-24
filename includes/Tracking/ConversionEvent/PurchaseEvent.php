@@ -50,9 +50,11 @@ final class PurchaseEvent implements ConversionEventInterface {
 	 *
 	 * @since 0.1.0
 	 *
+	 * @param array $args Overrideable payload args.
+	 *
 	 * @return array<string,mixed> Conversion event payload.
 	 */
-	public function build_payload(): array {
+	public function build_payload( array $args = array() ): array {
 		if ( ! $this->order ) {
 			return array();
 		}
@@ -77,7 +79,7 @@ final class PurchaseEvent implements ConversionEventInterface {
 			);
 		}
 
-		return array(
+		$default = array(
 			'event_name'       => 'PURCHASE',
 			'event_time'       => time(),
 			'event_id'         => EventIdRegistry::get_purchase_id( $this->order->get_id() ),
@@ -90,5 +92,7 @@ final class PurchaseEvent implements ConversionEventInterface {
 				'contents' => $contents,
 			),
 		);
+
+		return array_merge( $default, $args );
 	}
 }
