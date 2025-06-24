@@ -137,6 +137,12 @@ class ConversionTrackingService implements ServiceStatusInterface {
 	 * @return void
 	 */
 	public function handle_add_to_cart_old( string $cart_item_key, int $product_id, int $quantity ): void {
+		/**
+		 * Bail early if the Add to Cart event is handled asynchronously.
+		 *
+		 * @see ConversionTrackingService::handle_single_product_add_to_cart()
+		 * for more details on why we bail early.
+		 */
 		if ( Helper::is_add_to_cart_async() ) {
 			return;
 		}
