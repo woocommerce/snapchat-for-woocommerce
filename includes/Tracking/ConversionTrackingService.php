@@ -143,7 +143,7 @@ class ConversionTrackingService implements ServiceStatusInterface {
 		 * @see ConversionTrackingService::handle_single_product_add_to_cart()
 		 * for more details on why we bail early.
 		 */
-		if ( Helper::is_add_to_cart_async() ) {
+		if ( Helper::is_request_async() ) {
 			return;
 		}
 
@@ -220,9 +220,9 @@ class ConversionTrackingService implements ServiceStatusInterface {
 		 * to the `handle_async_add_to_cart()` method.
 		 *
 		 * To avoid double-tracking, we skip processing async add-to-cart actions here by checking
-		 * `Helper::is_add_to_cart_async()`. These are already handled in their dedicated async flow.
+		 * `Helper::is_request_async()`. These are already handled in their dedicated async flow.
 		 */
-		if ( Helper::is_add_to_cart_async() ) {
+		if ( Helper::is_request_async() ) {
 			return;
 		}
 
