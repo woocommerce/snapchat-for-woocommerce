@@ -1,0 +1,19 @@
+.snap4woostep-content-header {
+	display: flex;
+	flex-direction: column;
+	align-items: center;
+	max-width: $snap4woowidth-large;
+	text-align: center;
+	margin: auto;
+	gap: $grid-unit-15;
+	margin-bottom: var(--large-gap);
+
+	h1 {
+		font-size: $snap4woofont-large;
+		padding: 0;
+	}
+
+	&__description {
+		line-height: $snap4wooline-height-smaller;
+	}
+}

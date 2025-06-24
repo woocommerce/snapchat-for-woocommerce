@@ -1,0 +1,39 @@
+.snap4woo-section {
+	display: flex;
+	flex-direction: column;
+	margin-bottom: var(--large-gap);
+
+	&--is-disabled,
+	&--is-disabled-left &__header {
+		opacity: 0.5;
+	}
+
+	@include break-small {
+		flex-direction: row;
+		gap: var(--main-gap);
+	}
+
+	&__header {
+		@include break-small {
+			width: 33%;
+			padding-top: var(--main-gap);
+		}
+
+		h1 {
+			font-size: $editor-font-size;
+			font-style: normal;
+			font-weight: 600;
+			margin-bottom: $grid-unit;
+			padding: 0;
+		}
+
+		p {
+			margin: 0 0 $grid-unit;
+			line-height: $snap4woo-line-height-smaller;
+		}
+	}
+
+	.snap4woo-section__body {
+		flex: 1;
+	}
+}

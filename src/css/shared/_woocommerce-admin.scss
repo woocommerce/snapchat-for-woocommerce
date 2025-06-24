@@ -1,0 +1,83 @@
+// Used in ~/hooks/useLayout.js
+.snap4woo-full-content {
+	// #wpbody `margin-top` style is set onto DOM node directly in WC Admin.
+	// Here force override it to 0.
+	// Ref: https://github.com/woocommerce/woocommerce-admin/blob/95c487247416ab34eb8e492b984e2b068618e0d3/client/header/index.js#L92-L118.
+	#wpbody {
+		margin-top: 0 !important;
+	}
+
+	.woocommerce-layout {
+		padding-top: 0;
+
+		.woocommerce-layout__header {
+			display: none;
+		}
+
+		// Hide StoreAlerts.
+		.woocommerce-store-alerts,
+		.woocommerce-layout__notice-list {
+			display: none;
+		}
+		.woocommerce-layout__primary {
+			margin: 0;
+
+			.woocommerce-layout__main {
+				padding: 0;
+			}
+		}
+	}
+}
+
+// Used in ~/hooks/useLayout.js
+.snap4woo-full-page {
+	// hack to fix the margin-top when width is between 600px and 782px.
+	// without this, the margin-top would be -32px,
+	// and there would be a visible small grey gap.
+	&.is-wp-toolbar-disabled {
+		@media (min-width: #{ ($break-small) }) and (max-width: #{ ($break-medium) }) {
+			margin-top: -46px;
+		}
+	}
+
+	.woocommerce-layout {
+		padding-top: 0;
+
+		.woocommerce-layout__primary {
+			margin: 0;
+
+			.woocommerce-layout__main {
+				padding: 0;
+			}
+		}
+	}
+}
+
+// snap4woo-admin-page is for scoping particular styles to WP/WC core components in a GLA admin page.
+// If a style is expected to apply to a WC core component as its base style across GLA admin pages,
+// it's preferred to add them here.
+.snap4woo-admin-page {
+	.woocommerce-stepper__steps {
+		align-items: center;
+		justify-content: center;
+		height: $grid-unit-40 * 2;
+		background-color: $white;
+		box-shadow: inset 0 -1px 0 $gray-400;
+		margin-bottom: 0;
+
+		.woocommerce-stepper__step-divider {
+			margin-top: 0;
+			align-self: auto;
+			max-width: $grid-unit-60;
+		}
+	}
+
+	.components-notice:not(.app-notice) {
+		margin-bottom: $grid-unit-15;
+	}
+}
+
+// compatibility-code "WC >= 7.3" -- adding margin in the first question label.
+.wp-admin .woocommerce-customer-effort-score__intro {
+	margin-bottom: 1em;
+}
