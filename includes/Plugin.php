@@ -9,7 +9,7 @@
 
 namespace SnapchatForWooCommerce;
 
-use \SnapchatForWooCommerce\Admin;
+use SnapchatForWooCommerce\Admin;
 
 /**
  * Initializes and wires up core components of the Ad Partner for WooCommerce plugin.
