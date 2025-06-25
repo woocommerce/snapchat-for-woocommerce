@@ -10,18 +10,17 @@
 
 namespace SnapchatForWooCommerce;
 
-use Automattic\WooCommerce\GoogleListingsAndAds\Admin\Admin;
 use SnapchatForWooCommerce\Connection\ConnectionService;
 use SnapchatForWooCommerce\Connection\JetpackAuthenticator;
 use SnapchatForWooCommerce\Connection\WcsClient;
 use SnapchatForWooCommerce\Tracking\PixelTrackingService;
 use SnapchatForWooCommerce\Tracking\RemotePixelTracker;
-use SnapchatForWooCommerce\Tracking\GlobalSiteTag;
-use SnapchatForWooCommerce\Tracking\ConversionApiService;
 use SnapchatForWooCommerce\Tracking\ConversionTrackingService;
 use SnapchatForWooCommerce\Tracking\RemoteConversionTracker;
 use SnapchatForWooCommerce\Admin\Setup;
 use SnapchatForWooCommerce\Admin\ProductMeta\ProductMetaFields;
+use SnapchatForWooCommerce\Admin\Export\Service\ProductExportService;
+use SnapchatForWooCommerce\Admin\Export\Service\ProductIdCacheBuilder;
 
 /**
  * Static service container for resolving shared instances across the Ad Partner plugin.
@@ -98,7 +97,10 @@ final class ServiceContainer {
 				);
 			case ServiceKey::ADMIN_SETUP:
 				return new Setup(
-					new ProductMetaFields()
+					new ProductMetaFields(),
+					new ProductExportService(
+						new ProductIdCacheBuilder()
+					)
 				);
 
 			default:

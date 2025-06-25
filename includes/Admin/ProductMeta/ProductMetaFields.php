@@ -45,9 +45,15 @@ class ProductMetaFields {
 	 * @return void
 	 */
 	public function register_hooks(): void {
-		add_filter( 'woocommerce_product_data_tabs', array( $this, 'add_tab' ) );
-		add_action( 'woocommerce_product_data_panels', array( $this, 'render_panel' ) );
-		add_action( 'woocommerce_process_product_meta', array( $this, 'save_meta' ) );
+		add_action( 'current_screen', function ( $screen ) {
+			if ( 'product' !== $screen->post_type || 'post' !== $screen->base ) {
+				return;
+			}
+
+			add_filter( 'woocommerce_product_data_tabs', array( $this, 'add_tab' ) );
+			add_action( 'woocommerce_product_data_panels', array( $this, 'render_panel' ) );
+			add_action( 'woocommerce_process_product_meta', array( $this, 'save_meta' ) );
+		} );
 	}
 
 	/**
