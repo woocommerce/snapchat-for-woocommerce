@@ -1,12 +1,9 @@
 <?php
 /**
- * Scans and caches exportable product IDs in a memory-safe way.
+ * Queues and caches exportable product IDs in a memory-safe way using Action Scheduler.
  *
- * This builder queries WooCommerce products in pages and stores
- * only those with the meta key defined in Config::CATALOG_ITEM.
- *
- * Accepts dynamic query arguments to support filtered or scoped
- * exports (e.g., by category, stock status, tag, or date).
+ * Each page of products is scanned in a separate async job, allowing large catalogs
+ * to be processed without exhausting memory or execution time.
  *
  * @package SnapchatForWooCommerce\Export\Service
  * @since 0.1.0
@@ -14,110 +11,99 @@
 
 namespace SnapchatForWooCommerce\Export\Service;
 
-use SnapchatForWooCommerce\Utils\Helper;
+use SnapchatForWooCommerce\Export\Contract\CacheBuilderInterface;
+use SnapchatForWooCommerce\Config;
 use SnapchatForWooCommerce\Export\ExportConstants;
+use SnapchatForWooCommerce\Utils\Helper;
 use SnapchatForWooCommerce\Utils\Storage\Options;
 use SnapchatForWooCommerce\Utils\Storage\OptionDefaults;
 
 /**
- * Prepares a stable snapshot of exportable product IDs.
- *
- * Called before batch export begins, to ensure that the list of
- * products remains consistent across all Action Scheduler jobs.
- *
- * This class performs a paged WC_Product_Query to avoid memory overload
- * on large catalogs. Matching IDs are stored in the WordPress options table
- * for fast lookup and deterministic batching during export.
+ * Queues product ID scanning in pages, stores results in a shared WordPress option.
  *
  * @since 0.1.0
  */
-class ProductIdCacheBuilder {
+class ProductIdCacheBuilder implements CacheBuilderInterface {
+	/**
+	 * Action Scheduler hook name for scanning each page of IDs.
+	 *
+	 * @since 0.1.0
+	 */
+	public const ACTION_HOOK = 'scan_exportable_product_ids_page';
 
 	/**
 	 * Number of products to query per page.
-	 *
-	 * Controls the size of each WC_Product_Query pagination cycle.
-	 * Adjust this constant if performance tuning is needed.
 	 *
 	 * @since 0.1.0
 	 */
 	const BATCH_SIZE = 50;
 
 	/**
-	 * Optional query arguments to filter the product search.
+	 * Registers the Action Scheduler hook for ID scanning.
 	 *
-	 * Supports any arguments accepted by WC_Product_Query,
-	 * such as category, stock_status, tag, etc.
-	 *
-	 * These will be merged with the default constraints,
-	 * but cannot override pagination or export-specific filters.
-	 *
-	 * @since 0.1.0
-	 *
-	 * @var array<string,mixed>
+	 * @return void
 	 */
-	protected array $query_args = array();
-
-	/**
-	 * Constructor.
-	 *
-	 * Accepts optional query arguments to customize which products
-	 * are included in the ID scan (e.g., category-specific export).
-	 *
-	 * @since 0.1.0
-	 *
-	 * @param array<string,mixed> $query_args Optional WC_Product_Query args.
-	 */
-	public function __construct( array $query_args = [] ) {
-		$this->query_args = $query_args;
+	public function register(): void {
+		add_action(
+			Helper::with_prefix( self::ACTION_HOOK ),
+			array( $this, 'handle_batch' ),
+			10,
+			1
+		);
 	}
 
 	/**
-	 * Queries all exportable product IDs and stores them in a WordPress option.
-	 *
-	 * Performs a paged scan of products that match the meta key defined in
-	 * ExportConstants::CATALOG_ITEM (e.g., "snapchat_product_catalog_item" = true).
-	 *
-	 * This operation is safe for large catalogs due to pagination,
-	 * and results in a consistent ID list used by downstream export jobs.
-	 *
-	 * The cached list is stored in OptionDefaults::EXPORT_PRODUCT_IDS and
-	 * read by ProductEntityProvider for deterministic batch slicing.
-	 *
-	 * @since 0.1.0
+	 * Starts the scanning process by clearing old data and enqueueing page 1.
 	 *
 	 * @return void
 	 */
 	public function build_and_cache(): void {
-		$page    = isset( $this->query_args['page'] ) ? (int) $this->query_args['page'] : 1;
-		$all_ids = array();
+		Options::set( OptionDefaults::EXPORT_PRODUCT_IDS, array() );
 
-		do {
-			$default_args = array(
-				'limit'      => self::BATCH_SIZE,
-				'page'       => $page,
-				'status'     => 'publish',
-				'return'     => 'ids',
-				'meta_key'   => Helper::with_prefix( ExportConstants::CATALOG_ITEM ),
-				'meta_value' => true,
-			);
+		as_enqueue_async_action(
+			Helper::with_prefix( self::ACTION_HOOK ),
+			array( 'page' => 1 ),
+			Config::PLUGIN_SLUG
+		);
+	}
 
-			// Do not allow caller to override pagination or filtering logic.
-			$query_args = array_merge( $this->query_args, $default_args );
+	/**
+	 * Scans one page of exportable product IDs and schedules the next if needed.
+	 *
+	 * @param int $page Must contain 'page'.
+	 * @return void
+	 */
+	public function handle_batch( int $page ): void {
+		$page = $page > 1 ? $page : 1;
 
-			$query   = new \WC_Product_Query( $query_args );
-			$results = $query->get_products();
+		$query_args = array(
+			'limit'      => self::BATCH_SIZE,
+			'page'       => $page,
+			'status'     => 'publish',
+			'return'     => 'ids',
+			'meta_key'   => Helper::with_prefix( ExportConstants::CATALOG_ITEM ),
+			'meta_value' => true,
+		);
 
-			$result_count = count( $results );
+		$query   = new \WC_Product_Query( $query_args );
+		$results = $query->get_products();
 
-			if ( 0 === $result_count ) {
-				break;
+		if ( empty( $results ) ) {
+			if ( 1 !== $page ) {
+				do_action( Helper::with_prefix( 'export_products_cache_completed' ) );
 			}
+			return;
+		}
 
-			$all_ids = array_merge( $all_ids, array_map( 'intval', $results ) );
-			++$page;
-		} while ( self::BATCH_SIZE === $result_count );
+		$existing = Options::get( OptionDefaults::EXPORT_PRODUCT_IDS, array() );
+		$existing = array_unique( array_merge( $existing, array_map( 'intval', $results ) ) );
 
-		Options::set( OptionDefaults::EXPORT_PRODUCT_IDS, $all_ids );
+		Options::set( OptionDefaults::EXPORT_PRODUCT_IDS, $existing );
+
+		as_enqueue_async_action(
+			Helper::with_prefix( self::ACTION_HOOK ),
+			array( 'page' => $page + 1 ),
+			Config::PLUGIN_SLUG
+		);
 	}
 }

@@ -33,7 +33,7 @@ class BatchExportJob {
 	 *
 	 * @since 0.1.0
 	 */
-	const BATCH_SIZE = 100;
+	const BATCH_SIZE = 20;
 
 	/**
 	 * @var ExportableEntityProviderInterface

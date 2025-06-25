@@ -10,6 +10,7 @@
 
 namespace SnapchatForWooCommerce\Export\Service;
 
+use SnapchatForWooCommerce\Export\Contract\CacheBuilderInterface;
 use SnapchatForWooCommerce\Config;
 use SnapchatForWooCommerce\Utils\Helper;
 use SnapchatForWooCommerce\Export\BatchExportJob;
@@ -28,12 +29,18 @@ use SnapchatForWooCommerce\Utils\Storage\OptionDefaults;
  */
 class ProductExportService {
 
+	protected CacheBuilderInterface $cache_builder;
+
 	/**
 	 * Action Scheduler hook name.
 	 *
 	 * @since 0.1.0
 	 */
 	public const ACTION_HOOK = 'export_product_catalog';
+
+	public function __construct( CacheBuilderInterface $cache_builder ) {
+		$this->cache_builder = $cache_builder;
+	}
 
 	/**
 	 * Registers the async Action Scheduler hook.
@@ -43,6 +50,8 @@ class ProductExportService {
 	 * @return void
 	 */
 	public function register(): void {
+		$this->cache_builder->register();
+		add_action( Helper::with_prefix( 'export_products_cache_completed' ), array( $this, 'start_writing' ) );
 		add_action( Helper::with_prefix( self::ACTION_HOOK ), array( $this, 'handle_batch' ), 10, 2 );
 	}
 
@@ -56,8 +65,13 @@ class ProductExportService {
 	public function start_export(): void {
 		Options::delete( OptionDefaults::EXPORT_FILE_PATH );
 		Options::delete( OptionDefaults::EXPORT_FILE_URL );
-		Options::delete( OptionDefaults::EXPORT_PRODUCT_IDS );
 
+		if ( method_exists( $this->cache_builder, 'build_and_cache' ) ) {
+			$this->cache_builder->build_and_cache();
+		}
+	}
+
+	public function start_writing() {
 		as_enqueue_async_action(
 			Helper::with_prefix( self::ACTION_HOOK ),
 			array( 'offset' => 0 ),
