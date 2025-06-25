@@ -1,88 +1,69 @@
 <?php
 /**
- * Admin Setup Class.
+ * Admin setup class for Snapchat for WooCommerce.
  *
- * Registers admin scripts, styles, and WooCommerce Admin page for the plugin.
+ * Coordinates registration of admin-facing services, including:
+ * - Script and style enqueues
+ * - Product meta fields
+ * - WooCommerce Admin page integration
+ *
+ * This class uses constructor-based dependency injection to allow
+ * flexible registration of admin services that implement a `register_hooks()` method.
  *
  * @package SnapchatForWooCommerce\Admin
+ * @since 0.1.0
  */
 
 namespace SnapchatForWooCommerce\Admin;
 
 /**
- * SnapchatForWooCommerce Setup Class
+ * Coordinates admin-side service initialization for the plugin.
+ *
+ * This class accepts any number of service objects that support the
+ * `register_hooks()` method, and invokes them during admin bootstrap.
+ * It allows granular registration of features such as product metadata,
+ * script assets, and admin UI components without hardcoding dependencies.
+ *
+ * @since 0.1.0
  */
 class Setup {
+
+	/**
+	 * List of admin service instances.
+	 *
+	 * Each service must implement a `register_hooks()` method.
+	 *
+	 * @var array<int,object>
+	 */
+	protected array $services = array();
+
 	/**
 	 * Constructor.
 	 *
-	 * @since 1.0.0
+	 * Accepts an arbitrary number of services that will be stored for later initialization.
+	 *
+	 * @since 0.1.0
+	 *
+	 * @param object ...$services Services that expose a `register_hooks()` method.
 	 */
-	public function __construct() {
-		add_action( 'admin_enqueue_scripts', array( $this, 'register_scripts' ) );
-		add_action( 'admin_menu', array( $this, 'register_page' ) );
+	public function __construct( ...$services ) {
+		$this->services = $services;
 	}
 
 	/**
-	 * Load all necessary dependencies.
+	 * Calls `register_hooks()` on each injected service.
 	 *
-	 * @since 1.0.0
-	 */
-	public function register_scripts() {
-		if ( ! method_exists( 'Automattic\WooCommerce\Admin\PageController', 'is_admin_or_embed_page' ) ||
-		! \Automattic\WooCommerce\Admin\PageController::is_admin_or_embed_page()
-		) {
-			return;
-		}
-
-		$script_path       = '/build/index.js';
-		$script_asset_path = dirname( SNAPCHAT_FOR_WOOCOMMERCE ) . '/build/index.asset.php';
-		$script_asset      = file_exists( $script_asset_path )
-		? require $script_asset_path
-		: array(
-			'dependencies' => array(),
-			'version'      => filemtime( $script_path ),
-		);
-		$script_url        = plugins_url( $script_path, SNAPCHAT_FOR_WOOCOMMERCE );
-
-		wp_register_script(
-			'snapchat-for-woocommerce',
-			$script_url,
-			$script_asset['dependencies'],
-			$script_asset['version'],
-			true
-		);
-
-		wp_register_style(
-			'snapchat-for-woocommerce',
-			plugins_url( '/build/index.css', SNAPCHAT_FOR_WOOCOMMERCE ),
-			// Add any dependencies styles may have, such as wp-components.
-			array(),
-			filemtime( dirname( SNAPCHAT_FOR_WOOCOMMERCE ) . '/build/index.css' )
-		);
-
-		wp_enqueue_script( 'snapchat-for-woocommerce' );
-		wp_enqueue_style( 'snapchat-for-woocommerce' );
-	}
-
-	/**
-	 * Register page in wc-admin.
+	 * This method is intended to be invoked during plugin bootstrap.
 	 *
-	 * @since 1.0.0
+	 * @since 0.1.0
+	 *
+	 * @return void
 	 */
-	public function register_page() {
-
-		if ( ! function_exists( 'wc_admin_register_page' ) ) {
-			return;
+	public function init(): void {
+		foreach ( $this->services as $service ) {
+			if ( method_exists( $service, 'register_hooks' ) ) {
+				$service->register_hooks();
+			}
 		}
-
-		wc_admin_register_page(
-			array(
-				'id'     => 'snapchat_for_woocommerce-example-page',
-				'title'  => __( 'Snapchat For Woocommerce', 'snapchat-for-woocommerce' ),
-				'parent' => 'woocommerce',
-				'path'   => '/snapchat-for-woocommerce',
-			)
-		);
 	}
 }

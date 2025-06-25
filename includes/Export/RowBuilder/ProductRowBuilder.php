@@ -66,9 +66,7 @@ class ProductRowBuilder implements ExportRowBuilderInterface {
 			'image_link'   => $image_url,
 			'availability' => $product->is_in_stock() ? 'In stock' : 'Out of stock',
 			'price'        => $price . ' ' . $currency,
-			'brand'        => $product->get_attribute( 'brand' ), // Fallback: could check meta or custom attribute
-			'gtin'         => get_post_meta( $product->get_id(), 'gtin', true ),
-			'mpn'          => get_post_meta( $product->get_id(), 'mpn', true ),
+			'gtin'         => $product->get_global_unique_id(),
 		);
 	}
 }

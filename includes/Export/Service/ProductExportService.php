@@ -53,6 +53,15 @@ class ProductExportService {
 	public const ACTION_HOOK = 'export_product_catalog';
 
 	/**
+	 * The class name of the Cache Builder.
+	 *
+	 * @since 0.1.0
+	 *
+	 * @var string
+	 */
+	private string $cache_builder_class = '';
+
+	/**
 	 * Constructor.
 	 *
 	 * @since 0.1.0
@@ -60,7 +69,8 @@ class ProductExportService {
 	 * @param CacheBuilderInterface $cache_builder Responsible for building and storing product ID cache.
 	 */
 	public function __construct( CacheBuilderInterface $cache_builder ) {
-		$this->cache_builder = $cache_builder;
+		$this->cache_builder       = $cache_builder;
+		$this->cache_builder_class = get_class( $cache_builder );
 	}
 
 	/**
@@ -103,6 +113,13 @@ class ProductExportService {
 	 * @return void
 	 */
 	public function start_export(): void {
+		$scan_jobs   = as_has_scheduled_action( Helper::with_prefix( $this->cache_builder_class::ACTION_HOOK ) );
+		$export_jobs = as_has_scheduled_action( Helper::with_prefix( self::ACTION_HOOK ) );
+
+		if ( ! empty( $scan_jobs ) || ! empty( $export_jobs ) ) {
+			return;
+		}
+
 		Options::delete( OptionDefaults::EXPORT_FILE_PATH );
 		Options::delete( OptionDefaults::EXPORT_FILE_URL );
 

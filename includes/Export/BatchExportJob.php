@@ -42,7 +42,7 @@ class BatchExportJob {
 	 *
 	 * @since 0.1.0
 	 */
-	const BATCH_SIZE = 20;
+	const BATCH_SIZE = 50;
 
 	/**
 	 * Supplies entity IDs and objects to be exported.

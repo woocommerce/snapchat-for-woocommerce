@@ -120,7 +120,9 @@ class ProductIdCacheBuilder implements CacheBuilderInterface {
 			'page'       => $page,
 			'status'     => 'publish',
 			'return'     => 'ids',
+			// phpcs:ignore WordPress.DB.SlowDBQuery.slow_db_query_meta_key
 			'meta_key'   => Helper::with_prefix( ExportConstants::CATALOG_ITEM ),
+			// phpcs:ignore WordPress.DB.SlowDBQuery.slow_db_query_meta_value
 			'meta_value' => true,
 		);
 
@@ -129,6 +131,17 @@ class ProductIdCacheBuilder implements CacheBuilderInterface {
 
 		if ( empty( $results ) ) {
 			if ( 1 !== $page ) {
+				/**
+				 * Fires when exportable product IDs have been cached and export can begin.
+				 *
+				 * This hook is triggered after the cache builder has finished scanning and storing
+				 * the list of product IDs to be exported. It signals that the export writing process
+				 * (e.g., CSV generation) can now be initiated.
+				 *
+				 * @since 0.1.0
+				 *
+				 * @hook snapchat_for_woocommerce_export_products_cache_completed
+				 */
 				do_action( Helper::with_prefix( 'export_products_cache_completed' ) );
 			}
 			return;

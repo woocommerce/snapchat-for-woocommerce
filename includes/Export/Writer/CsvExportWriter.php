@@ -107,7 +107,17 @@ class CsvExportWriter implements ExportWriterInterface {
 		$content  = $this->fs->get_contents( $file_path );
 		$is_empty = empty( $content );
 
-		$fp = fopen( 'php://temp', 'r+' );
+		/**
+		 * Use php://temp for in-memory buffering of CSV data.
+		 *
+		 * This avoids touching the real filesystem and ensures compatibility across
+		 * environments. We use fputcsv to generate well-formatted lines, which would
+		 * otherwise require unsafe escaping logic if concatenated manually.
+		 *
+		 * Although WordPress Coding Standards warn against fopen/fclose,
+		 * this stream is fully memory-backed and safe to use.
+		 */
+		$fp = fopen( 'php://temp', 'r+' ); // phpcs:ignore WordPress.WP.AlternativeFunctions.file_system_operations_fopen
 
 		if ( $is_empty ) {
 			fputcsv( $fp, array_keys( $row ) );
@@ -117,9 +127,13 @@ class CsvExportWriter implements ExportWriterInterface {
 		rewind( $fp );
 
 		$new_data = stream_get_contents( $fp );
-		fclose( $fp );
 
-		$mode = $is_empty ? 'wb' : 'ab';
+		/**
+		 * Closes the temporary in-memory stream used for CSV formatting.
+		 *
+		 * Safe to ignore PHPCS warning because no real file I/O occurs.
+		 */
+		fclose( $fp ); // phpcs:ignore WordPress.WP.AlternativeFunctions.file_system_operations_fclose
 
 		$existing = $is_empty ? '' : $this->fs->get_contents( $file_path );
 		$this->fs->put_contents( $file_path, $existing . $new_data, FS_CHMOD_FILE );
