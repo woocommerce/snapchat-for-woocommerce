@@ -19,39 +19,46 @@ use WC_Helper_Order;
 final class EventIdRegistryTest extends TestCase {
 
 	/**
-	 * Reset state before each test.
+	 * The ID of the order created during the test.
+	 *
+	 * @var int
 	 */
-	protected function setUp(): void {
+	private $order_id;
+
+	/**
+	 * Sets up the test environment.
+	 */
+	public function setUp(): void {
 		parent::setUp();
 
-		// Reset private static properties using reflection.
-		$ref = new \ReflectionClass( EventIdRegistry::class );
+		// Create a simple product using WC helper.
+		$product = \WC_Helper_Product::create_simple_product();
 
-		$cart_ids = $ref->getProperty( 'add_to_cart_ids' );
-		$cart_ids->setAccessible( true );
-		$cart_ids->setValue( array() );
+		// Create an order and add the product.
+		$order = wc_create_order();
+		$order->add_product( $product, 1 );
+		$order->calculate_totals();
+		$order->save();
+
+		$this->order_id = $order->get_id();
 	}
 
 	/**
-	 * Test that the same product returns the same add-to-cart event ID.
+	 * Tests get_purchase_id() returns correct order key for a valid order.
 	 */
-	public function test_get_add_to_cart_id_is_stable_for_same_product(): void {
-		$product_id = 123;
+	public function test_get_purchase_id_returns_order_key_for_valid_order(): void {
+		$order    = wc_get_order( $this->order_id );
+		$expected = $order->get_order_key();
+		$actual   = EventIdRegistry::get_purchase_id( $this->order_id );
 
-		$first  = EventIdRegistry::get_add_to_cart_id( $product_id );
-		$second = EventIdRegistry::get_add_to_cart_id( $product_id );
-
-		$this->assertSame( $first, $second, 'Expected same ID for same product' );
-		$this->assertMatchesRegularExpression( '/^[0-9a-f\-]{36}$/i', $first );
+		$this->assertSame( $expected, $actual );
 	}
 
 	/**
-	 * Test that different product IDs return different event IDs.
+	 * Tests get_purchase_id() returns empty string for an invalid order ID.
 	 */
-	public function test_get_add_to_cart_id_is_unique_for_different_products(): void {
-		$id1 = EventIdRegistry::get_add_to_cart_id( 101 );
-		$id2 = EventIdRegistry::get_add_to_cart_id( 102 );
-
-		$this->assertNotSame( $id1, $id2, 'Expected different IDs for different products' );
+	public function test_get_purchase_id_returns_empty_string_for_invalid_order(): void {
+		$actual = EventIdRegistry::get_purchase_id( 999999 ); // Assuming this ID doesn't exist.
+		$this->assertSame( '', $actual );
 	}
 }
