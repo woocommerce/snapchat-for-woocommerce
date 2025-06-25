@@ -2,7 +2,11 @@
 /**
  * Action Scheduler service for exporting the Snapchat product catalog.
  *
- * Coordinates one batch of export at a time using the generic exporter engine.
+ * Coordinates the batch-based export process using Action Scheduler. This service:
+ * - Registers async hooks for cache building and export initiation.
+ * - Clears previous export data.
+ * - Delegates product scanning to a cache builder.
+ * - Triggers paginated batch exports using {@see BatchExportJob}.
  *
  * @package SnapchatForWooCommerce\Export\Service
  * @since 0.1.0
@@ -23,27 +27,48 @@ use SnapchatForWooCommerce\Utils\Storage\OptionDefaults;
 /**
  * Handles batch-based product export via Action Scheduler.
  *
- * Each job processes one batch and schedules the next if required.
+ * This service controls the full export pipeline. It begins by clearing any previous
+ * export results, then invokes the cache builder to compute eligible product IDs.
+ * Once the caching is completed (signaled via a custom hook), it initiates a sequence
+ * of export batches using the {@see BatchExportJob} class.
+ *
+ * Each batch is offset-based and runs as an independent async job.
  *
  * @since 0.1.0
  */
 class ProductExportService {
 
+	/**
+	 * Cache builder used to prepare the exportable product ID list.
+	 *
+	 * @var CacheBuilderInterface
+	 */
 	protected CacheBuilderInterface $cache_builder;
 
 	/**
-	 * Action Scheduler hook name.
+	 * Action Scheduler hook name for individual export batches.
 	 *
 	 * @since 0.1.0
 	 */
 	public const ACTION_HOOK = 'export_product_catalog';
 
+	/**
+	 * Constructor.
+	 *
+	 * @since 0.1.0
+	 *
+	 * @param CacheBuilderInterface $cache_builder Responsible for building and storing product ID cache.
+	 */
 	public function __construct( CacheBuilderInterface $cache_builder ) {
 		$this->cache_builder = $cache_builder;
 	}
 
 	/**
-	 * Registers the async Action Scheduler hook.
+	 * Registers Action Scheduler hooks for the export process.
+	 *
+	 * - Hook to begin export after product caching is complete.
+	 * - Hook to handle each export batch.
+	 * - Delegates cache hook registration to the cache builder.
 	 *
 	 * @since 0.1.0
 	 *
@@ -51,12 +76,27 @@ class ProductExportService {
 	 */
 	public function register(): void {
 		$this->cache_builder->register();
-		add_action( Helper::with_prefix( 'export_products_cache_completed' ), array( $this, 'start_writing' ) );
-		add_action( Helper::with_prefix( self::ACTION_HOOK ), array( $this, 'handle_batch' ), 10, 2 );
+
+		add_action(
+			Helper::with_prefix( 'export_products_cache_completed' ),
+			array( $this, 'start_writing' )
+		);
+
+		add_action(
+			Helper::with_prefix( self::ACTION_HOOK ),
+			array( $this, 'handle_batch' ),
+			10,
+			2
+		);
 	}
 
 	/**
-	 * Schedules the first export batch.
+	 * Initiates the product export by clearing previous state and triggering product scanning.
+	 *
+	 * This method:
+	 * - Deletes previously saved file path and URL options.
+	 * - Triggers the cache builder to compute exportable products.
+	 * - Does not immediately begin file writing — that is triggered once caching completes.
 	 *
 	 * @since 0.1.0
 	 *
@@ -71,7 +111,17 @@ class ProductExportService {
 		}
 	}
 
-	public function start_writing() {
+	/**
+	 * Starts writing the export file from offset 0.
+	 *
+	 * This method is hooked to run after exportable product IDs have been fully cached.
+	 * It schedules the first export batch asynchronously.
+	 *
+	 * @since 0.1.0
+	 *
+	 * @return void
+	 */
+	public function start_writing(): void {
 		as_enqueue_async_action(
 			Helper::with_prefix( self::ACTION_HOOK ),
 			array( 'offset' => 0 ),
@@ -82,10 +132,14 @@ class ProductExportService {
 	/**
 	 * Handles a single export batch.
 	 *
+	 * Each call creates and executes one instance of {@see BatchExportJob}.
+	 * If this is the first batch, it creates a new file and stores its path.
+	 * If additional batches are needed, this method schedules the next offset.
+	 *
 	 * @since 0.1.0
 	 *
-	 * @param int         $offset Offset into product list.
-	 * @param string|null $existing_file Optional existing file path to append to.
+	 * @param int         $offset Offset into the cached product ID list.
+	 * @param string|null $existing_file Optional existing file path to continue writing to.
 	 * @return void
 	 */
 	public function handle_batch( int $offset = 0, ?string $existing_file = null ): void {

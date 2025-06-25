@@ -2,11 +2,14 @@
 /**
  * Generic export job runner that processes entities in paginated batches.
  *
- * This class coordinates one export batch:
- * - Retrieves a page of entity IDs
- * - Resolves those entities
- * - Converts them into rows
- * - Appends them to the export file
+ * This class coordinates a single batch in the product catalog export process by:
+ * - Retrieving a page of exportable entity IDs from the provider
+ * - Resolving those entities into usable objects
+ * - Converting each entity into a structured row
+ * - Appending the rows to a CSV export file
+ *
+ * It is designed to be reused with Action Scheduler or similar async execution engines
+ * to iteratively generate large exports in chunks.
  *
  * @package SnapchatForWooCommerce\Export
  * @since 0.1.0
@@ -21,8 +24,12 @@ use SnapchatForWooCommerce\Export\Contract\ExportWriterInterface;
 /**
  * Executes a single export batch for any entity type.
  *
- * This class is designed to be reused with Action Scheduler or any async system
- * that handles offset-based batch work.
+ * This class encapsulates the logic for processing one offset-based chunk of exportable data,
+ * including file creation (for the first batch), header row writing, and entity resolution.
+ * It returns metadata including the generated file path, file URL, and a flag indicating
+ * whether the export is complete.
+ *
+ * Can be composed into multi-batch workflows via tools like Action Scheduler.
  *
  * @since 0.1.0
  */
@@ -31,21 +38,29 @@ class BatchExportJob {
 	/**
 	 * Number of entities to export in each batch.
 	 *
+	 * Adjust this constant to control memory usage and execution time per batch.
+	 *
 	 * @since 0.1.0
 	 */
 	const BATCH_SIZE = 20;
 
 	/**
+	 * Supplies entity IDs and objects to be exported.
+	 *
 	 * @var ExportableEntityProviderInterface
 	 */
 	protected ExportableEntityProviderInterface $provider;
 
 	/**
+	 * Converts each entity into an array of exportable row data.
+	 *
 	 * @var ExportRowBuilderInterface
 	 */
 	protected ExportRowBuilderInterface $row_builder;
 
 	/**
+	 * Writes row data to the final export file (e.g., CSV).
+	 *
 	 * @var ExportWriterInterface
 	 */
 	protected ExportWriterInterface $writer;
@@ -55,9 +70,9 @@ class BatchExportJob {
 	 *
 	 * @since 0.1.0
 	 *
-	 * @param ExportableEntityProviderInterface $provider    Supplies exportable entity IDs.
-	 * @param ExportRowBuilderInterface         $row_builder Builds CSV rows from each entity.
-	 * @param ExportWriterInterface             $writer      Appends rows to export file.
+	 * @param ExportableEntityProviderInterface $provider    Supplies exportable entity IDs and objects.
+	 * @param ExportRowBuilderInterface         $row_builder Builds CSV-compatible row data from entities.
+	 * @param ExportWriterInterface             $writer      Writes data to file and manages file output.
 	 */
 	public function __construct(
 		ExportableEntityProviderInterface $provider,
@@ -72,15 +87,22 @@ class BatchExportJob {
 	/**
 	 * Executes a single export batch at the given offset.
 	 *
-	 * If this is the first batch, it creates a new file and writes the header row.
-	 * Otherwise, it appends to the provided file.
+	 * This method performs one step in the export pipeline by processing
+	 * a page of entities. If it's the first batch, it creates a new export file
+	 * and writes the header. Otherwise, it appends data to the given file.
+	 *
+	 * It returns information about the file and whether additional batches are required.
 	 *
 	 * @since 0.1.0
 	 *
-	 * @param int         $offset Zero-based batch offset.
-	 * @param bool        $is_first_batch Whether to create the file and write headers.
-	 * @param string|null $existing_file Existing file to append to.
-	 * @return array{file_path: string, file_url: string, complete: bool}
+	 * @param int         $offset          Zero-based batch offset (i.e., page number).
+	 * @param bool        $is_first_batch  Whether this is the first batch (triggering file creation).
+	 * @param string|null $existing_file   Path to existing file if continuing a previous export.
+	 * @return array{
+	 *     file_path: string,
+	 *     file_url: string,
+	 *     complete: bool
+	 * } Metadata about the file and batch completion status.
 	 */
 	public function run( int $offset, bool $is_first_batch = false, ?string $existing_file = null ): array {
 		$ids = $this->provider->get_ids( $offset, self::BATCH_SIZE );

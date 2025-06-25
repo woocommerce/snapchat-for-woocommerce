@@ -2,8 +2,10 @@
 /**
  * Builds exportable CSV rows from WooCommerce product entities.
  *
- * Converts a WC_Product instance into a row matching Snapchat's product
- * catalog field specifications.
+ * This class transforms a `WC_Product` instance into an associative array of
+ * fields required by Snapchat's product catalog format. It ensures that
+ * all expected keys (such as title, price, and availability) are present,
+ * and performs minimal transformation where needed (e.g., appending currency to price).
  *
  * @package SnapchatForWooCommerce\Export\RowBuilder
  * @since 0.1.0
@@ -17,20 +19,33 @@ use SnapchatForWooCommerce\Export\Contract\ExportRowBuilderInterface;
 /**
  * Converts WooCommerce products into catalog-compatible row arrays.
  *
- * This builder returns rows with keys matching Snapchat's required
- * and recommended product catalog fields.
+ * Implements {@see ExportRowBuilderInterface} to define how a WooCommerce product
+ * should be exported into a format suitable for Snapchat’s product feed.
+ * Handles common fields such as title, price, and availability, and attempts
+ * to extract optional fields like brand, GTIN, and MPN from product attributes or meta.
+ *
+ * This class is intended to be reused across batch exporters or file writers.
  *
  * @since 0.1.0
  */
 class ProductRowBuilder implements ExportRowBuilderInterface {
 
 	/**
-	 * Builds a single exportable row from a product.
+	 * Builds a single exportable row from a product entity.
+	 *
+	 * Validates that the input is a `WC_Product`, then extracts relevant product data
+	 * into an associative array with Snapchat catalog keys. If the input is not a product,
+	 * returns `null` to skip the row.
+	 *
+	 * The resulting row includes:
+	 * - Core attributes like ID, title, description, image, and price
+	 * - Inventory status
+	 * - Optional metadata: brand, GTIN, and MPN
 	 *
 	 * @since 0.1.0
 	 *
-	 * @param mixed $product WC_Product instance expected.
-	 * @return array<string, scalar>|null Associative row or null to skip.
+	 * @param mixed $product A `WC_Product` instance expected.
+	 * @return array<string,scalar>|null Associative export row or null to skip.
 	 */
 	public function build_row( $product ): ?array {
 		if ( ! $product instanceof WC_Product ) {
