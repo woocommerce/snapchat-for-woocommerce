@@ -9,13 +9,13 @@
  * It ensures memory safety and execution time limits by scanning one page per job,
  * making it suitable for large catalogs with thousands of products.
  *
- * @package SnapchatForWooCommerce\Export\Service
+ * @package SnapchatForWooCommerce\Admin\Export\Service
  * @since 0.1.0
  */
 
-namespace SnapchatForWooCommerce\Export\Service;
+namespace SnapchatForWooCommerce\Admin\Export\Service;
 
-use SnapchatForWooCommerce\Export\Contract\CacheBuilderInterface;
+use SnapchatForWooCommerce\Admin\Export\Contract\CacheBuilderInterface;
 use SnapchatForWooCommerce\Config;
 use SnapchatForWooCommerce\Admin\ProductMeta\ProductMetaFields;
 use SnapchatForWooCommerce\Utils\Helper;

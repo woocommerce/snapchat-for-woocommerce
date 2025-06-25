@@ -5,11 +5,11 @@
  * This interface defines methods for creating, writing to, and retrieving
  * the export file or stream that stores final output.
  *
- * @package SnapchatForWooCommerce\Export\Contract
+ * @package SnapchatForWooCommerce\Admin\Export\Contract
  * @since 0.1.0
  */
 
-namespace SnapchatForWooCommerce\Export\Contract;
+namespace SnapchatForWooCommerce\Admin\Export\Contract;
 
 /**
  * Interface for writing export rows to disk or a streaming destination.

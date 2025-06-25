@@ -11,15 +11,15 @@
  * It is designed to be reused with Action Scheduler or similar async execution engines
  * to iteratively generate large exports in chunks.
  *
- * @package SnapchatForWooCommerce\Export
+ * @package SnapchatForWooCommerce\Admin\Export
  * @since 0.1.0
  */
 
-namespace SnapchatForWooCommerce\Export;
+namespace SnapchatForWooCommerce\Admin\Export;
 
-use SnapchatForWooCommerce\Export\Contract\ExportableEntityProviderInterface;
-use SnapchatForWooCommerce\Export\Contract\ExportRowBuilderInterface;
-use SnapchatForWooCommerce\Export\Contract\ExportWriterInterface;
+use SnapchatForWooCommerce\Admin\Export\Contract\ExportableEntityProviderInterface;
+use SnapchatForWooCommerce\Admin\Export\Contract\ExportRowBuilderInterface;
+use SnapchatForWooCommerce\Admin\Export\Contract\ExportWriterInterface;
 
 /**
  * Executes a single export batch for any entity type.

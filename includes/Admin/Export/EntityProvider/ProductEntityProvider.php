@@ -10,14 +10,14 @@
  * {@see \SnapchatForWooCommerce\Admin\ProductMeta\ProductMetaFields::CATALOG_ITEM}
  * and a value of `1`, `yes`, or `true` are included in the cached export list.
  *
- * @package SnapchatForWooCommerce\Export\EntityProvider
+ * @package SnapchatForWooCommerce\Admin\Export\EntityProvider
  * @since 0.1.0
  */
 
-namespace SnapchatForWooCommerce\Export\EntityProvider;
+namespace SnapchatForWooCommerce\Admin\Export\EntityProvider;
 
 use WC_Product;
-use SnapchatForWooCommerce\Export\Contract\ExportableEntityProviderInterface;
+use SnapchatForWooCommerce\Admin\Export\Contract\ExportableEntityProviderInterface;
 use SnapchatForWooCommerce\Utils\Storage\Options;
 use SnapchatForWooCommerce\Utils\Storage\OptionDefaults;
 

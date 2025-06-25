@@ -7,14 +7,14 @@
  * all expected keys (such as title, price, and availability) are present,
  * and performs minimal transformation where needed (e.g., appending currency to price).
  *
- * @package SnapchatForWooCommerce\Export\RowBuilder
+ * @package SnapchatForWooCommerce\Admin\Export\RowBuilder
  * @since 0.1.0
  */
 
-namespace SnapchatForWooCommerce\Export\RowBuilder;
+namespace SnapchatForWooCommerce\Admin\Export\RowBuilder;
 
 use WC_Product;
-use SnapchatForWooCommerce\Export\Contract\ExportRowBuilderInterface;
+use SnapchatForWooCommerce\Admin\Export\Contract\ExportRowBuilderInterface;
 
 /**
  * Converts WooCommerce products into catalog-compatible row arrays.

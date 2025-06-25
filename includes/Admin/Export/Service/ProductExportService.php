@@ -8,19 +8,19 @@
  * - Delegates product scanning to a cache builder.
  * - Triggers paginated batch exports using {@see BatchExportJob}.
  *
- * @package SnapchatForWooCommerce\Export\Service
+ * @package SnapchatForWooCommerce\Admin\Export\Service
  * @since 0.1.0
  */
 
-namespace SnapchatForWooCommerce\Export\Service;
+namespace SnapchatForWooCommerce\Admin\Export\Service;
 
-use SnapchatForWooCommerce\Export\Contract\CacheBuilderInterface;
+use SnapchatForWooCommerce\Admin\Export\Contract\CacheBuilderInterface;
 use SnapchatForWooCommerce\Config;
 use SnapchatForWooCommerce\Utils\Helper;
-use SnapchatForWooCommerce\Export\BatchExportJob;
-use SnapchatForWooCommerce\Export\EntityProvider\ProductEntityProvider;
-use SnapchatForWooCommerce\Export\RowBuilder\ProductRowBuilder;
-use SnapchatForWooCommerce\Export\Writer\CsvExportWriter;
+use SnapchatForWooCommerce\Admin\Export\BatchExportJob;
+use SnapchatForWooCommerce\Admin\Export\EntityProvider\ProductEntityProvider;
+use SnapchatForWooCommerce\Admin\Export\RowBuilder\ProductRowBuilder;
+use SnapchatForWooCommerce\Admin\Export\Writer\CsvExportWriter;
 use SnapchatForWooCommerce\Utils\Storage\Options;
 use SnapchatForWooCommerce\Utils\Storage\OptionDefaults;
 
@@ -84,7 +84,7 @@ class ProductExportService {
 	 *
 	 * @return void
 	 */
-	public function register(): void {
+	public function register_hooks(): void {
 		$this->cache_builder->register();
 
 		add_action(

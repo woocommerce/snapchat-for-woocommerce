@@ -11,11 +11,11 @@
  * Action Scheduler using paginated jobs. This approach avoids inconsistencies
  * in export output due to catalog changes during the export run.
  *
- * @package SnapchatForWooCommerce\Export\Contract
+ * @package SnapchatForWooCommerce\Admin\Export\Contract
  * @since 0.1.0
  */
 
-namespace SnapchatForWooCommerce\Export\Contract;
+namespace SnapchatForWooCommerce\Admin\Export\Contract;
 
 /**
  * Interface for cache builders that prepare exportable entity ID lists.

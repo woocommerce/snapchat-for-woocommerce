@@ -5,13 +5,13 @@
  * This implementation writes to the WordPress uploads directory and
  * generates a public download URL from the same.
  *
- * @package SnapchatForWooCommerce\Export\Writer
+ * @package SnapchatForWooCommerce\Admin\Export\Writer
  * @since 0.1.0
  */
 
-namespace SnapchatForWooCommerce\Export\Writer;
+namespace SnapchatForWooCommerce\Admin\Export\Writer;
 
-use SnapchatForWooCommerce\Export\Contract\ExportWriterInterface;
+use SnapchatForWooCommerce\Admin\Export\Contract\ExportWriterInterface;
 use WP_Filesystem_Direct;
 
 /**

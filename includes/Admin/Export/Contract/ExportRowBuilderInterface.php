@@ -6,11 +6,11 @@
  * (e.g., product, category, order) into a flat array suitable for
  * CSV or other structured formats.
  *
- * @package SnapchatForWooCommerce\Export\Contract
+ * @package SnapchatForWooCommerce\Admin\Export\Contract
  * @since 0.1.0
  */
 
-namespace SnapchatForWooCommerce\Export\Contract;
+namespace SnapchatForWooCommerce\Admin\Export\Contract;
 
 /**
  * Interface for building a row from an exportable entity.

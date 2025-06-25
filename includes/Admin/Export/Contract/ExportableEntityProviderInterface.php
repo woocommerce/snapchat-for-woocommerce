@@ -10,11 +10,11 @@
  * Designed to support batch-safe, large-scale exports using offset/limit
  * logic to avoid memory overhead.
  *
- * @package SnapchatForWooCommerce\Export\Contract
+ * @package SnapchatForWooCommerce\Admin\Export\Contract
  * @since 0.1.0
  */
 
-namespace SnapchatForWooCommerce\Export\Contract;
+namespace SnapchatForWooCommerce\Admin\Export\Contract;
 
 /**
  * Interface for providing exportable entities in paginated batches.
