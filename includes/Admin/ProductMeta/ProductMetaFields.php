@@ -11,7 +11,6 @@
 
 namespace SnapchatForWooCommerce\Admin\ProductMeta;
 
-use SnapchatForWooCommerce\Export\ExportConstants;
 use SnapchatForWooCommerce\Utils\Helper;
 
 /**
@@ -23,6 +22,21 @@ use SnapchatForWooCommerce\Utils\Helper;
  * @since 0.1.0
  */
 class ProductMetaFields {
+
+	/**
+	 * Meta key used to determine if a product is eligible for export.
+	 *
+	 * When this custom post meta is set to true (or a truthy value), the corresponding
+	 * product is considered exportable and will be included in catalog generation logic.
+	 * If this flag is missing or set to false, the product will be skipped.
+	 *
+	 * Used by:
+	 * - {@see ProductEntityProvider} to filter exportable product IDs.
+	 * - Admin UI or automation logic to toggle export eligibility.
+	 *
+	 * @since 0.1.0
+	 */
+	public const CATALOG_ITEM = 'product_catalog_item';
 
 	/**
 	 * Registers all WooCommerce hooks.
@@ -66,7 +80,7 @@ class ProductMetaFields {
 	public function render_panel(): void {
 		global $post;
 
-		$meta_key = Helper::with_prefix( ExportConstants::CATALOG_ITEM );
+		$meta_key = Helper::with_prefix( self::CATALOG_ITEM );
 		$value    = get_post_meta( $post->ID, $meta_key, true );
 		?>
 		<div id="snapchat_product_data" class="panel woocommerce_options_panel hidden">
@@ -95,7 +109,7 @@ class ProductMetaFields {
 	 * @return void
 	 */
 	public function save_meta( int $post_id ): void {
-		$meta_key = Helper::with_prefix( ExportConstants::CATALOG_ITEM );
+		$meta_key = Helper::with_prefix( self::CATALOG_ITEM );
 
 		// Nonce verification done in the Woo Core parent method.
 		// phpcs:ignore WordPress.Security.NonceVerification.Missing

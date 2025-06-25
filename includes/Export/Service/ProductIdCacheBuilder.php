@@ -17,7 +17,7 @@ namespace SnapchatForWooCommerce\Export\Service;
 
 use SnapchatForWooCommerce\Export\Contract\CacheBuilderInterface;
 use SnapchatForWooCommerce\Config;
-use SnapchatForWooCommerce\Export\ExportConstants;
+use SnapchatForWooCommerce\Admin\ProductMeta\ProductMetaFields;
 use SnapchatForWooCommerce\Utils\Helper;
 use SnapchatForWooCommerce\Utils\Storage\Options;
 use SnapchatForWooCommerce\Utils\Storage\OptionDefaults;
@@ -121,7 +121,7 @@ class ProductIdCacheBuilder implements CacheBuilderInterface {
 			'status'     => 'publish',
 			'return'     => 'ids',
 			// phpcs:ignore WordPress.DB.SlowDBQuery.slow_db_query_meta_key
-			'meta_key'   => Helper::with_prefix( ExportConstants::CATALOG_ITEM ),
+			'meta_key'   => Helper::with_prefix( ProductMetaFields::CATALOG_ITEM ),
 			// phpcs:ignore WordPress.DB.SlowDBQuery.slow_db_query_meta_value
 			'meta_value' => true,
 		);

@@ -6,7 +6,8 @@
  * and exposes them in paginated batches. It performs memory-safe operations using
  * `LIMIT` + `OFFSET` logic, and resolves each ID into a `WC_Product` object.
  *
- * Only products with the custom meta key defined in {@see \SnapchatForWooCommerce\Config::CATALOG_ITEM}
+ * Only products with the custom meta key defined in
+ * {@see \SnapchatForWooCommerce\Admin\ProductMeta\ProductMetaFields::CATALOG_ITEM}
  * and a value of `1`, `yes`, or `true` are included in the cached export list.
  *
  * @package SnapchatForWooCommerce\Export\EntityProvider
