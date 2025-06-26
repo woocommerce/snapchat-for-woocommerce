@@ -15,7 +15,6 @@ import ConnectedAdsAccountDetail from './connected-ads-account-detail';
 import Indicator from './indicator';
 import getAccountCreationTexts from './getAccountCreationTexts';
 import SpinnerCard from '~/components/spinner-card';
-import { StoreAddressCard } from '~/components/contact-information';
 import useAutoCreateAdsMCAccounts from '~/hooks/useAutoCreateAdsMCAccounts';
 import useGoogleMCAccount from '~/hooks/useGoogleMCAccount';
 import useExistingGoogleMCAccounts from '~/hooks/useExistingGoogleMCAccounts';
@@ -28,13 +27,12 @@ import useGoogleAdsAccountStatus from '~/hooks/useGoogleAdsAccountStatus';
 import useGoogleAdsAccount from '~/hooks/useGoogleAdsAccount';
 import useUpsertAdsAccount from '~/hooks/useUpsertAdsAccount';
 import showAdsConversionNotice from '~/utils/showAdsConversionNotice';
-import './connected-google-combo-account-card.scss';
+import './connected-snapchat-combo-account-card.scss';
 
 /**
- * Renders a Google account card UI with connected account information.
- * It will also kickoff Ads and Merchant Center account creation if the user does not have accounts.
+ * Renders a Snapchat account card UI with connected account information.
  */
-const ConnectedGoogleComboAccountCard = () => {
+const ConnectedSnapchatComboAccountCard = () => {
 	const [ editMode, setEditMode ] = useState( false );
 
 	// We use a single instance of the hook to create a MC (Merchant Center) account,
@@ -134,7 +132,7 @@ const ConnectedGoogleComboAccountCard = () => {
 			isTertiary
 			text={ __(
 				'Or, connect to a different Google account',
-				'google-listings-and-ads'
+				'snapchat-for-woo'
 			) }
 		/>
 	);
@@ -145,7 +143,7 @@ const ConnectedGoogleComboAccountCard = () => {
 				<div className="sfw-google-combo-account-card__description-actions">
 					{ switchAccountButton }
 					<AppButton isTertiary onClick={ handleCancelClick }>
-						{ __( 'Cancel', 'google-listings-and-ads' ) }
+						{ __( 'Cancel', 'snapchat-for-woo' ) }
 					</AppButton>
 				</div>
 			);
@@ -161,7 +159,7 @@ const ConnectedGoogleComboAccountCard = () => {
 				) : (
 					<AppButton
 						isTertiary
-						text={ __( 'Edit', 'google-listings-and-ads' ) }
+						text={ __( 'Edit', 'snapchat-for-woo' ) }
 						onClick={ handleEditClick }
 					/>
 				) }
@@ -184,7 +182,7 @@ const ConnectedGoogleComboAccountCard = () => {
 	return (
 		<div className="sfw-google-combo-account-card-wrapper">
 			<AccountCard
-				appearance={ APPEARANCE.GOOGLE }
+				appearance={ APPEARANCE.SNAPCHAT }
 				alignIcon="top"
 				className="sfw-google-combo-account-card sfw-google-combo-account-card--connected sfw-google-combo-service-account-card--google"
 				description={ text || <AccountDetails /> }
@@ -216,10 +214,8 @@ const ConnectedGoogleComboAccountCard = () => {
 					className="sfw-google-combo-account-card sfw-google-combo-service-account-card--mc"
 				/>
 			) }
-
-			{ showAddressCard && <StoreAddressCard /> }
 		</div>
 	);
 };
 
-export default ConnectedGoogleComboAccountCard;
+export default ConnectedSnapchatComboAccountCard;

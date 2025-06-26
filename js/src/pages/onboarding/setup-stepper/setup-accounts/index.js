@@ -16,6 +16,7 @@ import StepContentActions from '~/components/stepper/step-content-actions';
 import Section from '~/components/section';
 import useJetpackAccount from '~/hooks/useJetpackAccount';
 import WPComAccountCard from '~/components/wpcom-account-card';
+import SnapchatComboAccountCard from '~/components/snapchat-combo-account-card';
 import './index.scss';
 // import GoogleComboAccountCard from '~/components/google-combo-account-card';
 
@@ -59,8 +60,7 @@ const SetupAccounts = ( props ) => {
 				) }
 			>
 				<WPComAccountCard jetpack={ jetpack } />
-
-				{ /* <GoogleComboAccountCard disabled={ ! isJetpackActive } /> */ }
+				<SnapchatComboAccountCard disabled={ ! isJetpackActive } />
 			</Section>
 
 			<StepContentFooter>

@@ -6,7 +6,7 @@
  * @property {string|''} displayName Owner name. Available for jetpack owner.
  */
 
-export const getSnapchatSetup = ( state ) => {
+export const getSetup = ( state ) => {
 	return state.setup;
 };
 

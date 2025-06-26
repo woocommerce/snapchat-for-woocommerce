@@ -25,9 +25,9 @@ export default function SnapchatComboAccountCard( { disabled = false } ) {
 
 	const isConnected = snapchat?.active === 'yes';
 
-	if ( isConnected ) {
-		return <ConnectedSnapchatComboAccountCard />;
-	}
+	// if ( isConnected ) {
+	// 	return <ConnectedSnapchatComboAccountCard />;
+	// }
 
 	return <ConnectSnapchatComboAccountCard disabled={ disabled } />;
 }

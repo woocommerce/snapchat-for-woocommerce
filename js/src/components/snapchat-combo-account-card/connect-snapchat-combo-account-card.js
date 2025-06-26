@@ -13,7 +13,7 @@ import AppButton from '~/components/app-button';
 import {
 	ReadMoreLink,
 	useGoogleConnectFlow,
-} from '~/components/google-account-card';
+} from '~/components/snapchat-account-card';
 import AppDocumentationLink from '../app-documentation-link';
 
 /**

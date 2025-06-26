@@ -8,11 +8,11 @@ import { getHistory, getNewPath } from '@woocommerce/navigation';
  */
 import AppSpinner from '~/components/app-spinner';
 import SavedSetupStepper from './saved-setup-stepper';
-import useSnapchatSetup from '~/hooks/useSnapchatSetup';
+import useSetup from '~/hooks/useSetup';
 import stepNameKeyMap from './stepNameKeyMap';
 
 const SetupStepper = () => {
-	const { hasFinishedResolution, data: sfwSetup } = useSnapchatSetup();
+	const { hasFinishedResolution, data: sfwSetup } = useSetup();
 
 	if ( ! hasFinishedResolution && ! sfwSetup ) {
 		return <AppSpinner />;
