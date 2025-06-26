@@ -8,7 +8,7 @@ class Assets {
 	}
 
 	public function enqueue_assets() {
-		AssetLoader::enqueue_script( 'admin', 'admin' );
-		AssetLoader::enqueue_style( 'admin', 'admin' );
+		AssetLoader::enqueue_script( 'index', 'index' );
+		AssetLoader::enqueue_style( 'index', 'index' );
 	}
 }
