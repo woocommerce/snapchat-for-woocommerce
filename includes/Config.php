@@ -20,6 +20,17 @@ namespace SnapchatForWooCommerce;
  */
 final class Config {
 	/**
+	 * Unique slug identifier for the Ad Partner plugin.
+	 *
+	 * Used for naming purposes such as Action Scheduler groups, admin page slugs,
+	 * and internal prefixing of action/filter hooks.
+	 * Example: `snapchat_for_woocommerce`
+	 *
+	 * @since 0.1.0
+	 */
+	const PLUGIN_SLUG = 'snapchat_for_woocommerce';
+
+	/**
 	 * The namespace used for all REST API endpoints exposed by this plugin.
 	 *
 	 * This value is appended to `/wp-json/` to form the full route base.
@@ -53,12 +64,18 @@ final class Config {
 	const ASSET_HANDLE_PREFIX = 'snapchat_';
 
 	/**
-	 * Global JavaScript variable name used to localize frontend data for Ad Partner scripts.
+	 * JavaScript global variable prefix used for frontend data localization.
 	 *
-	 * This global (e.g., `window.snapchatAdsData`) is populated with tracking configuration and product data.
-	 * Used by frontend scripts to transmit tracking events to the Ad Partner.
+	 * This constant defines the prefix applied to all global variables created via `AssetLoader::localize_script()`.
+	 * For example, when localizing with object name `TrackingData`, the resulting JS global will be:
+	 * `window.snapchatAdsTrackingData`.
+	 *
+	 * This is used by Ad Partner scripts to access configuration, product metadata, or event identifiers
+	 * injected into the page from the server.
 	 *
 	 * @since 0.1.0
+	 *
+	 * @see \SnapchatForWooCommerce\Utils\AssetLoader::localize_script()
 	 */
-	const AD_PARTNER_JS_GLOBAL = 'snapchatAdsData';
+	const AD_PARTNER_JS_VAR_PREFIX = 'snapchatAds';
 }

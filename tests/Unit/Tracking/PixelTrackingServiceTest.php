@@ -18,7 +18,6 @@ namespace SnapchatForWooCommerce\Tests\Unit\Tracking;
 use WP_UnitTestCase;
 use SnapchatForWooCommerce\Tracking\PixelTrackingService;
 use SnapchatForWooCommerce\Tracking\PixelTrackerInterface;
-use SnapchatForWooCommerce\Tracking\GlobalSiteTag;
 use SnapchatForWooCommerce\Utils\Storage\OptionDefaults;
 use SnapchatForWooCommerce\Utils\Storage\Options;
 
@@ -56,13 +55,9 @@ class PixelTrackingServiceTest extends WP_UnitTestCase {
 	public function set_up(): void {
 		parent::set_up();
 
-		$this->tracker_mock = $this->createMock( PixelTrackerInterface::class );
-		$this->global_site_tag_mock = $this->createMock( GlobalSiteTag::class );
+		$this->tracker_mock         = $this->createMock( PixelTrackerInterface::class );
 
-		$this->service = new PixelTrackingService(
-			$this->tracker_mock,
-			$this->global_site_tag_mock
-		);
+		$this->service = new PixelTrackingService( $this->tracker_mock );
 	}
 
 	/**
@@ -102,12 +97,9 @@ class PixelTrackingServiceTest extends WP_UnitTestCase {
 	public function test_register_hooks_when_enabled() {
 		Options::set( OptionDefaults::PIXEL_ENABLED, true );
 
-		$this->global_site_tag_mock->expects( $this->once() )->method( 'register' );
-
 		$this->service->register_hooks();
 
-		$this->assertSame( 10, has_action( 'wp_head', [ $this->tracker_mock, 'maybe_inject_pixel' ] ) );
-		$this->assertSame( 10, has_action( 'wp_enqueue_scripts', [ $this->service, 'enqueue_tracking_scripts' ] ) );
+		$this->assertSame( 10, has_action( 'wp_head', array( $this->tracker_mock, 'maybe_inject_pixel' ) ) );
 	}
 
 	/**
@@ -118,12 +110,9 @@ class PixelTrackingServiceTest extends WP_UnitTestCase {
 	public function test_register_hooks_when_disabled_does_not_register() {
 		Options::set( OptionDefaults::PIXEL_ENABLED, false );
 
-		// GlobalSiteTag::register() must NOT be called.
-		$this->global_site_tag_mock->expects( $this->never() )->method( 'register' );
-
 		$this->service->register_hooks();
 
-		$this->assertFalse( has_action( 'wp_head', [ $this->tracker_mock, 'maybe_inject_pixel' ] ) );
-		$this->assertFalse( has_action( 'wp_enqueue_scripts', [ $this->service, 'enqueue_tracking_scripts' ] ) );
+		$this->assertFalse( has_action( 'wp_head', array( $this->tracker_mock, 'maybe_inject_pixel' ) ) );
+		$this->assertFalse( has_action( 'wp_enqueue_scripts', array( $this->service, 'enqueue_tracking_scripts' ) ) );
 	}
 }

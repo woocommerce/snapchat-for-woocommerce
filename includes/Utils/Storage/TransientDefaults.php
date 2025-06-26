@@ -39,7 +39,7 @@ final class TransientDefaults {
 	 *
 	 * @since 0.1.0
 	 *
-	 * @return array<string, int> Map of transient keys to TTL in seconds.
+	 * @return array<string,int> Map of transient keys to TTL in seconds.
 	 */
 	public static function get_all(): array {
 		return array(

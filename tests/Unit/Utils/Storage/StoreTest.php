@@ -26,10 +26,10 @@ class StoreTest extends TestCase {
 
 		$this->store = new Store(
 			$this->mock_strategy,
-			[
+			array(
 				'pixel_enabled' => true,
 				'pixel_script'  => '<script>fallback()</script>',
-			]
+			)
 		);
 	}
 

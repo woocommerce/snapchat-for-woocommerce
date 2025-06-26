@@ -17,6 +17,9 @@ use SnapchatForWooCommerce\Utils\Storage\Options;
 use SnapchatForWooCommerce\Utils\Storage\OptionDefaults;
 use SnapchatForWooCommerce\Utils\Storage\Transients;
 use SnapchatForWooCommerce\Utils\Storage\TransientDefaults;
+use SnapchatForWooCommerce\Tracking\Consent;
+use SnapchatForWooCommerce\Config;
+use WC_Product;
 
 /**
  * Fetches and injects Snapchat pixel tracking code into WooCommerce frontend pages.
@@ -36,6 +39,10 @@ use SnapchatForWooCommerce\Utils\Storage\TransientDefaults;
  * @since 0.1.0
  */
 final class RemotePixelTracker implements PixelTrackerInterface {
+	/**
+	 * Meta key used to mark orders that have already been tracked.
+	 */
+	protected const ORDER_PIXEL_TRACKED_META_KEY = '_snapchat_pixel_tracked';
 
 	/**
 	 * Client for making authenticated proxy requests to Snapchat Ads API.
@@ -69,6 +76,10 @@ final class RemotePixelTracker implements PixelTrackerInterface {
 	 * @since 0.1.0
 	 */
 	public function maybe_inject_pixel(): void {
+		if ( ! Consent::has_marketing_consent() ) {
+			return;
+		}
+
 		$allowed_tags = array(
 			'script'   => array(
 				'type'  => array(),
@@ -178,5 +189,114 @@ final class RemotePixelTracker implements PixelTrackerInterface {
 		Transients::set( TransientDefaults::PIXEL_SCRIPT, $pixel_script );
 
 		return self::personalize_tracking_script( $pixel_script );
+	}
+
+
+
+	/**
+	 * Emits the Snapchat `VIEW_CONTENT` tracking event for single product views.
+	 *
+	 * Hooked into `woocommerce_after_single_product`.
+	 *
+	 * @since 0.1.0
+	 */
+	public function track_view_content_event(): void {
+		if ( ! Consent::has_marketing_consent() ) {
+			return;
+		}
+
+		$product_id = get_the_ID();
+		$product    = wc_get_product( $product_id );
+
+		if ( ! $product instanceof WC_Product ) {
+			return;
+		}
+
+		$tracking_data = sprintf(
+			'snaptr("track", "VIEW_CONTENT", %s);',
+			wp_json_encode(
+				array(
+					'price'    => wc_get_price_to_display( $product ),
+					'currency' => get_woocommerce_currency(),
+					'item_ids' => array( $product_id ),
+				)
+			)
+		);
+
+		wp_add_inline_script( Config::ASSET_HANDLE_PREFIX . 'tracking', $tracking_data );
+	}
+
+	/**
+	 * Emits the Snapchat `PURCHASE` tracking event after a successful order.
+	 *
+	 * Hooked into `woocommerce_before_thankyou`. Avoids duplicate firing via meta key.
+	 *
+	 * @since 0.1.0
+	 *
+	 * @param int $order_id WooCommerce order ID.
+	 */
+	public function track_purchase_event( $order_id ) {
+		if ( ! is_order_received_page() ) {
+			return;
+		}
+
+		if ( ! Consent::has_marketing_consent() ) {
+			return;
+		}
+
+		$order = wc_get_order( $order_id );
+
+		// Make sure there is a valid order object and it is not already marked as tracked.
+		if ( ! $order || 1 === (int) $order->get_meta( self::ORDER_PIXEL_TRACKED_META_KEY, true ) ) {
+			return;
+		}
+
+		// Mark the order as tracked, to avoid double-reporting if the confirmation page is reloaded.
+		$order->update_meta_data( self::ORDER_PIXEL_TRACKED_META_KEY, 1 );
+		$order->save_meta_data();
+
+		$order_key       = $order->get_order_key();
+		$total           = $order->get_total();
+		$currency        = $order->get_currency();
+		$item_ids        = array();
+		$item_categories = array();
+		$number_items    = 0;
+
+		foreach ( $order->get_items() as $item ) {
+			/**
+			 * Product from the Order Line Item.
+			 *
+			 * @var \WC_Order_Item_Product $item Product item.
+			 */
+			$product = $item->get_product();
+			if ( $product ) {
+				$item_ids[]    = $product->get_id();
+				$number_items += $item->get_quantity();
+
+				$terms = get_the_terms( $product->get_id(), 'product_cat' );
+				if ( ! empty( $terms ) && ! is_wp_error( $terms ) ) {
+					foreach ( $terms as $term ) {
+						$item_categories[] = $term->name;
+					}
+				}
+			}
+		}
+
+		$tracking_data = sprintf(
+			'snaptr("track", "PURCHASE", %s);',
+			wp_json_encode(
+				array(
+					'price'          => $total,
+					'currency'       => $currency,
+					'event_id'       => $order_key,
+					'transaction_id' => $order_key,
+					'item_ids'       => $item_ids,
+					'item_category'  => implode( ', ', array_unique( $item_categories ) ),
+					'number_items'   => $number_items,
+				)
+			)
+		);
+
+		wp_add_inline_script( Config::ASSET_HANDLE_PREFIX . 'tracking', $tracking_data );
 	}
 }

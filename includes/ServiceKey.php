@@ -56,4 +56,11 @@ final class ServiceKey {
 	 * @since 0.1.0
 	 */
 	public const PIXEL_TRACKING = 'pixel_tracking';
+
+	/**
+	 * Identifier for the conversion tracking service.
+	 *
+	 * @since 0.1.0
+	 */
+	public const CONVERSION_TRACKING = 'conversion_tracking';
 }

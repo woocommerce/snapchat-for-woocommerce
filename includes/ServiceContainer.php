@@ -16,6 +16,9 @@ use SnapchatForWooCommerce\Connection\WcsClient;
 use SnapchatForWooCommerce\Tracking\PixelTrackingService;
 use SnapchatForWooCommerce\Tracking\RemotePixelTracker;
 use SnapchatForWooCommerce\Tracking\GlobalSiteTag;
+use SnapchatForWooCommerce\Tracking\ConversionApiService;
+use SnapchatForWooCommerce\Tracking\ConversionTrackingService;
+use SnapchatForWooCommerce\Tracking\RemoteConversionTracker;
 
 /**
  * Static service container for resolving shared instances across the Ad Partner plugin.
@@ -29,7 +32,7 @@ final class ServiceContainer {
 	/**
 	 * Stores resolved service instances.
 	 *
-	 * @var array<string, object>
+	 * @var array<string,object>
 	 */
 	private static $instances = array();
 
@@ -84,8 +87,13 @@ final class ServiceContainer {
 					new RemotePixelTracker(
 						self::get( ServiceKey::WCS_CLIENT ),
 						self::get( ServiceKey::JETPACK_AUTHENTICATOR )
-					),
-					self::get( ServiceKey::GLOBAL_SITE_TAG )
+					)
+				);
+			case ServiceKey::CONVERSION_TRACKING:
+				return new ConversionTrackingService(
+					new RemoteConversionTracker(
+						self::get( ServiceKey::WCS_CLIENT )
+					)
 				);
 
 			default:

@@ -9,9 +9,6 @@
 
 namespace SnapchatForWooCommerce;
 
-use SnapchatForWooCommerce\Config;
-use SnapchatForWooCommerce\Utils\Storage\OptionDefaults;
-
 /**
  * Initializes and wires up core components of the Ad Partner for WooCommerce plugin.
  *
@@ -79,6 +76,9 @@ final class Plugin {
 	 * @since 0.1.0
 	 */
 	public static function bootstrap_features(): void {
+		( new Assets() )->register_hooks();
+
 		ServiceContainer::get( ServiceKey::PIXEL_TRACKING )->register_hooks();
+		ServiceContainer::get( ServiceKey::CONVERSION_TRACKING )->register_hooks();
 	}
 }
