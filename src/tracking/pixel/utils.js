@@ -84,6 +84,7 @@ const trackAddToCartEvent = ( product, quantity = 1, eventId = null ) => {
 	};
 
 	if ( eventId ) {
+		data.event_id        = eventId;
 		data.client_dedup_id = eventId;
 	}
 

@@ -275,6 +275,7 @@ final class RemotePixelTracker implements PixelTrackerInterface {
 				array(
 					'price'          => $total,
 					'currency'       => $currency,
+					'event_id'       => $order_key,
 					'transaction_id' => $order_key,
 					'item_ids'       => $item_ids,
 					'item_category'  => implode( ', ', array_unique( $item_categories ) ),
