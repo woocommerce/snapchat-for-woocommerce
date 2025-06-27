@@ -6,13 +6,13 @@ import ConnectExistingAccount from './connect-existing-account';
 import ConnectingAccount from './connecting-account';
 
 /**
- * ConnectAds component renders an account card to connect to an existing Snapchat Ads account.
+ * ConnectOrganization component renders an account card to connect to an existing Snapchat Organization account.
  *
  * @param {Object} props Component props.
  * @param {string|null} props.upsertingAction The action the user is performing. Possible values are 'update', or null.
  * @return {JSX.Element} {@link AccountCard} filled with content.
  */
-const ConnectAds = ( { upsertingAction } ) => {
+const ConnectOrganization = ( { upsertingAction } ) => {
 	if ( upsertingAction ) {
 		return <ConnectingAccount />;
 	}
@@ -20,4 +20,4 @@ const ConnectAds = ( { upsertingAction } ) => {
 	return <ConnectExistingAccount />;
 };
 
-export default ConnectAds;
+export default ConnectOrganization;

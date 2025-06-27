@@ -60,7 +60,8 @@ const SetupAccounts = ( props ) => {
 				) }
 			>
 				<WPComAccountCard jetpack={ jetpack } />
-				<SnapchatComboAccountCard disabled={ ! isJetpackActive } />
+				{ /* <SnapchatComboAccountCard disabled={ ! isJetpackActive } /> */ }
+				<SnapchatComboAccountCard disabled={ isJetpackActive } />
 			</Section>
 
 			<StepContentFooter>

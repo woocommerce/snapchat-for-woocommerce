@@ -1,4 +1,4 @@
-.sfw-google-combo-account-card-wrapper {
+.sfw-snapchat-combo-account-card-wrapper {
 
 	.components-card {
 		&:not(:last-child) {
@@ -13,13 +13,13 @@
 	}
 }
 
-.sfw-google-combo-account-card--connected {
+.sfw-snapchat-combo-account-card--connected {
 
 	.sfw-account-card__description {
 		gap: 0;
 	}
 
-	.sfw-google-combo-account-card__description-actions {
+	.sfw-snapchat-combo-account-card__description-actions {
 		display: flex;
 		gap: var(--large-gap);
 	}

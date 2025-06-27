@@ -3,8 +3,9 @@ const useSnapchatAccount = () => {
 	return {
 		snapchat: {
 			active: 'yes',
-			hasFinishedResolution: true,
+			email: 'snap@chat.com',
 		},
+		hasFinishedResolution: true,
 	};
 };
 

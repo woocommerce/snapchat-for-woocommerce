@@ -6,36 +6,39 @@ import { __, sprintf } from '@wordpress/i18n';
 /**
  * Internal dependencies
  */
-import useGoogleAccount from '~/hooks/useGoogleAccount';
-import useGoogleAdsAccount from '~/hooks/useGoogleAdsAccount';
-import useGoogleMCAccount from '~/hooks/useGoogleMCAccount';
+import useSnapchatAccount from '~/hooks/useSnapchatAccount';
+import useSnapchatAdsAccount from '~/hooks/useSnapchatAdsAccount';
+import useSnapchatOrganization from '~/hooks/useSnapchatOrganization';
 
 /**
  * Account details.
  * @return {JSX.Element} JSX markup.
  */
 const AccountDetails = () => {
-	const { google } = useGoogleAccount();
-	const { googleAdsAccount } = useGoogleAdsAccount();
-	const { googleMCAccount, isReady: isGoogleMCReady } = useGoogleMCAccount();
+	const { snapchat } = useSnapchatAccount();
+	const { snapchatAdsAccount, isReady: isSnapchatAdsAccountReady } =
+		useSnapchatAdsAccount();
+	const { snapchatOrganization, isReady: isSnapchatOrganizationReady } =
+		useSnapchatOrganization();
 
 	return (
 		<>
-			<p>{ google.email }</p>
+			<p>{ snapchat.email }</p>
 			<p>
-				{ isGoogleMCReady &&
+				{ isSnapchatOrganizationReady &&
 					sprintf(
-						// Translators: %s is the Merchant Center ID
-						__( 'Merchant Center ID: %s', 'snapchat-for-woo' ),
-						googleMCAccount.id
+						// Translators: %s is the Organization name
+						__( 'Organization: %s', 'snapchat-for-woo' ),
+						snapchatOrganization.name
 					) }
 			</p>
 			<p>
-				{ googleAdsAccount?.id > 0 &&
+				{ isSnapchatAdsAccountReady &&
 					sprintf(
-						// Translators: %s is the Google Ads ID
-						__( 'Google Ads ID: %s', 'snapchat-for-woo' ),
-						googleAdsAccount.id
+						// Translators: %1$s is the Ads Account name, %2$s is the Ads Account ID
+						__( 'Ads Account: %1$s (%2$s)', 'snapchat-for-woo' ),
+						snapchatAdsAccount.name,
+						snapchatAdsAccount.id
 					) }
 			</p>
 		</>
