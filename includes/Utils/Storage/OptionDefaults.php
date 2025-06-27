@@ -25,6 +25,13 @@ namespace SnapchatForWooCommerce\Utils\Storage;
  * @since 0.1.0
  */
 final class OptionDefaults {
+	/**
+	 * Option key for the Ad Partner's Organizations
+	 * that include Ad Accounts.
+	 *
+	 * @since 0.1.0
+	 */
+	public const ORGANIZATIONS = 'organizations';
 
 	/**
 	 * Option key for the Ad Partner ad account ID.
@@ -46,6 +53,8 @@ final class OptionDefaults {
 	 * @since 0.1.0
 	 */
 	public const PIXEL_ENABLED = 'ads_pixel_enabled';
+
+	public const PIXELS = 'pixels';
 
 	/**
 	 * Option key for the Ad Partner's Pixel ID.
@@ -80,9 +89,11 @@ final class OptionDefaults {
 	 */
 	public static function get_all(): array {
 		return array(
+			self::ORGANIZATIONS           => array(),
 			self::AD_ACCOUNT_ID           => '',
 			self::ORGANIZATION_ID         => '',
 			self::PIXEL_ENABLED           => false,
+			self::PIXELS                  => array(),
 			self::PIXEL_ID                => '',
 			self::CONVERSIONS_ENABLED     => false,
 			self::CONVERSION_ACCESS_TOKEN => '',

@@ -33,15 +33,28 @@ final class TransientDefaults {
 	public const PIXEL_SCRIPT = 'ads_pixel_script';
 
 	/**
-	 * Returns TTLs for all known Ad Partner transients.
+	 * Returns defaults for all known Ad Partner transients.
 	 *
 	 * Used by {@see TransientStorage} when saving values.
 	 *
 	 * @since 0.1.0
 	 *
-	 * @return array<string,int> Map of transient keys to TTL in seconds.
+	 * @return array<string,int> Map of transient keys to their defaults.
 	 */
 	public static function get_all(): array {
+		return array(
+			self::PIXEL_SCRIPT => '',
+		);
+	}
+
+	/**
+	 * Returns TTLs for all known Ad Partner transients.
+	 *
+	 * @since 0.1.0
+	 *
+	 * @return array<string,int> Map of transient keys to TTL in seconds.
+	 */
+	private static function get_ttls(): array {
 		return array(
 			self::PIXEL_SCRIPT => MONTH_IN_SECONDS,
 		);
@@ -56,7 +69,7 @@ final class TransientDefaults {
 	 * @return int TTL in seconds.
 	 */
 	public static function get_ttl( string $key ): int {
-		$map = self::get_all();
+		$map = self::get_ttls();
 		return $map[ $key ] ?? HOUR_IN_SECONDS;
 	}
 }

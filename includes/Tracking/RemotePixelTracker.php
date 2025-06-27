@@ -166,9 +166,14 @@ final class RemotePixelTracker implements PixelTrackerInterface {
 			return null;
 		}
 
-		$account_id = Options::get( OptionDefaults::AD_ACCOUNT_ID );
-		$path       = sprintf( 'adaccounts/%s/pixels', $account_id );
-		$response   = $this->wcs_client->proxy_get( $token, $path );
+		$pixel_id = Options::get( OptionDefaults::PIXEL_ID );
+
+		if ( empty( $pixel_id ) ) {
+			return null;
+		}
+
+		$path     = sprintf( '/v1/pixels/%s', $pixel_id );
+		$response = $this->wcs_client->proxy_get( $token, $path );
 
 		if ( is_wp_error( $response ) ) {
 			return null;

@@ -70,6 +70,9 @@ final class Plugin {
 	public static function register_rest_routes(): void {
 		$connection = ServiceContainer::get( ServiceKey::CONNECTION );
 		$connection->register_routes();
+
+		$settings_controller = ServiceContainer::get( ServiceKey::SETTINGS_REST_CONTROLLER_SETUP );
+		$settings_controller->register_routes();
 	}
 
 	/**

@@ -1,0 +1,54 @@
+<?php
+/**
+ * Initializes all settings-related REST controllers for the Ad Partner plugin.
+ *
+ * This class acts as the central router for registering plugin-specific REST endpoints,
+ * primarily under the `wc/sfw/<ad_partner>` namespace.
+ *
+ * Controllers are instantiated with their required dependencies here and hooked into the REST API lifecycle.
+ *
+ * @package SnapchatForWooCommerce\Admin\Settings
+ */
+
+namespace SnapchatForWooCommerce\Admin\Settings;
+
+use SnapchatForWooCommerce\Connection\WcsClient;
+use SnapchatForWooCommerce\Connection\JetpackAuthenticator;
+
+/**
+ * Bootstrap class for registering REST API routes related to plugin settings.
+ *
+ * Instantiates individual controllers and registers their routes.
+ *
+ * @since 0.1.0
+ */
+class ControllerSetup {
+
+	/**
+	 * Registers all REST API routes used in the plugin settings.
+	 *
+	 * This method is typically called during the `rest_api_init` hook.
+	 *
+	 * Example:
+	 * ```php
+	 * add_action( 'rest_api_init', array( new ControllerSetup(), 'register_routes' ) );
+	 * ```
+	 *
+	 * @since 0.1.0
+	 *
+	 * @return void
+	 */
+	public function register_routes(): void {
+		( new SnapchatOrganizationsController(
+			new WcsClient(),
+			new JetpackAuthenticator()
+		) )->register_routes();
+
+		( new SnapchatAdAccountsController() )->register_routes();
+
+		( new SnapchatSnapPixelController(
+			new WcsClient(),
+			new JetpackAuthenticator()
+		) )->register_routes();
+	}
+}
