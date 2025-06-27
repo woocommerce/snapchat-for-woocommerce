@@ -39,11 +39,6 @@ class Assets {
 		add_action( 'admin_enqueue_scripts', array( $this, 'enqueue_assets' ) );
 	}
 
-	public function enqueue_assets() {
-		AssetLoader::enqueue_script( 'index', 'index' );
-		AssetLoader::enqueue_style( 'index', 'index' );
-	}
-
 	/**
 	 * Enqueues plugin admin assets (JS/CSS).
 	 *
@@ -56,7 +51,7 @@ class Assets {
 	 * @return void
 	 */
 	public function enqueue_assets(): void {
-		AssetLoader::enqueue_script( 'admin', 'admin' );
-		AssetLoader::enqueue_style( 'admin', 'admin' );
+		AssetLoader::enqueue_script( 'index', 'index' );
+		AssetLoader::enqueue_style( 'index', 'index' );
 	}
 }
