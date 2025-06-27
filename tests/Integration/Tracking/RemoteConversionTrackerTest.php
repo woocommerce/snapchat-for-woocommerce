@@ -110,6 +110,13 @@ class RemoteConversionTrackerTest extends WP_UnitTestCase {
 				'conversions'
 			);
 
-		$this->tracker->send( array( 'event_name' => 'Purchase' ), array() );
+		$this->tracker->send(
+			array(
+				'event_name' => 'Purchase',
+				'user_data'  => [
+					'client_ip_address' => '203.0.113.55',
+					'client_user_agent' => 'PHPUnitTestRunner',
+				]
+			), array() );
 	}
 }

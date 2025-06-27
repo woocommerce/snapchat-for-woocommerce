@@ -84,7 +84,11 @@ class RemoteConversionTracker implements ConversionTrackerInterface {
 		}
 
 		$event   = new PurchaseEvent( $order_id );
-		$payload = $event->build_payload();
+		$payload = $event->build_payload(
+			array(
+				'user_data' => UserIdentifier::get_user_data(),
+			)
+		);
 		$args    = array( 'order_id' => $order_id );
 
 		as_enqueue_async_action(
@@ -117,7 +121,12 @@ class RemoteConversionTracker implements ConversionTrackerInterface {
 		}
 
 		$event   = new AddToCartEvent( $product_id, $quantity );
-		$payload = $event->build_payload( array( 'event_id' => $event_id ) );
+		$payload = $event->build_payload(
+			array(
+				'event_id'  => $event_id,
+				'user_data' => UserIdentifier::get_user_data(),
+			)
+		);
 
 		as_enqueue_async_action(
 			Helper::with_prefix( 'send_conversion_event' ),
@@ -150,8 +159,6 @@ class RemoteConversionTracker implements ConversionTrackerInterface {
 		if ( ! $token || ! $pixel_id ) {
 			return;
 		}
-
-		$event_payload['user_data'] = UserIdentifier::get_user_data();
 
 		$query   = http_build_query( array( 'access_token' => $token ) );
 		$path    = "{$pixel_id}/events?{$query}";
