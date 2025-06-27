@@ -53,7 +53,7 @@ final class WcsClient {
 	}
 
 	/**
-	 * Sends a DELETE request to the WCS `/connection` endpoint to disconnect the Ad Partner.
+	 * Sends a GET request to the WCS `/connection` endpoint to disconnect the Ad Partner.
 	 *
 	 * @since 0.1.0
 	 *
@@ -95,7 +95,7 @@ final class WcsClient {
 	}
 
 	/**
-	 * Base URL for the WCS endpoint.
+	 * Returns the base URL for the WCS endpoint.
 	 *
 	 * @return string
 	 */
@@ -114,7 +114,8 @@ final class WcsClient {
 	}
 
 	/**
-	 * The service name under which the Ad Partner integration is registered.
+	 * The service name under which the Ad Partner integration is
+	 * registered with WCS.
 	 *
 	 * @return string
 	 */

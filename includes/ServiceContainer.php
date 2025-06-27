@@ -69,12 +69,6 @@ final class ServiceContainer {
 	 */
 	private static function resolve( string $service ) {
 		switch ( $service ) {
-			case ServiceKey::CONNECTION:
-				return new ConnectionService(
-					self::get( ServiceKey::WCS_CLIENT ),
-					self::get( ServiceKey::JETPACK_AUTHENTICATOR ),
-					Config::REST_NAMESPACE
-				);
 			case ServiceKey::SETTINGS_REST_CONTROLLER_SETUP:
 				return new Settings\ControllerSetup();
 			case ServiceKey::JETPACK_AUTHENTICATOR:

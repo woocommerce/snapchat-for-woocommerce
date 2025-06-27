@@ -22,12 +22,6 @@ namespace SnapchatForWooCommerce;
  * @since 0.1.0
  */
 final class ServiceKey {
-	/**
-	 * Identifier for the connection service.
-	 *
-	 * @since 0.1.0
-	 */
-	public const CONNECTION = 'connection';
 
 	/**
 	 * Identifier for the Jetpack authenticator service.
