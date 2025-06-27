@@ -18,10 +18,16 @@ use SnapchatForWooCommerce\Tracking\PixelTrackingService;
 use SnapchatForWooCommerce\Tracking\ConversionTrackingService;
 
 /**
- * Manages frontend asset loading for tracking features.
+ * Manages frontend asset loading for plugin features.
  *
- * Only enqueues assets if either pixel or conversion tracking is enabled.
- * Uses {@see AssetLoader} for script registration and localization.
+ * While currently responsible for tracking-related assets (e.g., Snapchat Pixel
+ * and Conversion API), this class serves as a centralized entry point to
+ * enqueue and localize JavaScript required by any frontend feature.
+ *
+ * This allows modular services (such as Tracking, Dynamic Ads, etc.) to share
+ * a common mechanism for script management, versioning, and localization.
+ *
+ * Uses {@see AssetLoader} for registering and localizing scripts.
  *
  * @since 0.1.0
  */
@@ -40,10 +46,13 @@ class Assets {
 	}
 
 	/**
-	 * Enqueues tracking scripts and localizes runtime configuration.
+	 * Enqueues frontend scripts and localizes runtime configuration.
 	 *
-	 * Checks if either Pixel or Conversion API tracking is enabled.
-	 * If so, enqueues the tracking script and passes localized data to JavaScript.
+	 * Currently enqueues tracking-related assets if Pixel or Conversion API
+	 * tracking is enabled. In the future, this method may coordinate loading
+	 * for additional features (e.g., product feeds, analytics).
+	 *
+	 * Scripts are registered and localized using the {@see AssetLoader}.
 	 *
 	 * @since 0.1.0
 	 *
@@ -90,6 +99,7 @@ class Assets {
 			apply_filters(
 				Helper::with_prefix( 'filter_tracking_data' ),
 				array(
+					'ajax_url'              => admin_url( 'admin-ajax.php' ),
 					'is_pixel_enabled'      => PixelTrackingService::is_enabled(),
 					'is_conversion_enabled' => ConversionTrackingService::is_enabled(),
 					'capi_nonce'            => wp_create_nonce( 'capi_nonce' ),

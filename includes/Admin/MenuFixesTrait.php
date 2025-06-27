@@ -1,5 +1,22 @@
 <?php
-declare(strict_types=1);
+/**
+ * Trait for fixing Woo Admin submenu registration behavior.
+ *
+ * This trait provides a workaround for registering React-powered WooCommerce Admin pages
+ * under existing classic menu slugs (like "Marketing") while preserving:
+ * - Correct menu ordering
+ * - Proper submenu slugs and paths
+ * - Compatibility with Woo Admin's PageController system
+ *
+ * It is used when registering JS-based admin pages in WooCommerce that need to
+ * appear in classic submenu hierarchies but are powered by the new `wc-admin` routing.
+ *
+ * Inspired by how the Google for WooCommerce plugin ensures its page appears under
+ * the Marketing menu without breaking Woo Admin's path structure.
+ *
+ * @package SnapchatForWooCommerce\Admin
+ * @since 0.1.0
+ */
 
 namespace SnapchatForWooCommerce\Admin;
 
@@ -26,10 +43,10 @@ trait MenuFixesTrait {
 	 * }
 	 */
 	protected function register_classic_submenu_page( array $options ): void {
-		$defaults = [
+		$defaults = array(
 			'capability' => 'manage_woocommerce',
 			'position'   => null,
-		];
+		);
 
 		$options            = wp_parse_args( $options, $defaults );
 		$options['js_page'] = true;
@@ -44,7 +61,7 @@ trait MenuFixesTrait {
 			$options['title'],
 			$options['capability'],
 			$options['path'],
-			[ PageController::class, 'page_wrapper' ],
+			array( PageController::class, 'page_wrapper' ),
 			$options['position']
 		);
 
