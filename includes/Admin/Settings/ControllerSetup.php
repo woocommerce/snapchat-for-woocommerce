@@ -50,7 +50,7 @@ class ControllerSetup {
 		( new SnapchatAccountController(
 			new WcsClient(),
 			new JetpackAuthenticator()
-		) );
+		) )->register_routes();
 
 		( new SnapchatOrganizationsController(
 			new WcsClient(),
