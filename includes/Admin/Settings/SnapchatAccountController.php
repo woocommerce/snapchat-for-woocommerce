@@ -100,7 +100,7 @@ class SnapchatAccountController extends SettingsBaseController {
 					'status'  => 'error',
 					'message' => $response->get_error_message(),
 				)
-			)->set_status( 500 );
+			);
 		}
 
 		$data = $response->get_data();
@@ -111,7 +111,7 @@ class SnapchatAccountController extends SettingsBaseController {
 					'status'  => 'error',
 					'message' => __( 'Invalid response from WCS. OAuth URL missing.', 'snapchat-for-woocommerce' ),
 				)
-			)->set_status( 500 );
+			);
 		}
 
 		return rest_ensure_response(
@@ -133,7 +133,7 @@ class SnapchatAccountController extends SettingsBaseController {
 					'status'  => 'error',
 					'message' => __( 'Missing Jetpack authorization token.', 'snapchat-for-woocommerce' ),
 				)
-			)->set_status( 401 );
+			);
 		}
 
 		$response = $this->wcs->get_connection_status( $token );
@@ -145,7 +145,7 @@ class SnapchatAccountController extends SettingsBaseController {
 					'message' => $response->get_error_message(),
 					'data'    => $response->get_error_data(),
 				)
-			)->set_status( 500 );
+			);
 		}
 
 		$data = $response->get_data();
@@ -172,7 +172,7 @@ class SnapchatAccountController extends SettingsBaseController {
 					'status'  => 'error',
 					'message' => __( 'Missing Jetpack authorization token.', 'snapchat-for-woocommerce' ),
 				)
-			)->set_status( 401 );
+			);
 		}
 
 		$response = $this->wcs->stop_connection( $token );
@@ -184,7 +184,7 @@ class SnapchatAccountController extends SettingsBaseController {
 					'message' => $response->get_error_message(),
 					'data'    => $response->get_error_data(),
 				)
-			)->set_status( 500 );
+			);
 		}
 
 		$data = $response->get_data();

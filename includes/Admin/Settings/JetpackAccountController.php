@@ -131,7 +131,7 @@ class JetpackAccountController extends SettingsBaseController {
 						'status'  => 'error',
 						'message' => $result->get_error_message(),
 					)
-				)->set_status( 400 );
+				);
 			}
 
 			$next     = $request->get_param( 'next_page_name' );

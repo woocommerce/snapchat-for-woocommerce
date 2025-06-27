@@ -35,7 +35,7 @@ final class WcsClient {
 	 * @return WP_REST_Response|WP_Error Connection status or error.
 	 */
 	public function get_connection_status( string $jetpack_token ) {
-		return $this->proxy_request( 'GET', $jetpack_token, sprintf( 'connection/%s', $this->get_wcs_service_name() ) );
+		return $this->proxy_get( $jetpack_token, 'connection/status' );
 	}
 
 	/**
@@ -49,7 +49,7 @@ final class WcsClient {
 	 * @return WP_REST_Response|WP_Error Connection initiation response or error.
 	 */
 	public function start_connection( string $jetpack_token, string $return_url ) {
-		return $this->proxy_request( 'POST', $jetpack_token, sprintf( 'connection/%s', $this->get_wcs_service_name() ), array( 'returnUrl' => $return_url ) );
+		return $this->proxy_get( $jetpack_token, 'connection/connect', array( 'returnUrl' => $return_url ) );
 	}
 
 	/**
@@ -62,7 +62,7 @@ final class WcsClient {
 	 * @return WP_REST_Response|WP_Error Disconnection response or error.
 	 */
 	public function stop_connection( string $jetpack_token ) {
-		return $this->proxy_request( 'DELETE', $jetpack_token, sprintf( 'connection/%s', $this->get_wcs_service_name() ) );
+		return $this->proxy_get( $jetpack_token, 'connection/disconnect' );
 	}
 
 	/**
