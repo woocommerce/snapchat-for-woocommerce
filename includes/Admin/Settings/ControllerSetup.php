@@ -12,8 +12,10 @@
 
 namespace SnapchatForWooCommerce\Admin\Settings;
 
+use Automattic\Jetpack\Connection\Manager;
 use SnapchatForWooCommerce\Connection\WcsClient;
 use SnapchatForWooCommerce\Connection\JetpackAuthenticator;
+use SnapchatForWooCommerce\Config;
 
 /**
  * Bootstrap class for registering REST API routes related to plugin settings.
@@ -39,6 +41,17 @@ class ControllerSetup {
 	 * @return void
 	 */
 	public function register_routes(): void {
+		( new JetpackAccountController(
+			new WcsClient(),
+			new JetpackAuthenticator(),
+			new Manager( Config::PLUGIN_SLUG )
+		) )->register_routes();
+
+		( new SnapchatAccountController(
+			new WcsClient(),
+			new JetpackAuthenticator()
+		) );
+
 		( new SnapchatOrganizationsController(
 			new WcsClient(),
 			new JetpackAuthenticator()

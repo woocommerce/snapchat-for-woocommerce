@@ -167,8 +167,7 @@ class SnapchatSnapPixelController extends SettingsBaseController {
 
 		$response = $this->wcs->proxy_get(
 			$token,
-			"/v1/adaccounts/{$ad_account_id}/pixels",
-			'ads'
+			"/ads/v1/adaccounts/{$ad_account_id}/pixels",
 		);
 
 		if ( is_wp_error( $response ) ) {

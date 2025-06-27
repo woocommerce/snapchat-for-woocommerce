@@ -141,8 +141,7 @@ class SnapchatOrganizationsController extends SettingsBaseController {
 			$token    = $this->auth->get_auth_header();
 			$response = $this->wcs->proxy_get(
 				$token,
-				'/v1/me/organizations?with_ad_accounts=true',
-				'ads'
+				'/ads/v1/me/organizations?with_ad_accounts=true',
 			);
 
 			if ( is_wp_error( $response ) ) {

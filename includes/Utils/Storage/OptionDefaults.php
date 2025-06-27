@@ -26,6 +26,21 @@ namespace SnapchatForWooCommerce\Utils\Storage;
  */
 final class OptionDefaults {
 	/**
+	 * Option key for storing the status of Jetpack's connection.
+	 *
+	 * @since 0.1.0
+	 */
+	public const IS_JETPACK_CONNECTED = 'is_jetpack_connected';
+
+	/**
+	 * Option key for storing the status of the acceptance
+	 * of WordPress's Terms & Conditions.
+	 *
+	 * @since 0.1.0
+	 */
+	public const WP_TOS_ACCEPTED = 'wp_tos_accepted';
+
+	/**
 	 * Option key for the Ad Partner's Organizations
 	 * that include Ad Accounts.
 	 *
@@ -54,6 +69,10 @@ final class OptionDefaults {
 	 */
 	public const PIXEL_ENABLED = 'ads_pixel_enabled';
 
+	/**
+	 * Option key used to store array of pixels accound data
+	 * under the current selection of `AD_ACCOUNT_ID`.
+	 */
 	public const PIXELS = 'pixels';
 
 	/**
@@ -89,6 +108,8 @@ final class OptionDefaults {
 	 */
 	public static function get_all(): array {
 		return array(
+			self::IS_JETPACK_CONNECTED    => false,
+			self::WP_TOS_ACCEPTED         => false,
 			self::ORGANIZATIONS           => array(),
 			self::AD_ACCOUNT_ID           => '',
 			self::ORGANIZATION_ID         => '',
