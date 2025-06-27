@@ -51,15 +51,15 @@ const ConnectSnapchatComboAccountCard = ( { disabled } ) => {
 								linkMerchant: (
 									<AppDocumentationLink
 										context="setup-mc-accounts"
-										linkId="google-mc-terms-of-service"
-										href="https://support.google.com/merchants/answer/160173"
+										linkId="snapchat-mc-terms-of-service"
+										href="https://support.snapchat.com/merchants/answer/160173"
 									/>
 								),
 								linkAds: (
 									<AppDocumentationLink
 										context="setup-ads"
-										linkId="google-ads-terms-of-service"
-										href="https://support.google.com/adspolicy/answer/54818"
+										linkId="snapchat-ads-terms-of-service"
+										href="https://support.snapchat.com/adspolicy/answer/54818"
 									/>
 								),
 							}

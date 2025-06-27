@@ -7,7 +7,7 @@ import MainTabNav from '~/components/main-tab-nav';
 import './index.scss';
 
 const Settings = () => {
-	// Make the component highlight GLA entry in the WC legacy menu.
+	// Make the component highlight SFW entry in the WC legacy menu.
 	useMenuEffect();
 
 	return (

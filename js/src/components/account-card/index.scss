@@ -85,7 +85,7 @@
 	.components-card__footer {
 		padding: calc(var(--main-gap) / 3 * 2) var(--main-gap);
 
-		// The buttons in card footer usually use the link style in GLA,
+		// The buttons in card footer usually use the link style in SFW,
 		// but the default link style has a smaller size that doesn't meet
 		// the visual design needs. So we override its size here.
 		> .components-button.is-link {

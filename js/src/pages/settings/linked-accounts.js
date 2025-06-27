@@ -24,12 +24,12 @@ import DisconnectModal, { ALL_ACCOUNTS } from './disconnect-modal';
 /**
  * Accounts are disconnected from the Setting page
  *
- * @event gla_disconnected_accounts
+ * @event sfw_disconnected_accounts
  * @property {string} context (`all-accounts`|`ads-account`) - indicate which accounts have been disconnected.
  */
 
 /**
- * @fires gla_disconnected_accounts
+ * @fires sfw_disconnected_accounts
  */
 export default function LinkedAccounts() {
 	const adminUrl = useAdminUrl();
@@ -50,7 +50,7 @@ export default function LinkedAccounts() {
 	const dismissModal = () => setOpenedModal( null );
 
 	const handleDisconnected = () => {
-		// Reload WC admin page to update the `glaData` initiated from the static script.
+		// Reload WC admin page to update the `sfwData` initiated from the static script.
 		const nextPage =
 			openedModal === ALL_ACCOUNTS
 				? adminUrl + getGetStartedUrl()

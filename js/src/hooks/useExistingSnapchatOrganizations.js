@@ -3,11 +3,11 @@ const useExistingSnapchatOrganizations = () => {
 		data: [
 			{
 				id: 5471687369,
-				name: 'Google for Woo',
+				name: 'Snapchat for Woo',
 			},
 			{
 				id: 5449539228,
-				name: 'googlewoo.instawp.xyz',
+				name: 'snapchatwoo.instawp.xyz',
 			},
 		],
 		hasFinishedResolution: true,

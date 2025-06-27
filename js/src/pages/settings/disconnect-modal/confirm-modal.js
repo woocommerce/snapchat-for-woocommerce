@@ -44,7 +44,7 @@ export default function ConfirmModal( {
 } ) {
 	const [ isAgreed, setAgreed ] = useState( false );
 	const [ isDisconnecting, setDisconnecting ] = useState( false );
-	const dispatcher = useAppDispatch();
+	const { disconnectAllAccounts } = useAppDispatch();
 
 	const { title, confirmButton, confirmation, contents } =
 		textDict[ disconnectTarget ];
@@ -57,10 +57,7 @@ export default function ConfirmModal( {
 	};
 
 	const handleConfirmClick = () => {
-		let disconnect =
-			disconnectTarget === ALL_ACCOUNTS
-				? dispatcher.disconnectAllAccounts
-				: dispatcher.disconnectGoogleAdsAccount;
+		let disconnect = disconnectAllAccounts;
 
 		if ( disconnectAction ) {
 			disconnect = disconnectAction;
