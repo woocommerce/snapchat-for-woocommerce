@@ -32,7 +32,7 @@ const HelpIconButton = ( { eventContext } ) => {
 	return (
 		<AppButton
 			className="sfw-help-icon-button"
-			href="https://woocommerce.com/document/google-for-woocommerce/"
+			href="https://woocommerce.com/document/snapchat-for-woocommerce/" // @TODO: Review
 			target="_blank"
 			eventName="sfw_help_click"
 			eventProps={ {

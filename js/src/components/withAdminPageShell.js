@@ -4,7 +4,7 @@
 import { createHigherOrderComponent } from '@wordpress/compose';
 
 /**
- * A higher-order component for wrapping the app shell on top of the GLA admin page.
+ * A higher-order component for wrapping the app shell on top of the SFW admin page.
  * Cross-page shared things could be handled here.
  *
  * @param {JSX.Element} Page Top-level admin page component to be wrapped by app shell.

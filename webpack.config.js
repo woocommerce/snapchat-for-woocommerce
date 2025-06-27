@@ -85,11 +85,7 @@ const webpackConfig = {
 	entry: () => ( {
 		...defaultConfig.entry(),
 		index: path.resolve( process.cwd(), 'js/src', 'index.js' ),
-		// 'tracking': path.resolve(
-		// 	process.cwd(),
-		// 	'src/tracking',
-		// 	'index.js'
-		// ),
+		tracking: path.resolve( process.cwd(), 'js/src/tracking', 'index.js' ),
 	} ),
 	output: {
 		...defaultConfig.output,

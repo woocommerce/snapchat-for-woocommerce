@@ -18,7 +18,6 @@ import useJetpackAccount from '~/hooks/useJetpackAccount';
 import WPComAccountCard from '~/components/wpcom-account-card';
 import SnapchatComboAccountCard from '~/components/snapchat-combo-account-card';
 import './index.scss';
-// import GoogleComboAccountCard from '~/components/google-combo-account-card';
 
 const SetupAccounts = ( props ) => {
 	const { onContinue = () => {} } = props;
@@ -52,7 +51,7 @@ const SetupAccounts = ( props ) => {
 				) }
 			/>
 			<Section
-				className="sfw-wp-google-accounts-section"
+				className="sfw-wp-snapchat-accounts-section"
 				title={ __( 'Connect accounts', 'snapchat-for-woo' ) }
 				description={ __(
 					'The following accounts are required to use the Snapchat plugin.',
@@ -60,7 +59,8 @@ const SetupAccounts = ( props ) => {
 				) }
 			>
 				<WPComAccountCard jetpack={ jetpack } />
-				<SnapchatComboAccountCard disabled={ ! isJetpackActive } />
+				{ /* <SnapchatComboAccountCard disabled={ ! isJetpackActive } /> */ }
+				<SnapchatComboAccountCard disabled={ isJetpackActive } />
 			</Section>
 
 			<StepContentFooter>

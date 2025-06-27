@@ -15,7 +15,7 @@ import './index.scss';
 const AppSpinner = () => {
 	return (
 		<div
-			className="swf-app-spinner"
+			className="sfw-app-spinner"
 			role="status"
 			aria-label={ __( 'Loading…', 'snapchat-for-woo' ) }
 		>

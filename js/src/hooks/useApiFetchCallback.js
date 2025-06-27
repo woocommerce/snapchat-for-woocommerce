@@ -104,7 +104,7 @@ const shouldReturnResponseBody = ( options ) => {
  * 		>
  * 			{ __(
  * 				'Switch to my new URL',
- * 				'google-listings-and-ads'
+ * 				'snapchat-for-woo'
  * 			) }
  * 		</AppButton>
  * )

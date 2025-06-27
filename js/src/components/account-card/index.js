@@ -24,7 +24,7 @@ export const APPEARANCE = {
 	SNAPCHAT: 'snapchat',
 };
 
-const googleLogo = (
+const snapchatLogo = (
 	<img
 		src={ snapchatLogoURL }
 		alt={ __( 'Snapchat Logo', 'snapchat-for-woo' ) }
@@ -49,8 +49,8 @@ const appearanceDict = {
 		title: 'WordPress.com',
 	},
 	[ APPEARANCE.SNAPCHAT ]: {
-		icon: googleLogo,
-		title: __( 'Google', 'snapchat-for-woo' ),
+		icon: snapchatLogo,
+		title: __( 'Snapchat', 'snapchat-for-woo' ),
 	},
 };
 

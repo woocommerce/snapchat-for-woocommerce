@@ -10,23 +10,21 @@ import { useState, useEffect } from '@wordpress/element';
 import { useAppDispatch } from '~/data';
 import AccountCard, { APPEARANCE } from '~/components/account-card';
 import ConnectAds from './connect-ads';
+import ConnectOrganization from './connect-organization';
 import AccountDetails from './account-details';
-import ConnectedAdsAccountDetail from './connected-ads-account-detail';
 import Indicator from './indicator';
-import getAccountCreationTexts from './getAccountCreationTexts';
 import SpinnerCard from '~/components/spinner-card';
-import useAutoCreateAdsMCAccounts from '~/hooks/useAutoCreateAdsMCAccounts';
-import useGoogleMCAccount from '~/hooks/useGoogleMCAccount';
-import useExistingGoogleMCAccounts from '~/hooks/useExistingGoogleMCAccounts';
-import useCreateMCAccount from '~/hooks/useCreateMCAccount';
-import { ConnectMC } from '~/components/google-mc-account-card';
-import useExistingGoogleAdsAccounts from '~/hooks/useExistingGoogleAdsAccounts';
+import useExistingSnapchatAdsAccounts from '~/hooks/useExistingSnapchatAdsAccounts';
+import useExistingSnapchatOrganizations from '~/hooks/useExistingSnapchatOrganizations';
+import useSnapchatAccount from '~/hooks/useSnapchatAccount';
+import useSnapchatAdsAccount from '~/hooks/useSnapchatAdsAccount';
+import useSnapchatOrganization from '~/hooks/useSnapchatOrganization';
 import AppButton from '~/components/app-button';
-import { SwitchAccountButton } from '~/components/google-account-card';
-import useGoogleAdsAccountStatus from '~/hooks/useGoogleAdsAccountStatus';
-import useGoogleAdsAccount from '~/hooks/useGoogleAdsAccount';
-import useUpsertAdsAccount from '~/hooks/useUpsertAdsAccount';
-import showAdsConversionNotice from '~/utils/showAdsConversionNotice';
+import {
+	SNAPCHAT_ADS_ACCOUNT_STATUS,
+	SNAPCHAT_ORGANIZATION_ACCOUNT_STATUS,
+} from '~/constants';
+import { SwitchAccountButton } from '~/components/snapchat-account-card';
 import './connected-snapchat-combo-account-card.scss';
 
 /**
@@ -34,48 +32,20 @@ import './connected-snapchat-combo-account-card.scss';
  */
 const ConnectedSnapchatComboAccountCard = () => {
 	const [ editMode, setEditMode ] = useState( false );
+	const { snapchat } = useSnapchatAccount();
+	const { status: snapchatAdsAccountStatus } = useSnapchatAdsAccount();
+	const { status: snapchatOrganizationStatus } = useSnapchatOrganization();
+	const { data: existingSnapchatAdsAccounts } =
+		useExistingSnapchatAdsAccounts();
+	const { data: existingSnapchatOrganizations } =
+		useExistingSnapchatOrganizations();
 
-	// We use a single instance of the hook to create a MC (Merchant Center) account,
-	// ensuring consistent results across both the main component (ConnectedGoogleComboAccountCard) and its child component (ConnectMC).
-	// This approach is especially useful when an MC account is automatically created, and the URL needs to be reclaimed.
-	// The URL reclaim component is rendered within the ConnectMC component.
-	const [ createMCAccount, resultCreateMCAccount ] = useCreateMCAccount();
-	const { data: existingGoogleMCAccounts } = useExistingGoogleMCAccounts();
-	const { hasDetermined, creatingWhich } =
-		useAutoCreateAdsMCAccounts( createMCAccount );
-	const { text, subText } = getAccountCreationTexts( creatingWhich );
-	const { existingAccounts: existingGoogleAdsAccounts } =
-		useExistingGoogleAdsAccounts();
-	const {
-		isReady: isGoogleMCReady,
-		hasGoogleMCConnection,
-		hasFinishedResolution,
-	} = useGoogleMCAccount();
 	const { invalidateResolution } = useAppDispatch();
-	const { googleAdsAccount, hasGoogleAdsConnection } = useGoogleAdsAccount();
-	const { hasAccess, step } = useGoogleAdsAccountStatus();
-	const [ upsertAdsAccount, { action, loading } ] = useUpsertAdsAccount();
 
-	const hasExistingGoogleMCAccounts = existingGoogleMCAccounts?.length > 0;
-	const hasExistingGoogleAdsAccounts = existingGoogleAdsAccounts?.length > 0;
-	const shouldClaimGoogleAdsAccount = Boolean(
-		! loading && googleAdsAccount?.id && hasAccess === false
-	);
-	const finalizeAdsAccountCreation =
-		hasAccess === true && step === 'conversion_action';
-
-	// Ideally updating the account should be done in ConnectMC component but the latter is not always rendered,
-	// (for e.g when the user is creating the first account).
-	useEffect( () => {
-		const upsertAccount = async () => {
-			if ( finalizeAdsAccountCreation ) {
-				await upsertAdsAccount();
-				invalidateResolution( 'getExistingGoogleAdsAccounts', [] );
-			}
-		};
-
-		upsertAccount();
-	}, [ finalizeAdsAccountCreation, upsertAdsAccount, invalidateResolution ] );
+	const hasExistingSnapchatAdsAccounts =
+		existingSnapchatAdsAccounts?.length > 0;
+	const hasExistingSnapchatOrganizations =
+		existingSnapchatOrganizations?.length > 0;
 
 	const handleCancelClick = () => {
 		setEditMode( false );
@@ -85,53 +55,43 @@ const ConnectedSnapchatComboAccountCard = () => {
 		setEditMode( true );
 	};
 
-	// During MC account creation, we need to show the ConnectMC component
-	// when the account creation needs to show the Switch or Reclaim flow.
-	const googleMCHasError = [ 409, 403 ].includes(
-		resultCreateMCAccount.response?.status
-	);
+	const hasSnapchatAdsConnection =
+		snapchatAdsAccountStatus === SNAPCHAT_ADS_ACCOUNT_STATUS.CONNECTED;
+	const hasSnapchatOrganizationConnection =
+		snapchatOrganizationStatus ===
+		SNAPCHAT_ORGANIZATION_ACCOUNT_STATUS.CONNECTED;
 
-	// After creating a new account, it may be connected but not ready
-	// (e.g., needing to reclaim the URL). In this case, we show the ConnectMC
-	// component, even if the existing accounts list has not yet updated.
-	//
-	// The last `hasGoogleMCConnection` condition exists for the scenario with these steps:
-	// 1. Automatically creating a Google Merchant Center account and reclaiming URL is required.
-	// 2. The merchant interrupts the onboarding flow and then resumes it.
-	//    This is also the case for refreshing webpage.
-	// 3. The newly created account is not yet among the existing accounts.
-	// 4. The condition enables the merchant to resume the Google Merchant Center connection
-	//    from the step of connecting the newly created account
-	const canShowConnectMC =
-		googleMCHasError ||
-		hasExistingGoogleMCAccounts ||
-		hasGoogleMCConnection;
-	const showConnectMC = canShowConnectMC && ( editMode || ! isGoogleMCReady );
+	const canShowConnectOrganization =
+		hasExistingSnapchatOrganizations || hasSnapchatOrganizationConnection;
+	const showConnectOrganization =
+		canShowConnectOrganization &&
+		( editMode || ! hasSnapchatOrganizationConnection );
 
-	// After creating a new account, it may not show up in the existing accounts list
-	// immediately. In this case, we show the ConnectAds component in edit mode unless
-	// we're showing the claim notice in the upper card.
 	const canShowConnectAds =
-		hasGoogleAdsConnection || hasExistingGoogleAdsAccounts;
+		hasSnapchatAdsConnection || hasExistingSnapchatAdsAccounts;
 	const showConnectAds =
-		canShowConnectAds && ( editMode || ! hasGoogleAdsConnection );
+		canShowConnectAds && ( editMode || ! hasSnapchatAdsConnection );
 
-	// When Ads and MC are disconnected in edit mode, exit edit mode.
+	// When Ads and Org are disconnected in edit mode, exit edit mode.
 	useEffect( () => {
-		if ( editMode && ! hasGoogleMCConnection && ! hasGoogleAdsConnection ) {
+		if (
+			editMode &&
+			! hasSnapchatAdsConnection &&
+			! hasSnapchatOrganizationConnection
+		) {
 			setEditMode( false );
 		}
-	}, [ editMode, hasGoogleAdsConnection, hasGoogleMCConnection ] );
-
-	if ( ! hasDetermined ) {
-		return <SpinnerCard />;
-	}
+	}, [
+		editMode,
+		hasSnapchatAdsConnection,
+		hasSnapchatOrganizationConnection,
+	] );
 
 	const switchAccountButton = (
 		<SwitchAccountButton
 			isTertiary
 			text={ __(
-				'Or, connect to a different Google account',
+				'Or, connect to a different Snapchat account',
 				'snapchat-for-woo'
 			) }
 		/>
@@ -140,7 +100,7 @@ const ConnectedSnapchatComboAccountCard = () => {
 	const getCardActions = () => {
 		if ( editMode ) {
 			return (
-				<div className="sfw-google-combo-account-card__description-actions">
+				<div className="sfw-snapchat-combo-account-card__description-actions">
 					{ switchAccountButton }
 					<AppButton isTertiary onClick={ handleCancelClick }>
 						{ __( 'Cancel', 'snapchat-for-woo' ) }
@@ -150,11 +110,11 @@ const ConnectedSnapchatComboAccountCard = () => {
 		}
 
 		// When not in edit mode, only show the edit button if clicking the
-		// button would change the visibility of the ConnectAds or ConnectMC cards.
+		// button would change the visibility of the ConnectAds or ConnectOrganization cards.
 		return (
-			<div className="sfw-google-combo-account-card__description-actions">
+			<div className="sfw-snapchat-combo-account-card__description-actions">
 				{ ( showConnectAds || ! canShowConnectAds ) &&
-				( showConnectMC || ! canShowConnectMC ) ? (
+				( showConnectOrganization || ! canShowConnectOrganization ) ? (
 					switchAccountButton
 				) : (
 					<AppButton
@@ -167,53 +127,24 @@ const ConnectedSnapchatComboAccountCard = () => {
 		);
 	};
 
-	// Show the spinner if there's an account creation in progress and account should not be claimed.
-	// If we are not showing the ConnectMC screen, for e.g when we are creating the first account,
-	// then show the spinner in the Google combo card while the Ads account is being claimed.
-	const showSpinner =
-		( Boolean( creatingWhich ) && ! shouldClaimGoogleAdsAccount ) ||
-		( ! showConnectAds && finalizeAdsAccountCreation );
-
-	const showConversionMeasurementNotice =
-		showAdsConversionNotice( googleAdsAccount );
-
-	const showAddressCard = hasFinishedResolution && isGoogleMCReady;
+	// @TODO: review
+	const showSpinner = false;
 
 	return (
-		<div className="sfw-google-combo-account-card-wrapper">
+		<div className="sfw-snapchat-combo-account-card-wrapper">
 			<AccountCard
 				appearance={ APPEARANCE.SNAPCHAT }
 				alignIcon="top"
-				className="sfw-google-combo-account-card sfw-google-combo-account-card--connected sfw-google-combo-service-account-card--google"
-				description={ text || <AccountDetails /> }
+				className="sfw-snapchat-combo-account-card sfw-snapchat-combo-account-card--connected sfw-snapchat-combo-service-account-card--snapchat"
+				description={ <AccountDetails /> }
 				actions={ getCardActions() }
-				helper={ subText }
 				indicator={ <Indicator showSpinner={ showSpinner } /> }
-				detail={
-					<ConnectedAdsAccountDetail
-						showConversionMeasurementNotice={
-							showConversionMeasurementNotice
-						}
-						claimGoogleAdsAccount={ shouldClaimGoogleAdsAccount }
-					/>
-				}
 				expandedDetail
 			/>
 
-			{ showConnectAds && (
-				<ConnectAds
-					onRequestCreate={ upsertAdsAccount }
-					upsertingAction={ action }
-				/>
-			) }
+			{ showConnectOrganization && <ConnectOrganization /> }
 
-			{ showConnectMC && (
-				<ConnectMC
-					createAccount={ createMCAccount }
-					resultCreateAccount={ resultCreateMCAccount }
-					className="sfw-google-combo-account-card sfw-google-combo-service-account-card--mc"
-				/>
-			) }
+			{ showConnectAds && <ConnectAds /> }
 		</div>
 	);
 };

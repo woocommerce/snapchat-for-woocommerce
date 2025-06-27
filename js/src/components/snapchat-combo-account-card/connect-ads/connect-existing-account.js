@@ -12,15 +12,14 @@ import ConnectExistingAccountActions from './connect-existing-account-actions';
 import LoadingLabel from '~/components/loading-label';
 import useApiFetchCallback from '~/hooks/useApiFetchCallback';
 import useDispatchCoreNotices from '~/hooks/useDispatchCoreNotices';
-import useGoogleAdsAccount from '~/hooks/useGoogleAdsAccount';
+import useSnapchatAdsAccount from '~/hooks/useSnapchatAdsAccount';
 import { useAppDispatch } from '~/data';
-import useGoogleAdsAccountReady from '~/hooks/useGoogleAdsAccountReady';
 import AdsAccountSelectControl from '~/components/ads-account-select-control';
 import ConnectedIconLabel from '~/components/connected-icon-label';
-import { ConnectAccountButton } from '~/components/google-ads-account-card';
+import ConnectAccountButton from './connect-account-button';
 
 /**
- * Renders an account card to connect to an existing Google Ads account.
+ * Renders an account card to connect to an existing Snapchat Ads account.
  *
  * @param {Object} props Component props.
  * @param {Function} props.onCreateClick Callback when clicking on the button to create a new account
@@ -29,25 +28,24 @@ const ConnectExistingAccount = ( { onCreateClick } ) => {
 	const [ value, setValue ] = useState();
 	const [ isLoading, setLoading ] = useState( false );
 	const { createNotice } = useDispatchCoreNotices();
-	const { fetchGoogleAdsAccountStatus } = useAppDispatch();
-	const { isGoogleAdsReady } = useGoogleAdsAccountReady();
+	const { fetchSnapchatAdsAccountStatus } = useAppDispatch();
 	const {
-		googleAdsAccount,
+		snapchatAdsAccount,
 		hasFinishedResolution,
-		hasGoogleAdsConnection,
-		refetchGoogleAdsAccount,
-	} = useGoogleAdsAccount();
-	const [ connectGoogleAdsAccount ] = useApiFetchCallback( {
+		refetchSnapchatAdsAccount,
+		isReady,
+	} = useSnapchatAdsAccount();
+	const [ connectSnapchatAdsAccount ] = useApiFetchCallback( {
 		path: '/wc/sfw/ads/accounts',
 		method: 'POST',
 		data: { id: value },
 	} );
 
 	useEffect( () => {
-		if ( hasGoogleAdsConnection ) {
-			setValue( googleAdsAccount.id );
+		if ( isReady ) {
+			setValue( snapchatAdsAccount.id );
 		}
-	}, [ googleAdsAccount, hasGoogleAdsConnection ] );
+	}, [ snapchatAdsAccount, isReady ] );
 
 	const handleConnectClick = async () => {
 		if ( ! value ) {
@@ -56,14 +54,14 @@ const ConnectExistingAccount = ( { onCreateClick } ) => {
 
 		setLoading( true );
 		try {
-			await connectGoogleAdsAccount();
-			await fetchGoogleAdsAccountStatus();
-			await refetchGoogleAdsAccount();
+			await connectSnapchatAdsAccount();
+			await fetchSnapchatAdsAccountStatus();
+			await refetchSnapchatAdsAccount();
 		} catch ( error ) {
 			createNotice(
 				'error',
 				__(
-					'Unable to connect your Google Ads account. Please try again later.',
+					'Unable to connect your Snapchat Ads account. Please try again later.',
 					'snapchat-for-woo'
 				)
 			);
@@ -95,28 +93,22 @@ const ConnectExistingAccount = ( { onCreateClick } ) => {
 			);
 		}
 
-		if ( isGoogleAdsReady ) {
+		if ( isReady ) {
 			return <ConnectedIconLabel />;
 		}
 
-		return (
-			<ConnectAccountButton
-				disabled={ hasGoogleAdsConnection }
-				accountID={ value }
-				onClick={ handleConnectClick }
-			/>
-		);
+		return <ConnectAccountButton onClick={ handleConnectClick } />;
 	};
 
 	return (
 		<AccountCard
-			className="sfw-google-combo-account-card sfw-google-combo-service-account-card--ads"
+			className="sfw-snapchat-combo-account-card sfw-snapchat-combo-service-account-card--ads"
 			title={ __(
-				'Connect to existing Google Ads account',
+				'2. Connect to existing Snap Ads account',
 				'snapchat-for-woo'
 			) }
 			helper={ __(
-				'Required to set up conversion measurement for your store.',
+				'Required to create and manage campaigns.',
 				'snapchat-for-woo'
 			) }
 			alignIndicator="toDetail"
@@ -130,13 +122,13 @@ const ConnectExistingAccount = ( { onCreateClick } ) => {
 					value={ value }
 					onChange={ setValue }
 					autoSelectFirstOption
-					nonInteractive={ hasGoogleAdsConnection }
+					nonInteractive={ isReady }
 				/>
 			}
 			actions={
 				<ConnectExistingAccountActions
 					disabled={ isLoading }
-					isConnected={ hasGoogleAdsConnection }
+					isConnected={ isReady }
 					onCreateNewClick={ onCreateClick }
 					onDisconnected={ handleDisconnected }
 				/>
