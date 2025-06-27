@@ -1,5 +1,5 @@
 /**
- * Internal Dependencies.
+ * Internal dependencies
  */
 import { TRACKING_DATA_VAR } from '../constants';
 
@@ -37,4 +37,4 @@ export const triggerCAPI = async ( eventId, productId, quantity ) => {
 		credentials: 'same-origin',
 		body: formData,
 	} );
-}
+};
