@@ -79,16 +79,10 @@ class ProductEntityProvider implements ExportableEntityProviderInterface {
 	 * @return array<int, WC_Product> List of valid product entities.
 	 */
 	public function get_entities( array $ids ): array {
-		$products = array();
-
-		foreach ( $ids as $id ) {
-			$product = wc_get_product( $id );
-
-			if ( $product instanceof WC_Product ) {
-				$products[] = $product;
-			}
-		}
-
-		return $products;
+		return wc_get_products( [
+			'include' => $ids,
+			'return'  => 'objects',
+			'limit'   => count( $ids ),
+		] );
 	}
 }
