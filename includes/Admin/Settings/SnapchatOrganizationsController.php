@@ -172,7 +172,22 @@ class SnapchatOrganizationsController extends SettingsBaseController {
 	 * @return WP_REST_Response
 	 */
 	public function set_organization( $request ) {
+		$orgs   = Options::get( OptionDefaults::ORGANIZATIONS );
 		$org_id = sanitize_text_field( $request['id'] );
+
+		$org_exists = ! empty(
+			array_filter(
+				$orgs,
+				fn( $org ) => $org['id'] === $org_id
+			)
+		);
+
+		if ( ! $org_exists ) {
+			return rest_ensure_response(
+				array( 'id' => '' )
+			);
+		}
+
 		Options::set( OptionDefaults::ORGANIZATION_ID, $org_id );
 
 		return rest_ensure_response(

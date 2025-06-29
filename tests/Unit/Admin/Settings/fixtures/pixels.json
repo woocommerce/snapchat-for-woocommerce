@@ -1,0 +1,45 @@
+{
+  "request_status": "SUCCESS",
+  "request_id": "5a0253c100ff013af0e5dd11d40001737e616473617069736300016275696c642d61306563656639392d312d3131392d3300010124",
+  "pixels": [
+    {
+      "sub_request_status": "SUCCESS",
+      "pixel": {
+        "id": "6abc82ca-4a3a-4391-98ba-0317a8471234",
+        "updated_at": "2017-03-15T18:19:08.576Z",
+        "created_at": "2017-03-15T18:19:08.576Z",
+        "effective_status": "ACTIVE",
+        "name": "Pixel for Woo",
+        "ad_account_id": "294da428-5f98-4c78-9946-14cf65cff14b",
+        "status": "ACTIVE",
+        "pixel_javascript": "<!-- Snap Pixel Code -->\n<script type='text/javascript'>\n(function(e,t,n){if(e.snaptr)return;var a=e.snaptr=function()\n{a.handleRequest?a.handleRequest.apply(a,arguments):a.queue.push(arguments)};\na.queue=[];var s='script';r=t.createElement(s);r.async=!0;\nr.src=n;var u=t.getElementsByTagName(s)[0];\nu.parentNode.insertBefore(r,u);})(window,document,\n'https://sc-static.net/scevent.min.js');\n\nsnaptr('init', '6abc82ca-4a3a-4391-98ba-0317a8471234', {\n'user_email': '__INSERT_USER_EMAIL__'\n});\n\nsnaptr('track', 'PAGE_VIEW');\n\n</script>\n<!-- End Snap Pixel Code -->"
+      }
+    },
+    {
+      "sub_request_status": "SUCCESS",
+      "pixel": {
+        "id": "e7d0967a-788c-4f32-a4b8-c94711e663de",
+        "updated_at": "2017-03-15T18:19:08.576Z",
+        "created_at": "2017-03-15T18:19:08.576Z",
+        "effective_status": "ACTIVE",
+        "name": "Pixel for App",
+        "ad_account_id": "294da428-5f98-4c78-9946-14cf65cff14b",
+        "status": "ACTIVE",
+        "pixel_javascript": "<!-- Snap Pixel Code -->\n<script type='text/javascript'>\n(function(e,t,n){if(e.snaptr)return;var a=e.snaptr=function()\n{a.handleRequest?a.handleRequest.apply(a,arguments):a.queue.push(arguments)};\na.queue=[];var s='script';r=t.createElement(s);r.async=!0;\nr.src=n;var u=t.getElementsByTagName(s)[0];\nu.parentNode.insertBefore(r,u);})(window,document,\n'https://sc-static.net/scevent.min.js');\n\nsnaptr('init', 'e7d0967a-788c-4f32-a4b8-c94711e663de', {\n'user_email': '__INSERT_USER_EMAIL__'\n});\n\nsnaptr('track', 'PAGE_VIEW');\n\n</script>\n<!-- End Snap Pixel Code -->"
+      }
+    },
+    {
+      "sub_request_status": "SUCCESS",
+      "pixel": {
+        "id": "3c9199dc-9734-4b77-841e-dba642d80c13",
+        "updated_at": "2017-03-15T18:19:08.576Z",
+        "created_at": "2017-03-15T18:19:08.576Z",
+        "effective_status": "INACTIVE",
+        "name": "Pixel from the Future",
+        "ad_account_id": "294da428-5f98-4c78-9946-14cf65cff14b",
+        "status": "INACTIVE",
+        "pixel_javascript": "<!-- Snap Pixel Code -->\n<script type='text/javascript'>\n(function(e,t,n){if(e.snaptr)return;var a=e.snaptr=function()\n{a.handleRequest?a.handleRequest.apply(a,arguments):a.queue.push(arguments)};\na.queue=[];var s='script';r=t.createElement(s);r.async=!0;\nr.src=n;var u=t.getElementsByTagName(s)[0];\nu.parentNode.insertBefore(r,u);})(window,document,\n'https://sc-static.net/scevent.min.js');\n\nsnaptr('init', '3c9199dc-9734-4b77-841e-dba642d80c13', {\n'user_email': '__INSERT_USER_EMAIL__'\n});\n\nsnaptr('track', 'PAGE_VIEW');\n\n</script>\n<!-- End Snap Pixel Code -->"
+      }
+    }
+  ]
+}

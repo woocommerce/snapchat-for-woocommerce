@@ -156,16 +156,15 @@ class SnapchatSnapPixelController extends SettingsBaseController {
 	 * @return WP_REST_Response|WP_Error
 	 */
 	public function get_pixels( $request ) {
-		$ad_account_id = sanitize_text_field( $request->get_param( 'ads_account_id' ) );
-		$pixels        = Options::get( OptionDefaults::PIXELS );
+		$pixels = Options::get( OptionDefaults::PIXELS );
 
 		if ( ! empty( $pixels ) ) {
 			return rest_ensure_response( $pixels );
 		}
 
-		$token = $this->auth->get_auth_header();
-
-		$response = $this->wcs->proxy_get(
+		$ad_account_id = sanitize_text_field( $request->get_param( 'ads_account_id' ) );
+		$token         = $this->auth->get_auth_header();
+		$response      = $this->wcs->proxy_get(
 			$token,
 			"/ads/v1/adaccounts/{$ad_account_id}/pixels",
 		);
@@ -216,7 +215,7 @@ class SnapchatSnapPixelController extends SettingsBaseController {
 		if ( empty( $pixel ) ) {
 			return new WP_Error(
 				'pixel_not_found',
-				__( 'Selected Pixel ID does not match any known pixels.', 'snapchat-for-woocommerce' ),
+				'Selected Pixel ID does not match any known pixels.',
 				array( 'status' => 400 )
 			);
 		}

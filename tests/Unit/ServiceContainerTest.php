@@ -72,14 +72,6 @@ class ServiceContainerTest extends WP_UnitTestCase {
 	}
 
 	/**
-	 * Asserts that the ConnectionService is resolved and constructed with its dependencies.
-	 */
-	public function test_it_returns_connection_service_instance() {
-		$mock = $this->createMock( JetpackAuthenticator::class );
-		$this->set_service( ServiceKey::JETPACK_AUTHENTICATOR, $mock );
-	}
-
-	/**
 	 * Asserts that the PixelTrackingService is resolved and properly constructed.
 	 */
 	public function test_it_returns_pixel_tracking_service_instance() {

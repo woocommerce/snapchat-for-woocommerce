@@ -64,11 +64,6 @@ class SnapchatAdAccountsController extends SettingsBaseController {
 						),
 					),
 				),
-				array(
-					'methods'             => 'DELETE',
-					'callback'            => array( $this, 'delete_ads_account' ),
-					'permission_callback' => array( $this, 'permissions_check' ),
-				),
 				'schema' => array( $this, 'ads_accounts_schema' ),
 			)
 		);
@@ -102,6 +97,11 @@ class SnapchatAdAccountsController extends SettingsBaseController {
 						),
 					),
 				),
+				array(
+					'methods'             => 'DELETE',
+					'callback'            => array( $this, 'delete_ads_account' ),
+					'permission_callback' => array( $this, 'permissions_check' ),
+				),
 				'schema' => array( $this, 'ads_account_schema' ),
 			)
 		);
@@ -122,7 +122,7 @@ class SnapchatAdAccountsController extends SettingsBaseController {
 		if ( empty( $orgs ) ) {
 			return new WP_Error(
 				'no_organizations_cached',
-				__( 'Organization data not available. Please reload organizations first.', 'snapchat-for-woocommerce' ),
+				'Organization data not available. Please reload organizations first.',
 				array( 'status' => 400 )
 			);
 		}
@@ -130,7 +130,7 @@ class SnapchatAdAccountsController extends SettingsBaseController {
 		$org = current(
 			array_filter(
 				$orgs,
-				fn( $entry ) => (string) $entry['id'] === (string) $org_id
+				fn( $entry ) => $entry['id'] === $org_id
 			)
 		);
 
@@ -151,6 +151,41 @@ class SnapchatAdAccountsController extends SettingsBaseController {
 	 */
 	public function save_ads_account_id( $request ) {
 		$ad_account_id = sanitize_text_field( $request['id'] );
+		$orgs          = Options::get( OptionDefaults::ORGANIZATIONS );
+		$org_id        = Options::get( OptionDefaults::ORGANIZATION_ID );
+
+		if ( empty( $org_id ) ) {
+			return new WP_Error(
+				'org_id_not_set',
+				'Set the organization ID first.'
+			);
+		}
+
+		$org = current(
+			array_filter(
+				$orgs,
+				fn( $org ) => $org['id'] === $org_id
+			)
+		);
+
+		if ( empty( $org ) && ! is_array( $org ) ) {
+			return rest_ensure_response( array( 'id' => '' ) );
+		}
+
+		$ad_accounts = current(
+			array_filter(
+				$org['ad_accounts'],
+				fn( $account ) => $account['id'] === $ad_account_id
+			)
+		);
+
+		if ( empty( $ad_accounts ) ) {
+			return new WP_Error(
+				'ads_account_not_found',
+				'No details are associated with the provided account ID.'
+			);
+		}
+
 		Options::set( OptionDefaults::AD_ACCOUNT_ID, $ad_account_id );
 
 		return rest_ensure_response( array( 'id' => $ad_account_id ) );
@@ -177,26 +212,7 @@ class SnapchatAdAccountsController extends SettingsBaseController {
 	 * @return WP_REST_Response
 	 */
 	public function get_ads_account_id() {
-		$ad_account_id = Options::get( OptionDefaults::AD_ACCOUNT_ID );
-		$orgs          = Options::get( OptionDefaults::ORGANIZATIONS );
-
-		if ( empty( $orgs ) || empty( $ad_account_id ) ) {
-			return rest_ensure_response(
-				array( 'id' => '' )
-			);
-		}
-
-		foreach ( $orgs as $org ) {
-			foreach ( $org['ad_accounts'] as $account ) {
-				if ( (string) $account['id'] === (string) $ad_account_id ) {
-					return rest_ensure_response(
-						array( 'id' => $account['id'] )
-					);
-				}
-			}
-		}
-
-		return rest_ensure_response( array( 'id' => '' ) );
+		return rest_ensure_response( array( 'id' => Options::get( OptionDefaults::AD_ACCOUNT_ID ) ) );
 	}
 
 	/**

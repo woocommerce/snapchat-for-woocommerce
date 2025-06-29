@@ -1,0 +1,143 @@
+{
+  "request_status": "SUCCESS",
+  "request_id": "mocked-request-id-abcdef123456",
+  "organizations": [
+    {
+      "sub_request_status": "SUCCESS",
+      "organization": {
+        "id": "40d6719b-da09-410b-9185-0cc9c0dfed1d",
+        "updated_at": "2018-09-04T16:27:01.066Z",
+        "created_at": "2016-08-09T17:12:49.707Z",
+        "name": "Hooli Inc",
+        "country": "US",
+        "postal_code": "90291",
+        "locality": "Venice",
+        "contact_name": "",
+        "contact_email": "",
+        "contact_phone": "",
+        "tax_type": "NONE",
+        "address_line_1": "64 Market St",
+        "administrative_district_level_1": "CA",
+        "accepted_term_version": "8",
+        "is_agency": true,
+        "configuration_settings": {
+          "notifications_enabled": true
+        },
+        "type": "ENTERPRISE",
+        "state": "ACTIVE",
+        "roles": ["member"],
+        "ad_accounts": [
+          {
+            "id": "8b8e40af-fc64-455d-925b-ca80f7af6914",
+            "updated_at": "2018-03-07T23:39:20.469Z",
+            "created_at": "2018-03-27T23:42:43.513Z",
+            "name": "Hooli Originals",
+            "type": "PARTNER",
+            "status": "ACTIVE",
+            "currency": "USD",
+            "timezone": "America/Los_Angeles",
+            "roles": ["reports"]
+          },
+          {
+            "id": "294da428-5f98-4c78-9946-14cf65cff14b",
+            "updated_at": "2018-03-07T23:39:20.469Z",
+            "created_at": "2018-03-27T23:48:53.513Z",
+            "name": "Hooli Fakes",
+            "type": "PARTNER",
+            "status": "ACTIVE",
+            "currency": "USD",
+            "timezone": "America/Los_Angeles",
+            "roles": ["reports"]
+          }
+        ],
+        "my_display_name": "Honey Badger",
+        "my_invited_email": "honey.badger@hooli.com",
+        "my_member_id": "8454ada6-cec8-4e97-a0a7-c0b262c4137b"
+      }
+    },
+    {
+      "sub_request_status": "SUCCESS",
+      "organization": {
+        "id": "b35f4c9f-a123-4cde-8934-d32b4b91a731",
+        "updated_at": "2020-01-14T10:00:00.000Z",
+        "created_at": "2019-12-25T08:45:12.999Z",
+        "name": "Pied Piper LLC",
+        "country": "US",
+        "postal_code": "94301",
+        "locality": "Palo Alto",
+        "contact_name": "Richard Hendricks",
+        "contact_email": "richard@piedpiper.com",
+        "contact_phone": "+1-800-555-0199",
+        "tax_type": "VAT",
+        "address_line_1": "500 University Ave",
+        "administrative_district_level_1": "CA",
+        "accepted_term_version": "10",
+        "is_agency": false,
+        "configuration_settings": {
+          "notifications_enabled": false
+        },
+        "type": "SMALL_BUSINESS",
+        "state": "ACTIVE",
+        "roles": ["admin"],
+        "ad_accounts": [
+          {
+            "id": "9cc671b0-13ab-432e-9914-ffac19a37b2a",
+            "updated_at": "2020-03-07T23:00:00.000Z",
+            "created_at": "2020-03-01T11:12:00.000Z",
+            "name": "Pied Piper Ad Account",
+            "type": "PARTNER",
+            "status": "ACTIVE",
+            "currency": "USD",
+            "timezone": "America/Los_Angeles",
+            "roles": ["admin"]
+          }
+        ],
+        "my_display_name": "Richard",
+        "my_invited_email": "richard@piedpiper.com",
+        "my_member_id": "2233aabb-44cc-55dd-66ee-77889900aabb"
+      }
+    },
+    {
+      "sub_request_status": "SUCCESS",
+      "organization": {
+        "id": "97e3473e-c313-4f52-b6f9-3fd420b313be",
+        "updated_at": "2022-06-15T12:35:44.199Z",
+        "created_at": "2022-01-01T00:00:00.000Z",
+        "name": "Initech Corp",
+        "country": "US",
+        "postal_code": "75001",
+        "locality": "Dallas",
+        "contact_name": "Peter Gibbons",
+        "contact_email": "peter@initech.com",
+        "contact_phone": "+1-800-123-4567",
+        "tax_type": "GST",
+        "address_line_1": "1 Tech Drive",
+        "administrative_district_level_1": "TX",
+        "accepted_term_version": "12",
+        "is_agency": false,
+        "configuration_settings": {
+          "notifications_enabled": true
+        },
+        "type": "ENTERPRISE",
+        "state": "ACTIVE",
+        "roles": ["admin"],
+        "ad_accounts": [
+          {
+            "id": "a1b2c3d4-e5f6-7890-abcd-112233445566",
+            "updated_at": "2022-06-15T12:00:00.000Z",
+            "created_at": "2022-01-15T08:00:00.000Z",
+            "name": "Initech Main Account",
+            "type": "PARTNER",
+            "status": "ACTIVE",
+            "currency": "USD",
+            "timezone": "America/Chicago",
+            "roles": ["creative", "admin"]
+          }
+        ],
+        "my_display_name": "Peter",
+        "my_invited_email": "peter@initech.com",
+        "my_member_id": "f0e1d2c3-b4a5-6789-90ab-cdef12345678"
+      }
+    }
+  ]
+}
