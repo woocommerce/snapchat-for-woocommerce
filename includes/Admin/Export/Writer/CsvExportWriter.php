@@ -60,20 +60,39 @@ class CsvExportWriter implements ExportWriterInterface {
 	 *
 	 * @since 0.1.0
 	 *
+	 * @todo Move the Filesystem checks to a base class.
+	 *
 	 * @return string Absolute path to the newly created file.
+	 * @throws \RuntimeException If upload directory is missing, export folder can't be created, or file creation fails.
 	 */
 	public function create_file(): string {
 		$upload_dir = wp_upload_dir();
-		$dir_path   = trailingslashit( $upload_dir['basedir'] ) . self::EXPORT_FOLDER;
+
+		if ( empty( $upload_dir['basedir'] ) || ! is_dir( $upload_dir['basedir'] ) ) {
+			// phpcs:ignore WordPress.Security.EscapeOutput.ExceptionNotEscaped
+			throw new \RuntimeException( 'Unable to determine upload directory.' );
+		}
+
+		$dir_path = trailingslashit( $upload_dir['basedir'] ) . self::EXPORT_FOLDER;
 
 		if ( ! $this->fs->is_dir( $dir_path ) ) {
 			wp_mkdir_p( $dir_path );
+
+			if ( ! $this->fs->is_dir( $dir_path ) ) {
+				// phpcs:ignore WordPress.Security.EscapeOutput.ExceptionNotEscaped
+				throw new \RuntimeException( 'Failed to create export directory: ' . $dir_path );
+			}
 		}
 
 		$filename = 'catalog-export-' . gmdate( 'Ymd-His' ) . '.csv';
 		$file     = trailingslashit( $dir_path ) . $filename;
 
-		$this->fs->put_contents( $file, '' );
+		$success = $this->fs->put_contents( $file, '' );
+
+		if ( ! $success ) {
+			// phpcs:ignore WordPress.Security.EscapeOutput.ExceptionNotEscaped
+			throw new \RuntimeException( 'Failed to create CSV file: ' . $file );
+		}
 
 		return $file;
 	}
