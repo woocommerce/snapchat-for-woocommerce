@@ -187,7 +187,7 @@ final class WcsClient {
 
 		$args['headers']['Authorization'] = $jetpack_token;
 
-		if ( null !== $body ) {
+		if ( ! empty( $body ) ) {
 			$args['headers']['Content-Type'] = 'application/json';
 			$args['body']                    = wp_json_encode( $body );
 		}
