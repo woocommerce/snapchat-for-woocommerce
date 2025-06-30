@@ -60,8 +60,8 @@ class JetpackAccountController extends SettingsBaseController {
 	 * @var string[]
 	 */
 	private const NEXT_PATH_MAPPING = array(
-		'setup-mc'  => '/snapchat/setup',
-		'reconnect' => '/snapchat/settings&subpath=/reconnect-wpcom-account',
+		'setup-snapchat' => '/snapchat/setup',
+		'reconnect'      => '/snapchat/settings&subpath=/reconnect-wpcom-account',
 	);
 
 	/**
