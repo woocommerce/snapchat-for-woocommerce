@@ -156,7 +156,7 @@ final class RemotePixelTracker implements PixelTrackerInterface {
 			return null;
 		}
 
-		$path     = sprintf( '/v1/pixels/%s', $pixel_id );
+		$path     = sprintf( '/ads/v1/pixels/%s', $pixel_id );
 		$response = $this->wcs_client->proxy_get( $path );
 
 		if ( is_wp_error( $response ) ) {
@@ -165,7 +165,7 @@ final class RemotePixelTracker implements PixelTrackerInterface {
 
 		$data = $response->get_data();
 
-		if ( ! $data ) {
+		if ( empty( $data ) ) {
 			return null;
 		}
 
