@@ -12,6 +12,7 @@ namespace SnapchatForWooCommerce\Connection;
 
 use WP_REST_Response;
 use WP_Error;
+use SnapchatForWooCommerce\Utils\Helper;
 
 /**
  * Performs authenticated API calls to the Ad Partner's WCS backend.
@@ -23,15 +24,6 @@ use WP_Error;
  * It is designed to centralize all HTTP communication between the plugin and the remote WCS service.
  */
 final class WcsClient {
-	/**
-	 * Base URL for the WCS endpoint.
-	 */
-	const WCS_BASE_URL = 'https://wcs-mock.mylocal/wp-json/mock-wcs';
-
-	/**
-	 * The service name under which the Ad Partner integration is registered.
-	 */
-	const SERVICE_NAME = 'snapchat';
 
 	/**
 	 * Sends a GET request to the WCS `/connection/status` endpoint.
@@ -43,7 +35,7 @@ final class WcsClient {
 	 * @return WP_REST_Response|WP_Error Connection status or error.
 	 */
 	public function get_connection_status( string $jetpack_token ) {
-		return $this->proxy_request( 'GET', $jetpack_token, 'connection/status' );
+		return $this->proxy_get( $jetpack_token, 'connection/status' );
 	}
 
 	/**
@@ -57,7 +49,20 @@ final class WcsClient {
 	 * @return WP_REST_Response|WP_Error Connection initiation response or error.
 	 */
 	public function start_connection( string $jetpack_token, string $return_url ) {
-		return $this->proxy_request( 'POST', $jetpack_token, 'connection/connect', array( 'returnUrl' => $return_url ) );
+		return $this->proxy_get( $jetpack_token, 'connection/connect', array( 'returnUrl' => $return_url ) );
+	}
+
+	/**
+	 * Sends a GET request to the WCS `/connection` endpoint to disconnect the Ad Partner.
+	 *
+	 * @since 0.1.0
+	 *
+	 * @param string $jetpack_token Jetpack authorization token.
+	 *
+	 * @return WP_REST_Response|WP_Error Disconnection response or error.
+	 */
+	public function stop_connection( string $jetpack_token ) {
+		return $this->proxy_get( $jetpack_token, 'connection/disconnect' );
 	}
 
 	/**
@@ -67,12 +72,11 @@ final class WcsClient {
 	 *
 	 * @param string $token   Jetpack authorization token.
 	 * @param string $path    Path within the WCS API (relative to service base).
-	 * @param string $service The target service name used in the WCS proxy path (e.g., 'ads' or 'conversions').
 	 *
 	 * @return WP_REST_Response|WP_Error API response or error.
 	 */
-	public function proxy_get( string $token, string $path, string $service = 'ads' ) {
-		return $this->proxy_request( 'GET', $token, $path, null, $service );
+	public function proxy_get( string $token, string $path ) {
+		return $this->proxy_request( 'GET', $token, $path, null );
 	}
 
 	/**
@@ -83,12 +87,50 @@ final class WcsClient {
 	 * @param string $token   Jetpack authorization token.
 	 * @param string $path    Path within the WCS API (relative to service base).
 	 * @param mixed  $body    Body payload to send in JSON format.
-	 * @param string $service The target service name used in the WCS proxy path (e.g., 'ads' or 'conversions').
 	 *
 	 * @return WP_REST_Response|WP_Error API response or error.
 	 */
-	public function proxy_post( string $token, string $path, $body, string $service = 'ads' ) {
-		return $this->proxy_request( 'POST', $token, $path, $body, $service );
+	public function proxy_post( string $token, string $path, $body ) {
+		return $this->proxy_request( 'POST', $token, $path, $body );
+	}
+
+	/**
+	 * Returns the base URL for the WCS endpoint.
+	 *
+	 * @return string
+	 */
+	private function get_wcs_url(): string {
+		/**
+		 * Filters the base URL for the WCS (Web Conversion Service) endpoint.
+		 *
+		 * @since 1.0.0
+		 *
+		 * @param string $url The default WCS endpoint URL.
+		 */
+		return apply_filters(
+			Helper::with_prefix( 'wcs_base_url' ),
+			'https://api.woocommerce.com'
+		);
+	}
+
+	/**
+	 * The service name under which the Ad Partner integration is
+	 * registered with WCS.
+	 *
+	 * @return string
+	 */
+	private function get_wcs_service_name(): string {
+		/**
+		 * Filters the service name used for the Ad Partner integration.
+		 *
+		 * @since 1.0.0
+		 *
+		 * @param string $service_name The default service name.
+		 */
+		return apply_filters(
+			Helper::with_prefix( 'service_name' ),
+			'snapchat'
+		);
 	}
 
 	/**
@@ -103,16 +145,14 @@ final class WcsClient {
 	 * @param string     $jetpack_token  Jetpack authorization token.
 	 * @param string     $path           Endpoint path relative to the service root.
 	 * @param array|null $body           Optional request body (for POST).
-	 * @param string     $service        The target service name used in the WCS proxy path (e.g., 'ads' or 'conversions').
 	 *
 	 * @return WP_REST_Response|WP_Error Parsed response or error.
 	 */
-	private function proxy_request( string $method, string $jetpack_token, string $path, $body = null, string $service = 'ads' ) {
+	private function proxy_request( string $method, string $jetpack_token, string $path, $body = null ) {
 		$url = sprintf(
-			'%s/%s/%s/%s',
-			self::WCS_BASE_URL,
-			self::SERVICE_NAME,
-			rawurlencode( $service ),
+			'%s/%s/%s',
+			$this->get_wcs_url(),
+			$this->get_wcs_service_name(),
 			ltrim( $path, '/' )
 		);
 
@@ -122,7 +162,7 @@ final class WcsClient {
 		);
 
 		if ( $jetpack_token ) {
-			$args['headers']['Authorization'] = "Bearer $jetpack_token";
+			$args['headers']['Authorization'] = $jetpack_token;
 		}
 
 		if ( null !== $body ) {

@@ -11,6 +11,7 @@
 namespace SnapchatForWooCommerce\Connection;
 
 use Automattic\Jetpack\Connection\Manager;
+use SnapchatForWooCommerce\Utils\Helper;
 use Jetpack_Options;
 use WP_Error;
 
@@ -63,7 +64,7 @@ class JetpackAuthenticator {
 		 *
 		 * @param string|null $token The token to use for authenticated requests. Default null (uses default auth method).
 		 */
-		$token = apply_filters( 'ad_partner_jetpack_auth_token', null );
+		$token = apply_filters( Helper::with_prefix( 'jetpack_auth_token' ), null );
 
 		if ( $token ) {
 			return $token;

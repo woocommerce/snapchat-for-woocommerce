@@ -70,6 +70,7 @@ class RemotePixelTrackerTest extends WP_UnitTestCase {
 	 * It also asserts that the fetched script is cached for future use.
 	 */
 	public function test_pixel_script_fetched_from_wcs_and_cached() {
+		Options::set( OptionDefaults::PIXEL_ID, 'snap-pixel-12345' );
 		Transients::delete( TransientDefaults::PIXEL_SCRIPT );
 
 		$auth_mock = $this->createMock( JetpackAuthenticator::class );
