@@ -41,27 +41,14 @@ class ControllerSetup {
 	 * @return void
 	 */
 	public function register_routes(): void {
-		( new JetpackAccountController(
-			new WcsClient(),
-			new JetpackAuthenticator(),
-			new Manager( Config::PLUGIN_SLUG )
-		) )->register_routes();
+		$wcs_client    = new WcsClient();
+		$authenticator = new JetpackAuthenticator();
+		$manager       = new Manager( Config::PLUGIN_SLUG );
 
-		( new SnapchatAccountController(
-			new WcsClient(),
-			new JetpackAuthenticator()
-		) )->register_routes();
-
-		( new SnapchatOrganizationsController(
-			new WcsClient(),
-			new JetpackAuthenticator()
-		) )->register_routes();
-
+		( new JetpackAccountController( $wcs_client, $authenticator, $manager ) )->register_routes();
+		( new SnapchatAccountController( $wcs_client, $authenticator ) )->register_routes();
+		( new SnapchatOrganizationsController( $wcs_client, $authenticator ) )->register_routes();
 		( new SnapchatAdAccountsController() )->register_routes();
-
-		( new SnapchatSnapPixelController(
-			new WcsClient(),
-			new JetpackAuthenticator()
-		) )->register_routes();
+		( new SnapchatSnapPixelController( $wcs_client, $authenticator ) )->register_routes();
 	}
 }
