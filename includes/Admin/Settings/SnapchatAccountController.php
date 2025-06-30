@@ -42,12 +42,10 @@ class SnapchatAccountController extends SettingsBaseController {
 	/**
 	 * Constructor.
 	 *
-	 * @param WcsClient            $wcs  WCS proxy request client.
-	 * @param JetpackAuthenticator $auth Authenticator for Jetpack headers.
+	 * @param WcsClient $wcs WCS proxy request client.
 	 */
-	public function __construct( WcsClient $wcs, JetpackAuthenticator $auth ) {
+	public function __construct( WcsClient $wcs ) {
 		$this->wcs       = $wcs;
-		$this->auth      = $auth;
 		$this->namespace = 'wc/sfw/snapchat';
 	}
 
@@ -89,10 +87,8 @@ class SnapchatAccountController extends SettingsBaseController {
 	 * @return WP_REST_Response
 	 */
 	public function initiate_oauth() {
-		$token      = $this->auth->get_auth_header();
 		$return_url = admin_url( 'admin.php?page=wc-admin&path=/snapchat/setup' );
-
-		$response = $this->wcs->start_connection( $token, $return_url );
+		$response   = $this->wcs->start_connection( $return_url );
 
 		if ( is_wp_error( $response ) ) {
 			return rest_ensure_response(
@@ -125,18 +121,7 @@ class SnapchatAccountController extends SettingsBaseController {
 	 * @return WP_REST_Response
 	 */
 	public function check_connection() {
-		$token = $this->auth->get_auth_header();
-
-		if ( empty( $token ) ) {
-			return rest_ensure_response(
-				array(
-					'status'  => 'error',
-					'message' => __( 'Missing Jetpack authorization token.', 'snapchat-for-woocommerce' ),
-				)
-			);
-		}
-
-		$response = $this->wcs->get_connection_status( $token );
+		$response = $this->wcs->get_connection_status();
 
 		if ( is_wp_error( $response ) ) {
 			return rest_ensure_response(
@@ -164,18 +149,7 @@ class SnapchatAccountController extends SettingsBaseController {
 	 * @return WP_REST_Response
 	 */
 	public function delete_connection() {
-		$token = $this->auth->get_auth_header();
-
-		if ( empty( $token ) ) {
-			return rest_ensure_response(
-				array(
-					'status'  => 'error',
-					'message' => __( 'Missing Jetpack authorization token.', 'snapchat-for-woocommerce' ),
-				)
-			);
-		}
-
-		$response = $this->wcs->stop_connection( $token );
+		$response = $this->wcs->stop_connection();
 
 		if ( is_wp_error( $response ) ) {
 			return rest_ensure_response(

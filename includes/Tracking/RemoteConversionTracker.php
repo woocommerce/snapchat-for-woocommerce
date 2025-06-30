@@ -164,7 +164,7 @@ class RemoteConversionTracker implements ConversionTrackerInterface {
 		$path    = "{$pixel_id}/events?{$query}";
 		$payload = array( 'data' => array( $event_payload ) );
 
-		$this->client->proxy_post( '', $path, $payload, 'conversions' );
+		$this->client->proxy_post( $path, $payload, false );
 
 		/**
 		 * Fires after a conversion event has been sent to the Ad Partner.

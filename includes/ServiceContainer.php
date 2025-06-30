@@ -74,12 +74,13 @@ final class ServiceContainer {
 			case ServiceKey::JETPACK_AUTHENTICATOR:
 				return new JetpackAuthenticator();
 			case ServiceKey::WCS_CLIENT:
-				return new WcsClient();
+				return new WcsClient(
+					self::get( ServiceKey::JETPACK_AUTHENTICATOR )
+				);
 			case ServiceKey::PIXEL_TRACKING:
 				return new PixelTrackingService(
 					new RemotePixelTracker(
-						self::get( ServiceKey::WCS_CLIENT ),
-						self::get( ServiceKey::JETPACK_AUTHENTICATOR )
+						self::get( ServiceKey::WCS_CLIENT )
 					)
 				);
 			case ServiceKey::CONVERSION_TRACKING:
