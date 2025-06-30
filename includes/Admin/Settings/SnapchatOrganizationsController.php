@@ -37,25 +37,16 @@ class SnapchatOrganizationsController extends SettingsBaseController {
 	protected WcsClient $wcs;
 
 	/**
-	 * Authenticator for generating secure headers.
-	 *
-	 * @var JetpackAuthenticator
-	 */
-	private JetpackAuthenticator $auth;
-
-	/**
 	 * Class constructor.
 	 *
 	 * @since 0.1.0
 	 *
-	 * @param WcsClient            $wcs  WCS proxy request client.
-	 * @param JetpackAuthenticator $auth Authenticator for Jetpack headers.
+	 * @param WcsClient $wcs WCS proxy request client.
 	 */
-	public function __construct( WcsClient $wcs, JetpackAuthenticator $auth ) {
+	public function __construct( WcsClient $wcs ) {
 		$this->namespace = 'wc/sfw/snapchat';
 		$this->rest_base = 'organizations';
 		$this->wcs       = $wcs;
-		$this->auth      = $auth;
 	}
 
 	/**
@@ -138,9 +129,7 @@ class SnapchatOrganizationsController extends SettingsBaseController {
 		$orgs = Options::get( OptionDefaults::ORGANIZATIONS );
 
 		if ( empty( $orgs ) ) {
-			$token    = $this->auth->get_auth_header();
 			$response = $this->wcs->proxy_get(
-				$token,
 				'/ads/v1/me/organizations?with_ad_accounts=true',
 			);
 

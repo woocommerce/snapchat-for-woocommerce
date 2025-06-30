@@ -26,16 +26,30 @@ use SnapchatForWooCommerce\Utils\Helper;
 final class WcsClient {
 
 	/**
+	 * Authenticator used to generate secure auth headers for API requests.
+	 *
+	 * @var JetpackAuthenticator
+	 */
+	private $authenticator;
+
+	/**
+	 * Class construnctor.
+	 *
+	 * @param JetpackAuthenticator $authenticator Authenticator for API access.
+	 */
+	public function __construct( JetpackAuthenticator $authenticator ) {
+		$this->authenticator = $authenticator;
+	}
+
+	/**
 	 * Sends a GET request to the WCS `/connection/status` endpoint.
 	 *
 	 * @since 0.1.0
 	 *
-	 * @param string $jetpack_token Jetpack authorization token.
-	 *
 	 * @return WP_REST_Response|WP_Error Connection status or error.
 	 */
-	public function get_connection_status( string $jetpack_token ) {
-		return $this->proxy_get( $jetpack_token, 'connection/status' );
+	public function get_connection_status() {
+		return $this->proxy_get( 'connection/status' );
 	}
 
 	/**
@@ -43,13 +57,12 @@ final class WcsClient {
 	 *
 	 * @since 0.1.0
 	 *
-	 * @param string $jetpack_token Jetpack authorization token.
 	 * @param string $return_url    URL to redirect the user to after authorization.
 	 *
 	 * @return WP_REST_Response|WP_Error Connection initiation response or error.
 	 */
-	public function start_connection( string $jetpack_token, string $return_url ) {
-		return $this->proxy_get( $jetpack_token, 'connection/connect', array( 'returnUrl' => $return_url ) );
+	public function start_connection( string $return_url ) {
+		return $this->proxy_get( 'connection/connect', array( 'returnUrl' => $return_url ) );
 	}
 
 	/**
@@ -57,12 +70,10 @@ final class WcsClient {
 	 *
 	 * @since 0.1.0
 	 *
-	 * @param string $jetpack_token Jetpack authorization token.
-	 *
 	 * @return WP_REST_Response|WP_Error Disconnection response or error.
 	 */
-	public function stop_connection( string $jetpack_token ) {
-		return $this->proxy_get( $jetpack_token, 'connection/disconnect' );
+	public function stop_connection() {
+		return $this->proxy_get( 'connection/disconnect' );
 	}
 
 	/**
@@ -70,13 +81,14 @@ final class WcsClient {
 	 *
 	 * @since 0.1.0
 	 *
-	 * @param string $token   Jetpack authorization token.
-	 * @param string $path    Path within the WCS API (relative to service base).
+	 * @param string $path          Path within the WCS API (relative to service base).
+	 * @param array  $query_params  Optional query parameters to append to the URL.
+	 * @param bool   $requires_auth Whether to include the Jetpack auth header.
 	 *
 	 * @return WP_REST_Response|WP_Error API response or error.
 	 */
-	public function proxy_get( string $token, string $path ) {
-		return $this->proxy_request( 'GET', $token, $path, null );
+	public function proxy_get( string $path, array $query_params = array(), bool $requires_auth = true ) {
+		return $this->proxy_request( 'GET', $path, $query_params, $requires_auth );
 	}
 
 	/**
@@ -84,14 +96,14 @@ final class WcsClient {
 	 *
 	 * @since 0.1.0
 	 *
-	 * @param string $token   Jetpack authorization token.
-	 * @param string $path    Path within the WCS API (relative to service base).
-	 * @param mixed  $body    Body payload to send in JSON format.
+	 * @param string $path           Path within the WCS API (relative to service base).
+	 * @param mixed  $body           Body payload to send in JSON format.
+	 * @param bool   $requires_auth  Whether to include the Jetpack auth header.
 	 *
 	 * @return WP_REST_Response|WP_Error API response or error.
 	 */
-	public function proxy_post( string $token, string $path, $body ) {
-		return $this->proxy_request( 'POST', $token, $path, $body );
+	public function proxy_post( string $path, $body, bool $requires_auth = true ) {
+		return $this->proxy_request( 'POST', $path, $body, $requires_auth );
 	}
 
 	/**
@@ -142,13 +154,13 @@ final class WcsClient {
 	 * @since 0.1.0
 	 *
 	 * @param string     $method         HTTP method (`GET` or `POST`).
-	 * @param string     $jetpack_token  Jetpack authorization token.
 	 * @param string     $path           Endpoint path relative to the service root.
-	 * @param array|null $body           Optional request body (for POST).
+	 * @param array|null $body           Optional request body (for POST) or query parameters (for GET).
+	 * @param bool       $requires_auth  Whether to include the Jetpack auth header.
 	 *
 	 * @return WP_REST_Response|WP_Error Parsed response or error.
 	 */
-	private function proxy_request( string $method, string $jetpack_token, string $path, $body = null ) {
+	private function proxy_request( string $method, string $path, $body = null, $requires_auth = true ) {
 		$url = sprintf(
 			'%s/%s/%s',
 			$this->get_wcs_url(),
@@ -156,14 +168,24 @@ final class WcsClient {
 			ltrim( $path, '/' )
 		);
 
+		if ( 'GET' === strtoupper( $method ) && ! empty( $body ) && is_array( $body ) ) {
+			$url = add_query_arg( $body, $url );
+		}
+
 		$args = array(
 			'method'  => strtoupper( $method ),
 			'timeout' => 15,
 		);
 
-		if ( $jetpack_token ) {
-			$args['headers']['Authorization'] = $jetpack_token;
+		if ( $requires_auth ) {
+			$jetpack_token = $this->authenticator->get_auth_header();
+
+			if ( empty( $jetpack_token ) ) {
+				return new WP_REST_Response( array( 'message' => 'Jetpack token missing' ) );
+			}
 		}
+
+		$args['headers']['Authorization'] = $jetpack_token;
 
 		if ( null !== $body ) {
 			$args['headers']['Content-Type'] = 'application/json';
