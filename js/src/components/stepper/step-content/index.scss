@@ -1,0 +1,10 @@
+.sfw-step-content {
+	display: flex;
+	justify-content: center;
+
+	.sfw-step-content__container {
+		max-width: 1032px;
+		margin: var(--large-gap);
+		flex: 1;
+	}
+}
