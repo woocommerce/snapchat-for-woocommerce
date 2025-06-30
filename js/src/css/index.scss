@@ -1,0 +1,5 @@
+// Import Gutenberg components that aren't already imported in the lowest WC Admin version we support
+@import "./shared/gutenberg-components";
+
+// Import SFW-wise styling that based on woocommerce-admin styles.
+@import "./shared/woocommerce-admin";

@@ -1,0 +1,39 @@
+.sfw-app-modal {
+	/**
+	 * Set `hidden` as the default overflow for container and `auto` for body to
+	 * make them stable across newer versions of @wordpress/components.
+	 * More details can be found in the AppModal implementation.
+	 */
+	overflow: hidden;
+
+	@include break-large {
+		width: $sfw-width-large;
+	}
+
+	.sfw-app-modal__footer {
+		display: flex;
+		flex-direction: column-reverse;
+		gap: calc(var(--main-gap) / 2);
+		margin-top: var(--large-gap);
+
+		@include break-mobile {
+			flex-direction: row;
+			justify-content: flex-end;
+		}
+
+		button {
+			justify-content: center;
+		}
+	}
+
+	.components-modal__content {
+		overflow: auto;
+	}
+
+	&__styled--overflow-visible {
+		&.sfw-app-modal,
+		.components-modal__content {
+			overflow: visible;
+		}
+	}
+}
