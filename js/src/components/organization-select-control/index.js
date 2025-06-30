@@ -1,0 +1,61 @@
+/**
+ * External dependencies
+ */
+import { __, sprintf } from '@wordpress/i18n';
+
+/**
+ * Internal dependencies
+ */
+import AppSelectControl from '~/components/app-select-control';
+import useExistingSnapchatOrganizations from '~/hooks/useExistingSnapchatOrganizations';
+import useSnapchatOrganization from '~/hooks/useSnapchatOrganization';
+
+/**
+ * @param {Object} props The component props
+ * @return {JSX.Element} An enhanced AppSelectControl component.
+ */
+const OrganizationSelectControl = ( props ) => {
+	const { data: existingAccounts } = useExistingSnapchatOrganizations();
+	const { snapchatOrganization, isReady } = useSnapchatOrganization();
+
+	const accountIdExists = existingAccounts?.some(
+		( existingAccount ) => existingAccount.id === snapchatOrganization?.id
+	);
+
+	// If the account ID is not in the list of existing accounts, fake the select options by displaying the connected account ID only.
+	if ( ! accountIdExists && isReady ) {
+		return (
+			<AppSelectControl
+				autoSelectFirstOption
+				nonInteractive
+				value={ snapchatOrganization.id }
+				options={ [
+					{
+						value: snapchatOrganization.id,
+						label: sprintf(
+							// translators: 1: account domain, 2: account ID.
+							__( '(%1$s) (%2$s)', 'snapchat-for-woo' ),
+							snapchatOrganization.name,
+							snapchatOrganization.id
+						),
+					},
+				] }
+			/>
+		);
+	}
+
+	const options = existingAccounts?.map( ( acc ) => ( {
+		value: acc.id,
+		label: `(${ acc.name }) ${ acc.id }`,
+	} ) );
+
+	return (
+		<AppSelectControl
+			options={ options }
+			autoSelectFirstOption
+			{ ...props }
+		/>
+	);
+};
+
+export default OrganizationSelectControl;
