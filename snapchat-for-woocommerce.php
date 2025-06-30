@@ -32,11 +32,11 @@ if ( ! defined( 'SNAPCHAT_ADS_PLUGIN_URL' ) ) {
 }
 
 if ( ! defined( 'SNAPCHAT_ADS_PLUGIN_BUILD_PATH' ) ) {
-	define( 'SNAPCHAT_ADS_PLUGIN_BUILD_PATH', SNAPCHAT_ADS_PLUGIN_DIR . 'build/' );
+	define( 'SNAPCHAT_ADS_PLUGIN_BUILD_PATH', SNAPCHAT_ADS_PLUGIN_DIR . 'js/build/' );
 }
 
 if ( ! defined( 'SNAPCHAT_ADS_PLUGIN_BUILD_URL' ) ) {
-	define( 'SNAPCHAT_ADS_PLUGIN_BUILD_URL', SNAPCHAT_ADS_PLUGIN_URL . 'build/' );
+	define( 'SNAPCHAT_ADS_PLUGIN_BUILD_URL', SNAPCHAT_ADS_PLUGIN_URL . 'js/build/' );
 }
 
 require_once plugin_dir_path( __FILE__ ) . '/vendor/autoload_packages.php';

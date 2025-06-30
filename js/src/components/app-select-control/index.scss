@@ -1,0 +1,9 @@
+.sfw-app-select-control {
+	.components-base-control__field {
+		margin-bottom: 0;
+	}
+
+	&.sfw-app-select-control--is-non-interactive {
+		pointer-events: none;
+	}
+}
