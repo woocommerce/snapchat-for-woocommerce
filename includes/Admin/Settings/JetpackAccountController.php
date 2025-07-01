@@ -132,7 +132,7 @@ class JetpackAccountController extends SettingsBaseController {
 
 			$auth_url = esc_url(
 				add_query_arg(
-					array( 'from' => 'google-listings-and-ads' ),
+					array( 'from' => 'snapchat-for-woocommerce' ),
 					$auth_url
 				),
 				null,
