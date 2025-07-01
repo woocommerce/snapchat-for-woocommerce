@@ -34,13 +34,6 @@ class JetpackAccountController extends SettingsBaseController {
 	protected WcsClient $wcs;
 
 	/**
-	 * Authenticator for generating secure headers.
-	 *
-	 * @var JetpackAuthenticator
-	 */
-	private JetpackAuthenticator $auth;
-
-	/**
 	 * Jetpack connection manager.
 	 *
 	 * @var Manager
@@ -67,13 +60,11 @@ class JetpackAccountController extends SettingsBaseController {
 	/**
 	 * Constructor.
 	 *
-	 * @param WcsClient            $wcs    WCS proxy request client.
-	 * @param JetpackAuthenticator $auth   Authenticator for Jetpack headers.
-	 * @param Manager              $manager Jetpack connection manager.
+	 * @param WcsClient $wcs    WCS proxy request client.
+	 * @param Manager   $manager Jetpack connection manager.
 	 */
-	public function __construct( WcsClient $wcs, JetpackAuthenticator $auth, Manager $manager ) {
+	public function __construct( WcsClient $wcs, Manager $manager ) {
 		$this->wcs       = $wcs;
-		$this->auth      = $auth;
 		$this->manager   = $manager;
 		$this->namespace = 'wc/sfw/jetpack';
 	}
@@ -300,10 +291,7 @@ class JetpackAccountController extends SettingsBaseController {
 	 * @return mixed
 	 */
 	public function mark_tos_accepted( string $email ) {
-		$token = $this->auth->get_auth_header();
-
 		return $this->wcs->proxy_post(
-			$token,
 			'tos',
 			array(
 				'body' => wp_json_encode(
