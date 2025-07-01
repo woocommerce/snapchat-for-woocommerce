@@ -14,6 +14,8 @@
 namespace SnapchatForWooCommerce\Admin;
 
 use SnapchatForWooCommerce\Utils\AssetLoader;
+use SnapchatForWooCommerce\Utils\Storage\Options;
+use SnapchatForWooCommerce\Utils\Storage\OptionDefaults;
 
 /**
  * Handles admin script and style enqueues.
@@ -51,7 +53,17 @@ class Assets {
 	 * @return void
 	 */
 	public function enqueue_assets(): void {
+		// @todo: Conditionally load for only plugin specific page.
+
 		AssetLoader::enqueue_script( 'index', 'index' );
 		AssetLoader::enqueue_style( 'index', 'index' );
+		AssetLoader::localize_script(
+			'index',
+			'AdminData',
+			array(
+				'status' => Options::get( OptionDefaults::ONBOARDING_STATUS ),
+				'step'   => Options::get( OptionDefaults::ONBOARDING_STEP ),
+			)
+		);
 	}
 }
