@@ -135,6 +135,16 @@ const reducer = ( state = DEFAULT_STATE, action ) => {
 			return setIn( state, 'accounts.snapchat', snapchatAccount );
 		}
 
+		case TYPES.DISCONNECT_ACCOUNTS_SNAPCHAT: {
+			return setIn(
+				state,
+				'accounts.snapchat',
+				DEFAULT_STATE.accounts.snapchat
+			);
+		}
+
+		// Page will be reloaded after all accounts have been disconnected, so no need to mutate state.
+		case TYPES.DISCONNECT_ACCOUNTS_ALL:
 		default:
 			return state;
 	}

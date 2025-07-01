@@ -12,14 +12,17 @@ import { getGetStartedUrl } from '~/utils/urls';
 import useAdminUrl from '~/hooks/useAdminUrl';
 import useJetpackAccount from '~/hooks/useJetpackAccount';
 import useSnapchatAccount from '~/hooks/useSnapchatAccount';
-import useSnapchatAdsAccount from '~/hooks/useSnapchatAdsAccount';
 import useSnapchatOrganization from '~/hooks/useSnapchatOrganization';
 import AppButton from '~/components/app-button';
 import SpinnerCard from '~/components/spinner-card';
+import Section from '~/components/section';
 import { ConnectedWPComAccountCard } from '~/components/wpcom-account-card';
 import { ConnectedSnapchatAccountCard } from '~/components/snapchat-account-card';
 import LinkedAccountsSectionWrapper from './linked-accounts-section-wrapper';
-import DisconnectModal, { ALL_ACCOUNTS } from './disconnect-modal';
+import DisconnectModal, {
+	ALL_ACCOUNTS,
+	SNAPCHAT_ACCOUNT,
+} from './disconnect-modal';
 
 /**
  * Accounts are disconnected from the Setting page
@@ -42,6 +45,8 @@ export default function LinkedAccounts() {
 
 	const [ openedModal, setOpenedModal ] = useState( null );
 	const openDisconnectAllAccountsModal = () => setOpenedModal( ALL_ACCOUNTS );
+	const openDisconnectAdsAccountModal = () =>
+		setOpenedModal( SNAPCHAT_ACCOUNT );
 	const dismissModal = () => setOpenedModal( null );
 
 	const handleDisconnected = () => {
@@ -71,7 +76,20 @@ export default function LinkedAccounts() {
 					<ConnectedSnapchatAccountCard
 						organizationName={ organizationName }
 						hideAccountSwitch
-					/>
+					>
+						<Section.Card.Footer>
+							<AppButton
+								isDestructive
+								isLink
+								onClick={ openDisconnectAdsAccountModal }
+							>
+								{ __(
+									'Disconnect Snapchat account only',
+									'snapchat-for-woo'
+								) }
+							</AppButton>
+						</Section.Card.Footer>
+					</ConnectedSnapchatAccountCard>
 
 					<Flex justify="flex-end">
 						<AppButton

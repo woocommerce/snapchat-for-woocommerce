@@ -9,6 +9,7 @@ import ConnectedIconLabel from '~/components/connected-icon-label';
 const ConnectedSnapchatAccountCard = ( {
 	organizationName,
 	hideAccountSwitch = false,
+	children,
 } ) => {
 	const getCardActions = () => {
 		if ( hideAccountSwitch ) {
@@ -23,7 +24,9 @@ const ConnectedSnapchatAccountCard = ( {
 			description={ organizationName || SNAPCHAT_DESCRIPTION }
 			indicator={ <ConnectedIconLabel /> }
 			actions={ getCardActions() }
-		/>
+		>
+			{ children }
+		</AccountCard>
 	);
 };
 
