@@ -42,7 +42,6 @@ class SnapchatOrganizationsController extends SettingsBaseController {
 	 */
 	public function __construct( WcsClient $wcs ) {
 		$this->namespace = 'wc/sfw/snapchat';
-		$this->rest_base = 'organizations';
 		$this->wcs       = $wcs;
 	}
 
@@ -58,9 +57,6 @@ class SnapchatOrganizationsController extends SettingsBaseController {
 		 * GET /wp-json/wc/sfw/snapchat/organization
 		 * - Returns an array of OptionDefaults::ORGANIZATION_ID
 		 *   and OptionDefaults::ORGANIZATION_NAME
-		 *
-		 * DELETE /wp-json/wc/sfw/snapchat/organization
-		 * - Deletes the options ORGANIZATION_ID and ORGANIZATION_NAME
 		 */
 		register_rest_route(
 			$this->namespace,
@@ -69,11 +65,6 @@ class SnapchatOrganizationsController extends SettingsBaseController {
 				array(
 					'methods'             => 'GET',
 					'callback'            => array( $this, 'get_organization' ),
-					'permission_callback' => array( $this, 'permissions_check' ),
-				),
-				array(
-					'methods'             => 'DELETE',
-					'callback'            => array( $this, 'delete_organization' ),
 					'permission_callback' => array( $this, 'permissions_check' ),
 				),
 				'schema' => array( $this, 'organization_schema' ),
@@ -110,7 +101,7 @@ class SnapchatOrganizationsController extends SettingsBaseController {
 		}
 
 		$data = $response->get_data();
-		$orgs = $data['organizations'];
+		$orgs = $data['organizations'] ?? array();
 
 		if ( empty( $orgs ) ) {
 			return rest_ensure_response(
@@ -136,20 +127,6 @@ class SnapchatOrganizationsController extends SettingsBaseController {
 	}
 
 	/**
-	 * Deletes all Options related to organizations.
-	 *
-	 * @since 0.1.0
-	 *
-	 * @return WP_REST_Response
-	 */
-	public function delete_organization() {
-		Options::delete( OptionDefaults::ORGANIZATION_ID );
-		Options::delete( OptionDefaults::ORGANIZATION_NAME );
-
-		return rest_ensure_response( array( 'deleted' => true ) );
-	}
-
-	/**
 	 * Returns the JSON schema for the `/organization` REST endpoint.
 	 *
 	 * This schema defines a single object with a required `id` property
@@ -166,7 +143,7 @@ class SnapchatOrganizationsController extends SettingsBaseController {
 			'title'      => 'snapchat_organization',
 			'type'       => 'object',
 			'properties' => array(
-				'id' => array(
+				'id'   => array(
 					'description' => 'The unique ID of the selected Snapchat Organization.',
 					'type'        => 'string',
 				),

@@ -14,13 +14,15 @@ use WP_REST_Server;
 use SnapchatForWooCommerce\Utils\Helper;
 use SnapchatForWooCommerce\Utils\Storage\Options;
 use SnapchatForWooCommerce\Utils\Storage\OptionDefaults;
+use SnapchatForWooCommerce\Utils\Storage\Transients;
+use SnapchatForWooCommerce\Utils\Storage\TransientDefaults;
 
 /**
  * Tests the SnapchatOrganizationsController REST API endpoints.
  *
  * @group rest-api
  */
-class SnapchatOrganizationsControllerTest extends WP_UnitTestCase {
+class SnapchatBusinessExtensionControllerTest extends WP_UnitTestCase {
 
 	/**
 	 * REST server instance.
@@ -59,12 +61,16 @@ class SnapchatOrganizationsControllerTest extends WP_UnitTestCase {
 		$this->server  = rest_get_server();
 		$this->options = require __DIR__ . '/fixtures/options.php';
 
+		Options::delete( OptionDefaults::ORGANIZATIONS );
 		Options::delete( OptionDefaults::ORGANIZATION_ID );
 		Options::delete( OptionDefaults::ORGANIZATION_NAME );
+		Options::delete( OptionDefaults::AD_ACCOUNT_ID );
+		Options::delete( OptionDefaults::PIXEL_ID );
+		Transients::delete( TransientDefaults::PIXEL_SCRIPT );
 
 		add_filter( Helper::with_prefix( 'jetpack_auth_token' ), fn() => 'abc123' );
 
-		$this->mock_fixture = __DIR__ . '/fixtures/organizations.json';
+		$this->mock_fixture = __DIR__ . '/fixtures/snapchat-config.json';
 	}
 
 	/**
@@ -83,7 +89,7 @@ class SnapchatOrganizationsControllerTest extends WP_UnitTestCase {
 	 * @return array|mixed
 	 */
 	public function intercept_wcs_http_requests_with_empty_response( $preempt, $parsed_args, $url ) {
-		if ( str_contains( $url, '/ads/v1/organizations' ) !== false ) {
+		if ( strpos( $url, '/ads/v1/organizations' ) !== false ) {
 			return array(
 				'response' => array( 'code' => 200, 'message' => 'OK' ),
 				'headers'  => array(),
@@ -103,7 +109,7 @@ class SnapchatOrganizationsControllerTest extends WP_UnitTestCase {
 	 * @return array|mixed
 	 */
 	public function intercept_wcs_http_requests_with_non_empty_response( $preempt, $parsed_args, $url ) {
-		if ( str_contains( $url, '/ads/v1/organizations' ) !== false ) {
+		if ( str_contains( $url, '/ads/v1/business_extension_configurations/' ) !== false ) {
 			return array(
 				'response' => array( 'code' => 200, 'message' => 'OK' ),
 				'headers'  => array(),
@@ -115,12 +121,12 @@ class SnapchatOrganizationsControllerTest extends WP_UnitTestCase {
 	}
 
 	/**
-	 * Test: API returns empty when the org_id is empty.
+	 * Test: API returns errors without config id.
 	 */
-	public function test_get_organizations_org_id_empty(): void {
+	public function test_get_config_without_config_id(): void {
 		add_filter( 'pre_http_request', array( $this, 'intercept_wcs_http_requests_with_empty_response' ), 10, 3 );
 
-		$request  = new WP_REST_Request( 'GET', '/wc/sfw/snapchat/organization' );
+		$request  = new WP_REST_Request( 'POST', '/wc/sfw/snapchat/config' );
 		$response = $this->server->dispatch( $request );
 
 		remove_filter( 'pre_http_request', array( $this, 'intercept_wcs_http_requests_with_empty_response' ), 10 );
@@ -129,17 +135,24 @@ class SnapchatOrganizationsControllerTest extends WP_UnitTestCase {
 
 		$data = $response->get_data();
 
-		$this->assertSame( array( 'id' => '', 'name' => '' ), $data );
+		$this->assertSame( 'rest_missing_callback_param', $data['code'] );
+		$this->assertSame( 'Missing parameter(s): id', $data['message'] );
 	}
 
 	/**
-	 * Test: API returns empty when the org_id is not empty.
+	 * Test: API sets options with correct config id.
 	 */
-	public function test_get_organizations_org_id_not_empty(): void {
-		Options::set( OptionDefaults::ORGANIZATION_ID, $this->options['org_id'] );
+	public function test_get_config_with_config_id(): void {
 		add_filter( 'pre_http_request', array( $this, 'intercept_wcs_http_requests_with_non_empty_response' ), 10, 3 );
 
-		$request  = new WP_REST_Request( 'GET', '/wc/sfw/snapchat/organization' );
+		$request  = new WP_REST_Request( 'POST', '/wc/sfw/snapchat/config' );
+		$request->set_header( 'Content-Type', 'application/json' );
+		$request->set_body(
+			wp_json_encode(
+				array( 'id' => 'hello' )
+			)
+		);
+
 		$response = $this->server->dispatch( $request );
 
 		remove_filter( 'pre_http_request', array( $this, 'intercept_wcs_http_requests_with_non_empty_response' ), 10 );
@@ -148,6 +161,11 @@ class SnapchatOrganizationsControllerTest extends WP_UnitTestCase {
 
 		$data = $response->get_data();
 
-		$this->assertSame( array( 'id' => $this->options['org_id'], 'name' => $this->options['org_name'] ), $data );
+		$this->assertSame( array( 'id' => 'hello' ), $data );
+		$this->assertSame( $this->options['org_id'], Options::get( OptionDefaults::ORGANIZATION_ID ) );
+		$this->assertSame( '', Options::get( OptionDefaults::ORGANIZATION_NAME ) );
+		$this->assertSame( $this->options['ad_account_id'], Options::get( OptionDefaults::AD_ACCOUNT_ID ) );
+		$this->assertSame( $this->options['pixel_id'], Options::get( OptionDefaults::PIXEL_ID ) );
+		$this->assertSame( '', Transients::get( TransientDefaults::PIXEL_SCRIPT ) );
 	}
 }
