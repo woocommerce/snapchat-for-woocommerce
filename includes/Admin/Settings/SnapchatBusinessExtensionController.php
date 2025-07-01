@@ -247,8 +247,7 @@ class SnapchatBusinessExtensionController extends SettingsBaseController {
 
 		return rest_ensure_response(
 			array(
-				'status' => 'success',
-				'email'  => $data['email'] ?? '',
+				'status' => $data['status'],
 			)
 		);
 	}
@@ -272,7 +271,33 @@ class SnapchatBusinessExtensionController extends SettingsBaseController {
 			);
 		}
 
-		$data = $response->get_data();
+		$data         = $response->get_data();
+		$oauth_status = '';
+
+		if ( $data['success'] && 'disconnected' === $data['success'] ) {
+			$oauth_status = $data['success'];
+		}
+
+		$config_id = Options::get( OptionDefaults::CONFIG_ID );
+
+		if ( $config_id ) {
+			$response = $this->wcs->proxy_delete(
+				'/ads/v1/business_extension_configurations/' . $config_id
+			);
+
+			$data = $response->get_data();
+
+			if ( is_wp_error( $data ) ) {
+				return new WP_REST_Response(
+					array(
+						'status'  => 'error',
+						'message' => $response->get_error_message(),
+						'data'    => $response->get_error_data(),
+					),
+					500
+				);
+			}
+		}
 
 		Options::delete( OptionDefaults::CONFIG_ID );
 		Options::delete( OptionDefaults::ORGANIZATION_ID );
@@ -284,8 +309,7 @@ class SnapchatBusinessExtensionController extends SettingsBaseController {
 
 		return rest_ensure_response(
 			array(
-				'status' => 'success',
-				'email'  => $data['email'] ?? '',
+				'status' => $oauth_status,
 			)
 		);
 	}
