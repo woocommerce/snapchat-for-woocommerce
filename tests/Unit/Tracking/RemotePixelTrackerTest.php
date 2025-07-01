@@ -34,13 +34,13 @@ class RemotePixelTrackerTest extends WP_UnitTestCase {
 		Transients::set( TransientDefaults::PIXEL_SCRIPT, '<script src="https://sc-static.net/scevent.min.js"></script>' );
 
 		// Provide a dummy ad account ID for API path construction.
-		Options::set( OptionDefaults::AD_ACCOUNT_ID, 'fake-account-id' );
+		Options::set( OptionDefaults::ADS_ACCOUNT_ID, 'fake-account-id' );
 	}
 
 	public function tear_down(): void {
 		Options::delete( OptionDefaults::PIXEL_ENABLED );
 		Transients::delete( TransientDefaults::PIXEL_SCRIPT );
-		Options::delete( OptionDefaults::AD_ACCOUNT_ID );
+		Options::delete( OptionDefaults::ADS_ACCOUNT_ID );
 
 		parent::tear_down();
 	}

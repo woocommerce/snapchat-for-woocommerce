@@ -40,14 +40,6 @@ final class OptionDefaults {
 	 */
 	public const WP_TOS_ACCEPTED = 'wp_tos_accepted';
 
-	/**
-	 * Option key for the Ad Partner's Organizations
-	 * that include Ad Accounts.
-	 *
-	 * @since 0.1.0
-	 */
-	public const ORGANIZATIONS = 'organizations';
-
 	public const CONFIG_ID = 'config_id';
 
 	/**
@@ -55,15 +47,18 @@ final class OptionDefaults {
 	 *
 	 * @since 0.1.0
 	 */
-	public const AD_ACCOUNT_ID = 'ad_account_id';
+	public const ADS_ACCOUNT_ID = 'ad_account_id';
 
 	/**
-	 * Option key for the Ad Partner organization ID.
+	 * Option key for the Snapchat organization ID.
 	 *
 	 * @since 0.1.0
 	 */
 	public const ORGANIZATION_ID = 'organization_id';
 
+	/**
+	 * Option key for Snapchat organization name.
+	 */
 	public const ORGANIZATION_NAME = 'organization_name';
 
 	/**
@@ -72,12 +67,6 @@ final class OptionDefaults {
 	 * @since 0.1.0
 	 */
 	public const PIXEL_ENABLED = 'ads_pixel_enabled';
-
-	/**
-	 * Option key used to store array of pixels accound data
-	 * under the current selection of `AD_ACCOUNT_ID`.
-	 */
-	public const PIXELS = 'pixels';
 
 	/**
 	 * Option key for the Ad Partner's Pixel ID.
@@ -115,12 +104,10 @@ final class OptionDefaults {
 			self::IS_JETPACK_CONNECTED    => false,
 			self::WP_TOS_ACCEPTED         => false,
 			self::CONFIG_ID               => '',
-			self::ORGANIZATIONS           => array(), // may not need.
-			self::AD_ACCOUNT_ID           => '',
+			self::ADS_ACCOUNT_ID          => '',
 			self::ORGANIZATION_ID         => '',
 			self::ORGANIZATION_NAME       => '',
 			self::PIXEL_ENABLED           => false,
-			self::PIXELS                  => array(),
 			self::PIXEL_ID                => '',
 			self::CONVERSIONS_ENABLED     => false,
 			self::CONVERSION_ACCESS_TOKEN => '',
