@@ -25,6 +25,8 @@ namespace SnapchatForWooCommerce\Utils\Storage;
  * @since 0.1.0
  */
 final class OptionDefaults {
+	public const ONBOARDING_STATUS = 'onboarding_status';
+	public const ONBOARDING_STEP = 'onboarding_step';
 	/**
 	 * Option key for storing the status of Jetpack's connection.
 	 *
@@ -101,6 +103,8 @@ final class OptionDefaults {
 	 */
 	public static function get_all(): array {
 		return array(
+			self::ONBOARDING_STATUS       => 'disconnected',
+			self::ONBOARDING_STEP         => 'setup',
 			self::IS_JETPACK_CONNECTED    => false,
 			self::WP_TOS_ACCEPTED         => false,
 			self::CONFIG_ID               => '',
