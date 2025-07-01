@@ -1,4 +1,9 @@
 /**
+ * External dependencies
+ */
+import { getQuery } from '@woocommerce/navigation';
+
+/**
  * Internal dependencies
  */
 import useSnapchatAccount from '~/hooks/useSnapchatAccount';
@@ -7,12 +12,21 @@ import ConnectSnapchatAccountCard from './connect-snapchat-account-card';
 
 const SnapchatAccountCard = ( { disabled = false } ) => {
 	const { isConnected, email } = useSnapchatAccount();
+	const { state: stateQuery } = getQuery();
+	const stateQueryParams = new URLSearchParams( stateQuery );
+	const configId = stateQueryParams.get( 'config_id' );
 
+	console.log( useSnapchatAccount() );
 	if ( isConnected ) {
 		return <ConnectedSnapchatAccountCard email={ email } />;
 	}
 
-	return <ConnectSnapchatAccountCard disabled={ disabled } />;
+	return (
+		<ConnectSnapchatAccountCard
+			disabled={ disabled }
+			configId={ configId }
+		/>
+	);
 };
 
 export default SnapchatAccountCard;

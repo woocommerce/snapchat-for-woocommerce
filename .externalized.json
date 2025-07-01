@@ -1,1 +1,1 @@
-["@woocommerce/components","@woocommerce/navigation","@woocommerce/settings","@wordpress/api-fetch","@wordpress/components","@wordpress/compose","@wordpress/data","@wordpress/element","@wordpress/hooks","@wordpress/i18n","@wordpress/url","lodash","react"]
+["@woocommerce/components","@woocommerce/navigation","@woocommerce/settings","@wordpress/api-fetch","@wordpress/components","@wordpress/compose","@wordpress/data","@wordpress/data-controls","@wordpress/element","@wordpress/hooks","@wordpress/i18n","@wordpress/url","lodash","react"]

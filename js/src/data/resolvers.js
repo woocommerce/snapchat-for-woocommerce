@@ -16,7 +16,7 @@ import {
 	receiveSnapchatOrganization,
 	receiveExistingSnapchatAdsAccounts,
 	receiveExistingSnapchatOrganizations,
-	receiveSnapchatAccount,
+	fetchSnapchatAccount,
 } from './actions';
 
 /**
@@ -156,28 +156,10 @@ export function getSnapchatOrganization() {
 }
 
 /**
- * Fetch Snapchat account information.
+ * Retrieves the Snapchat account fetch function.
  *
- * Dispatches the received Snapchat account data to the store on success.
- * Handles and reports errors if the API call fails.
- *
- * @return {Function} Thunk function that accepts Redux's dispatch.
+ * @return {Function} The function to fetch the Snapchat account.
  */
 export function getSnapchatAccount() {
-	return async function ( { dispatch } ) {
-		try {
-			const response = await apiFetch( {
-				path: `${ API_NAMESPACE }/snapchat/connection`,
-			} );
-			dispatch( receiveSnapchatAccount( response ) );
-		} catch ( error ) {
-			handleApiError(
-				error,
-				__(
-					'There was an error loading Snapchat account info.',
-					'snapchat-for-woo'
-				)
-			);
-		}
-	};
+	return fetchSnapchatAccount;
 }

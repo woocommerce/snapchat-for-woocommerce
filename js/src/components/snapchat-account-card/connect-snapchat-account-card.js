@@ -2,6 +2,7 @@
  * External dependencies
  */
 import { __ } from '@wordpress/i18n';
+import { useEffect } from '@wordpress/element';
 import { addQueryArgs } from '@wordpress/url';
 
 /**
@@ -10,6 +11,7 @@ import { addQueryArgs } from '@wordpress/url';
 import { sfwData } from '~/constants';
 import { API_NAMESPACE } from '~/data/constants';
 import AppButton from '~/components/app-button';
+import useUpsertSnapchatConfig from '~/hooks/useUpsertSnapchatConfig';
 import AccountCard, { APPEARANCE } from '~/components/account-card';
 import useDispatchCoreNotices from '~/hooks/useDispatchCoreNotices';
 import useApiFetchCallback from '~/hooks/useApiFetchCallback';
@@ -24,9 +26,10 @@ import useApiFetchCallback from '~/hooks/useApiFetchCallback';
 /**
  * @fires sfw_snapchat_account_connect_button_click
  */
-const ConnectSnapchatAccountCard = ( { disabled } ) => {
+const ConnectSnapchatAccountCard = ( { disabled, configId } ) => {
 	const { createNotice } = useDispatchCoreNotices();
-
+	const { upsertSnapchatConfig, loading: loadingUpsertSnapchatConfig } =
+		useUpsertSnapchatConfig( configId );
 	const nextPageName = sfwData?.snapchatSetupComplete
 		? 'reconnect'
 		: 'setup-snapchat';
@@ -35,6 +38,12 @@ const ConnectSnapchatAccountCard = ( { disabled } ) => {
 	const [ fetchSnapchatConnect, { loading, data } ] = useApiFetchCallback( {
 		path,
 	} );
+
+	useEffect( () => {
+		if ( configId ) {
+			upsertSnapchatConfig( configId );
+		}
+	}, [ configId, upsertSnapchatConfig ] );
 
 	const handleConnectClick = async () => {
 		try {
@@ -51,6 +60,30 @@ const ConnectSnapchatAccountCard = ( { disabled } ) => {
 		}
 	};
 
+	const getIndicator = () => {
+		if ( loadingUpsertSnapchatConfig ) {
+			return (
+				<AppButton
+					loading
+					text={ __( 'Connecting…', 'snapchat-for-woo' ) }
+				/>
+			);
+		}
+
+		return (
+			<AppButton
+				isSecondary
+				disabled={ disabled }
+				loading={ loading || data }
+				eventName="sfw_snapchat_account_connect_button_click"
+				eventProps={ { context: nextPageName } }
+				onClick={ handleConnectClick }
+			>
+				{ __( 'Connect', 'snapchat-for-woo' ) }
+			</AppButton>
+		);
+	};
+
 	return (
 		<AccountCard
 			appearance={ APPEARANCE.SNAPCHAT }
@@ -59,17 +92,7 @@ const ConnectSnapchatAccountCard = ( { disabled } ) => {
 				'Connect your Snapchat Business Account to sync your catalog and run Dynamic Ads.',
 				'snapchat-for-woo'
 			) }
-			indicator={
-				<AppButton
-					isSecondary
-					loading={ loading || data }
-					eventName="sfw_snapchat_account_connect_button_click"
-					eventProps={ { context: nextPageName } }
-					onClick={ handleConnectClick }
-				>
-					{ __( 'Connect', 'snapchat-for-woo' ) }
-				</AppButton>
-			}
+			indicator={ getIndicator() }
 		/>
 	);
 };
