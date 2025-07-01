@@ -26,6 +26,25 @@ namespace SnapchatForWooCommerce\Utils\Storage;
  */
 final class OptionDefaults {
 	/**
+	 * Option key for storing the current onboarding status.
+	 *
+	 * Can be values like 'disconnected', 'connected', or 'in_progress'.
+	 *
+	 * @since 0.1.0
+	 */
+	public const ONBOARDING_STATUS = 'onboarding_status';
+
+
+	/**
+	 * Option key for storing the current onboarding step.
+	 *
+	 * Represents the plugin setup progress step, e.g., 'setup', 'connect', 'configure'.
+	 *
+	 * @since 0.1.0
+	 */
+	public const ONBOARDING_STEP = 'onboarding_step';
+
+	/**
 	 * Option key for storing the status of Jetpack's connection.
 	 *
 	 * @since 0.1.0
@@ -40,6 +59,14 @@ final class OptionDefaults {
 	 */
 	public const WP_TOS_ACCEPTED = 'wp_tos_accepted';
 
+	/**
+	 * Option key for storing the generated Snapchat config ID.
+	 *
+	 * This ID identifies configuration the merchant created for
+	 * their Snapchat Ads Account.
+	 *
+	 * @since 0.1.0
+	 */
 	public const CONFIG_ID = 'config_id';
 
 	/**
@@ -57,7 +84,11 @@ final class OptionDefaults {
 	public const ORGANIZATION_ID = 'organization_id';
 
 	/**
-	 * Option key for Snapchat organization name.
+	 * Option key for storing the name of the selected Snapchat organization.
+	 *
+	 * Stored locally after fetching the organization from the Snapchat API.
+	 *
+	 * @since 0.1.0
 	 */
 	public const ORGANIZATION_NAME = 'organization_name';
 
@@ -101,6 +132,8 @@ final class OptionDefaults {
 	 */
 	public static function get_all(): array {
 		return array(
+			self::ONBOARDING_STATUS       => 'disconnected',
+			self::ONBOARDING_STEP         => 'setup',
 			self::IS_JETPACK_CONNECTED    => false,
 			self::WP_TOS_ACCEPTED         => false,
 			self::CONFIG_ID               => '',

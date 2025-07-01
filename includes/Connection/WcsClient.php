@@ -72,6 +72,20 @@ final class WcsClient {
 	}
 
 	/**
+	 * Sends a proxy DELETE request to an arbitrary WCS endpoint.
+	 *
+	 * @since 0.1.0
+	 *
+	 * @param string $path           Path within the WCS API (relative to service base).
+	 * @param bool   $requires_auth  Whether to include the Jetpack auth header.
+	 *
+	 * @return WP_REST_Response|WP_Error API response or error.
+	 */
+	public function proxy_delete( string $path, bool $requires_auth = true ) {
+		return $this->proxy_request( 'DELETE', $path, null, $requires_auth );
+	}
+
+	/**
 	 * Returns the base URL for the WCS endpoint.
 	 *
 	 * @return string
@@ -125,7 +139,7 @@ final class WcsClient {
 	 *
 	 * @return WP_REST_Response|WP_Error Parsed response or error.
 	 */
-	private function proxy_request( string $method, string $path, $body = null, $requires_auth = true ) {
+	public function proxy_request( string $method, string $path, $body = null, $requires_auth = true ) {
 		$url = sprintf(
 			'%s/%s/%s',
 			$this->get_wcs_url(),
