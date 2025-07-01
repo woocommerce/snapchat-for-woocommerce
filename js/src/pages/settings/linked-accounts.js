@@ -34,11 +34,11 @@ import DisconnectModal, { ALL_ACCOUNTS } from './disconnect-modal';
 export default function LinkedAccounts() {
 	const adminUrl = useAdminUrl();
 	const { jetpack } = useJetpackAccount();
-	const { email } = useSnapchatAccount();
-	const { id: adsAccountId } = useSnapchatAdsAccount();
-	const { id: organizationId } = useSnapchatOrganization();
+	const { isConnected } = useSnapchatAccount();
+	const { id: organizationId, name: organizationName } =
+		useSnapchatOrganization();
 
-	const isLoading = ! ( jetpack && email && adsAccountId && organizationId );
+	const isLoading = ! ( jetpack && isConnected && organizationId );
 
 	const [ openedModal, setOpenedModal ] = useState( null );
 	const openDisconnectAllAccountsModal = () => setOpenedModal( ALL_ACCOUNTS );
@@ -69,9 +69,8 @@ export default function LinkedAccounts() {
 				<>
 					<ConnectedWPComAccountCard jetpack={ jetpack } />
 					<ConnectedSnapchatAccountCard
-						snapchatAccount={ {
-							email,
-						} }
+						organizationName={ organizationName }
+						hideAccountSwitch
 					/>
 
 					<Flex justify="flex-end">

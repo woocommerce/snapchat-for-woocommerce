@@ -17,7 +17,6 @@ const useSnapchatAccount = () => {
 		const account = selector[ selectorName ]();
 
 		return {
-			email: account?.email,
 			status: account?.status,
 			isConnected: account?.status === SNAPCHAT_ACCOUNT_STATUS.CONNECTED,
 			hasFinishedResolution: selector.hasFinishedResolution(

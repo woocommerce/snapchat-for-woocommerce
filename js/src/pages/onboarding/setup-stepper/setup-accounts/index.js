@@ -19,10 +19,9 @@ import useSnapchatAccount from '~/hooks/useSnapchatAccount';
 import WPComAccountCard from '~/components/wpcom-account-card';
 import SnapchatAccountCard from '~/components/snapchat-account-card';
 import './index.scss';
-// import SnapchatComboAccountCard from '~/components/snapchat-combo-account-card';
 
 const SetupAccounts = ( props ) => {
-	const { onContinue = () => {} } = props;
+	const { onContinue = noop } = props;
 	const { jetpack } = useJetpackAccount();
 	const {
 		isConnected: isSnapchatConnected,
@@ -43,7 +42,10 @@ const SetupAccounts = ( props ) => {
 		return <AppSpinner />;
 	}
 
-	const handleSubmitCallback = noop;
+	const handleOnClick = () => {
+		onContinue();
+	};
+
 	const isContinueButtonDisabled = ! isJetpackActive || ! isSnapchatConnected;
 	const isSubmitting = false;
 
@@ -75,7 +77,7 @@ const SetupAccounts = ( props ) => {
 						disabled={ isContinueButtonDisabled }
 						loading={ isSubmitting }
 						text={ __( 'Continue', 'snapchat-for-woo' ) }
-						onClick={ handleSubmitCallback }
+						onClick={ handleOnClick }
 					/>
 				</StepContentActions>
 			</StepContentFooter>

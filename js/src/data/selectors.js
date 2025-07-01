@@ -27,27 +27,6 @@ export const getJetpackAccount = ( state ) => {
 };
 
 /**
- * Retrieves the list of existing Snapchat organizations.
- *
- * @param {Object} state - The Redux state object.
- * @return {Array|null} The array of existing Snapchat organizations, or null if not set.
- */
-export const getExistingSnapchatOrganizations = ( state ) => {
-	return state.accounts.existing_organizations;
-};
-
-/**
- * Retrieves the list of existing Snapchat ads accounts.
- *
- * @param {Object} state - The Redux state object.
- * @param {string} organizationId - The ID of the organization to filter by.
- * @return {Array|null} The array of existing Snapchat ads, or null if not set.
- */
-export const getExistingSnapchatAdsAccounts = ( state, organizationId ) => {
-	return state.accounts.existing_ads[ organizationId ];
-};
-
-/**
  * Retrieves the Snapchat Ads account information.
  *
  * @param {Object} state - The Redux state object.

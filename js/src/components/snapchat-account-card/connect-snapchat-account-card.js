@@ -10,6 +10,7 @@ import { addQueryArgs } from '@wordpress/url';
  */
 import { sfwData } from '~/constants';
 import { API_NAMESPACE } from '~/data/constants';
+import { SNAPCHAT_DESCRIPTION } from './constants';
 import AppButton from '~/components/app-button';
 import useUpsertSnapchatConfig from '~/hooks/useUpsertSnapchatConfig';
 import AccountCard, { APPEARANCE } from '~/components/account-card';
@@ -88,10 +89,7 @@ const ConnectSnapchatAccountCard = ( { disabled, configId } ) => {
 		<AccountCard
 			appearance={ APPEARANCE.SNAPCHAT }
 			disabled={ disabled }
-			description={ __(
-				'Connect your Snapchat Business Account to sync your catalog and run Dynamic Ads.',
-				'snapchat-for-woo'
-			) }
+			description={ SNAPCHAT_DESCRIPTION }
 			indicator={ getIndicator() }
 		/>
 	);

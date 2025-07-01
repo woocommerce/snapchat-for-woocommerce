@@ -18,24 +18,6 @@ export function receiveJetpackAccount( account ) {
 	};
 }
 
-export function receiveExistingSnapchatOrganizations( snapchatOrganizations ) {
-	return {
-		type: TYPES.RECEIVE_EXISTING_SNAPCHAT_ORGANIZATIONS,
-		snapchatOrganizations,
-	};
-}
-
-export function receiveExistingSnapchatAdsAccounts(
-	snapchatAdsAccounts,
-	organizationId
-) {
-	return {
-		type: TYPES.RECEIVE_EXISTING_SNAPCHAT_ADS_ACCOUNTS,
-		snapchatAdsAccounts,
-		organizationId,
-	};
-}
-
 export function receiveSnapchatAdsAccount( snapchatAdsAccount ) {
 	return {
 		type: TYPES.RECEIVE_SNAPCHAT_ADS_ACCOUNT,

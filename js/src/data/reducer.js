@@ -11,9 +11,6 @@ import TYPES from './action-types';
 const DEFAULT_STATE = {
 	general: {
 		version: null,
-		id: null,
-		adsId: null,
-		organizationId: null,
 	},
 	setup: {
 		status: 'incomplete',
@@ -24,8 +21,6 @@ const DEFAULT_STATE = {
 		snapchat: null,
 		ads: null,
 		organization: null,
-		existing_organizations: null,
-		existing_ads: {},
 	},
 };
 
@@ -116,26 +111,6 @@ const reducer = ( state = DEFAULT_STATE, action ) => {
 			const { account } = action;
 
 			return setIn( state, 'accounts.jetpack', account );
-		}
-
-		case TYPES.RECEIVE_EXISTING_SNAPCHAT_ORGANIZATIONS: {
-			const { snapchatOrganizations } = action;
-
-			return setIn(
-				state,
-				'accounts.existing_organizations',
-				snapchatOrganizations
-			);
-		}
-
-		case TYPES.RECEIVE_EXISTING_SNAPCHAT_ADS_ACCOUNTS: {
-			const { organizationId, snapchatAdsAccounts } = action;
-
-			return setIn(
-				state,
-				[ 'accounts.existing_ads', organizationId ],
-				snapchatAdsAccounts
-			);
 		}
 
 		case TYPES.RECEIVE_SNAPCHAT_ADS_ACCOUNT: {

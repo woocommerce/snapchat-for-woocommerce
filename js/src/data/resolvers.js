@@ -14,8 +14,6 @@ import {
 	receiveJetpackAccount,
 	receiveSnapchatAdsAccount,
 	receiveSnapchatOrganization,
-	receiveExistingSnapchatAdsAccounts,
-	receiveExistingSnapchatOrganizations,
 	fetchSnapchatAccount,
 } from './actions';
 
@@ -40,66 +38,6 @@ export function getJetpackAccount() {
 				error,
 				__(
 					'There was an error loading Jetpack account info.',
-					'snapchat-for-woo'
-				)
-			);
-		}
-	};
-}
-
-/**
- * Fetches existing Snapchat organizations from the API and dispatches the result.
- *
- * @return {Function} An async thunk function that takes a Redux-like dispatch object.
- */
-export function getExistingSnapchatOrganizations() {
-	return async function ( { dispatch } ) {
-		try {
-			const response = await apiFetch( {
-				path: `${ API_NAMESPACE }/snapchat/organizations`,
-			} );
-
-			dispatch( receiveExistingSnapchatOrganizations( response ) );
-		} catch ( error ) {
-			handleApiError(
-				error,
-				__(
-					'There was an error loading existing Snapchat organizations.',
-					'snapchat-for-woo'
-				)
-			);
-		}
-	};
-}
-
-/**
- * Asynchronous action creator to fetch existing Snapchat Ads accounts.
- *
- * Dispatches the 'RECEIVE_EXISTING_SNAPCHAT_ADS_ACCOUNTS' action with the retrieved accounts on success.
- * Handles and reports errors if the API request fails.
- *
- * @return {Function} Thunk function that accepts Redux dispatch and performs the API call.
- */
-export function getExistingSnapchatAdsAccounts( organizationId ) {
-	return async function ( { dispatch } ) {
-		try {
-			const response = await apiFetch( {
-				path: addQueryArgs(
-					`${ API_NAMESPACE }/snapchat/ads_accounts`,
-					{
-						org_id: organizationId,
-					}
-				),
-			} );
-
-			dispatch(
-				receiveExistingSnapchatAdsAccounts( response, organizationId )
-			);
-		} catch ( error ) {
-			handleApiError(
-				error,
-				__(
-					'There was an error loading existing Snapchat ads accounts.',
 					'snapchat-for-woo'
 				)
 			);
