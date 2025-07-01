@@ -51,7 +51,7 @@ class SnapchatBusinessExtensionController extends SettingsBaseController {
 			$this->namespace,
 			'connect',
 			array(
-				'methods'             => 'POST',
+				'methods'             => 'GET',
 				'callback'            => array( $this, 'initiate_oauth' ),
 				'permission_callback' => array( $this, 'permissions_check' ),
 			)
