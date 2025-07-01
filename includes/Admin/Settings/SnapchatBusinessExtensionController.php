@@ -18,6 +18,8 @@ namespace SnapchatForWooCommerce\Admin\Settings;
 use SnapchatForWooCommerce\Connection\WcsClient;
 use SnapchatForWooCommerce\Utils\Storage\Options;
 use SnapchatForWooCommerce\Utils\Storage\OptionDefaults;
+use SnapchatForWooCommerce\Utils\Storage\Transients;
+use SnapchatForWooCommerce\Utils\Storage\TransientDefaults;
 
 /**
  * Controller for setting up and managing the Snapchat account connection.
@@ -59,23 +61,6 @@ class SnapchatBusinessExtensionController extends SettingsBaseController {
 
 		register_rest_route(
 			$this->namespace,
-			'config',
-			array(
-				'methods'             => 'POST',
-				'callback'            => array( $this, 'set_config' ),
-				'permission_callback' => array( $this, 'permissions_check' ),
-				'args'                => array(
-					'id' => array(
-						'description' => 'The config_id returned by Snapchat.',
-						'type'        => 'string',
-						'required'    => true,
-					),
-				),
-			)
-		);
-
-		register_rest_route(
-			$this->namespace,
 			'connection',
 			array(
 				array(
@@ -88,7 +73,27 @@ class SnapchatBusinessExtensionController extends SettingsBaseController {
 					'callback'            => array( $this, 'delete_connection' ),
 					'permission_callback' => array( $this, 'permissions_check' ),
 				),
-			)
+			),
+		);
+
+		register_rest_route(
+			$this->namespace,
+			'config',
+			array(
+				array(
+					'methods'             => 'POST',
+					'callback'            => array( $this, 'set_config' ),
+					'permission_callback' => array( $this, 'permissions_check' ),
+					'args'                => array(
+						'id' => array(
+							'description' => 'The config_id returned by Snapchat.',
+							'type'        => 'string',
+							'required'    => true,
+						),
+					),
+				),
+				'schema' => array( $this, 'config_schema' ),
+			),
 		);
 	}
 
@@ -127,6 +132,18 @@ class SnapchatBusinessExtensionController extends SettingsBaseController {
 		return $this->wcs->proxy_get( 'connection/disconnect' );
 	}
 
+	/**
+	 * Saves the selected Snapchat Business Extension configuration.
+	 *
+	 * Fetches the configuration details using the provided config ID and stores
+	 * the related Organization ID, Ad Account ID, Pixel ID, and Conversion API token.
+	 *
+	 * @since 0.1.0
+	 *
+	 * @param WP_REST_Request $request REST request object.
+	 *
+	 * @return WP_REST_Response|WP_Error
+	 */
 	public function set_config( $request ) {
 		$config_id = sanitize_text_field( $request['id'] );
 
@@ -246,11 +263,40 @@ class SnapchatBusinessExtensionController extends SettingsBaseController {
 
 		$data = $response->get_data();
 
+		Options::delete( OptionDefaults::ORGANIZATION_ID );
+		Options::delete( OptionDefaults::ORGANIZATION_NAME );
+		Options::delete( OptionDefaults::AD_ACCOUNT_ID );
+		Options::delete( OptionDefaults::CONVERSION_ACCESS_TOKEN );
+		Options::delete( OptionDefaults::PIXEL_ID );
+		Transients::delete( TransientDefaults::PIXEL_SCRIPT );
+
 		return rest_ensure_response(
 			array(
 				'status' => 'success',
 				'email'  => $data['email'] ?? '',
 			)
+		);
+	}
+
+	/**
+	 * Returns the JSON Schema for the `/config` endpoint.
+	 *
+	 * @since 0.1.0
+	 *
+	 * @return array JSON Schema definition.
+	 */
+	public function config_schema() {
+		return array(
+			'$schema'    => 'http://json-schema.org/draft-04/schema#',
+			'title'      => 'snapchat_config',
+			'type'       => 'object',
+			'properties' => array(
+				'id' => array(
+					'description' => 'The unique Snapchat config ID.',
+					'type'        => 'string',
+				),
+			),
+			'required'   => array( 'id' ),
 		);
 	}
 }
