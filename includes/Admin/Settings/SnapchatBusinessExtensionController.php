@@ -15,6 +15,8 @@
 
 namespace SnapchatForWooCommerce\Admin\Settings;
 
+use WP_REST_Response;
+use WP_Error;
 use SnapchatForWooCommerce\Connection\WcsClient;
 use SnapchatForWooCommerce\Utils\Storage\Options;
 use SnapchatForWooCommerce\Utils\Storage\OptionDefaults;
@@ -156,7 +158,13 @@ class SnapchatBusinessExtensionController extends SettingsBaseController {
 		$response = $this->wcs->proxy_get( '/ads/v1/business_extension_configurations/' . $config_id );
 
 		if ( is_wp_error( $response ) ) {
-			return $response;
+			return new WP_REST_Response(
+				array(
+					'status'  => 'error',
+					'message' => $response->get_error_message(),
+				),
+				500
+			);
 		}
 
 		$data        = $response->get_data();
@@ -167,7 +175,7 @@ class SnapchatBusinessExtensionController extends SettingsBaseController {
 		}
 
 		if ( $client_data['ad_account_id'] ) {
-			Options::set( OptionDefaults::AD_ACCOUNT_ID, $client_data['ad_account_id'] );
+			Options::set( OptionDefaults::ADS_ACCOUNT_ID, $client_data['ad_account_id'] );
 		}
 
 		if ( $client_data['pixel_id'] ) {
@@ -191,11 +199,12 @@ class SnapchatBusinessExtensionController extends SettingsBaseController {
 		$response   = $this->start_connection( $return_url );
 
 		if ( is_wp_error( $response ) ) {
-			return rest_ensure_response(
+			return new WP_REST_Response(
 				array(
 					'status'  => 'error',
 					'message' => $response->get_error_message(),
-				)
+				),
+				500
 			);
 		}
 
@@ -224,12 +233,13 @@ class SnapchatBusinessExtensionController extends SettingsBaseController {
 		$response = $this->get_connection_status();
 
 		if ( is_wp_error( $response ) ) {
-			return rest_ensure_response(
+			return new WP_REST_Response(
 				array(
 					'status'  => 'error',
 					'message' => $response->get_error_message(),
 					'data'    => $response->get_error_data(),
-				)
+				),
+				500
 			);
 		}
 
@@ -252,20 +262,22 @@ class SnapchatBusinessExtensionController extends SettingsBaseController {
 		$response = $this->stop_connection();
 
 		if ( is_wp_error( $response ) ) {
-			return rest_ensure_response(
+			return new WP_REST_Response(
 				array(
 					'status'  => 'error',
 					'message' => $response->get_error_message(),
 					'data'    => $response->get_error_data(),
-				)
+				),
+				500
 			);
 		}
 
 		$data = $response->get_data();
 
+		Options::delete( OptionDefaults::CONFIG_ID );
 		Options::delete( OptionDefaults::ORGANIZATION_ID );
 		Options::delete( OptionDefaults::ORGANIZATION_NAME );
-		Options::delete( OptionDefaults::AD_ACCOUNT_ID );
+		Options::delete( OptionDefaults::ADS_ACCOUNT_ID );
 		Options::delete( OptionDefaults::CONVERSION_ACCESS_TOKEN );
 		Options::delete( OptionDefaults::PIXEL_ID );
 		Transients::delete( TransientDefaults::PIXEL_SCRIPT );
