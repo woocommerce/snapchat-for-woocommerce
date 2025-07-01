@@ -48,6 +48,8 @@ final class OptionDefaults {
 	 */
 	public const ORGANIZATIONS = 'organizations';
 
+	public const CONFIG_ID = 'config_id';
+
 	/**
 	 * Option key for the Ad Partner ad account ID.
 	 *
@@ -61,6 +63,8 @@ final class OptionDefaults {
 	 * @since 0.1.0
 	 */
 	public const ORGANIZATION_ID = 'organization_id';
+
+	public const ORGANIZATION_NAME = 'organization_name';
 
 	/**
 	 * Option key that toggles whether pixel tracking is enabled.
@@ -110,9 +114,11 @@ final class OptionDefaults {
 		return array(
 			self::IS_JETPACK_CONNECTED    => false,
 			self::WP_TOS_ACCEPTED         => false,
-			self::ORGANIZATIONS           => array(),
+			self::CONFIG_ID               => '',
+			self::ORGANIZATIONS           => array(), // may not need.
 			self::AD_ACCOUNT_ID           => '',
 			self::ORGANIZATION_ID         => '',
+			self::ORGANIZATION_NAME       => '',
 			self::PIXEL_ENABLED           => false,
 			self::PIXELS                  => array(),
 			self::PIXEL_ID                => '',

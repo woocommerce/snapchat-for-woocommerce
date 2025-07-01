@@ -42,41 +42,6 @@ final class WcsClient {
 	}
 
 	/**
-	 * Sends a GET request to the WCS `/connection/status` endpoint.
-	 *
-	 * @since 0.1.0
-	 *
-	 * @return WP_REST_Response|WP_Error Connection status or error.
-	 */
-	public function get_connection_status() {
-		return $this->proxy_get( 'connection/status' );
-	}
-
-	/**
-	 * Sends a POST request to the WCS `/connection/connect` endpoint to initiate a connection.
-	 *
-	 * @since 0.1.0
-	 *
-	 * @param string $return_url    URL to redirect the user to after authorization.
-	 *
-	 * @return WP_REST_Response|WP_Error Connection initiation response or error.
-	 */
-	public function start_connection( string $return_url ) {
-		return $this->proxy_get( 'connection/connect', array( 'returnUrl' => $return_url ) );
-	}
-
-	/**
-	 * Sends a GET request to the WCS `/connection` endpoint to disconnect the Ad Partner.
-	 *
-	 * @since 0.1.0
-	 *
-	 * @return WP_REST_Response|WP_Error Disconnection response or error.
-	 */
-	public function stop_connection() {
-		return $this->proxy_get( 'connection/disconnect' );
-	}
-
-	/**
 	 * Sends a proxy GET request to an arbitrary WCS endpoint.
 	 *
 	 * @since 0.1.0
