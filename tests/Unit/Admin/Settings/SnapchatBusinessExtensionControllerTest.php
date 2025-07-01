@@ -61,10 +61,9 @@ class SnapchatBusinessExtensionControllerTest extends WP_UnitTestCase {
 		$this->server  = rest_get_server();
 		$this->options = require __DIR__ . '/fixtures/options.php';
 
-		Options::delete( OptionDefaults::ORGANIZATIONS );
 		Options::delete( OptionDefaults::ORGANIZATION_ID );
 		Options::delete( OptionDefaults::ORGANIZATION_NAME );
-		Options::delete( OptionDefaults::AD_ACCOUNT_ID );
+		Options::delete( OptionDefaults::ADS_ACCOUNT_ID );
 		Options::delete( OptionDefaults::PIXEL_ID );
 		Transients::delete( TransientDefaults::PIXEL_SCRIPT );
 
@@ -164,8 +163,9 @@ class SnapchatBusinessExtensionControllerTest extends WP_UnitTestCase {
 		$this->assertSame( array( 'id' => 'hello' ), $data );
 		$this->assertSame( $this->options['org_id'], Options::get( OptionDefaults::ORGANIZATION_ID ) );
 		$this->assertSame( '', Options::get( OptionDefaults::ORGANIZATION_NAME ) );
-		$this->assertSame( $this->options['ad_account_id'], Options::get( OptionDefaults::AD_ACCOUNT_ID ) );
+		$this->assertSame( $this->options['ads_account_id'], Options::get( OptionDefaults::ADS_ACCOUNT_ID ) );
 		$this->assertSame( $this->options['pixel_id'], Options::get( OptionDefaults::PIXEL_ID ) );
 		$this->assertSame( '', Transients::get( TransientDefaults::PIXEL_SCRIPT ) );
 	}
 }
+
