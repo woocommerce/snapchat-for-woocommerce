@@ -247,7 +247,7 @@ class SnapchatBusinessExtensionController extends SettingsBaseController {
 
 		return rest_ensure_response(
 			array(
-				'status' => $data['status']
+				'status' => $data['status'],
 			)
 		);
 	}
