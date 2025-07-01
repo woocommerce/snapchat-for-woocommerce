@@ -1,0 +1,21 @@
+{
+	"request_status": "SUCCESS",
+	"request_id": "5928472c00ff04f7eaae709d770001737e7465616d6b6f363139000161646d616e616765722d61706",
+	"organizations": [
+		{
+			"sub_request_status": "SUCCESS",
+			"organization": {
+				"id": "0877b15f-518h-4e8d-93a7-2e83b8329a00",
+				"updated_at": "2017-05-26T15:14:44.877Z",
+				"created_at": "2017-05-26T15:14:44.877Z",
+				"name": "WooForSnapchat",
+				"address_line_1": "101 Stewart St",
+				"locality": "Seattle",
+				"administrative_district_level_1": "WA",
+				"country": "US",
+				"postal_code": "98134",
+				"type": "ENTERPRISE"
+			}
+		}
+	]
+}
