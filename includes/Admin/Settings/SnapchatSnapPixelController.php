@@ -14,7 +14,6 @@ use WP_REST_Request;
 use WP_REST_Response;
 use WP_Error;
 use SnapchatForWooCommerce\Connection\WcsClient;
-use SnapchatForWooCommerce\Connection\JetpackAuthenticator;
 use SnapchatForWooCommerce\Utils\Storage\Options;
 use SnapchatForWooCommerce\Utils\Storage\OptionDefaults;
 use SnapchatForWooCommerce\Utils\Storage\Transients;

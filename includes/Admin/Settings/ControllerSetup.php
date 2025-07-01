@@ -15,8 +15,6 @@ namespace SnapchatForWooCommerce\Admin\Settings;
 use Automattic\Jetpack\Connection\Manager;
 use SnapchatForWooCommerce\ServiceContainer;
 use SnapchatForWooCommerce\ServiceKey;
-use SnapchatForWooCommerce\Connection\WcsClient;
-use SnapchatForWooCommerce\Connection\JetpackAuthenticator;
 use SnapchatForWooCommerce\Config;
 
 /**
@@ -47,9 +45,9 @@ class ControllerSetup {
 		$manager    = new Manager( Config::PLUGIN_SLUG );
 
 		( new JetpackAccountController( $wcs_client, $manager ) )->register_routes();
-		( new SnapchatAccountController( $wcs_client ) )->register_routes();
+		( new SnapchatBusinessExtensionController( $wcs_client ) )->register_routes();
 		( new SnapchatOrganizationsController( $wcs_client ) )->register_routes();
-		( new SnapchatAdAccountsController() )->register_routes();
-		( new SnapchatSnapPixelController( $wcs_client ) )->register_routes();
+		// ( new SnapchatAdAccountsController() )->register_routes();
+		// ( new SnapchatSnapPixelController( $wcs_client ) )->register_routes();
 	}
 }
