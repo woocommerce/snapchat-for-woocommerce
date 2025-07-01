@@ -148,11 +148,11 @@ final class WcsClient {
 			if ( empty( $jetpack_token ) ) {
 				return new WP_REST_Response( array( 'message' => 'Jetpack token missing' ) );
 			}
+
+			$args['headers']['Authorization'] = $jetpack_token;
 		}
 
-		$args['headers']['Authorization'] = $jetpack_token;
-
-		if ( ! empty( $body ) ) {
+		if ( 'POST' === $method && ! empty( $body ) ) {
 			$args['headers']['Content-Type'] = 'application/json';
 			$args['body']                    = wp_json_encode( $body );
 		}

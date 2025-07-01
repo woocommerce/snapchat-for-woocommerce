@@ -47,7 +47,5 @@ class ControllerSetup {
 		( new JetpackAccountController( $wcs_client, $manager ) )->register_routes();
 		( new SnapchatBusinessExtensionController( $wcs_client ) )->register_routes();
 		( new SnapchatOrganizationsController( $wcs_client ) )->register_routes();
-		// ( new SnapchatAdAccountsController() )->register_routes();
-		// ( new SnapchatSnapPixelController( $wcs_client ) )->register_routes();
 	}
 }
