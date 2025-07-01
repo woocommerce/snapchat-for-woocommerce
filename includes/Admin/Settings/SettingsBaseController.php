@@ -37,7 +37,6 @@ class SettingsBaseController extends WC_REST_Controller {
 	 * @return bool True if the user has permission; false otherwise.
 	 */
 	public function permissions_check(): bool {
-		return true;
 		return current_user_can( 'manage_woocommerce' );
 	}
 }

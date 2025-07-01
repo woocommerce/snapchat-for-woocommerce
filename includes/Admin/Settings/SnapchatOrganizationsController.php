@@ -97,7 +97,13 @@ class SnapchatOrganizationsController extends SettingsBaseController {
 		);
 
 		if ( is_wp_error( $response ) ) {
-			return $response;
+			return new WP_REST_Response(
+				array(
+					'status'  => 'error',
+					'message' => $response->get_error_message(),
+				),
+				500
+			);
 		}
 
 		$data = $response->get_data();
