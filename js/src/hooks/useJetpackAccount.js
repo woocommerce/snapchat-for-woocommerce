@@ -8,15 +8,19 @@ import { useSelect } from '@wordpress/data';
  */
 import { STORE_KEY } from '~/data/constants';
 
+const selectorName = 'getJetpackAccount';
+
 const useJetpackAccount = () => {
 	return useSelect( ( select ) => {
-		const jetpack = select( STORE_KEY ).getJetpackAccount();
-		const isResolving =
-			select( STORE_KEY ).isResolving( 'getJetpackAccount' );
-		const hasFinishedResolution =
-			select( STORE_KEY ).hasFinishedResolution( 'getJetpackAccount' );
+		const selector = select( STORE_KEY );
 
-		return { jetpack, isResolving, hasFinishedResolution };
+		return {
+			jetpack: selector[ selectorName ](),
+			hasFinishedResolution: selector.hasFinishedResolution(
+				selectorName,
+				[]
+			),
+		};
 	}, [] );
 };
 

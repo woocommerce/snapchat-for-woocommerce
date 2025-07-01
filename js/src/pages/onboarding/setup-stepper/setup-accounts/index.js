@@ -24,7 +24,7 @@ const SetupAccounts = ( props ) => {
 	const { jetpack } = useJetpackAccount();
 
 	/**
-	 * When jetpack is loading, or when snapchat account is loading,
+	 * When jetpack is loading, or when Snapchat account is loading,
 	 *  we display the AppSpinner.
 	 *
 	 * The account loading is in sequential manner, one after another.
@@ -38,7 +38,7 @@ const SetupAccounts = ( props ) => {
 	}
 
 	const handleSubmitCallback = noop;
-	const isContinueButtonDisabled = false;
+	const isContinueButtonDisabled = ! isJetpackActive;
 	const isSubmitting = false;
 
 	return (
@@ -59,8 +59,7 @@ const SetupAccounts = ( props ) => {
 				) }
 			>
 				<WPComAccountCard jetpack={ jetpack } />
-				{ /* <SnapchatComboAccountCard disabled={ ! isJetpackActive } /> */ }
-				<SnapchatComboAccountCard disabled={ isJetpackActive } />
+				<SnapchatComboAccountCard disabled={ ! isJetpackActive } />
 			</Section>
 
 			<StepContentFooter>

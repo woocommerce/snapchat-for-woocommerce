@@ -17,6 +17,7 @@ import { useAppDispatch } from '~/data';
 import AdsAccountSelectControl from '~/components/ads-account-select-control';
 import ConnectedIconLabel from '~/components/connected-icon-label';
 import ConnectAccountButton from './connect-account-button';
+import { SNAPCHAT_ADS_ACCOUNT_STATUS } from '~/constants';
 
 /**
  * Renders an account card to connect to an existing Snapchat Ads account.
@@ -33,7 +34,7 @@ const ConnectExistingAccount = ( { onCreateClick } ) => {
 		snapchatAdsAccount,
 		hasFinishedResolution,
 		refetchSnapchatAdsAccount,
-		isReady,
+		isConnected,
 	} = useSnapchatAdsAccount();
 	const [ connectSnapchatAdsAccount ] = useApiFetchCallback( {
 		path: '/wc/sfw/ads/accounts',
@@ -42,10 +43,10 @@ const ConnectExistingAccount = ( { onCreateClick } ) => {
 	} );
 
 	useEffect( () => {
-		if ( isReady ) {
+		if ( isConnected ) {
 			setValue( snapchatAdsAccount.id );
 		}
-	}, [ snapchatAdsAccount, isReady ] );
+	}, [ snapchatAdsAccount, isConnected ] );
 
 	const handleConnectClick = async () => {
 		if ( ! value ) {
@@ -93,11 +94,16 @@ const ConnectExistingAccount = ( { onCreateClick } ) => {
 			);
 		}
 
-		if ( isReady ) {
+		if ( isConnected ) {
 			return <ConnectedIconLabel />;
 		}
 
-		return <ConnectAccountButton onClick={ handleConnectClick } />;
+		return (
+			<ConnectAccountButton
+				onClick={ handleConnectClick }
+				accountID={ value }
+			/>
+		);
 	};
 
 	return (
@@ -122,13 +128,13 @@ const ConnectExistingAccount = ( { onCreateClick } ) => {
 					value={ value }
 					onChange={ setValue }
 					autoSelectFirstOption
-					nonInteractive={ isReady }
+					nonInteractive={ isConnected }
 				/>
 			}
 			actions={
 				<ConnectExistingAccountActions
 					disabled={ isLoading }
-					isConnected={ isReady }
+					isConnected={ isConnected }
 					onCreateNewClick={ onCreateClick }
 					onDisconnected={ handleDisconnected }
 				/>

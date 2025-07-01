@@ -7,13 +7,13 @@ import { __ } from '@wordpress/i18n';
 /**
  * Internal dependencies
  */
+import { useAppDispatch } from '~/data';
 import AccountCard from '~/components/account-card';
 import ConnectExistingAccountActions from './connect-existing-account-actions';
 import LoadingLabel from '~/components/loading-label';
 import useApiFetchCallback from '~/hooks/useApiFetchCallback';
 import useDispatchCoreNotices from '~/hooks/useDispatchCoreNotices';
 import useSnapchatOrganization from '~/hooks/useSnapchatOrganization';
-import { useAppDispatch } from '~/data';
 import OrganizationSelectControl from '~/components/organization-select-control';
 import ConnectedIconLabel from '~/components/connected-icon-label';
 import ConnectAccountButton from './connect-account-button';
@@ -30,22 +30,22 @@ const ConnectExistingAccount = ( { onCreateClick } ) => {
 	const { createNotice } = useDispatchCoreNotices();
 	const { fetchSnapchatOrganizationStatus } = useAppDispatch();
 	const {
-		snapchatOrganization,
+		id: snapchatOrganizationId,
+		isConnected,
 		hasFinishedResolution,
 		refetchSnapchatOrganization,
-		isReady,
 	} = useSnapchatOrganization();
 	const [ connectSnapchatOrganization ] = useApiFetchCallback( {
-		path: '/wc/sfw/organizations',
+		path: '/wc/sfw/organization',
 		method: 'POST',
 		data: { id: value },
 	} );
 
 	useEffect( () => {
-		if ( isReady ) {
-			setValue( snapchatOrganization.id );
+		if ( isConnected ) {
+			setValue( snapchatOrganizationId );
 		}
-	}, [ snapchatOrganization, isReady ] );
+	}, [ snapchatOrganizationId, isConnected ] );
 
 	const handleConnectClick = async () => {
 		if ( ! value ) {
@@ -93,11 +93,16 @@ const ConnectExistingAccount = ( { onCreateClick } ) => {
 			);
 		}
 
-		if ( isReady ) {
+		if ( isConnected ) {
 			return <ConnectedIconLabel />;
 		}
 
-		return <ConnectAccountButton onClick={ handleConnectClick } />;
+		return (
+			<ConnectAccountButton
+				onClick={ handleConnectClick }
+				accountID={ value }
+			/>
+		);
 	};
 
 	return (
@@ -122,13 +127,13 @@ const ConnectExistingAccount = ( { onCreateClick } ) => {
 					value={ value }
 					onChange={ setValue }
 					autoSelectFirstOption
-					nonInteractive={ isReady }
+					nonInteractive={ isConnected }
 				/>
 			}
 			actions={
 				<ConnectExistingAccountActions
 					disabled={ isLoading }
-					isConnected={ isReady }
+					isConnected={ isConnected }
 					onCreateNewClick={ onCreateClick }
 					onDisconnected={ handleDisconnected }
 				/>

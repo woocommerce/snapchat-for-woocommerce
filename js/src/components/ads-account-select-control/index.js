@@ -16,14 +16,14 @@ import useSnapchatAdsAccount from '~/hooks/useSnapchatAdsAccount';
  */
 const AdsAccountSelectControl = ( props ) => {
 	const { data: existingAccounts } = useExistingSnapchatAdsAccounts();
-	const { snapchatAdsAccount, isReady } = useSnapchatAdsAccount();
+	const { snapchatAdsAccount, isConnected } = useSnapchatAdsAccount();
 
 	const accountIdExists = existingAccounts?.some(
 		( existingAccount ) => existingAccount.id === snapchatAdsAccount?.id
 	);
 
 	// If the account ID is not in the list of existing accounts, fake the select options by displaying the connected account ID only.
-	if ( ! accountIdExists && isReady ) {
+	if ( ! accountIdExists && isConnected ) {
 		return (
 			<AppSelectControl
 				autoSelectFirstOption

@@ -15,25 +15,27 @@ import useSnapchatOrganization from '~/hooks/useSnapchatOrganization';
  * @return {JSX.Element} JSX markup.
  */
 const AccountDetails = () => {
-	const { snapchat } = useSnapchatAccount();
-	const { snapchatAdsAccount, isReady: isSnapchatAdsAccountReady } =
+	const { email } = useSnapchatAccount();
+	const {
+		name: snapchatOrganizationName,
+		isConnected: isSnapchatOrganizationConnected,
+	} = useSnapchatOrganization();
+	const { snapchatAdsAccount, isConnected: isSnapchatAdsAccountConnected } =
 		useSnapchatAdsAccount();
-	const { snapchatOrganization, isReady: isSnapchatOrganizationReady } =
-		useSnapchatOrganization();
 
 	return (
 		<>
-			<p>{ snapchat.email }</p>
+			<p>{ email }</p>
 			<p>
-				{ isSnapchatOrganizationReady &&
+				{ isSnapchatOrganizationConnected &&
 					sprintf(
 						// Translators: %s is the Organization name
 						__( 'Organization: %s', 'snapchat-for-woo' ),
-						snapchatOrganization.name
+						snapchatOrganizationName
 					) }
 			</p>
 			<p>
-				{ isSnapchatAdsAccountReady &&
+				{ isSnapchatAdsAccountConnected &&
 					sprintf(
 						// Translators: %1$s is the Ads Account name, %2$s is the Ads Account ID
 						__( 'Ads Account: %1$s (%2$s)', 'snapchat-for-woo' ),

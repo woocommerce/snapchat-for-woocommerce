@@ -20,15 +20,12 @@ const DEFAULT_STATE = {
 		step: 'accounts',
 	},
 	accounts: {
-		jetpack: {
-			active: 'no',
-			owner: 'no',
-			email: 'asvin.balloo@10up.com',
-			displayName: 'Asvin Balloo',
-		},
-		snapchat: {},
-		ads: {},
-		organization: {},
+		jetpack: null,
+		snapchat: null,
+		ads: null,
+		organization: null,
+		existing_organizations: null,
+		existing_ads: {},
 	},
 };
 
@@ -114,7 +111,58 @@ function setIn( state, path, value ) {
 }
 
 const reducer = ( state = DEFAULT_STATE, action ) => {
-	return state;
+	switch ( action.type ) {
+		case TYPES.RECEIVE_ACCOUNTS_JETPACK: {
+			const { account } = action;
+
+			return setIn( state, 'accounts.jetpack', account );
+		}
+
+		case TYPES.RECEIVE_EXISTING_SNAPCHAT_ORGANIZATIONS: {
+			const { snapchatOrganizations } = action;
+
+			return setIn(
+				state,
+				'accounts.existing_organizations',
+				snapchatOrganizations
+			);
+		}
+
+		case TYPES.RECEIVE_EXISTING_SNAPCHAT_ADS_ACCOUNTS: {
+			const { organizationId, snapchatAdsAccounts } = action;
+
+			return setIn(
+				state,
+				[ 'accounts.existing_ads', organizationId ],
+				snapchatAdsAccounts
+			);
+		}
+
+		case TYPES.RECEIVE_SNAPCHAT_ADS_ACCOUNT: {
+			const { snapchatAdsAccount } = action;
+
+			return setIn( state, 'accounts.ads', snapchatAdsAccount );
+		}
+
+		case TYPES.RECEIVE_SNAPCHAT_ORGANIZATION: {
+			const { snapchatOrganization } = action;
+
+			return setIn(
+				state,
+				'accounts.organization',
+				snapchatOrganization
+			);
+		}
+
+		case TYPES.RECEIVE_SNAPCHAT_ACCOUNT: {
+			const { snapchatAccount } = action;
+
+			return setIn( state, 'accounts.snapchat', snapchatAccount );
+		}
+
+		default:
+			return state;
+	}
 };
 
 export default reducer;

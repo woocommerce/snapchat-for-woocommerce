@@ -1,6 +1,7 @@
 /**
  * Internal dependencies
  */
+import { SNAPCHAT_ACCOUNT_STATUS } from '~/constants';
 import useSnapchatAccount from '~/hooks/useSnapchatAccount';
 import AppSpinner from '~/components/app-spinner';
 import AccountCard from '~/components/account-card';
@@ -17,13 +18,11 @@ import './index.scss';
  * @param {boolean} [props.disabled=false] Whether display the Card in disabled style.
  */
 export default function SnapchatComboAccountCard( { disabled = false } ) {
-	const { snapchat, hasFinishedResolution } = useSnapchatAccount();
+	const { isConnected, hasFinishedResolution } = useSnapchatAccount();
 
 	if ( ! hasFinishedResolution ) {
 		return <AccountCard description={ <AppSpinner /> } />;
 	}
-
-	const isConnected = snapchat?.active === 'yes';
 
 	if ( isConnected ) {
 		return <ConnectedSnapchatComboAccountCard />;

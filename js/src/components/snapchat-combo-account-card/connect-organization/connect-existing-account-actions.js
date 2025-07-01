@@ -5,9 +5,10 @@ import DisconnectAccountButton from './disconnect-account-button';
 import useExistingSnapchatOrganizations from '~/hooks/useExistingSnapchatOrganizations';
 
 const ConnectExistingAccountActions = ( { isConnected, onDisconnected } ) => {
-	const { data: existingAccounts } = useExistingSnapchatOrganizations();
+	const { existingSnapchatOrganizations } =
+		useExistingSnapchatOrganizations();
 
-	if ( isConnected && existingAccounts.length > 0 ) {
+	if ( isConnected && existingSnapchatOrganizations.length > 0 ) {
 		return <DisconnectAccountButton onDisconnected={ onDisconnected } />;
 	}
 };

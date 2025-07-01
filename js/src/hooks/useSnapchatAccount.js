@@ -1,12 +1,31 @@
+/**
+ * External dependencies
+ */
+import { useSelect } from '@wordpress/data';
+
+/**
+ * Internal dependencies
+ */
+import { STORE_KEY } from '~/data/constants';
+import { SNAPCHAT_ACCOUNT_STATUS } from '~/constants';
+
+const selectorName = 'getSnapchatAccount';
+
 const useSnapchatAccount = () => {
-	// @todo: Replace with actual logic to determine if the Snapchat account is ready
-	return {
-		snapchat: {
-			active: 'yes',
-			email: 'snap@chat.com',
-		},
-		hasFinishedResolution: true,
-	};
+	return useSelect( ( select ) => {
+		const selector = select( STORE_KEY );
+		const account = selector[ selectorName ]();
+
+		return {
+			email: account?.email,
+			status: account?.status,
+			isConnected: account?.status === SNAPCHAT_ACCOUNT_STATUS.CONNECTED,
+			hasFinishedResolution: selector.hasFinishedResolution(
+				selectorName,
+				[]
+			),
+		};
+	}, [] );
 };
 
 export default useSnapchatAccount;

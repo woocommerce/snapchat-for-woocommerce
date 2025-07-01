@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import { registerStore, useDispatch, dispatch } from '@wordpress/data';
+import { createReduxStore, register, useDispatch } from '@wordpress/data';
 
 /**
  * Internal dependencies
@@ -11,20 +11,16 @@ import { STORE_KEY } from './constants';
 import * as actions from './actions';
 import * as selectors from './selectors';
 import * as resolvers from './resolvers';
-import { controls } from './controls';
 import reducer from './reducer';
 
-registerStore( STORE_KEY, {
+const store = createReduxStore( STORE_KEY, {
 	actions,
 	selectors,
 	resolvers,
-	controls,
 	reducer,
+	// initialState: sfwData?.initialWpData || {},
 } );
-
-// dispatch( STORE_KEY ).hydratePrefetchedData( sfwData?.initialWpData );
-
-export { STORE_KEY };
+register( store );
 
 export const useAppDispatch = () => {
 	return useDispatch( STORE_KEY );

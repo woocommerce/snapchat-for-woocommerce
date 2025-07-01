@@ -7,7 +7,6 @@ import { useState, useEffect } from '@wordpress/element';
 /**
  * Internal dependencies
  */
-import { useAppDispatch } from '~/data';
 import AccountCard, { APPEARANCE } from '~/components/account-card';
 import ConnectAds from './connect-ads';
 import ConnectOrganization from './connect-organization';
@@ -16,14 +15,9 @@ import Indicator from './indicator';
 import SpinnerCard from '~/components/spinner-card';
 import useExistingSnapchatAdsAccounts from '~/hooks/useExistingSnapchatAdsAccounts';
 import useExistingSnapchatOrganizations from '~/hooks/useExistingSnapchatOrganizations';
-import useSnapchatAccount from '~/hooks/useSnapchatAccount';
 import useSnapchatAdsAccount from '~/hooks/useSnapchatAdsAccount';
 import useSnapchatOrganization from '~/hooks/useSnapchatOrganization';
 import AppButton from '~/components/app-button';
-import {
-	SNAPCHAT_ADS_ACCOUNT_STATUS,
-	SNAPCHAT_ORGANIZATION_ACCOUNT_STATUS,
-} from '~/constants';
 import { SwitchAccountButton } from '~/components/snapchat-account-card';
 import './connected-snapchat-combo-account-card.scss';
 
@@ -32,20 +26,13 @@ import './connected-snapchat-combo-account-card.scss';
  */
 const ConnectedSnapchatComboAccountCard = () => {
 	const [ editMode, setEditMode ] = useState( false );
-	const { snapchat } = useSnapchatAccount();
-	const { status: snapchatAdsAccountStatus } = useSnapchatAdsAccount();
-	const { status: snapchatOrganizationStatus } = useSnapchatOrganization();
-	const { data: existingSnapchatAdsAccounts } =
-		useExistingSnapchatAdsAccounts();
-	const { data: existingSnapchatOrganizations } =
+	const { id: organizationId, isConnected: isOrganizationConnected } =
+		useSnapchatOrganization();
+	const { isConnected: isAdsAccountConnected } = useSnapchatAdsAccount();
+	const { existingSnapchatAdsAccounts } =
+		useExistingSnapchatAdsAccounts( organizationId );
+	const { existingSnapchatOrganizations } =
 		useExistingSnapchatOrganizations();
-
-	const { invalidateResolution } = useAppDispatch();
-
-	const hasExistingSnapchatAdsAccounts =
-		existingSnapchatAdsAccounts?.length > 0;
-	const hasExistingSnapchatOrganizations =
-		existingSnapchatOrganizations?.length > 0;
 
 	const handleCancelClick = () => {
 		setEditMode( false );
@@ -55,37 +42,34 @@ const ConnectedSnapchatComboAccountCard = () => {
 		setEditMode( true );
 	};
 
-	const hasSnapchatAdsConnection =
-		snapchatAdsAccountStatus === SNAPCHAT_ADS_ACCOUNT_STATUS.CONNECTED;
-	const hasSnapchatOrganizationConnection =
-		snapchatOrganizationStatus ===
-		SNAPCHAT_ORGANIZATION_ACCOUNT_STATUS.CONNECTED;
-
-	const canShowConnectOrganization =
-		hasExistingSnapchatOrganizations || hasSnapchatOrganizationConnection;
 	const showConnectOrganization =
-		canShowConnectOrganization &&
-		( editMode || ! hasSnapchatOrganizationConnection );
-
-	const canShowConnectAds =
-		hasSnapchatAdsConnection || hasExistingSnapchatAdsAccounts;
+		editMode ||
+		( existingSnapchatOrganizations?.length > 1 &&
+			! isOrganizationConnected );
 	const showConnectAds =
-		canShowConnectAds && ( editMode || ! hasSnapchatAdsConnection );
+		editMode ||
+		( existingSnapchatAdsAccounts?.length > 1 && ! isAdsAccountConnected );
+
+	// const canShowConnectOrganization =
+	// 	hasExistingSnapchatOrganizations || isAdsAccountConnected;
+	// const showConnectOrganization =
+	// 	canShowConnectOrganization && ( editMode || ! isAdsAccountConnected );
+
+	// const canShowConnectAds =
+	// 	isAdsAccountConnected || hasExistingSnapchatAdsAccounts;
+	// const showConnectAds =
+	// 	canShowConnectAds && ( editMode || ! isAdsAccountConnected );
 
 	// When Ads and Org are disconnected in edit mode, exit edit mode.
 	useEffect( () => {
 		if (
 			editMode &&
-			! hasSnapchatAdsConnection &&
-			! hasSnapchatOrganizationConnection
+			! isAdsAccountConnected &&
+			! isOrganizationConnected
 		) {
 			setEditMode( false );
 		}
-	}, [
-		editMode,
-		hasSnapchatAdsConnection,
-		hasSnapchatOrganizationConnection,
-	] );
+	}, [ editMode, isAdsAccountConnected, isOrganizationConnected ] );
 
 	const switchAccountButton = (
 		<SwitchAccountButton
@@ -113,8 +97,7 @@ const ConnectedSnapchatComboAccountCard = () => {
 		// button would change the visibility of the ConnectAds or ConnectOrganization cards.
 		return (
 			<div className="sfw-snapchat-combo-account-card__description-actions">
-				{ ( showConnectAds || ! canShowConnectAds ) &&
-				( showConnectOrganization || ! canShowConnectOrganization ) ? (
+				{ showConnectAds && showConnectOrganization ? (
 					switchAccountButton
 				) : (
 					<AppButton

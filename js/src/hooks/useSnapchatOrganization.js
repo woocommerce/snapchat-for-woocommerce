@@ -1,19 +1,45 @@
 /**
+ * External dependencies
+ */
+import { useSelect } from '@wordpress/data';
+import { useCallback } from '@wordpress/element';
+
+/**
  * Internal dependencies
  */
-import { SNAPCHAT_ORGANIZATION_ACCOUNT_STATUS } from '~/constants';
+import { useAppDispatch } from '~/data';
+import { STORE_KEY } from '~/data/constants';
+import { SNAPCHAT_ORGANIZATION_STATUS } from '~/constants';
+
+const selectorName = 'getSnapchatOrganization';
 
 const useSnapchatOrganization = () => {
-	const status = SNAPCHAT_ORGANIZATION_ACCOUNT_STATUS.CONNECTED;
+	const dispatcher = useAppDispatch();
+	const refetchSnapchatOrganization = useCallback( () => {
+		dispatcher.invalidateResolution( selectorName, [] );
+	}, [ dispatcher ] );
 
-	return {
-		snapchatOrganization: {
-			id: '123-456-7890', // Example ID, replace with actual data fetching logic
-			name: 'Snapchat Organization',
+	return useSelect(
+		( select ) => {
+			const selector = select( STORE_KEY );
+			const organization = selector[ selectorName ]();
+
+			return {
+				id: organization?.id,
+				name: organization?.name,
+				status: organization?.status,
+				isConnected:
+					organization?.status ===
+					SNAPCHAT_ORGANIZATION_STATUS.CONNECTED,
+				refetchSnapchatOrganization,
+				hasFinishedResolution: selector.hasFinishedResolution(
+					selectorName,
+					[]
+				),
+			};
 		},
-		isReady: status === SNAPCHAT_ORGANIZATION_ACCOUNT_STATUS.CONNECTED,
-		hasFinishedResolution: true,
-	};
+		[ refetchSnapchatOrganization ]
+	);
 };
 
 export default useSnapchatOrganization;
