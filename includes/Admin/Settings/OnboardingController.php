@@ -38,8 +38,8 @@ class OnboardingController extends SettingsBaseController {
 	 * Registers REST API routes.
 	 *
 	 * Provides GET and POST methods for onboarding state:
-	 * - GET  /wp-json/wc/sfw/snapchat/onboarding/setup
-	 * - POST /wp-json/wc/sfw/snapchat/onboarding/setup
+	 * - GET  /wp-json/wc/sfw/snapchat/setup
+	 * - POST /wp-json/wc/sfw/snapchat/setup
 	 *
 	 * @since 0.1.0
 	 *
@@ -48,7 +48,7 @@ class OnboardingController extends SettingsBaseController {
 	public function register_routes(): void {
 		register_rest_route(
 			$this->namespace,
-			'/onboarding/setup',
+			'/setup',
 			array(
 				array(
 					'methods'             => 'GET',
