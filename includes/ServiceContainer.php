@@ -69,7 +69,7 @@ final class ServiceContainer {
 	private static function resolve( string $service ) {
 		switch ( $service ) {
 			case ServiceKey::SETTINGS_REST_CONTROLLER_SETUP:
-				return new Controllers\Setup();
+				return new Controllers\SetupService();
 			case ServiceKey::JETPACK_AUTHENTICATOR:
 				return new JetpackAuthenticator();
 			case ServiceKey::WCS_CLIENT:

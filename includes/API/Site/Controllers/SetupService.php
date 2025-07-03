@@ -24,7 +24,7 @@ use SnapchatForWooCommerce\Config;
  *
  * @since 0.1.0
  */
-class Setup {
+class SetupService {
 
 	/**
 	 * Registers all REST API routes used in the plugin settings.
@@ -33,7 +33,7 @@ class Setup {
 	 *
 	 * Example:
 	 * ```php
-	 * add_action( 'rest_api_init', array( new ControllerSetup(), 'register_routes' ) );
+	 * add_action( 'rest_api_init', array( new Setup(), 'register_routes' ) );
 	 * ```
 	 *
 	 * @since 0.1.0

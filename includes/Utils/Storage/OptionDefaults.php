@@ -132,8 +132,8 @@ final class OptionDefaults {
 	 */
 	public static function get_all(): array {
 		return array(
-			self::ONBOARDING_STATUS       => 'disconnected',
-			self::ONBOARDING_STEP         => 'setup',
+			self::ONBOARDING_STATUS       => 'incomplete',
+			self::ONBOARDING_STEP         => 'accounts',
 			self::IS_JETPACK_CONNECTED    => false,
 			self::WP_TOS_ACCEPTED         => false,
 			self::CONFIG_ID               => '',

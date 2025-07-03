@@ -34,13 +34,13 @@ final class Config {
 	 * The namespace used for all REST API endpoints exposed by this plugin.
 	 *
 	 * This value is appended to `/wp-json/` to form the full route base.
-	 * Example: `/wp-json/snapchat-comms/v1/track`
+	 * Example: `/wp-json/wc/sfw/snapchat/config`
 	 *
 	 * @since 0.1.0
 	 *
 	 * @todo: Change this to the actual WCS endpoint.
 	 */
-	const REST_NAMESPACE = 'snapchat-comms/v1';
+	const REST_NAMESPACE = 'wc/sfw';
 
 	/**
 	 * Prefix used for all WordPress storage keys managed by this plugin.
