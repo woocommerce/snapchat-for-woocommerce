@@ -94,10 +94,10 @@ class ProductExportService {
 	 *
 	 * @since 0.1.0
 	 *
-	 * @param CacheBuilderInterface             $cache_builder               Builds and caches exportable product IDs.
-	 * @param ExportableEntityProviderInterface $entity_provider  Provides paginated export entities from cache.
-	 * @param ExportRowBuilderInterface         $row_builder              Converts entities into formatted export rows.
-	 * @param ExportWriterInterface             $export_writer                Creates and writes the export file.
+	 * @param CacheBuilderInterface             $cache_builder   Builds and caches exportable product IDs.
+	 * @param ExportableEntityProviderInterface $entity_provider Provides paginated export entities from cache.
+	 * @param ExportRowBuilderInterface         $row_builder     Converts entities into formatted export rows.
+	 * @param ExportWriterInterface             $export_writer   Creates and writes the export file.
 	 */
 	public function __construct(
 		CacheBuilderInterface $cache_builder,
