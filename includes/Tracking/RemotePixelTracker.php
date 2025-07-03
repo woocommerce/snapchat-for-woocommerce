@@ -12,7 +12,6 @@
 namespace SnapchatForWooCommerce\Tracking;
 
 use SnapchatForWooCommerce\Connection\WcsClient;
-use SnapchatForWooCommerce\Connection\JetpackAuthenticator;
 use SnapchatForWooCommerce\Utils\Storage\Options;
 use SnapchatForWooCommerce\Utils\Storage\OptionDefaults;
 use SnapchatForWooCommerce\Utils\Storage\Transients;
@@ -52,21 +51,12 @@ final class RemotePixelTracker implements PixelTrackerInterface {
 	private WcsClient $wcs_client;
 
 	/**
-	 * Authenticator to generate secure headers for Snapchat API requests.
-	 *
-	 * @var JetpackAuthenticator
-	 */
-	private JetpackAuthenticator $auth;
-
-	/**
 	 * Constructor.
 	 *
-	 * @param WcsClient            $wcs_client WCS API client.
-	 * @param JetpackAuthenticator $auth       Authenticator for API access.
+	 * @param WcsClient $wcs_client WCS API client.
 	 */
-	public function __construct( WcsClient $wcs_client, JetpackAuthenticator $auth ) {
+	public function __construct( WcsClient $wcs_client ) {
 		$this->wcs_client = $wcs_client;
-		$this->auth       = $auth;
 	}
 
 	/**
@@ -160,20 +150,14 @@ final class RemotePixelTracker implements PixelTrackerInterface {
 			return self::personalize_tracking_script( $pixel_script );
 		}
 
-		$token = $this->auth->get_auth_header();
-
-		if ( is_wp_error( $token ) ) {
-			return null;
-		}
-
 		$pixel_id = Options::get( OptionDefaults::PIXEL_ID );
 
 		if ( empty( $pixel_id ) ) {
 			return null;
 		}
 
-		$path     = sprintf( '/v1/pixels/%s', $pixel_id );
-		$response = $this->wcs_client->proxy_get( $token, $path );
+		$path     = sprintf( '/ads/v1/pixels/%s', $pixel_id );
+		$response = $this->wcs_client->proxy_get( $path );
 
 		if ( is_wp_error( $response ) ) {
 			return null;
@@ -181,7 +165,7 @@ final class RemotePixelTracker implements PixelTrackerInterface {
 
 		$data = $response->get_data();
 
-		if ( ! $data ) {
+		if ( empty( $data ) ) {
 			return null;
 		}
 

@@ -26,6 +26,25 @@ namespace SnapchatForWooCommerce\Utils\Storage;
  */
 final class OptionDefaults {
 	/**
+	 * Option key for storing the current onboarding status.
+	 *
+	 * Can be values like 'disconnected', 'connected', or 'in_progress'.
+	 *
+	 * @since 0.1.0
+	 */
+	public const ONBOARDING_STATUS = 'onboarding_status';
+
+
+	/**
+	 * Option key for storing the current onboarding step.
+	 *
+	 * Represents the plugin setup progress step, e.g., 'setup', 'connect', 'configure'.
+	 *
+	 * @since 0.1.0
+	 */
+	public const ONBOARDING_STEP = 'onboarding_step';
+
+	/**
 	 * Option key for storing the status of Jetpack's connection.
 	 *
 	 * @since 0.1.0
@@ -41,26 +60,37 @@ final class OptionDefaults {
 	public const WP_TOS_ACCEPTED = 'wp_tos_accepted';
 
 	/**
-	 * Option key for the Ad Partner's Organizations
-	 * that include Ad Accounts.
+	 * Option key for storing the generated Snapchat config ID.
+	 *
+	 * This ID identifies configuration the merchant created for
+	 * their Snapchat Ads Account.
 	 *
 	 * @since 0.1.0
 	 */
-	public const ORGANIZATIONS = 'organizations';
+	public const CONFIG_ID = 'config_id';
 
 	/**
 	 * Option key for the Ad Partner ad account ID.
 	 *
 	 * @since 0.1.0
 	 */
-	public const AD_ACCOUNT_ID = 'ad_account_id';
+	public const ADS_ACCOUNT_ID = 'ad_account_id';
 
 	/**
-	 * Option key for the Ad Partner organization ID.
+	 * Option key for the Snapchat organization ID.
 	 *
 	 * @since 0.1.0
 	 */
 	public const ORGANIZATION_ID = 'organization_id';
+
+	/**
+	 * Option key for storing the name of the selected Snapchat organization.
+	 *
+	 * Stored locally after fetching the organization from the Snapchat API.
+	 *
+	 * @since 0.1.0
+	 */
+	public const ORGANIZATION_NAME = 'organization_name';
 
 	/**
 	 * Option key that toggles whether pixel tracking is enabled.
@@ -68,12 +98,6 @@ final class OptionDefaults {
 	 * @since 0.1.0
 	 */
 	public const PIXEL_ENABLED = 'ads_pixel_enabled';
-
-	/**
-	 * Option key used to store array of pixels accound data
-	 * under the current selection of `AD_ACCOUNT_ID`.
-	 */
-	public const PIXELS = 'pixels';
 
 	/**
 	 * Option key for the Ad Partner's Pixel ID.
@@ -108,13 +132,15 @@ final class OptionDefaults {
 	 */
 	public static function get_all(): array {
 		return array(
+			self::ONBOARDING_STATUS       => 'incomplete',
+			self::ONBOARDING_STEP         => 'accounts',
 			self::IS_JETPACK_CONNECTED    => false,
 			self::WP_TOS_ACCEPTED         => false,
-			self::ORGANIZATIONS           => array(),
-			self::AD_ACCOUNT_ID           => '',
+			self::CONFIG_ID               => '',
+			self::ADS_ACCOUNT_ID          => '',
 			self::ORGANIZATION_ID         => '',
+			self::ORGANIZATION_NAME       => '',
 			self::PIXEL_ENABLED           => false,
-			self::PIXELS                  => array(),
 			self::PIXEL_ID                => '',
 			self::CONVERSIONS_ENABLED     => false,
 			self::CONVERSION_ACCESS_TOKEN => '',

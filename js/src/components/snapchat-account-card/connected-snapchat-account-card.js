@@ -1,37 +1,31 @@
 /**
  * Internal dependencies
  */
+import { SNAPCHAT_DESCRIPTION } from './constants';
+import SwitchAccountButton from './switch-account-button';
 import AccountCard, { APPEARANCE } from '~/components/account-card';
 import ConnectedIconLabel from '~/components/connected-icon-label';
-import Section from '~/components/section';
-import SwitchAccountButton from './switch-account-button';
 
-/**
- * Renders a Snapchat account card UI with connected account information.
- * It also provides a switch button that lets user connect with another Snapchat account.
- *
- * @param {Object} props React props.
- * @param {{ email: string }} props.snapchatAccount A data payload object containing the user's Snapchat account email.
- * @param {JSX.Element} [props.helper] Helper content below the Snapchat account email.
- * @param {boolean} [props.hideAccountSwitch=false] Indicate whether hide the account switch block at the card footer.
- */
 const ConnectedSnapchatAccountCard = ( {
-	snapchatAccount,
-	helper,
+	organizationName,
 	hideAccountSwitch = false,
+	children,
 } ) => {
+	const getCardActions = () => {
+		if ( hideAccountSwitch ) {
+			return null;
+		}
+		return <SwitchAccountButton isTertiary />;
+	};
+
 	return (
 		<AccountCard
 			appearance={ APPEARANCE.SNAPCHAT }
-			description={ snapchatAccount.email }
-			helper={ helper }
+			description={ organizationName || SNAPCHAT_DESCRIPTION }
 			indicator={ <ConnectedIconLabel /> }
+			actions={ getCardActions() }
 		>
-			{ ! hideAccountSwitch && (
-				<Section.Card.Footer>
-					<SwitchAccountButton />
-				</Section.Card.Footer>
-			) }
+			{ children }
 		</AccountCard>
 	);
 };

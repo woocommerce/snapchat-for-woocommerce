@@ -1,30 +1,31 @@
 /**
+ * External dependencies
+ */
+import { getQuery } from '@woocommerce/navigation';
+
+/**
  * Internal dependencies
  */
 import useSnapchatAccount from '~/hooks/useSnapchatAccount';
-import AppSpinner from '~/components/app-spinner';
-import AccountCard from '~/components/account-card';
 import ConnectedSnapchatAccountCard from './connected-snapchat-account-card';
 import ConnectSnapchatAccountCard from './connect-snapchat-account-card';
 
-/**
- * Renders a card to connect, request full access, or display a connected Snapchat account.
- *
- * Please note that this component is only used on the Reconnection page.
- * For the onboarding flow, the `SnapchatComboAccountCard` component is used instead.
- */
-export default function SnapchatAccountCard() {
-	const { snapchat, scope, hasFinishedResolution } = useSnapchatAccount();
+const SnapchatAccountCard = ( { disabled = false } ) => {
+	const { isConnected } = useSnapchatAccount();
+	const { state: stateQuery } = getQuery();
+	const stateQueryParams = new URLSearchParams( stateQuery );
+	const configId = stateQueryParams.get( 'config_id' );
 
-	if ( ! hasFinishedResolution ) {
-		return <AccountCard description={ <AppSpinner /> } />;
+	if ( isConnected ) {
+		return <ConnectedSnapchatAccountCard />;
 	}
 
-	const isConnected = snapchat?.active === 'yes';
+	return (
+		<ConnectSnapchatAccountCard
+			disabled={ disabled }
+			configId={ configId }
+		/>
+	);
+};
 
-	if ( isConnected && scope.reconnectionRequired ) {
-		return <ConnectedSnapchatAccountCard snapchatAccount={ snapchat } />;
-	}
-
-	return <ConnectSnapchatAccountCard />;
-}
+export default SnapchatAccountCard;

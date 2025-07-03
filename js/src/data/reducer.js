@@ -11,24 +11,16 @@ import TYPES from './action-types';
 const DEFAULT_STATE = {
 	general: {
 		version: null,
-		id: null,
-		adsId: null,
-		organizationId: null,
 	},
 	setup: {
 		status: 'incomplete',
 		step: 'accounts',
 	},
 	accounts: {
-		jetpack: {
-			active: 'no',
-			owner: 'no',
-			email: 'asvin.balloo@10up.com',
-			displayName: 'Asvin Balloo',
-		},
-		snapchat: {},
-		ads: {},
-		organization: {},
+		jetpack: null,
+		snapchat: null,
+		ads: null,
+		organization: null,
 	},
 };
 
@@ -114,7 +106,48 @@ function setIn( state, path, value ) {
 }
 
 const reducer = ( state = DEFAULT_STATE, action ) => {
-	return state;
+	switch ( action.type ) {
+		case TYPES.RECEIVE_ACCOUNTS_JETPACK: {
+			const { account } = action;
+
+			return setIn( state, 'accounts.jetpack', account );
+		}
+
+		case TYPES.RECEIVE_SNAPCHAT_ADS_ACCOUNT: {
+			const { snapchatAdsAccount } = action;
+
+			return setIn( state, 'accounts.ads', snapchatAdsAccount );
+		}
+
+		case TYPES.RECEIVE_SNAPCHAT_ORGANIZATION: {
+			const { snapchatOrganization } = action;
+
+			return setIn(
+				state,
+				'accounts.organization',
+				snapchatOrganization
+			);
+		}
+
+		case TYPES.RECEIVE_SNAPCHAT_ACCOUNT: {
+			const { snapchatAccount } = action;
+
+			return setIn( state, 'accounts.snapchat', snapchatAccount );
+		}
+
+		case TYPES.DISCONNECT_ACCOUNTS_SNAPCHAT: {
+			return setIn(
+				state,
+				'accounts.snapchat',
+				DEFAULT_STATE.accounts.snapchat
+			);
+		}
+
+		// Page will be reloaded after all accounts have been disconnected, so no need to mutate state.
+		case TYPES.DISCONNECT_ACCOUNTS_ALL:
+		default:
+			return state;
+	}
 };
 
 export default reducer;

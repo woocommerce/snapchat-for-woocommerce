@@ -6,12 +6,17 @@ export const API_RESPONSE_CODES = {
 	SNAPCHAT_DISCONNECTED: 'SNAPCHAT_DISCONNECTED',
 };
 
+export const SNAPCHAT_ACCOUNT_STATUS = {
+	CONNECTED: 'connected',
+	DISCONNECTED: 'disconnected',
+};
+
 export const SNAPCHAT_ADS_ACCOUNT_STATUS = {
 	CONNECTED: 'connected',
 	DISCONNECTED: 'disconnected',
 };
 
-export const SNAPCHAT_ORGANIZATION_ACCOUNT_STATUS = {
+export const SNAPCHAT_ORGANIZATION_STATUS = {
 	CONNECTED: 'connected',
 	DISCONNECTED: 'disconnected',
 };
