@@ -2,10 +2,10 @@
 /**
  * Integration test for SnapchatOrganizationsController using real REST API call (mocked via pre_http_request).
  *
- * @package SnapchatForWooCommerce\Tests\Integration\Admin\Settings
+ * @package SnapchatForWooCommerce\Tests\Integration\API\Controllers
  */
 
-namespace SnapchatForWooCommerce\Tests\Integration\Admin\Settings;
+namespace SnapchatForWooCommerce\Tests\Integration\API\Controllers;
 
 use WP_UnitTestCase;
 use WP_REST_Request;
@@ -66,6 +66,7 @@ class SnapchatBusinessExtensionControllerTest extends WP_UnitTestCase {
 		Options::delete( OptionDefaults::ADS_ACCOUNT_ID );
 		Options::delete( OptionDefaults::PIXEL_ID );
 		Transients::delete( TransientDefaults::PIXEL_SCRIPT );
+		Options::delete( OptionDefaults::ONBOARDING_STATUS );
 
 		add_filter( Helper::with_prefix( 'jetpack_auth_token' ), fn() => 'abc123' );
 
@@ -166,6 +167,7 @@ class SnapchatBusinessExtensionControllerTest extends WP_UnitTestCase {
 		$this->assertSame( $this->options['ads_account_id'], Options::get( OptionDefaults::ADS_ACCOUNT_ID ) );
 		$this->assertSame( $this->options['pixel_id'], Options::get( OptionDefaults::PIXEL_ID ) );
 		$this->assertSame( '', Transients::get( TransientDefaults::PIXEL_SCRIPT ) );
+		$this->assertSame( 'complete', Options::get( OptionDefaults::ONBOARDING_STATUS ) );
 	}
 }
 

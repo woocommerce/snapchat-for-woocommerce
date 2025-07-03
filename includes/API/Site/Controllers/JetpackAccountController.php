@@ -6,18 +6,17 @@
  * Jetpack (WordPress.com) connection status. It supports routing merchants
  * to appropriate authorization URLs and stores consent state in WordPress options.
  *
- * @package SnapchatForWooCommerce\Admin\Settings
+ * @package SnapchatForWooCommerce\API\Site\Controllers
  */
 
-namespace SnapchatForWooCommerce\Admin\Settings;
+namespace SnapchatForWooCommerce\API\Site\Controllers;
 
+use SnapchatForWooCommerce\Config;
 use Automattic\Jetpack\Connection\Manager;
 use SnapchatForWooCommerce\Connection\WcsClient;
-use SnapchatForWooCommerce\Connection\JetpackAuthenticator;
 use SnapchatForWooCommerce\Utils\Storage\Options;
 use SnapchatForWooCommerce\Utils\Storage\OptionDefaults;
 use WP_REST_Request as Request;
-use WP_REST_Response as Response;
 
 /**
  * Controller for the Jetpack connection REST endpoints.
@@ -64,9 +63,8 @@ class JetpackAccountController extends SettingsBaseController {
 	 * @param Manager   $manager Jetpack connection manager.
 	 */
 	public function __construct( WcsClient $wcs, Manager $manager ) {
-		$this->wcs       = $wcs;
-		$this->manager   = $manager;
-		$this->namespace = 'wc/sfw/jetpack';
+		$this->wcs     = $wcs;
+		$this->manager = $manager;
 	}
 
 	/**
@@ -74,7 +72,7 @@ class JetpackAccountController extends SettingsBaseController {
 	 */
 	public function register_routes(): void {
 		register_rest_route(
-			$this->namespace,
+			Config::REST_NAMESPACE . '/jetpack',
 			'/connect',
 			array(
 				array(
@@ -93,7 +91,7 @@ class JetpackAccountController extends SettingsBaseController {
 		);
 
 		register_rest_route(
-			$this->namespace,
+			Config::REST_NAMESPACE . '/jetpack',
 			'/connected',
 			array(
 				array(

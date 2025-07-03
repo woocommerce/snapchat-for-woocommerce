@@ -9,12 +9,13 @@
  * via the WooCommerce Connect Server (WCS) and stores relevant selections
  * in the local WordPress options.
  *
- * @package SnapchatForWooCommerce\Admin\Settings
+ * @package SnapchatForWooCommerce\API\Site\Controllers
  */
 
-namespace SnapchatForWooCommerce\Admin\Settings;
+namespace SnapchatForWooCommerce\API\Site\Controllers;
 
 use WP_REST_Response;
+use SnapchatForWooCommerce\Config;
 use SnapchatForWooCommerce\Connection\WcsClient;
 use SnapchatForWooCommerce\Utils\Storage\Options;
 use SnapchatForWooCommerce\Utils\Storage\OptionDefaults;
@@ -41,8 +42,7 @@ class SnapchatOrganizationsController extends SettingsBaseController {
 	 * @param WcsClient $wcs WCS proxy request client.
 	 */
 	public function __construct( WcsClient $wcs ) {
-		$this->namespace = 'wc/sfw/snapchat';
-		$this->wcs       = $wcs;
+		$this->wcs = $wcs;
 	}
 
 	/**
@@ -54,12 +54,12 @@ class SnapchatOrganizationsController extends SettingsBaseController {
 	 */
 	public function register_routes(): void {
 		/**
-		 * GET /wp-json/wc/sfw/snapchat/organization
+		 * GET /organization
 		 * - Returns an array of OptionDefaults::ORGANIZATION_ID
 		 *   and OptionDefaults::ORGANIZATION_NAME
 		 */
 		register_rest_route(
-			$this->namespace,
+			Config::REST_NAMESPACE . '/snapchat',
 			'/organization',
 			array(
 				array(

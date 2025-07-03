@@ -10,13 +10,14 @@
  * - GET    /connection  – Check current Snapchat connection status.
  * - DELETE /connection  – Disconnect the Snapchat account.
  *
- * @package SnapchatForWooCommerce\Admin\Settings
+ * @package SnapchatForWooCommerce\API\Site\Controllers
  */
 
-namespace SnapchatForWooCommerce\Admin\Settings;
+namespace SnapchatForWooCommerce\API\Site\Controllers;
 
 use WP_REST_Response;
 use WP_Error;
+use SnapchatForWooCommerce\Config;
 use SnapchatForWooCommerce\Connection\WcsClient;
 use SnapchatForWooCommerce\Utils\Storage\Options;
 use SnapchatForWooCommerce\Utils\Storage\OptionDefaults;
@@ -43,8 +44,7 @@ class SnapchatBusinessExtensionController extends SettingsBaseController {
 	 * @param WcsClient $wcs WCS proxy request client.
 	 */
 	public function __construct( WcsClient $wcs ) {
-		$this->wcs       = $wcs;
-		$this->namespace = 'wc/sfw/snapchat';
+		$this->wcs = $wcs;
 	}
 
 	/**
@@ -52,7 +52,7 @@ class SnapchatBusinessExtensionController extends SettingsBaseController {
 	 */
 	public function register_routes(): void {
 		register_rest_route(
-			$this->namespace,
+			Config::REST_NAMESPACE . '/snapchat',
 			'connect',
 			array(
 				'methods'             => 'GET',
@@ -62,7 +62,7 @@ class SnapchatBusinessExtensionController extends SettingsBaseController {
 		);
 
 		register_rest_route(
-			$this->namespace,
+			Config::REST_NAMESPACE . '/snapchat',
 			'connection',
 			array(
 				array(
@@ -79,7 +79,7 @@ class SnapchatBusinessExtensionController extends SettingsBaseController {
 		);
 
 		register_rest_route(
-			$this->namespace,
+			Config::REST_NAMESPACE . '/snapchat',
 			'config',
 			array(
 				array(
@@ -185,6 +185,8 @@ class SnapchatBusinessExtensionController extends SettingsBaseController {
 		if ( $client_data['capi_token'] ) {
 			Options::set( OptionDefaults::CONVERSION_ACCESS_TOKEN, $client_data['capi_token'] );
 		}
+
+		Options::set( OptionDefaults::ONBOARDING_STATUS, 'complete' );
 
 		return rest_ensure_response( ( array( 'id' => $config_id ) ) );
 	}
