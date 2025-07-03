@@ -3,7 +3,7 @@
 	"apiVersion": 3,
 	"name": "woocommerce/snapchat-for-woocommerce",
 	"version": "0.1.0",
-	"title": "Snapchat For Woocommerce",
+	"title": "Snapchat for WooCommerce",
 	"category": "widgets",
 	"textdomain": "snapchat-for-woocommerce",
 	"editorScript": "file:./build/index.js",

@@ -51,7 +51,7 @@ wp-env run tests-cli wp wc product create --user=1 \
   --type="simple" \
   --regular_price="10"
 
-wp-env run tests-cli wp wc product create --user=1 \
+PRODUCT_ID=$(wp-env run tests-cli wp wc product create --user=1 \
   --type=variable \
   --name="Variable Product One" \
   --slug="variable-product-one" \
@@ -64,7 +64,7 @@ wp-env run tests-cli wp wc product create --user=1 \
       "options": ["Red", "Blue", "Green"]
     }
   ]' \
-  --porcelain
+  --porcelain)
 
 wp-env run tests-cli wp wc product_variation create $PRODUCT_ID --user=1 \
   --regular_price=12 \

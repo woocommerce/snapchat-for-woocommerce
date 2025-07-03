@@ -3,7 +3,8 @@
 	"core": null,
 	"plugins": [
 		"https://downloads.wordpress.org/plugin/woocommerce.zip",
-		"."
+		".",
+		"./tests/e2e/plugins/snapchat-options.php"
 	],
 	"themes": [
 		"https://downloads.wordpress.org/theme/storefront.zip"
