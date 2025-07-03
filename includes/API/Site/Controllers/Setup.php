@@ -7,10 +7,10 @@
  *
  * Controllers are instantiated with their required dependencies here and hooked into the REST API lifecycle.
  *
- * @package SnapchatForWooCommerce\Admin\Settings
+ * @package SnapchatForWooCommerce\API\Site\Controllers
  */
 
-namespace SnapchatForWooCommerce\Admin\Settings;
+namespace SnapchatForWooCommerce\API\Site\Controllers;
 
 use Automattic\Jetpack\Connection\Manager;
 use SnapchatForWooCommerce\ServiceContainer;
@@ -24,7 +24,7 @@ use SnapchatForWooCommerce\Config;
  *
  * @since 0.1.0
  */
-class ControllerSetup {
+class Setup {
 
 	/**
 	 * Registers all REST API routes used in the plugin settings.

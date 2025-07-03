@@ -10,10 +10,10 @@
  * - GET    /connection  – Check current Snapchat connection status.
  * - DELETE /connection  – Disconnect the Snapchat account.
  *
- * @package SnapchatForWooCommerce\Admin\Settings
+ * @package SnapchatForWooCommerce\API\Site\Controllers
  */
 
-namespace SnapchatForWooCommerce\Admin\Settings;
+namespace SnapchatForWooCommerce\API\Site\Controllers;
 
 use WP_REST_Response;
 use WP_Error;
