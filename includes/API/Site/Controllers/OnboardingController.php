@@ -8,10 +8,10 @@
  *
  * Onboarding data is stored locally in WordPress options.
  *
- * @package SnapchatForWooCommerce\Admin\Settings
+ * @package SnapchatForWooCommerce\API\Site\Controllers
  */
 
-namespace SnapchatForWooCommerce\Admin\Settings;
+namespace SnapchatForWooCommerce\API\Site\Controllers;
 
 use WP_REST_Response;
 use WP_REST_Request;

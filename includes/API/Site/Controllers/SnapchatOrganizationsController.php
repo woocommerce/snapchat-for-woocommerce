@@ -9,10 +9,10 @@
  * via the WooCommerce Connect Server (WCS) and stores relevant selections
  * in the local WordPress options.
  *
- * @package SnapchatForWooCommerce\Admin\Settings
+ * @package SnapchatForWooCommerce\API\Site\Controllers
  */
 
-namespace SnapchatForWooCommerce\Admin\Settings;
+namespace SnapchatForWooCommerce\API\Site\Controllers;
 
 use WP_REST_Response;
 use SnapchatForWooCommerce\Connection\WcsClient;

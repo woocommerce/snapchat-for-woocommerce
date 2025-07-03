@@ -2,10 +2,10 @@
 /**
  * Integration test for SnapchatOrganizationsController using real REST API call (mocked via pre_http_request).
  *
- * @package SnapchatForWooCommerce\Tests\Integration\Admin\Settings
+ * @package SnapchatForWooCommerce\Tests\Integration\API\Controllers
  */
 
-namespace SnapchatForWooCommerce\Tests\Integration\Admin\Settings;
+namespace SnapchatForWooCommerce\Tests\Integration\API\Controllers;
 
 use WP_UnitTestCase;
 use WP_REST_Request;

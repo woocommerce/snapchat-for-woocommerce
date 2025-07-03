@@ -6,10 +6,10 @@
  * Jetpack (WordPress.com) connection status. It supports routing merchants
  * to appropriate authorization URLs and stores consent state in WordPress options.
  *
- * @package SnapchatForWooCommerce\Admin\Settings
+ * @package SnapchatForWooCommerce\API\Site\Controllers
  */
 
-namespace SnapchatForWooCommerce\Admin\Settings;
+namespace SnapchatForWooCommerce\API\Site\Controllers;
 
 use Automattic\Jetpack\Connection\Manager;
 use SnapchatForWooCommerce\Connection\WcsClient;

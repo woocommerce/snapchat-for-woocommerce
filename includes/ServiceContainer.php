@@ -10,14 +10,13 @@
 
 namespace SnapchatForWooCommerce;
 
-use SnapchatForWooCommerce\Connection\ConnectionService;
 use SnapchatForWooCommerce\Connection\JetpackAuthenticator;
 use SnapchatForWooCommerce\Connection\WcsClient;
 use SnapchatForWooCommerce\Tracking\PixelTrackingService;
 use SnapchatForWooCommerce\Tracking\RemotePixelTracker;
 use SnapchatForWooCommerce\Tracking\ConversionTrackingService;
 use SnapchatForWooCommerce\Tracking\RemoteConversionTracker;
-use SnapchatForWooCommerce\Admin\Settings;
+use SnapchatForWooCommerce\API\Site\Controllers;
 
 /**
  * Static service container for resolving shared instances across the Ad Partner plugin.
@@ -70,7 +69,7 @@ final class ServiceContainer {
 	private static function resolve( string $service ) {
 		switch ( $service ) {
 			case ServiceKey::SETTINGS_REST_CONTROLLER_SETUP:
-				return new Settings\ControllerSetup();
+				return new Controllers\Setup();
 			case ServiceKey::JETPACK_AUTHENTICATOR:
 				return new JetpackAuthenticator();
 			case ServiceKey::WCS_CLIENT:
