@@ -8,10 +8,6 @@ const PLUGINS_PAGE_URL = '/wp-admin/plugins.php';
 test.describe( 'Snapchat for WooCommerce', () => {
 	test.use( { storageState: process.env.ADMINSTATE } );
 
-	test.beforeAll( 'Restore Defaults', async ( { browser } ) => {
-		const page = await browser.newPage( { storageState: process.env.ADMINSTATE } );
-	} );
-
 	test( 'Woo Dependency', async ( { page } ) => {
 		await page.goto( PLUGINS_PAGE_URL );
 
