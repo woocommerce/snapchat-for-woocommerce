@@ -76,7 +76,8 @@ final class ServiceContainer {
 				return new Connection\JetpackAuthenticator();
 			case ServiceKey::WCS_CLIENT:
 				return new WcsClient(
-					self::get( ServiceKey::JETPACK_AUTHENTICATOR )
+					self::get( ServiceKey::JETPACK_AUTHENTICATOR ),
+					new Connection\JetpackClient()
 				);
 			case ServiceKey::PIXEL_TRACKING:
 				return new PixelTrackingService(
