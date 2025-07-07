@@ -12,6 +12,7 @@ namespace SnapchatForWooCommerce\Connection;
 
 use WP_REST_Response;
 use WP_Error;
+use Jetpack_Options;
 use SnapchatForWooCommerce\Utils\Helper;
 
 /**
@@ -100,7 +101,10 @@ final class WcsClient {
 		 */
 		return apply_filters(
 			Helper::with_prefix( 'wcs_base_url' ),
-			'https://api.woocommerce.com'
+			sprintf(
+				'https://public-api.wordpress.com/wpcom/v2/sites/%s/wc',
+				Jetpack_Options::get_option( 'id' )
+			)
 		);
 	}
 
