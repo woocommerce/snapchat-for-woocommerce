@@ -13,6 +13,7 @@ namespace SnapchatForWooCommerce\Connection;
 use WP_REST_Response;
 use WP_Error;
 use Jetpack_Options;
+use Automattic\Jetpack\Connection\Client;
 use SnapchatForWooCommerce\Utils\Helper;
 
 /**
@@ -175,7 +176,12 @@ final class WcsClient {
 			$args['body']                    = wp_json_encode( $body );
 		}
 
-		$response = wp_remote_request( $url, $args );
+		$response = Client::remote_request(
+			array_merge(
+				$args,
+				array( 'url' => $url )
+			)
+		);
 
 		return $this->handle_response( $response );
 	}

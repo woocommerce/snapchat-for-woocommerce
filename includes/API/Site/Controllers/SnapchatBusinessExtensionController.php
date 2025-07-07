@@ -120,7 +120,7 @@ class SnapchatBusinessExtensionController extends SettingsBaseController {
 	 * @return WP_REST_Response|WP_Error Connection initiation response or error.
 	 */
 	public function start_connection( string $return_url ) {
-		return $this->wcs->proxy_get( 'connection/connect', array( 'returnUrl' => $return_url ) );
+		return $this->wcs->proxy_get( 'connection/connect', array( 'return_url' => $return_url ) );
 	}
 
 	/**
@@ -212,7 +212,7 @@ class SnapchatBusinessExtensionController extends SettingsBaseController {
 
 		$data = $response->get_data();
 
-		if ( empty( $data['oauthUrl'] ) ) {
+		if ( empty( $data['oauth_url'] ) ) {
 			return rest_ensure_response(
 				array(
 					'status'  => 'error',
@@ -222,7 +222,7 @@ class SnapchatBusinessExtensionController extends SettingsBaseController {
 		}
 
 		return rest_ensure_response(
-			array( 'url' => esc_url_raw( $data['oauthUrl'] ) )
+			array( 'url' => esc_url_raw( $data['oauth_url'] ) )
 		);
 	}
 
