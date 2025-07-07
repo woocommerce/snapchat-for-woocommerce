@@ -98,7 +98,6 @@ class RemoteConversionTrackerTest extends WP_UnitTestCase {
 		$this->client->expects( $this->once() )
 			->method( 'proxy_post' )
 			->with(
-				'',
 				$this->callback( fn( $path ) => str_starts_with( $path, 'pixel_456/events?access_token=token_abc' ) ),
 				$this->callback(
 					function ( $payload ) {
@@ -106,8 +105,7 @@ class RemoteConversionTrackerTest extends WP_UnitTestCase {
 						&& $payload['data'][0]['user_data']['client_ip_address'] === '203.0.113.55'
 						&& $payload['data'][0]['user_data']['client_user_agent'] === 'PHPUnitTestRunner';
 					}
-				),
-				'conversions'
+				)
 			);
 
 		$this->tracker->send(
