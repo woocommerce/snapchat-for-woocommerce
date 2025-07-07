@@ -276,8 +276,8 @@ class SnapchatBusinessExtensionController extends RESTBaseController {
 		$data         = $response->get_data();
 		$oauth_status = '';
 
-		if ( $data['success'] && 'disconnected' === $data['success'] ) {
-			$oauth_status = $data['success'];
+		if ( $data['status'] && 'disconnected' === $data['status'] ) {
+			$oauth_status = $data['status'];
 		}
 
 		$config_id = Options::get( OptionDefaults::CONFIG_ID );
