@@ -23,7 +23,7 @@ use WP_REST_Request as Request;
  *
  * @since 0.1.0
  */
-class JetpackAccountController extends SettingsBaseController {
+class JetpackAccountController extends RESTBaseController {
 
 	/**
 	 * WCS proxy request client.

@@ -13,7 +13,6 @@
 namespace SnapchatForWooCommerce\API\Site\Controllers;
 
 use WC_REST_Controller;
-use SnapchatForWooCommerce\Config;
 use SnapchatForWooCommerce\API\AdminPermissionsTrait;
 
 /**
@@ -24,6 +23,6 @@ use SnapchatForWooCommerce\API\AdminPermissionsTrait;
  *
  * @since 0.1.0
  */
-class SettingsBaseController extends WC_REST_Controller {
+class RESTBaseController extends WC_REST_Controller {
 	use AdminPermissionsTrait;
 }

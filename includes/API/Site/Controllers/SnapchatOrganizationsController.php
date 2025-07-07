@@ -25,7 +25,7 @@ use SnapchatForWooCommerce\Utils\Storage\OptionDefaults;
  *
  * @since 0.1.0
  */
-class SnapchatOrganizationsController extends SettingsBaseController {
+class SnapchatOrganizationsController extends RESTBaseController {
 
 	/**
 	 * WCS proxy request client.

@@ -29,7 +29,7 @@ use SnapchatForWooCommerce\Utils\Storage\TransientDefaults;
  *
  * @since 0.1.0
  */
-class SnapchatBusinessExtensionController extends SettingsBaseController {
+class SnapchatBusinessExtensionController extends RESTBaseController {
 
 	/**
 	 * WCS proxy request client.
