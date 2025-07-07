@@ -13,7 +13,7 @@ namespace SnapchatForWooCommerce;
 use SnapchatForWooCommerce\Connection\WcsClient;
 use SnapchatForWooCommerce\Tracking\PixelTrackingService;
 use SnapchatForWooCommerce\Tracking\RemotePixelTracker;
-use SnapchatForWooCommerce\API\Site\Controllers;
+use SnapchatForWooCommerce\API;
 use SnapchatForWooCommerce\Connection;
 use SnapchatForWooCommerce\Tracking;
 use SnapchatForWooCommerce\Admin;
@@ -71,7 +71,7 @@ final class ServiceContainer {
 	private static function resolve( string $service ) {
 		switch ( $service ) {
 			case ServiceKey::SETTINGS_REST_CONTROLLER_SETUP:
-				return new Controllers\SetupService();
+				return new API\SetupService();
 			case ServiceKey::JETPACK_AUTHENTICATOR:
 				return new Connection\JetpackAuthenticator();
 			case ServiceKey::WCS_CLIENT:
