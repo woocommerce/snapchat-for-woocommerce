@@ -31,15 +31,24 @@ final class WcsClient {
 	 *
 	 * @var JetpackAuthenticator
 	 */
-	private $authenticator;
+	private JetpackAuthenticator $authenticator;
+
+	/**
+	 * Jetpack client wrapper.
+	 *
+	 * @var JetpackClient
+	 */
+	private JetpackClient $jetpack_client;
 
 	/**
 	 * Class construnctor.
 	 *
-	 * @param JetpackAuthenticator $authenticator Authenticator for API access.
+	 * @param JetpackAuthenticator $authenticator  Authenticator for API access.
+	 * @param JetpackClient        $jetpack_client Jetpack client wrapper.
 	 */
-	public function __construct( JetpackAuthenticator $authenticator ) {
-		$this->authenticator = $authenticator;
+	public function __construct( JetpackAuthenticator $authenticator, JetpackClient $jetpack_client ) {
+		$this->authenticator  = $authenticator;
+		$this->jetpack_client = $jetpack_client;
 	}
 
 	/**
@@ -175,7 +184,12 @@ final class WcsClient {
 			$args['body']                    = wp_json_encode( $body );
 		}
 
-		$response = wp_remote_request( $url, $args );
+		$response = $this->jetpack_client->remote_request(
+			array_merge(
+				$args,
+				array( 'url' => $url )
+			)
+		);
 
 		return $this->handle_response( $response );
 	}

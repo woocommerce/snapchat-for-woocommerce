@@ -24,7 +24,7 @@ use SnapchatForWooCommerce\Utils\Storage\OptionDefaults;
  *
  * @since 0.1.0
  */
-class OnboardingController extends SettingsBaseController {
+class OnboardingController extends RESTBaseController {
 	/**
 	 * Registers REST API routes.
 	 *
