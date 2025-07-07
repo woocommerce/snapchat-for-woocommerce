@@ -10,7 +10,10 @@
 
 namespace SnapchatForWooCommerce;
 
-use SnapchatForWooCommerce\Connection\ConnectionService;
+use SnapchatForWooCommerce\Connection\WcsClient;
+use SnapchatForWooCommerce\Tracking\PixelTrackingService;
+use SnapchatForWooCommerce\Tracking\RemotePixelTracker;
+use SnapchatForWooCommerce\API;
 use SnapchatForWooCommerce\Connection;
 use SnapchatForWooCommerce\Tracking;
 use SnapchatForWooCommerce\Admin;
@@ -67,21 +70,19 @@ final class ServiceContainer {
 	 */
 	private static function resolve( string $service ) {
 		switch ( $service ) {
-			case ServiceKey::CONNECTION:
-				return new ConnectionService(
-					self::get( ServiceKey::WCS_CLIENT ),
-					self::get( ServiceKey::JETPACK_AUTHENTICATOR ),
-					Config::REST_NAMESPACE
-				);
+			case ServiceKey::SETTINGS_REST_CONTROLLER_SETUP:
+				return new API\SetupService();
 			case ServiceKey::JETPACK_AUTHENTICATOR:
 				return new Connection\JetpackAuthenticator();
 			case ServiceKey::WCS_CLIENT:
-				return new Connection\WcsClient();
+				return new WcsClient(
+					self::get( ServiceKey::JETPACK_AUTHENTICATOR ),
+					new Connection\JetpackClient()
+				);
 			case ServiceKey::PIXEL_TRACKING:
-				return new Tracking\PixelTrackingService(
-					new Tracking\RemotePixelTracker(
-						self::get( ServiceKey::WCS_CLIENT ),
-						self::get( ServiceKey::JETPACK_AUTHENTICATOR )
+				return new PixelTrackingService(
+					new RemotePixelTracker(
+						self::get( ServiceKey::WCS_CLIENT )
 					)
 				);
 			case ServiceKey::CONVERSION_TRACKING:

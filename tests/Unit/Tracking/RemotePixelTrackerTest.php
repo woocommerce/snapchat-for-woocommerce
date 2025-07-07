@@ -34,13 +34,13 @@ class RemotePixelTrackerTest extends WP_UnitTestCase {
 		Transients::set( TransientDefaults::PIXEL_SCRIPT, '<script src="https://sc-static.net/scevent.min.js"></script>' );
 
 		// Provide a dummy ad account ID for API path construction.
-		Options::set( OptionDefaults::AD_ACCOUNT_ID, 'fake-account-id' );
+		Options::set( OptionDefaults::ADS_ACCOUNT_ID, 'fake-account-id' );
 	}
 
 	public function tear_down(): void {
 		Options::delete( OptionDefaults::PIXEL_ENABLED );
 		Transients::delete( TransientDefaults::PIXEL_SCRIPT );
-		Options::delete( OptionDefaults::AD_ACCOUNT_ID );
+		Options::delete( OptionDefaults::ADS_ACCOUNT_ID );
 
 		parent::tear_down();
 	}
@@ -52,9 +52,8 @@ class RemotePixelTrackerTest extends WP_UnitTestCase {
 		Options::set( OptionDefaults::PIXEL_ENABLED, true );
 		Transients::set( TransientDefaults::PIXEL_SCRIPT, '<script src="https://sc-static.net/scevent.min.js"></script>' );
 
-		$auth    = $this->createMock( JetpackAuthenticator::class );
 		$wcs     = $this->createMock( WcsClient::class );
-		$tracker = new RemotePixelTracker( $wcs, $auth );
+		$tracker = new RemotePixelTracker( $wcs );
 
 		ob_start();
 		$tracker->maybe_inject_pixel();
@@ -70,10 +69,8 @@ class RemotePixelTrackerTest extends WP_UnitTestCase {
 	 * It also asserts that the fetched script is cached for future use.
 	 */
 	public function test_pixel_script_fetched_from_wcs_and_cached() {
+		Options::set( OptionDefaults::PIXEL_ID, 'snap-pixel-12345' );
 		Transients::delete( TransientDefaults::PIXEL_SCRIPT );
-
-		$auth_mock = $this->createMock( JetpackAuthenticator::class );
-		$auth_mock->method( 'get_auth_header' )->willReturn( 'Bearer token' );
 
 		$response_mock = $this->createMock( \WP_REST_Response::class );
 		$response_mock->method( 'get_data' )->willReturn(
@@ -87,7 +84,7 @@ class RemotePixelTrackerTest extends WP_UnitTestCase {
 		$client_mock = $this->createMock( WcsClient::class );
 		$client_mock->method( 'proxy_get' )->willReturn( $response_mock );
 
-		$tracker = new RemotePixelTracker( $client_mock, $auth_mock );
+		$tracker = new RemotePixelTracker( $client_mock );
 
 		ob_start();
 		$tracker->maybe_inject_pixel();
@@ -102,12 +99,9 @@ class RemotePixelTrackerTest extends WP_UnitTestCase {
 	public function test_returns_null_if_authentication_fails() {
 		Transients::delete( TransientDefaults::PIXEL_SCRIPT );
 
-		$auth_mock = $this->createMock( JetpackAuthenticator::class );
-		$auth_mock->method( 'get_auth_header' )->willReturn( new \WP_Error( 'auth_fail', 'failed' ) );
-
 		$client_mock = $this->createMock( WcsClient::class );
 
-		$tracker = new RemotePixelTracker( $client_mock, $auth_mock );
+		$tracker = new RemotePixelTracker( $client_mock );
 
 		ob_start();
 		$tracker->maybe_inject_pixel();

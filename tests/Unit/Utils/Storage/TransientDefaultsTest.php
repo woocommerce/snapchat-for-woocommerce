@@ -19,7 +19,7 @@ class TransientDefaultsTest extends TestCase {
 		$all = TransientDefaults::get_all();
 
 		$this->assertArrayHasKey( TransientDefaults::PIXEL_SCRIPT, $all );
-		$this->assertSame( MONTH_IN_SECONDS, $all[ TransientDefaults::PIXEL_SCRIPT ] );
+		$this->assertSame( '', $all[ TransientDefaults::PIXEL_SCRIPT ] );
 	}
 
 	public function test_get_all_returns_array(): void {

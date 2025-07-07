@@ -1,0 +1,21 @@
+{
+    "code": "wcs_error",
+    "message": "WCS request failed",
+    "data": {
+        "response": {
+            "headers": {},
+            "body": "{\"statusCode\":401,\"error\":\"Unauthorized\",\"message\":\"Invalid token\",\"attributes\":{\"error\":\"Invalid token\"}}",
+            "response": {
+                "code": 401,
+                "message": "Unauthorized"
+            },
+            "cookies": [],
+            "filename": null,
+            "http_response": {
+                "data": null,
+                "headers": null,
+                "status": null
+            }
+        }
+    }
+}
