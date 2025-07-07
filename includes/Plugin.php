@@ -54,6 +54,7 @@ final class Plugin {
 	private static function register_hooks(): void {
 		add_action( 'rest_api_init', array( self::class, 'register_rest_routes' ) );
 		add_action( 'init', array( self::class, 'bootstrap_features' ) );
+		add_action( 'admin_init', array( self::class, 'bootstrap_admin_features' ) );
 	}
 
 	/**
@@ -73,7 +74,7 @@ final class Plugin {
 	}
 
 	/**
-	 * Initializes additional feature hooks during the `init` action.
+	 * Initializes feature hooks during the `init` action.
 	 *
 	 * @since 0.1.0
 	 */
@@ -88,5 +89,14 @@ final class Plugin {
 			new Admin\Assets(),
 			new Admin\Onboarding(),
 		) )->init();
+	}
+
+	/**
+	 * Initializes admin feature hooks during the `admin_init` action.
+	 *
+	 * @since 0.1.0
+	 */
+	public static function bootstrap_admin_features(): void {
+		ServiceContainer::get( ServiceKey::ADMIN_SETUP )->init();
 	}
 }

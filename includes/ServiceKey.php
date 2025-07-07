@@ -63,4 +63,11 @@ final class ServiceKey {
 	 * @since 0.1.0
 	 */
 	public const CONVERSION_TRACKING = 'conversion_tracking';
+
+	/**
+	 * Identifier for the Admin related services and features.
+	 *
+	 * @since 0.1.0
+	 */
+	public const ADMIN_SETUP = 'admin_setup';
 }
