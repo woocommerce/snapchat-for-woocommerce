@@ -86,7 +86,7 @@ class SnapchatPixelController extends RESTBaseController {
 			'title'      => 'snapchat_pixel',
 			'type'       => 'object',
 			'properties' => array(
-				'id'   => array(
+				'id' => array(
 					'description' => 'The unique ID of the selected Snapchat Pixel.',
 					'type'        => 'string',
 				),
