@@ -8,22 +8,6 @@ import { setWith, clone } from 'lodash';
  */
 import TYPES from './action-types';
 
-const DEFAULT_STATE = {
-	general: {
-		version: null,
-	},
-	setup: {
-		status: 'incomplete',
-		step: 'accounts',
-	},
-	accounts: {
-		jetpack: null,
-		snapchat: null,
-		ads: null,
-		organization: null,
-	},
-};
-
 /**
  * @callback chainSet
  * @param {Array<string>|string} path The path of the property to set the new value.
@@ -105,7 +89,7 @@ function setIn( state, path, value ) {
 	return chainState( state ).setIn( path, value ).end();
 }
 
-const reducer = ( state = DEFAULT_STATE, action ) => {
+const reducer = ( state, action ) => {
 	switch ( action.type ) {
 		case TYPES.RECEIVE_ACCOUNTS_JETPACK: {
 			const { account } = action;
@@ -135,12 +119,14 @@ const reducer = ( state = DEFAULT_STATE, action ) => {
 			return setIn( state, 'accounts.snapchat', snapchatAccount );
 		}
 
+		case TYPES.RECEIVE_SNAPCHAT_PIXEL: {
+			const { snapchatPixel } = action;
+
+			return setIn( state, 'accounts.pixel', snapchatPixel );
+		}
+
 		case TYPES.DISCONNECT_ACCOUNTS_SNAPCHAT: {
-			return setIn(
-				state,
-				'accounts.snapchat',
-				DEFAULT_STATE.accounts.snapchat
-			);
+			return setIn( state, 'accounts.snapchat', null );
 		}
 
 		// Page will be reloaded after all accounts have been disconnected, so no need to mutate state.

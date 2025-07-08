@@ -2,7 +2,6 @@
  * External dependencies
  */
 import { __ } from '@wordpress/i18n';
-import { Flex } from '@wordpress/components';
 import { useState } from '@wordpress/element';
 
 /**
@@ -12,11 +11,9 @@ import { getGetStartedUrl } from '~/utils/urls';
 import useAdminUrl from '~/hooks/useAdminUrl';
 import useJetpackAccount from '~/hooks/useJetpackAccount';
 import useSnapchatAccount from '~/hooks/useSnapchatAccount';
-import useSnapchatOrganization from '~/hooks/useSnapchatOrganization';
 import AppButton from '~/components/app-button';
 import SpinnerCard from '~/components/spinner-card';
 import Section from '~/components/section';
-import { ConnectedWPComAccountCard } from '~/components/wpcom-account-card';
 import { ConnectedSnapchatAccountCard } from '~/components/snapchat-account-card';
 import LinkedAccountsSectionWrapper from './linked-accounts-section-wrapper';
 import DisconnectModal, {
@@ -35,26 +32,19 @@ import DisconnectModal, {
  * @fires sfw_disconnected_accounts
  */
 export default function LinkedAccounts() {
-	const adminUrl = useAdminUrl();
 	const { jetpack } = useJetpackAccount();
 	const { isConnected } = useSnapchatAccount();
-	const { id: organizationId, name: organizationName } =
-		useSnapchatOrganization();
 
-	const isLoading = ! ( jetpack && isConnected && organizationId );
+	const isLoading = ! ( jetpack && isConnected );
 
 	const [ openedModal, setOpenedModal ] = useState( null );
-	const openDisconnectAllAccountsModal = () => setOpenedModal( ALL_ACCOUNTS );
 	const openDisconnectAdsAccountModal = () =>
 		setOpenedModal( SNAPCHAT_ACCOUNT );
 	const dismissModal = () => setOpenedModal( null );
 
 	const handleDisconnected = () => {
 		// Reload WC admin page to update the `sfwData` initiated from the static script.
-		const nextPage =
-			openedModal === ALL_ACCOUNTS
-				? adminUrl + getGetStartedUrl()
-				: window.location.href;
+		const nextPage = window.location.href;
 
 		window.location.href = nextPage;
 	};
@@ -68,42 +58,24 @@ export default function LinkedAccounts() {
 					disconnectTarget={ openedModal }
 				/>
 			) }
+
 			{ isLoading ? (
 				<SpinnerCard />
 			) : (
-				<>
-					<ConnectedWPComAccountCard jetpack={ jetpack } />
-					<ConnectedSnapchatAccountCard
-						organizationName={ organizationName }
-						hideAccountSwitch
-					>
-						<Section.Card.Footer>
-							<AppButton
-								isDestructive
-								isLink
-								onClick={ openDisconnectAdsAccountModal }
-							>
-								{ __(
-									'Disconnect Snapchat account only',
-									'snapchat-for-woo'
-								) }
-							</AppButton>
-						</Section.Card.Footer>
-					</ConnectedSnapchatAccountCard>
-
-					<Flex justify="flex-end">
+				<ConnectedSnapchatAccountCard hideAccountSwitch>
+					<Section.Card.Footer>
 						<AppButton
-							isPrimary
 							isDestructive
-							onClick={ openDisconnectAllAccountsModal }
+							isLink
+							onClick={ openDisconnectAdsAccountModal }
 						>
 							{ __(
-								'Disconnect from all accounts',
+								'Disconnect Snapchat account only',
 								'snapchat-for-woo'
 							) }
 						</AppButton>
-					</Flex>
-				</>
+					</Section.Card.Footer>
+				</ConnectedSnapchatAccountCard>
 			) }
 		</LinkedAccountsSectionWrapper>
 	);

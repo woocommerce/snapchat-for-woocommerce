@@ -18,7 +18,22 @@ const store = createReduxStore( STORE_KEY, {
 	selectors,
 	resolvers,
 	reducer,
-	// initialState: sfwData?.initialWpData || {},
+	initialState: {
+		general: {
+			version: null,
+		},
+		setup: {
+			status: sfwData.status,
+			step: sfwData.step,
+		},
+		accounts: {
+			jetpack: null,
+			snapchat: null,
+			ads: null,
+			organization: null,
+			pixel: null,
+		},
+	},
 } );
 register( store );
 

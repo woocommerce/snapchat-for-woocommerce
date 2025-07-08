@@ -13,6 +13,7 @@ import {
 	receiveJetpackAccount,
 	receiveSnapchatAdsAccount,
 	receiveSnapchatOrganization,
+	receiveSnapchatPixel,
 	fetchSnapchatAccount,
 } from './actions';
 
@@ -99,4 +100,28 @@ export function getSnapchatOrganization() {
  */
 export function getSnapchatAccount() {
 	return fetchSnapchatAccount;
+}
+
+/**
+ * Fetches the Snapchat Pixel information from the API.
+ *
+ * @return {Function} An async thunk function that takes a Redux-like dispatch object.
+ */
+export function getSnapchatPixel() {
+	return async function ( { dispatch } ) {
+		try {
+			const response = await apiFetch( {
+				path: `${ API_NAMESPACE }/snapchat/pixel`,
+			} );
+			dispatch( receiveSnapchatPixel( response ) );
+		} catch ( error ) {
+			handleApiError(
+				error,
+				__(
+					'There was an error loading Snapchat Pixel info.',
+					'snapchat-for-woo'
+				)
+			);
+		}
+	};
 }

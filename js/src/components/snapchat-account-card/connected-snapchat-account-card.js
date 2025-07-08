@@ -1,13 +1,12 @@
 /**
  * Internal dependencies
  */
-import { SNAPCHAT_DESCRIPTION } from './constants';
+import AccountDetails from './account-details';
 import SwitchAccountButton from './switch-account-button';
 import AccountCard, { APPEARANCE } from '~/components/account-card';
 import ConnectedIconLabel from '~/components/connected-icon-label';
 
 const ConnectedSnapchatAccountCard = ( {
-	organizationName,
 	hideAccountSwitch = false,
 	children,
 } ) => {
@@ -21,7 +20,7 @@ const ConnectedSnapchatAccountCard = ( {
 	return (
 		<AccountCard
 			appearance={ APPEARANCE.SNAPCHAT }
-			description={ organizationName || SNAPCHAT_DESCRIPTION }
+			description={ <AccountDetails /> }
 			indicator={ <ConnectedIconLabel /> }
 			actions={ getCardActions() }
 		>

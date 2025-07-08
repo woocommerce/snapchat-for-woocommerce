@@ -54,3 +54,13 @@ export const getSnapchatOrganization = ( state ) => {
 export const getSnapchatAccount = ( state ) => {
 	return state.accounts.snapchat;
 };
+
+/**
+ * Retrieves the Snapchat Pixel information.
+ *
+ * @param {Object} state - The Redux state object.
+ * @return {* | null} The Snapchat Pixel data from the state, or null if not set.
+ */
+export const getSnapchatPixel = ( state ) => {
+	return state.accounts.pixel;
+};

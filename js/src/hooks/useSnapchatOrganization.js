@@ -9,7 +9,6 @@ import { useCallback } from '@wordpress/element';
  */
 import { useAppDispatch } from '~/data';
 import { STORE_KEY } from '~/data/constants';
-import { SNAPCHAT_ORGANIZATION_STATUS } from '~/constants';
 
 const selectorName = 'getSnapchatOrganization';
 
@@ -27,10 +26,6 @@ const useSnapchatOrganization = () => {
 			return {
 				id: organization?.id,
 				name: organization?.name,
-				status: organization?.status,
-				isConnected:
-					organization?.status ===
-					SNAPCHAT_ORGANIZATION_STATUS.CONNECTED,
 				refetchSnapchatOrganization,
 				hasFinishedResolution: selector.hasFinishedResolution(
 					selectorName,

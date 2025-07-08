@@ -12,12 +12,6 @@ import useMenuEffect from '~/hooks/useMenuEffect';
 
 const tabs = [
 	{
-		key: 'dashboard',
-		title: __( 'Dashboard', 'snapchat-for-woo' ),
-		href: getNewPath( {}, '/snapchat/dashboard', {} ),
-	},
-
-	{
 		key: 'settings',
 		title: __( 'Settings', 'snapchat-for-woo' ),
 		href: getNewPath( {}, '/snapchat/settings', {} ),
