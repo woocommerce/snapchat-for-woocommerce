@@ -33,11 +33,12 @@ class JetpackClient {
 	 *
 	 * @since 0.1.0
 	 *
-	 * @param array $args Arguments for the HTTP request.
+	 * @param array             $args Arguments for the HTTP request.
+	 * @param array|string|null $body The request body.
 	 *
 	 * @return array|WP_Error Response array on success, or WP_Error on failure.
 	 */
-	public function remote_request( array $args ) {
-		return Client::remote_request( $args );
+	public function remote_request( array $args, $body = null ) {
+		return Client::remote_request( $args, $body );
 	}
 }
