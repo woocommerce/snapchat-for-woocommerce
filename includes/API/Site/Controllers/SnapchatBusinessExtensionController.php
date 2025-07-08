@@ -305,6 +305,7 @@ class SnapchatBusinessExtensionController extends RESTBaseController {
 		Options::delete( OptionDefaults::ORGANIZATION_ID );
 		Options::delete( OptionDefaults::ORGANIZATION_NAME );
 		Options::delete( OptionDefaults::ADS_ACCOUNT_ID );
+		Options::delete( OptionDefaults::ADS_ACCOUNT_NAME );
 		Options::delete( OptionDefaults::CONVERSION_ACCESS_TOKEN );
 		Options::delete( OptionDefaults::PIXEL_ID );
 		Transients::delete( TransientDefaults::PIXEL_SCRIPT );

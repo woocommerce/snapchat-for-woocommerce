@@ -77,6 +77,13 @@ final class OptionDefaults {
 	public const ADS_ACCOUNT_ID = 'ad_account_id';
 
 	/**
+	 * Option key for the Ad Partner ad account name.
+	 *
+	 * @since 0.1.0
+	 */
+	public const ADS_ACCOUNT_NAME = 'ad_account_name';
+
+	/**
 	 * Option key for the Snapchat organization ID.
 	 *
 	 * @since 0.1.0
@@ -168,6 +175,7 @@ final class OptionDefaults {
 			self::WP_TOS_ACCEPTED         => false,
 			self::CONFIG_ID               => '',
 			self::ADS_ACCOUNT_ID          => '',
+			self::ADS_ACCOUNT_NAME        => '',
 			self::ORGANIZATION_ID         => '',
 			self::ORGANIZATION_NAME       => '',
 			self::PIXEL_ENABLED           => false,
