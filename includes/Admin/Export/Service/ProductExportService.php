@@ -50,7 +50,7 @@ class ProductExportService {
 	 *
 	 * @var BatchExportJob
 	 */
-	protected BatchExportJob $job;
+	public BatchExportJob $job;
 
 	/**
 	 * Constructor.
@@ -85,6 +85,18 @@ class ProductExportService {
 		add_action(
 			Helper::with_prefix( self::ACTION_HOOK ),
 			array( $this, 'handle_batch' ),
+			10,
+			2
+		);
+
+		add_action(
+			'wp_ajax_' . Helper::with_prefix( 'generate_feed' ),
+			array( $this, 'trigger_export_callback' )
+		);
+
+		add_filter(
+			'heartbeat_received',
+			array( $this, 'check_export_status' ),
 			10,
 			2
 		);
@@ -200,6 +212,7 @@ class ProductExportService {
 		if ( $is_first_batch ) {
 			Options::set( OptionDefaults::EXPORT_FILE_PATH, $result['file_path'] );
 			Options::set( OptionDefaults::EXPORT_FILE_URL, $result['file_url'] );
+			$this->job->set_timestamp();
 		}
 
 		if ( ! $result['complete'] ) {
@@ -211,6 +224,64 @@ class ProductExportService {
 				),
 				Config::PLUGIN_SLUG
 			);
+		} else {
+			$this->job->set_timestamp();
 		}
+	}
+
+	/**
+	 * Handles the AJAX request to initiate the product catalog export.
+	 *
+	 * This method:
+	 * - Verifies the security nonce.
+	 * - Attempts to start the export process.
+	 * - Sends a JSON success or error response.
+	 *
+	 * @since 0.1.0
+	 */
+	public function trigger_export_callback(): void {
+		check_ajax_referer( 'export-nonce', 'security' );
+
+		if ( $this->start_export() ) {
+			wp_send_json_success();
+		}
+
+		wp_send_json_error();
+	}
+
+	/**
+	 * Responds to Heartbeat API requests to report the current export status.
+	 *
+	 * This is used by the frontend to check if an export is idle, in progress,
+	 * or completed, and to return the file URL if available.
+	 *
+	 * @since 0.1.0
+	 *
+	 * @param array $response Existing Heartbeat response data.
+	 * @param array $data     Heartbeat data received from the client.
+	 * @return array Modified response including export status if requested.
+	 */
+	public function check_export_status( $response, $data ) {
+		$request_key  = Helper::with_prefix( 'check_export_status' );
+		$response_key = Helper::with_prefix( 'export_status' );
+
+		if ( ! empty( $data[ $request_key ] ) ) {
+			$is_job_in_progress = $this->job->is_job_in_progress( self::ACTION_HOOK );
+			$file_url           = Options::get( OptionDefaults::EXPORT_FILE_URL );
+			$status             = 'idle';
+
+			if ( $is_job_in_progress && empty( $file_url ) ) {
+				$status = 'in-progress';
+			} elseif ( ! empty( $file_url ) && ! $is_job_in_progress ) {
+				$status = 'completed';
+			}
+
+			$response[ $response_key ] = array(
+				'status'  => $status,
+				'fileUrl' => Options::get( OptionDefaults::EXPORT_FILE_URL ),
+			);
+		}
+
+		return $response;
 	}
 }

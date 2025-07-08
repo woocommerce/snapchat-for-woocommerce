@@ -22,6 +22,8 @@ use SnapchatForWooCommerce\Admin\Export\Contract\ExportRowBuilderInterface;
 use SnapchatForWooCommerce\Admin\Export\Contract\ExportWriterInterface;
 use SnapchatForWooCommerce\Admin\Export\Contract\CacheBuilderInterface;
 use SnapchatForWooCommerce\Utils\Helper;
+use SnapchatForWooCommerce\Utils\Storage\Options;
+use SnapchatForWooCommerce\Utils\Storage\OptionDefaults;
 
 /**
  * Executes a single export batch for any entity type.
@@ -170,7 +172,7 @@ class BatchExportJob {
 	 * @param string $entity_export_id Unique export hook name (e.g., export_product_catalog).
 	 * @return bool True if any export or cache jobs are in progress, false otherwise.
 	 */
-	public function is_job_in_progress( string $entity_export_id ) {
+	public function is_job_in_progress( string $entity_export_id ): bool {
 		$scan_jobs   = as_has_scheduled_action( Helper::with_prefix( $entity_export_id ) );
 		$export_jobs = as_has_scheduled_action( Helper::with_prefix( get_class( $this->cache_builder )::ACTION_HOOK ) );
 
@@ -179,5 +181,21 @@ class BatchExportJob {
 		}
 
 		return false;
+	}
+
+	/**
+	 * Updates the last export timestamp in plugin options.
+	 *
+	 * This is stored for audit or display purposes after a successful export run.
+	 *
+	 * @since 0.1.0
+	 *
+	 * @return void
+	 */
+	public function set_timestamp(): void {
+		$timestamp = date_i18n(
+			get_option( 'date_format' ) . ' \a\t ' . get_option( 'time_format' )
+		);
+		Options::set( OptionDefaults::LAST_EXPORT_TIMESTAMP, $timestamp );
 	}
 }
