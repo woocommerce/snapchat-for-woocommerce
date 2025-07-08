@@ -21,7 +21,7 @@ class OptionDefaultsTest extends TestCase {
 	public function test_all_keys_are_mapped_in_defaults(): void {
 		$defaults = OptionDefaults::get_all();
 
-		$this->assertArrayHasKey( OptionDefaults::ADS_ACCOUNT_ID, $defaults );
+		$this->assertArrayHasKey( OptionDefaults::AD_ACCOUNT_ID, $defaults );
 		$this->assertArrayHasKey( OptionDefaults::ORGANIZATION_ID, $defaults );
 		$this->assertArrayHasKey( OptionDefaults::PIXEL_ENABLED, $defaults );
 	}
@@ -32,7 +32,7 @@ class OptionDefaultsTest extends TestCase {
 	public function test_default_values_are_correct(): void {
 		$defaults = OptionDefaults::get_all();
 
-		$this->assertSame( '', $defaults[ OptionDefaults::ADS_ACCOUNT_ID ] );
+		$this->assertSame( '', $defaults[ OptionDefaults::AD_ACCOUNT_ID ] );
 		$this->assertSame( '', $defaults[ OptionDefaults::ORGANIZATION_ID ] );
 		$this->assertFalse( $defaults[ OptionDefaults::PIXEL_ENABLED ] );
 	}
