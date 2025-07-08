@@ -64,6 +64,19 @@ export function receiveSnapchatAccount( snapchatAccount ) {
 }
 
 /**
+ * Creates an action to receive a Snapchat Pixel object.
+ *
+ * @param {Object} snapchatPixel - The Snapchat Pixel data to be received.
+ * @return {Object} Action object with type RECEIVE_SNAPCHAT_PIXEL and the Snapchat Pixel data.
+ */
+export function receiveSnapchatPixel( snapchatPixel ) {
+	return {
+		type: TYPES.RECEIVE_SNAPCHAT_PIXEL,
+		snapchatPixel,
+	};
+}
+
+/**
  * Fetches the Snapchat account information from the API and dispatches the result.
  *
  * @async

@@ -74,14 +74,14 @@ final class OptionDefaults {
 	 *
 	 * @since 0.1.0
 	 */
-	public const ADS_ACCOUNT_ID = 'ad_account_id';
+	public const ADS_ACCOUNT_ID = 'ads_account_id';
 
 	/**
 	 * Option key for the Ad Partner ad account name.
 	 *
 	 * @since 0.1.0
 	 */
-	public const ADS_ACCOUNT_NAME = 'ad_account_name';
+	public const ADS_ACCOUNT_NAME = 'ads_account_name';
 
 	/**
 	 * Option key for the Snapchat organization ID.

@@ -11,12 +11,14 @@ import AppButton from '~/components/app-button';
 import { getOnboardingUrl } from '~/utils/urls';
 
 const GetStarted = () => {
+	const onboardingUrl = getOnboardingUrl();
+
 	return (
 		<Card className="sfw-get-started-card" isBorderless>
 			<CardBody>
 				<AppButton
 					isPrimary
-					href={ getOnboardingUrl() }
+					href={ onboardingUrl }
 					eventName="sfw_setup_snapchat"
 					eventProps={ {
 						triggered_by: 'start-onboarding-button',

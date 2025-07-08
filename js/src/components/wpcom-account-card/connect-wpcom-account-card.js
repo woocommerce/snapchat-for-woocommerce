@@ -27,7 +27,7 @@ import useApiFetchCallback from '~/hooks/useApiFetchCallback';
 const ConnectWPComAccountCard = () => {
 	const { createNotice } = useDispatchCoreNotices();
 
-	const nextPageName = sfwData?.snapchatSetupComplete
+	const nextPageName = sfwData?.setupComplete
 		? 'reconnect'
 		: 'setup-snapchat';
 	const query = { next_page_name: nextPageName };
