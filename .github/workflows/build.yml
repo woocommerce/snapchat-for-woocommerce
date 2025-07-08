@@ -1,0 +1,55 @@
+name: Build
+
+on:
+  workflow_call:
+  push:
+    branches:
+      - trunk
+      - develop
+  pull_request:
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  BuildExtensionBundle:
+    name: Build extension bundle
+    runs-on: ubuntu-latest
+    env:
+      FORCE_COLOR: 2
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Prepare PHP
+        uses: woocommerce/grow/prepare-php@actions-v2
+        with:
+          install-deps: "no"
+
+      - name: Prepare node
+        uses: woocommerce/grow/prepare-node@actions-v2
+        with:
+          node-version-file: ".nvmrc"
+          ignore-scripts: "no"
+
+      - name: Build production bundle
+        run: |
+          echo "::group::Build log"
+          npm run build
+          echo "::endgroup::"
+
+      - name: Publish dev build to GitHub
+        if: ${{ github.event_name == 'push' && github.ref_name == 'develop' }}
+        uses: woocommerce/grow/publish-extension-dev-build@actions-v2
+        with:
+          extension-asset-path: snapchat-for-woocommerce.zip
+
+      - name: Publish build artifact
+        if: ${{ ! ( github.event_name == 'push' && github.ref_name == 'develop' ) }}
+        uses: actions/upload-artifact@v4
+        with:
+          name: snapchat-for-woocommerce.zip
+          path: ${{ github.workspace }}/snapchat-for-woocommerce.zip
+          # Do not bloat the storage. Keep in only long enough for a caller workflow to pick it up and follow up with some manual debugging.
+          retention-days: 2
