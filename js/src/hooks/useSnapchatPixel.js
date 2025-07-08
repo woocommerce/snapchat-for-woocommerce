@@ -10,31 +10,30 @@ import { useCallback } from '@wordpress/element';
 import { useAppDispatch } from '~/data';
 import { STORE_KEY } from '~/data/constants';
 
-const selectorName = 'getSnapchatAdsAccount';
+const selectorName = 'getSnapchatPixel';
 
-const useSnapchatAdsAccount = () => {
+const useSnapchatPixel = () => {
 	const dispatcher = useAppDispatch();
-	const refetchSnapchatAdsAccount = useCallback( () => {
+	const refetchSnapchatPixel = useCallback( () => {
 		dispatcher.invalidateResolution( selectorName, [] );
 	}, [ dispatcher ] );
 
 	return useSelect(
 		( select ) => {
 			const selector = select( STORE_KEY );
-			const account = selector[ selectorName ]();
+			const pixel = selector[ selectorName ]();
 
 			return {
-				id: account?.id,
-				name: account?.name,
-				refetchSnapchatAdsAccount,
+				id: pixel?.id,
+				refetchSnapchatPixel,
 				hasFinishedResolution: selector.hasFinishedResolution(
 					selectorName,
 					[]
 				),
 			};
 		},
-		[ refetchSnapchatAdsAccount ]
+		[ refetchSnapchatPixel ]
 	);
 };
 
-export default useSnapchatAdsAccount;
+export default useSnapchatPixel;

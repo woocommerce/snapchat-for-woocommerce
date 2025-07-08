@@ -61,8 +61,9 @@ class Assets {
 			'index',
 			'AdminData',
 			array(
-				'status' => Options::get( OptionDefaults::ONBOARDING_STATUS ),
-				'step'   => Options::get( OptionDefaults::ONBOARDING_STEP ),
+				'setupComplete' => Options::get( OptionDefaults::ONBOARDING_STATUS ) === 'connected',
+				'status'        => Options::get( OptionDefaults::ONBOARDING_STATUS ),
+				'step'          => Options::get( OptionDefaults::ONBOARDING_STEP ),
 			)
 		);
 	}
