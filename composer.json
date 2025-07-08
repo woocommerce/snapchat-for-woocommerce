@@ -18,12 +18,13 @@
 	},
 	"archive": {
 		"exclude": [
-			"!/assets",
-			"!/build",
+			"!/js/build",
 			"!/languages",
+			"!/vendor/*",
+			"src",
 			"tests",
 			"node_modules",
-			"woocommerce-eu-vat-number.zip",
+			"snapchat-for-woocommerce.zip",
 			"README.md",
 			"composer.json",
 			"composer.lock",
