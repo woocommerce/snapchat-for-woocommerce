@@ -55,8 +55,8 @@ class SnapchatAdsAccountController extends RESTBaseController {
 	public function register_routes(): void {
 		/**
 		 * GET /ads_account
-		 * - Returns an array of OptionDefaults::ADS_ACCOUNT_ID
-		 *   and OptionDefaults::ADS_ACCOUNT_NAME
+		 * - Returns an array of OptionDefaults::AD_ACCOUNT_ID
+		 *   and OptionDefaults::AD_ACCOUNT_NAME
 		 */
 		register_rest_route(
 			Config::REST_NAMESPACE . '/snapchat',
@@ -80,54 +80,13 @@ class SnapchatAdsAccountController extends RESTBaseController {
 	 * @return WP_REST_Response
 	 */
 	public function get_ads_account() {
-		$ads_account_id   = Options::get( OptionDefaults::ADS_ACCOUNT_ID );
-		$ads_account_name = Options::get( OptionDefaults::ADS_ACCOUNT_NAME );
-
-		if ( $ads_account_id && $ads_account_name ) {
-			return rest_ensure_response(
-				array(
-					'id'   => $ads_account_id,
-					'name' => $ads_account_name,
-				)
-			);
-		}
-
-		$response = $this->wcs->proxy_get(
-			'/ads/v1/adaccounts/' . $ads_account_id
-		);
-
-		if ( is_wp_error( $response ) ) {
-			return new WP_REST_Response(
-				array(
-					'status'  => 'error',
-					'message' => $response->get_error_message(),
-				),
-				500
-			);
-		}
-
-		$data = $response->get_data();
-		$orgs = $data['adaccounts'] ?? array();
-
-		if ( empty( $orgs ) ) {
-			return rest_ensure_response(
-				array(
-					'id'   => '',
-					'name' => '',
-				)
-			);
-		}
-
-		$ads_account_name = sanitize_text_field( $orgs[0]['adaccount']['name'] ?? '' );
-
-		if ( $ads_account_name ) {
-			Options::set( OptionDefaults::ADS_ACCOUNT_NAME, $ads_account_name );
-		}
+		$ad_account_id   = Options::get( OptionDefaults::AD_ACCOUNT_ID );
+		$ad_account_name = Options::get( OptionDefaults::AD_ACCOUNT_NAME );
 
 		return rest_ensure_response(
 			array(
-				'id'   => $ads_account_id,
-				'name' => $ads_account_name,
+				'id'   => $ad_account_id,
+				'name' => $ad_account_name,
 			)
 		);
 	}

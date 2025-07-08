@@ -83,47 +83,6 @@ class SnapchatOrganizationsController extends RESTBaseController {
 		$org_id   = Options::get( OptionDefaults::ORGANIZATION_ID );
 		$org_name = Options::get( OptionDefaults::ORGANIZATION_NAME );
 
-		if ( $org_id && $org_name ) {
-			return rest_ensure_response(
-				array(
-					'id'   => $org_id,
-					'name' => $org_name,
-				)
-			);
-		}
-
-		$response = $this->wcs->proxy_get(
-			'/ads/v1/organizations/' . $org_id
-		);
-
-		if ( is_wp_error( $response ) ) {
-			return new WP_REST_Response(
-				array(
-					'status'  => 'error',
-					'message' => $response->get_error_message(),
-				),
-				500
-			);
-		}
-
-		$data = $response->get_data();
-		$orgs = $data['organizations'] ?? array();
-
-		if ( empty( $orgs ) ) {
-			return rest_ensure_response(
-				array(
-					'id'   => '',
-					'name' => '',
-				)
-			);
-		}
-
-		$org_name = sanitize_text_field( $orgs[0]['organization']['name'] ?? '' );
-
-		if ( $org_name ) {
-			Options::set( OptionDefaults::ORGANIZATION_NAME, $org_name );
-		}
-
 		return rest_ensure_response(
 			array(
 				'id'   => $org_id,

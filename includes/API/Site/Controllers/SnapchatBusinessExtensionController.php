@@ -170,27 +170,27 @@ class SnapchatBusinessExtensionController extends RESTBaseController {
 		$data        = $response->get_data();
 		$client_data = $data['business_extension_configuration'];
 
-		if ( $client_data['organization_id'] ) {
+		if ( ! empty( $client_data['organization_id'] ) ) {
 			Options::set( OptionDefaults::ORGANIZATION_ID, $client_data['organization_id'] );
 		}
 
-		if ( $client_data['organization_name'] ) {
+		if ( ! empty( $client_data['organization_name'] ) ) {
 			Options::set( OptionDefaults::ORGANIZATION_NAME, $client_data['organization_name'] );
 		}
 
-		if ( $client_data['ad_account_id'] ) {
-			Options::set( OptionDefaults::ADS_ACCOUNT_ID, $client_data['ad_account_id'] );
+		if ( ! empty( $client_data['ad_account_id'] ) ) {
+			Options::set( OptionDefaults::AD_ACCOUNT_ID, $client_data['ad_account_id'] );
 		}
 
-		if ( $client_data['ad_account_name'] ) {
-			Options::set( OptionDefaults::ADS_ACCOUNT_NAME, $client_data['ad_account_name'] );
+		if ( ! empty( $client_data['ad_account_name'] ) ) {
+			Options::set( OptionDefaults::AD_ACCOUNT_NAME, $client_data['ad_account_name'] );
 		}
 
-		if ( $client_data['pixel_id'] ) {
+		if ( ! empty( $client_data['pixel_id'] ) ) {
 			Options::set( OptionDefaults::PIXEL_ID, $client_data['pixel_id'] );
 		}
 
-		if ( $client_data['capi_token'] ) {
+		if ( ! empty( $client_data['capi_token'] ) ) {
 			Options::set( OptionDefaults::CONVERSION_ACCESS_TOKEN, $client_data['capi_token'] );
 		}
 
@@ -200,8 +200,8 @@ class SnapchatBusinessExtensionController extends RESTBaseController {
 			array(
 				'org_id'      => Options::get( OptionDefaults::ORGANIZATION_ID ),
 				'org_name'    => Options::get( OptionDefaults::ORGANIZATION_NAME ),
-				'ad_acc_id'   => Options::get( OptionDefaults::ADS_ACCOUNT_ID ),
-				'ad_acc_name' => Options::get( OptionDefaults::ADS_ACCOUNT_NAME ),
+				'ad_acc_id'   => Options::get( OptionDefaults::AD_ACCOUNT_ID ),
+				'ad_acc_name' => Options::get( OptionDefaults::AD_ACCOUNT_NAME ),
 				'pixel_id'    => Options::get( OptionDefaults::PIXEL_ID ),
 			)
 		);
@@ -331,8 +331,8 @@ class SnapchatBusinessExtensionController extends RESTBaseController {
 		Options::delete( OptionDefaults::CONFIG_ID );
 		Options::delete( OptionDefaults::ORGANIZATION_ID );
 		Options::delete( OptionDefaults::ORGANIZATION_NAME );
-		Options::delete( OptionDefaults::ADS_ACCOUNT_ID );
-		Options::delete( OptionDefaults::ADS_ACCOUNT_NAME );
+		Options::delete( OptionDefaults::AD_ACCOUNT_ID );
+		Options::delete( OptionDefaults::AD_ACCOUNT_NAME );
 		Options::delete( OptionDefaults::CONVERSION_ACCESS_TOKEN );
 		Options::delete( OptionDefaults::PIXEL_ID );
 		Transients::delete( TransientDefaults::PIXEL_SCRIPT );
