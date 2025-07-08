@@ -102,6 +102,9 @@ final class ServiceContainer {
 				);
 			case ServiceKey::ADMIN_SETUP:
 				return new Admin\Setup(
+					new Admin\Assets(),
+					new Admin\Menu(),
+					new Admin\Onboarding(),
 					new ProductMeta\ProductMetaFields(),
 				);
 
