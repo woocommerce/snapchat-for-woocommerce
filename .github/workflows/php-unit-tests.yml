@@ -2,12 +2,28 @@ name: PHPUnit Tests
 
 on:
   push:
-    branches: [ trunk ]
+    branches:
+      - trunk
+      - develop
+    paths:
+      - "**.php"
+      - composer.json
+      - composer.lock
+      - .github/workflows/php-unit-tests.yml
   pull_request:
+    paths:
+      - "**.php"
+      - composer.json
+      - composer.lock
+      - .github/workflows/php-unit-tests.yml
 
 jobs:
   phpunit:
     runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        php-version: [7.4, 8.0, 8.2, 8.3]
+
     env:
       WP_CORE_DIR: /tmp/wordpress
       WP_TESTS_DIR: /tmp/wordpress-tests-lib
@@ -22,10 +38,10 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v4
 
-      - name: Set up PHP 7.4
+      - name: Set up PHP ${{ matrix.php-version }}
         uses: shivammathur/setup-php@v2
         with:
-          php-version: 7.4
+          php-version: ${{ matrix.php-version }}
           extensions: mbstring, mysqli
           tools: composer, phpunit
 
