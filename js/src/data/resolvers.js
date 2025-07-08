@@ -107,7 +107,7 @@ export function getSnapchatAccount() {
  *
  * @return {Function} An async thunk function that takes a Redux-like dispatch object.
  */
-export function getSnapchatPixelLOL() {
+export function getSnapchatPixel() {
 	return async function ( { dispatch } ) {
 		try {
 			const response = await apiFetch( {

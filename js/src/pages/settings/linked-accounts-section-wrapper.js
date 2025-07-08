@@ -11,9 +11,9 @@ import Section from '~/components/section';
 export default function LinkedAccountsSectionWrapper( props ) {
 	return (
 		<Section
-			title={ __( 'Linked accounts', 'snapchat-for-woo' ) }
+			title={ __( 'Manage Snapchat Connection', 'snapchat-for-woo' ) }
 			description={ __(
-				'A WordPress.com account, and Snapchat account are required to use this extension in WooCommerce.',
+				'See your currently connected account or disconnect.',
 				'snapchat-for-woo'
 			) }
 			{ ...props }
