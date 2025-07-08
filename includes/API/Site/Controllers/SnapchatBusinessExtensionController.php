@@ -174,8 +174,16 @@ class SnapchatBusinessExtensionController extends RESTBaseController {
 			Options::set( OptionDefaults::ORGANIZATION_ID, $client_data['organization_id'] );
 		}
 
+		if ( $client_data['organization_name'] ) {
+			Options::set( OptionDefaults::ORGANIZATION_NAME, $client_data['organization_name'] );
+		}
+
 		if ( $client_data['ad_account_id'] ) {
 			Options::set( OptionDefaults::ADS_ACCOUNT_ID, $client_data['ad_account_id'] );
+		}
+
+		if ( $client_data['ad_account_name'] ) {
+			Options::set( OptionDefaults::ADS_ACCOUNT_NAME, $client_data['ad_account_name'] );
 		}
 
 		if ( $client_data['pixel_id'] ) {
@@ -188,7 +196,15 @@ class SnapchatBusinessExtensionController extends RESTBaseController {
 
 		Options::set( OptionDefaults::ONBOARDING_STATUS, 'complete' );
 
-		return rest_ensure_response( ( array( 'id' => $config_id ) ) );
+		return rest_ensure_response(
+			array(
+				'org_id'      => Options::get( OptionDefaults::ORGANIZATION_ID ),
+				'org_name'    => Options::get( OptionDefaults::ORGANIZATION_NAME ),
+				'ad_acc_id'   => Options::get( OptionDefaults::ADS_ACCOUNT_ID ),
+				'ad_acc_name' => Options::get( OptionDefaults::ADS_ACCOUNT_NAME ),
+				'pixel_id'    => Options::get( OptionDefaults::PIXEL_ID ),
+			)
+		);
 	}
 
 	/**
@@ -197,7 +213,7 @@ class SnapchatBusinessExtensionController extends RESTBaseController {
 	 * @return WP_REST_Response
 	 */
 	public function initiate_oauth() {
-		$return_url = admin_url( 'admin.php?page=wc-admin&path=/snapchat/setup' );
+		$return_url = rawurlencode( admin_url( 'admin.php?page=wc-admin&path=/snapchat/setup' ) );
 		$response   = $this->start_connection( $return_url );
 
 		if ( is_wp_error( $response ) ) {
@@ -338,11 +354,27 @@ class SnapchatBusinessExtensionController extends RESTBaseController {
 	public function config_schema() {
 		return array(
 			'$schema'    => 'http://json-schema.org/draft-04/schema#',
-			'title'      => 'snapchat_config',
+			'title'      => 'snapchat_merchant_config',
 			'type'       => 'object',
 			'properties' => array(
-				'id' => array(
-					'description' => 'The unique Snapchat config ID.',
+				'org_id'      => array(
+					'description' => "Selected Organization's id.",
+					'type'        => 'string',
+				),
+				'org_name'    => array(
+					'description' => "Selected Organization's name.",
+					'type'        => 'string',
+				),
+				'ad_acc_id'   => array(
+					'description' => 'Selected Ad Account id.',
+					'type'        => 'string',
+				),
+				'ad_acc_name' => array(
+					'description' => 'Selected Ad Account name.',
+					'type'        => 'string',
+				),
+				'pixel_id'    => array(
+					'description' => 'Selected Pixel id.',
 					'type'        => 'string',
 				),
 			),
