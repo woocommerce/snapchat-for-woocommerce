@@ -55,9 +55,8 @@ class PixelTrackingServiceTest extends WP_UnitTestCase {
 	public function set_up(): void {
 		parent::set_up();
 
-		$this->tracker_mock         = $this->createMock( PixelTrackerInterface::class );
-
-		$this->service = new PixelTrackingService( $this->tracker_mock );
+		$this->tracker_mock = $this->createMock( PixelTrackerInterface::class );
+		$this->service      = new PixelTrackingService( $this->tracker_mock );
 	}
 
 	/**
