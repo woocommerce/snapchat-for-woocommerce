@@ -34,7 +34,7 @@
 		"@wordpress/date": "^4.42.13",
 		"@wordpress/dom": "^3.42.13",
 		"@wordpress/element": "^5.19.13",
-		"@wordpress/hooks": "^3.42.13",
+		"@wordpress/hooks": "^3.58.0",
 		"@wordpress/html-entities": "^3.42.13",
 		"@wordpress/i18n": "^4.42.13",
 		"@wordpress/icons": "^9.33.13",
