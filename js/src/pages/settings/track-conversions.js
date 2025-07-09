@@ -9,7 +9,6 @@ import { useState, useCallback } from '@wordpress/element';
  * Internal dependencies
  */
 import { useAppDispatch } from '~/data';
-import AppSpinner from '~/components/app-spinner';
 import useEnableEnhancedConversions from '~/hooks/useEnableEnhancedConversions';
 import useDispatchCoreNotices from '~/hooks/useDispatchCoreNotices';
 import AccountCard from '~/components/account-card';
