@@ -10,10 +10,11 @@ import apiFetch from '@wordpress/api-fetch';
 import { API_NAMESPACE } from './constants';
 import { handleApiError } from '~/utils/handleError';
 import {
-	receiveJetpackAccount,
-	receiveSnapchatAdsAccount,
-	receiveSnapchatOrganization,
+	fetchSetup,
 	fetchSnapchatAccount,
+	receiveJetpackAccount,
+	receiveSnapchatAccountDetails,
+	receiveEnhancedConversionsStatus,
 } from './actions';
 
 /**
@@ -45,58 +46,72 @@ export function getJetpackAccount() {
 }
 
 /**
- * Fetches the Snapchat Ads account information from the API.
- *
- * @return {Function} An async thunk function that takes a Redux-like dispatch object.
- */
-export function getSnapchatAdsAccount() {
-	return async function ( { dispatch } ) {
-		try {
-			const response = await apiFetch( {
-				path: `${ API_NAMESPACE }/snapchat/ads_account`,
-			} );
-			dispatch( receiveSnapchatAdsAccount( response ) );
-		} catch ( error ) {
-			handleApiError(
-				error,
-				__(
-					'There was an error loading Snapchat Ads account info.',
-					'snapchat-for-woo'
-				)
-			);
-		}
-	};
-}
-
-/**
- * Fetches the Snapchat Organization information from the API.
- *
- * @return {Function} An async thunk function that takes a Redux-like dispatch object.
- */
-export function getSnapchatOrganization() {
-	return async function ( { dispatch } ) {
-		try {
-			const response = await apiFetch( {
-				path: `${ API_NAMESPACE }/snapchat/organization`,
-			} );
-			dispatch( receiveSnapchatOrganization( response ) );
-		} catch ( error ) {
-			handleApiError(
-				error,
-				__(
-					'There was an error loading Snapchat Organization info.',
-					'snapchat-for-woo'
-				)
-			);
-		}
-	};
-}
-
-/**
  * Retrieves the Snapchat account fetch function.
  *
  * @return {Function} The function to fetch the Snapchat account.
  */
 export function getSnapchatAccount() {
 	return fetchSnapchatAccount;
+}
+
+/**
+ * Fetches the Snapchat account details information from the API.
+ *
+ * @return {Function} An async thunk function that takes a Redux-like dispatch object.
+ */
+export function getSnapchatAccountDetails() {
+	return async function ( { dispatch } ) {
+		try {
+			const response = await apiFetch( {
+				path: `${ API_NAMESPACE }/snapchat/account`,
+			} );
+			dispatch( receiveSnapchatAccountDetails( response ) );
+		} catch ( error ) {
+			handleApiError(
+				error,
+				__(
+					'There was an error loading Snapchat account details info.',
+					'snapchat-for-woo'
+				)
+			);
+		}
+	};
+}
+
+/**
+ * Fetches the status of enhanced conversions from the API.
+ *
+ * @return {Function} An async thunk function that takes a Redux-like dispatch object.
+ */
+export function getEnableEnhancedConversions() {
+	return async function ( { dispatch } ) {
+		try {
+			const response = await apiFetch( {
+				path: `${ API_NAMESPACE }/snapchat/settings`,
+			} );
+
+			dispatch(
+				receiveEnhancedConversionsStatus(
+					Boolean( response.capi_enabled )
+				)
+			);
+		} catch ( error ) {
+			handleApiError(
+				error,
+				__(
+					'There was an error getting the enhanced conversions status.',
+					'snapchat-for-woo'
+				)
+			);
+		}
+	};
+}
+
+/**
+ * Fetches the Snapchat setup information from the API and dispatches the result.
+ *
+ * @return {Function} An async thunk function that takes a Redux-like dispatch object.
+ */
+export function getSetup() {
+	return fetchSetup;
 }

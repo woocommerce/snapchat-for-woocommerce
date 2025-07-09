@@ -16,11 +16,14 @@ use SnapchatForWooCommerce\Utils\Storage\Options;
 use SnapchatForWooCommerce\Utils\Storage\OptionDefaults;
 use SnapchatForWooCommerce\Utils\Storage\Transients;
 use SnapchatForWooCommerce\Utils\Storage\TransientDefaults;
+use SnapchatForWooCommerce\API\Site\Controllers\SnapchatBusinessExtensionController;
+use SnapchatForWooCommerce\Connection\WcsClient;
+use SnapchatForWooCommerce\Connection\JetpackAuthenticator;
+use SnapchatForWooCommerce\Connection\JetpackClient;
+use SnapchatForWooCommerce\Plugin;
 
 /**
  * Tests the SnapchatOrganizationsController REST API endpoints.
- *
- * @group rest-api
  */
 class SnapchatBusinessExtensionControllerTest extends WP_UnitTestCase {
 
@@ -46,24 +49,37 @@ class SnapchatBusinessExtensionControllerTest extends WP_UnitTestCase {
 	protected $options = array();
 
 	/**
+	 * Mocked Jetpack client.
+	 *
+	 * @var JetpackClient
+	 */
+	private $jetpack_client;
+
+	/**
 	 * Set up test environment.
 	 */
 	public function set_up(): void {
 		parent::set_up();
 
+		$this->jetpack_client = $this->createMock( JetpackClient::class );
+
+		remove_action( 'rest_api_init', array( Plugin::class, 'register_rest_routes' ) );
+		add_action( 'rest_api_init', array( $this, 'register_route' ) );
+
+		$GLOBALS['wp_rest_server'] = null;
+		do_action( 'rest_api_init' );
+		$this->server = rest_get_server();
+
+		$this->options = require __DIR__ . '/fixtures/options.php';
+
 		$user_id = $this->factory->user->create(
-			array(
-				'role' => 'administrator',
-			)
+			array( 'role' => 'administrator' )
 		);
 		wp_set_current_user( $user_id );
 
-		$this->server  = rest_get_server();
-		$this->options = require __DIR__ . '/fixtures/options.php';
-
 		Options::delete( OptionDefaults::ORGANIZATION_ID );
 		Options::delete( OptionDefaults::ORGANIZATION_NAME );
-		Options::delete( OptionDefaults::ADS_ACCOUNT_ID );
+		Options::delete( OptionDefaults::AD_ACCOUNT_ID );
 		Options::delete( OptionDefaults::PIXEL_ID );
 		Transients::delete( TransientDefaults::PIXEL_SCRIPT );
 		Options::delete( OptionDefaults::ONBOARDING_STATUS );
@@ -77,59 +93,39 @@ class SnapchatBusinessExtensionControllerTest extends WP_UnitTestCase {
 	 * Clean up test environment.
 	 */
 	public function tear_down(): void {
+		remove_action( 'rest_api_init', array( $this, 'register_route' ) );
+		add_action( 'rest_api_init', array( Plugin::class, 'register_rest_routes' ) );
+		do_action( 'rest_api_init' );
 		parent::tear_down();
 	}
 
 	/**
-	 * Intercept HTTP requests and return an empty JSON body.
-	 *
-	 * @param mixed  $preempt     Preemptive response.
-	 * @param array  $parsed_args Parsed request arguments.
-	 * @param string $url         Request URL.
-	 * @return array|mixed
+	 * Register the REST route with mocked Jetpack client.
 	 */
-	public function intercept_wcs_http_requests_with_empty_response( $preempt, $parsed_args, $url ) {
-		if ( strpos( $url, '/ads/v1/organizations' ) !== false ) {
-			return array(
-				'response' => array( 'code' => 200, 'message' => 'OK' ),
-				'headers'  => array(),
-				'body'     => '{}',
-			);
-		}
-
-		return $preempt;
-	}
-
-	/**
-	 * Intercept HTTP requests and return fixture data.
-	 *
-	 * @param mixed  $preempt     Preemptive response.
-	 * @param array  $parsed_args Parsed request arguments.
-	 * @param string $url         Request URL.
-	 * @return array|mixed
-	 */
-	public function intercept_wcs_http_requests_with_non_empty_response( $preempt, $parsed_args, $url ) {
-		if ( str_contains( $url, '/ads/v1/business_extension_configurations/' ) !== false ) {
-			return array(
-				'response' => array( 'code' => 200, 'message' => 'OK' ),
-				'headers'  => array(),
-				'body'     => file_get_contents( $this->mock_fixture ),
-			);
-		}
-
-		return $preempt;
+	public function register_route(): void {
+		$controller = new SnapchatBusinessExtensionController(
+			new WcsClient(
+				new JetpackAuthenticator(),
+				$this->jetpack_client
+			)
+		);
+		$controller->register_routes();
 	}
 
 	/**
 	 * Test: API returns errors without config id.
 	 */
 	public function test_get_config_without_config_id(): void {
-		add_filter( 'pre_http_request', array( $this, 'intercept_wcs_http_requests_with_empty_response' ), 10, 3 );
+		$this->jetpack_client
+			->method( 'remote_request' )
+			->willReturn( array(
+				'response' => array( 'code' => 200, 'message' => 'OK' ),
+				'headers'  => array(),
+				'body'     => file_get_contents( $this->mock_fixture ),
+			) );
 
 		$request  = new WP_REST_Request( 'POST', '/wc/sfw/snapchat/config' );
 		$response = $this->server->dispatch( $request );
-
-		remove_filter( 'pre_http_request', array( $this, 'intercept_wcs_http_requests_with_empty_response' ), 10 );
 
 		$this->assertInstanceOf( WP_REST_Response::class, $response );
 
@@ -143,9 +139,15 @@ class SnapchatBusinessExtensionControllerTest extends WP_UnitTestCase {
 	 * Test: API sets options with correct config id.
 	 */
 	public function test_get_config_with_config_id(): void {
-		add_filter( 'pre_http_request', array( $this, 'intercept_wcs_http_requests_with_non_empty_response' ), 10, 3 );
+		$this->jetpack_client
+			->method( 'remote_request' )
+			->willReturn( array(
+				'response' => array( 'code' => 200, 'message' => 'OK' ),
+				'headers'  => array(),
+				'body'     => file_get_contents( $this->mock_fixture ),
+			) );
 
-		$request  = new WP_REST_Request( 'POST', '/wc/sfw/snapchat/config' );
+		$request = new WP_REST_Request( 'POST', '/wc/sfw/snapchat/config' );
 		$request->set_header( 'Content-Type', 'application/json' );
 		$request->set_body(
 			wp_json_encode(
@@ -155,19 +157,22 @@ class SnapchatBusinessExtensionControllerTest extends WP_UnitTestCase {
 
 		$response = $this->server->dispatch( $request );
 
-		remove_filter( 'pre_http_request', array( $this, 'intercept_wcs_http_requests_with_non_empty_response' ), 10 );
-
 		$this->assertInstanceOf( WP_REST_Response::class, $response );
 
 		$data = $response->get_data();
 
-		$this->assertSame( array( 'id' => 'hello' ), $data );
+		$this->assertSame( array(
+			'org_id'      => '0877b15f-518h-4e8d-93a7-2e83b8329a00',
+			'org_name'    => 'Seireitei',
+			'ad_acc_id'   => 'be1l1a65-e320-456f-4a49-68999aee29c5',
+			'ad_acc_name' => 'Squad 6',
+			'pixel_id'    => 'a6458d50-44a3-42e2-65e4-ed1943j59da4',
+		), $data );
 		$this->assertSame( $this->options['org_id'], Options::get( OptionDefaults::ORGANIZATION_ID ) );
-		$this->assertSame( '', Options::get( OptionDefaults::ORGANIZATION_NAME ) );
-		$this->assertSame( $this->options['ads_account_id'], Options::get( OptionDefaults::ADS_ACCOUNT_ID ) );
+		$this->assertSame( 'Seireitei', Options::get( OptionDefaults::ORGANIZATION_NAME ) );
+		$this->assertSame( $this->options['ad_account_id'], Options::get( OptionDefaults::AD_ACCOUNT_ID ) );
 		$this->assertSame( $this->options['pixel_id'], Options::get( OptionDefaults::PIXEL_ID ) );
 		$this->assertSame( '', Transients::get( TransientDefaults::PIXEL_SCRIPT ) );
-		$this->assertSame( 'complete', Options::get( OptionDefaults::ONBOARDING_STATUS ) );
+		$this->assertSame( 'connected', Options::get( OptionDefaults::ONBOARDING_STATUS ) );
 	}
 }
-

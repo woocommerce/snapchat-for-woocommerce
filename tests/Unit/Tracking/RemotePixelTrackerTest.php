@@ -28,19 +28,19 @@ class RemotePixelTrackerTest extends WP_UnitTestCase {
 		parent::set_up();
 
 		// Enable pixel tracking.
-		Options::set( OptionDefaults::PIXEL_ENABLED, true );
+		Options::set( OptionDefaults::PIXEL_ENABLED, 'yes' );
 
 		// Provide a default pixel script.
 		Transients::set( TransientDefaults::PIXEL_SCRIPT, '<script src="https://sc-static.net/scevent.min.js"></script>' );
 
 		// Provide a dummy ad account ID for API path construction.
-		Options::set( OptionDefaults::ADS_ACCOUNT_ID, 'fake-account-id' );
+		Options::set( OptionDefaults::AD_ACCOUNT_ID, 'fake-account-id' );
 	}
 
 	public function tear_down(): void {
 		Options::delete( OptionDefaults::PIXEL_ENABLED );
 		Transients::delete( TransientDefaults::PIXEL_SCRIPT );
-		Options::delete( OptionDefaults::ADS_ACCOUNT_ID );
+		Options::delete( OptionDefaults::AD_ACCOUNT_ID );
 
 		parent::tear_down();
 	}
@@ -49,7 +49,7 @@ class RemotePixelTrackerTest extends WP_UnitTestCase {
 	 * Test that the pixel script is rendered from cache if present.
 	 */
 	public function test_maybe_inject_pixel_outputs_cached_script() {
-		Options::set( OptionDefaults::PIXEL_ENABLED, true );
+		Options::set( OptionDefaults::PIXEL_ENABLED, 'yes' );
 		Transients::set( TransientDefaults::PIXEL_SCRIPT, '<script src="https://sc-static.net/scevent.min.js"></script>' );
 
 		$wcs     = $this->createMock( WcsClient::class );

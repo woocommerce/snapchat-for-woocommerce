@@ -1,20 +1,18 @@
 /**
  * External dependencies
  */
-import { Stepper } from '@woocommerce/components';
 import { __ } from '@wordpress/i18n';
 import { useState } from '@wordpress/element';
+import { Stepper } from '@woocommerce/components';
+import { getHistory } from '@woocommerce/navigation';
 
 /**
  * Internal dependencies
  */
+import { getSettingsUrl } from '~/utils/urls';
+import { STEP_NAME_KEY_MAP } from './constants';
+import { recordStepperChangeEvent } from '~/utils/tracks';
 import SetupAccounts from './setup-accounts';
-import SetupPaidAds from './setup-paid-ads';
-import stepNameKeyMap from './stepNameKeyMap';
-import {
-	recordStepperChangeEvent,
-	recordStepContinueEvent,
-} from '~/utils/tracks';
 
 /**
  * @param {Object} props React props
@@ -23,20 +21,9 @@ import {
 const SavedSetupStepper = ( { savedStep } ) => {
 	const [ step, setStep ] = useState( savedStep );
 
-	/**
-	 * Handles "onContinue" callback to set the current step and record event tracking.
-	 *
-	 * @param {string} to The next step to go to.
-	 */
-	const continueStep = ( to ) => {
-		const from = step;
-
-		recordStepContinueEvent( 'sfw_setup_mc', from, to );
-		setStep( to );
-	};
-
 	const handleSetupAccountsContinue = () => {
-		continueStep( stepNameKeyMap.paid_ads );
+		const settingsUrl = getSettingsUrl();
+		getHistory().push( settingsUrl );
 	};
 
 	const handleStepClick = ( stepKey ) => {
@@ -53,19 +40,13 @@ const SavedSetupStepper = ( { savedStep } ) => {
 			currentStep={ step }
 			steps={ [
 				{
-					key: stepNameKeyMap.accounts,
+					key: STEP_NAME_KEY_MAP.accounts,
 					label: __( 'Set up your accounts', 'snapchat-for-woo' ),
 					content: (
 						<SetupAccounts
 							onContinue={ handleSetupAccountsContinue }
 						/>
 					),
-					onClick: handleStepClick,
-				},
-				{
-					key: stepNameKeyMap.paid_ads,
-					label: __( 'Create a campaign', 'snapchat-for-woo' ),
-					content: <SetupPaidAds />,
 					onClick: handleStepClick,
 				},
 			] }

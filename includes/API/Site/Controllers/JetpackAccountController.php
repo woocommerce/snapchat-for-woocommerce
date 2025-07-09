@@ -23,7 +23,7 @@ use WP_REST_Request as Request;
  *
  * @since 0.1.0
  */
-class JetpackAccountController extends SettingsBaseController {
+class JetpackAccountController extends RESTBaseController {
 
 	/**
 	 * WCS proxy request client.
@@ -206,11 +206,7 @@ class JetpackAccountController extends SettingsBaseController {
 	 */
 	protected function get_connected_callback(): callable {
 		return function () {
-			if ( $this->is_jetpack_connected() && ! Options::get( OptionDefaults::WP_TOS_ACCEPTED ) ) {
-				$this->log_wp_tos_accepted();
-			}
-
-			Options::set( OptionDefaults::IS_JETPACK_CONNECTED, $this->is_jetpack_connected() );
+			Options::set( OptionDefaults::IS_JETPACK_CONNECTED, $this->is_jetpack_connected() ? 'yes' : 'no' );
 
 			$user_data = $this->get_jetpack_user_data();
 
@@ -279,7 +275,7 @@ class JetpackAccountController extends SettingsBaseController {
 	protected function log_wp_tos_accepted(): void {
 		$user = wp_get_current_user();
 		$this->mark_tos_accepted( $user->user_email );
-		Options::set( OptionDefaults::WP_TOS_ACCEPTED, true );
+		Options::set( OptionDefaults::WP_TOS_ACCEPTED, 'yes' );
 	}
 
 	/**

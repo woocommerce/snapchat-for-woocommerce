@@ -18,10 +18,26 @@ const store = createReduxStore( STORE_KEY, {
 	selectors,
 	resolvers,
 	reducer,
-	// initialState: sfwData?.initialWpData || {},
+	initialState: {
+		general: {
+			version: '0.1',
+		},
+		setup: {
+			status: sfwData.status,
+			step: sfwData.step,
+		},
+		accounts: {
+			jetpack: null,
+			snapchat: null,
+		},
+		snapchat: null,
+		enhancedConversions: null,
+	},
 } );
 register( store );
 
 export const useAppDispatch = () => {
 	return useDispatch( STORE_KEY );
 };
+
+export { STORE_KEY };

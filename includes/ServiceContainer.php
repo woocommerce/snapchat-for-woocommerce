@@ -10,13 +10,15 @@
 
 namespace SnapchatForWooCommerce;
 
-use SnapchatForWooCommerce\Connection\JetpackAuthenticator;
 use SnapchatForWooCommerce\Connection\WcsClient;
 use SnapchatForWooCommerce\Tracking\PixelTrackingService;
 use SnapchatForWooCommerce\Tracking\RemotePixelTracker;
-use SnapchatForWooCommerce\Tracking\ConversionTrackingService;
-use SnapchatForWooCommerce\Tracking\RemoteConversionTracker;
-use SnapchatForWooCommerce\API\Site\Controllers;
+use SnapchatForWooCommerce\API;
+use SnapchatForWooCommerce\Connection;
+use SnapchatForWooCommerce\Tracking;
+use SnapchatForWooCommerce\Admin;
+use SnapchatForWooCommerce\Admin\Export;
+use SnapchatForWooCommerce\Admin\ProductMeta;
 
 /**
  * Static service container for resolving shared instances across the Ad Partner plugin.
@@ -69,12 +71,13 @@ final class ServiceContainer {
 	private static function resolve( string $service ) {
 		switch ( $service ) {
 			case ServiceKey::SETTINGS_REST_CONTROLLER_SETUP:
-				return new Controllers\SetupService();
+				return new API\SetupService();
 			case ServiceKey::JETPACK_AUTHENTICATOR:
-				return new JetpackAuthenticator();
+				return new Connection\JetpackAuthenticator();
 			case ServiceKey::WCS_CLIENT:
 				return new WcsClient(
-					self::get( ServiceKey::JETPACK_AUTHENTICATOR )
+					self::get( ServiceKey::JETPACK_AUTHENTICATOR ),
+					new Connection\JetpackClient()
 				);
 			case ServiceKey::PIXEL_TRACKING:
 				return new PixelTrackingService(
@@ -83,14 +86,31 @@ final class ServiceContainer {
 					)
 				);
 			case ServiceKey::CONVERSION_TRACKING:
-				return new ConversionTrackingService(
-					new RemoteConversionTracker(
+				return new Tracking\ConversionTrackingService(
+					new Tracking\RemoteConversionTracker(
 						self::get( ServiceKey::WCS_CLIENT )
 					)
 				);
+			case ServiceKey::PRODUCT_EXPORT_SERVICE:
+				return new Export\Service\ProductExportService(
+					new Export\BatchExportJob(
+						new Export\Service\ProductIdCacheBuilder(),
+						new Export\EntityProvider\ProductEntityProvider(),
+						new Export\RowBuilder\ProductRowBuilder(),
+						new Export\Writer\CsvExportWriter(),
+					)
+				);
+			case ServiceKey::ADMIN_SETUP:
+				return new Admin\Setup(
+					new Admin\Assets(),
+					new Admin\Menu(),
+					new Admin\Onboarding(),
+					new ProductMeta\ProductMetaFields(),
+				);
 
 			default:
-				throw new \InvalidArgumentException( esc_html( "Unknown service: $service" ) );
+				// phpcs:ignore WordPress.Security.EscapeOutput.ExceptionNotEscaped
+				throw new \InvalidArgumentException( "Unknown service: $service" );
 		}
 	}
 }

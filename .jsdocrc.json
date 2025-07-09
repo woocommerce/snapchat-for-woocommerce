@@ -1,0 +1,17 @@
+{
+  "plugins": [
+    "woocommerce-grow-jsdoc/tilde-alias",
+    "woocommerce-grow-tracking-jsdoc/fires-description",
+    "jsdoc-plugin-typescript",
+    "jsdoc-advanced-types-plugin",
+    "jsdoc-plugin-intersection"
+  ],
+  "typescript": {
+    "moduleRoot": "./js/src"
+  },
+  "templates": {
+    "woocommerce-grow-tracking-jsdoc": {
+      "path": "Tracking.md"
+    }
+  }
+}

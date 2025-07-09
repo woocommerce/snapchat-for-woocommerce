@@ -10,12 +10,13 @@
  * @package SnapchatForWooCommerce\API\Site\Controllers
  */
 
-namespace SnapchatForWooCommerce\API\Site\Controllers;
+namespace SnapchatForWooCommerce\API;
 
 use Automattic\Jetpack\Connection\Manager;
 use SnapchatForWooCommerce\ServiceContainer;
 use SnapchatForWooCommerce\ServiceKey;
 use SnapchatForWooCommerce\Config;
+use SnapchatForWooCommerce\API\Site\Controllers;
 
 /**
  * Bootstrap class for registering REST API routes related to plugin settings.
@@ -44,9 +45,10 @@ class SetupService {
 		$wcs_client = ServiceContainer::get( ServiceKey::WCS_CLIENT );
 		$manager    = new Manager( Config::PLUGIN_SLUG );
 
-		( new JetpackAccountController( $wcs_client, $manager ) )->register_routes();
-		( new SnapchatBusinessExtensionController( $wcs_client ) )->register_routes();
-		( new SnapchatOrganizationsController( $wcs_client ) )->register_routes();
-		( new OnboardingController() )->register_routes();
+		( new Controllers\JetpackAccountController( $wcs_client, $manager ) )->register_routes();
+		( new Controllers\SnapchatBusinessExtensionController( $wcs_client ) )->register_routes();
+		( new Controllers\SnapchatAccountController() )->register_routes();
+		( new Controllers\OnboardingController() )->register_routes();
+		( new Controllers\SettingsController() )->register_routes();
 	}
 }

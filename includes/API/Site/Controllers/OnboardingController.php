@@ -14,7 +14,6 @@
 namespace SnapchatForWooCommerce\API\Site\Controllers;
 
 use WP_REST_Response;
-use WP_REST_Request;
 use SnapchatForWooCommerce\Config;
 use SnapchatForWooCommerce\Utils\Storage\Options;
 use SnapchatForWooCommerce\Utils\Storage\OptionDefaults;
@@ -24,7 +23,7 @@ use SnapchatForWooCommerce\Utils\Storage\OptionDefaults;
  *
  * @since 0.1.0
  */
-class OnboardingController extends SettingsBaseController {
+class OnboardingController extends RESTBaseController {
 	/**
 	 * Registers REST API routes.
 	 *
