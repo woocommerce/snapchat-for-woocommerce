@@ -84,7 +84,7 @@ class ConversionTrackingService implements ServiceStatusInterface {
 	 * @return bool True if pixel tracking is enabled; false otherwise.
 	 */
 	public static function is_enabled(): bool {
-		return (bool) Options::get( OptionDefaults::CONVERSIONS_ENABLED );
+		return 'yes' === Options::get( OptionDefaults::CONVERSIONS_ENABLED );
 	}
 
 	/**

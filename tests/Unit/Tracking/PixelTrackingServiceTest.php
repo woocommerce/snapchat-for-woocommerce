@@ -74,7 +74,7 @@ class PixelTrackingServiceTest extends WP_UnitTestCase {
 	 * Tests that is_enabled() returns true when pixel tracking is enabled in options.
 	 */
 	public function test_is_enabled_returns_true_if_enabled() {
-		Options::set( OptionDefaults::PIXEL_ENABLED, true );
+		Options::set( OptionDefaults::PIXEL_ENABLED, 'yes' );
 
 		$this->assertTrue( PixelTrackingService::is_enabled() );
 	}
@@ -83,7 +83,7 @@ class PixelTrackingServiceTest extends WP_UnitTestCase {
 	 * Tests that is_enabled() returns false when pixel tracking is disabled in options.
 	 */
 	public function test_is_enabled_returns_false_if_disabled() {
-		Options::set( OptionDefaults::PIXEL_ENABLED, false );
+		Options::set( OptionDefaults::PIXEL_ENABLED, 'no' );
 
 		$this->assertFalse( PixelTrackingService::is_enabled() );
 	}
@@ -94,7 +94,7 @@ class PixelTrackingServiceTest extends WP_UnitTestCase {
 	 * Also verifies that GlobalSiteTag::register() is invoked.
 	 */
 	public function test_register_hooks_when_enabled() {
-		Options::set( OptionDefaults::PIXEL_ENABLED, true );
+		Options::set( OptionDefaults::PIXEL_ENABLED, 'yes' );
 
 		$this->service->register_hooks();
 
@@ -107,7 +107,7 @@ class PixelTrackingServiceTest extends WP_UnitTestCase {
 	 * Also verifies that GlobalSiteTag::register() is not invoked.
 	 */
 	public function test_register_hooks_when_disabled_does_not_register() {
-		Options::set( OptionDefaults::PIXEL_ENABLED, false );
+		Options::set( OptionDefaults::PIXEL_ENABLED, 'no' );
 
 		$this->service->register_hooks();
 

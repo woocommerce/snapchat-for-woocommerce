@@ -206,11 +206,11 @@ class JetpackAccountController extends RESTBaseController {
 	 */
 	protected function get_connected_callback(): callable {
 		return function () {
-			if ( $this->is_jetpack_connected() && ! Options::get( OptionDefaults::WP_TOS_ACCEPTED ) ) {
+			if ( $this->is_jetpack_connected() && 'no' === Options::get( OptionDefaults::WP_TOS_ACCEPTED ) ) {
 				$this->log_wp_tos_accepted();
 			}
 
-			Options::set( OptionDefaults::IS_JETPACK_CONNECTED, $this->is_jetpack_connected() );
+			Options::set( OptionDefaults::IS_JETPACK_CONNECTED, $this->is_jetpack_connected() ? 'yes' : 'no' );
 
 			$user_data = $this->get_jetpack_user_data();
 
@@ -279,7 +279,7 @@ class JetpackAccountController extends RESTBaseController {
 	protected function log_wp_tos_accepted(): void {
 		$user = wp_get_current_user();
 		$this->mark_tos_accepted( $user->user_email );
-		Options::set( OptionDefaults::WP_TOS_ACCEPTED, true );
+		Options::set( OptionDefaults::WP_TOS_ACCEPTED, 'yes' );
 	}
 
 	/**
