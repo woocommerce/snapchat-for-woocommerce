@@ -9,10 +9,10 @@ import { useState, useCallback } from '@wordpress/element';
  * Internal dependencies
  */
 import { useAppDispatch } from '~/data';
-import AppSpinner from '~/components/app-spinner';
 import useEnableEnhancedConversions from '~/hooks/useEnableEnhancedConversions';
 import useDispatchCoreNotices from '~/hooks/useDispatchCoreNotices';
 import AccountCard from '~/components/account-card';
+import SpinnerCard from '~/components/spinner-card';
 
 const TrackConversions = () => {
 	const { isEnabled, hasFinishedResolution } = useEnableEnhancedConversions();
@@ -43,6 +43,10 @@ const TrackConversions = () => {
 		}
 	};
 
+	if ( ! hasFinishedResolution ) {
+		return <SpinnerCard />;
+	}
+
 	return (
 		<AccountCard
 			title={ __( 'Conversions API', 'snapchat-for-woo' ) }
@@ -51,21 +55,15 @@ const TrackConversions = () => {
 				'snapchat-for-woo'
 			) }
 			actions={
-				<>
-					{ hasFinishedResolution && (
-						<CheckboxControl
-							label={ __(
-								'Enable Conversions API tracking',
-								'snapchat-for-woo'
-							) }
-							checked={ isEnabled }
-							disabled={ isSaving }
-							onChange={ handleOnChange }
-						/>
+				<CheckboxControl
+					label={ __(
+						'Enable Conversions API tracking',
+						'snapchat-for-woo'
 					) }
-
-					{ ! hasFinishedResolution && <AppSpinner /> }
-				</>
+					checked={ isEnabled }
+					disabled={ isSaving }
+					onChange={ handleOnChange }
+				/>
 			}
 		/>
 	);

@@ -17,8 +17,7 @@ import useApiFetchCallback from '~/hooks/useApiFetchCallback';
  * This hook provides a function to disconnect the current Snapchat account and initiate
  * the connection flow for a new Snapchat account. It manages loading states and user notifications.
  *
- * @return {[Function, { loading: boolean }]}
- *   Returns a tuple:
+ * @return {Array} `[ handleSwitch, { loading } ]`
  *     - handleSwitch: Function to trigger the account switch process.
  *     - An object with a `loading` boolean indicating if the process is ongoing.
  */
