@@ -7,6 +7,31 @@
  */
 
 /**
+ * @typedef {Object} SnapchatAccount
+ * @property {'connected'|'disconnected'} status The status of the Snapchat account.
+ */
+
+/**
+ * @typedef {Object} General
+ * @property {string} version The version of the Snapchat for WooCommerce plugin.
+ */
+
+/**
+ * @typedef {Object} Setup
+ * @property {'connected'|'disconnected'} status The setup status.
+ * @property {string} step The current setup step.
+ */
+
+/**
+ * @typedef {Object} SnapchatAccountDetails
+ * @property {string} org_id The Snapchat organization ID.
+ * @property {string} org_name The name of the Snapchat organization.
+ * @property {string} ad_acc_id The Snapchat ad account ID.
+ * @property {string} ad_acc_name The name of the Snapchat ad account.
+ * @property {string} pixel_id The Snapchat pixel ID.
+ */
+
+/**
  * Selector to retrieve the 'setup' property from the state.
  *
  * @param {Object} state - The Redux state object.
@@ -27,50 +52,40 @@ export const getJetpackAccount = ( state ) => {
 };
 
 /**
- * Retrieves the Snapchat Ads account information.
- *
- * @param {Object} state - The Redux state object.
- * @return {* | null} The Snapchat Ads account data from the state, or null if not set.
- */
-export const getSnapchatAdsAccount = ( state ) => {
-	return state.accounts.ads;
-};
-
-/**
- * Retrieves the Snapchat organization.
- *
- * @param {Object} state - The Redux state object.
- * @return {* | null} The organization associated with the Snapchat Ads account.
- */
-export const getSnapchatOrganization = ( state ) => {
-	return state.accounts.organization;
-};
-
-/**
  * Retrieves the Snapchat account information.
  * @param {Object} state - The Redux state object.
- * @return {* | null} The Snapchat account data from the state, or null if not set.
+ * @return {SnapchatAccount | null} The Snapchat account data from the state, or null if not set.
  */
 export const getSnapchatAccount = ( state ) => {
 	return state.accounts.snapchat;
 };
 
 /**
- * Retrieves the Snapchat Pixel information.
- *
- * @param {Object} state - The Redux state object.
- * @return {* | null} The Snapchat Pixel data from the state, or null if not set.
- */
-export const getSnapchatPixel = ( state ) => {
-	return state.accounts.pixel;
-};
-
-/**
  * Retrieves the general settings of the Snapchat for WooCommerce plugin.
  *
  * @param {Object} state - The Redux state object.
- * @return {Object} The general settings object containing version and other properties.
+ * @return {General} The general settings object containing version and other properties.
  */
 export const getGeneral = ( state ) => {
 	return state.general;
+};
+
+/**
+ * Retrieves the Snapchat account details from the state.
+ *
+ * @param {Object} state - The Redux state object.
+ * @return {SnapchatAccountDetails|null} The Snapchat details or null if not set.
+ */
+export const getSnapchatAccountDetails = ( state ) => {
+	return state.snapchat;
+};
+
+/**
+ * Retrieves the status of enhanced conversions.
+ *
+ * @param {Object} state - The Redux state object.
+ * @return {boolean} The status of enhanced conversions, true if enabled, false otherwise or null if not set.
+ */
+export const getEnableEnhancedConversions = ( state ) => {
+	return state.enhancedConversions;
 };

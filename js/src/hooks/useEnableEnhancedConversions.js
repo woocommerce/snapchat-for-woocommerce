@@ -8,29 +8,25 @@ import { useSelect } from '@wordpress/data';
  */
 import { STORE_KEY } from '~/data/constants';
 
-const selectorName = 'getJetpackAccount';
+const selectorName = 'getEnableEnhancedConversions';
 
 /**
- * @typedef {import('../data/selectors').JetpackAccount} JetpackObject
- */
-
-/**
- * @typedef {Object} JetpackAccountState
- * @property {JetpackObject} jetpack The Jetpack account data.
+ * @typedef {Object} EnableEnhancedConversions
+ * @property {boolean} isEnabled Whether enhanced conversions are enabled.
  * @property {boolean} hasFinishedResolution Whether the resolution for the selector has finished.
  */
 
 /**
- * Retrieves the Jetpack account data and its resolution status.
+ * Retrieves the enabled state and resolution status for the enhanced conversions feature.
  *
- * @return {JetpackAccountState} The Jetpack account data and its state.
+ * @return {EnableEnhancedConversions} The data and its state.
  */
-const useJetpackAccount = () => {
+const useEnableEnhancedConversions = () => {
 	return useSelect( ( select ) => {
 		const selector = select( STORE_KEY );
 
 		return {
-			jetpack: selector[ selectorName ](),
+			isEnabled: selector[ selectorName ](),
 			hasFinishedResolution: selector.hasFinishedResolution(
 				selectorName,
 				[]
@@ -39,4 +35,4 @@ const useJetpackAccount = () => {
 	}, [] );
 };
 
-export default useJetpackAccount;
+export default useEnableEnhancedConversions;
