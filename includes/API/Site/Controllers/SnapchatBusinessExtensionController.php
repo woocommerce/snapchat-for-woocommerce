@@ -276,27 +276,8 @@ class SnapchatBusinessExtensionController extends RESTBaseController {
 	 * @return WP_REST_Response
 	 */
 	public function delete_connection() {
-		$response = $this->stop_connection();
-
-		if ( is_wp_error( $response ) ) {
-			return new WP_REST_Response(
-				array(
-					'status'  => 'error',
-					'message' => $response->get_error_message(),
-					'data'    => $response->get_error_data(),
-				),
-				500
-			);
-		}
-
-		$data         = $response->get_data();
-		$oauth_status = '';
-
-		if ( $data['status'] && 'disconnected' === $data['status'] ) {
-			$oauth_status = $data['status'];
-		}
-
 		$config_id = Options::get( OptionDefaults::CONFIG_ID );
+		$config_id = 'f752ecc2-9775-44ee-a5c2-dc3db1b1cfa5';
 
 		if ( $config_id ) {
 			$response = $this->wcs->proxy_delete(
@@ -326,6 +307,26 @@ class SnapchatBusinessExtensionController extends RESTBaseController {
 					500
 				);
 			}
+		}
+
+		$response = $this->stop_connection();
+
+		if ( is_wp_error( $response ) ) {
+			return new WP_REST_Response(
+				array(
+					'status'  => 'error',
+					'message' => $response->get_error_message(),
+					'data'    => $response->get_error_data(),
+				),
+				500
+			);
+		}
+
+		$data         = $response->get_data();
+		$oauth_status = '';
+
+		if ( $data['status'] && 'disconnected' === $data['status'] ) {
+			$oauth_status = $data['status'];
 		}
 
 		Options::delete( OptionDefaults::CONFIG_ID );
