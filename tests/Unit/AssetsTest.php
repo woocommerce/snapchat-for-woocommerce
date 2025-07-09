@@ -43,8 +43,8 @@ final class AssetsTest extends WP_UnitTestCase {
 	}
 
 	public function test_scripts_not_enqueued_when_tracking_disabled(): void {
-		Options::set( OptionDefaults::PIXEL_ENABLED, false );
-		Options::set( OptionDefaults::CONVERSIONS_ENABLED, false );
+		Options::set( OptionDefaults::PIXEL_ENABLED, 'no' );
+		Options::set( OptionDefaults::CONVERSIONS_ENABLED, 'no' );
 
 		$assets = new Assets();
 		$assets->enqueue_scripts();
@@ -55,8 +55,8 @@ final class AssetsTest extends WP_UnitTestCase {
 	}
 
 	public function test_scripts_enqueued_when_pixel_enabled(): void {
-		Options::set( OptionDefaults::PIXEL_ENABLED, true );
-		Options::set( OptionDefaults::CONVERSIONS_ENABLED, false );
+		Options::set( OptionDefaults::PIXEL_ENABLED, 'yes' );
+		Options::set( OptionDefaults::CONVERSIONS_ENABLED, 'no' );
 
 		$assets = new Assets();
 		$assets->enqueue_scripts();
@@ -67,8 +67,8 @@ final class AssetsTest extends WP_UnitTestCase {
 	}
 
 	public function test_scripts_enqueued_when_conversion_enabled(): void {
-		Options::set( OptionDefaults::PIXEL_ENABLED, false );
-		Options::set( OptionDefaults::CONVERSIONS_ENABLED, true );
+		Options::set( OptionDefaults::PIXEL_ENABLED, 'no' );
+		Options::set( OptionDefaults::CONVERSIONS_ENABLED, 'yes' );
 
 		$assets = new Assets();
 		$assets->enqueue_scripts();
@@ -79,8 +79,8 @@ final class AssetsTest extends WP_UnitTestCase {
 	}
 
 	public function test_localized_data_passed_correctly(): void {
-		Options::set( OptionDefaults::PIXEL_ENABLED, true );
-		Options::set( OptionDefaults::CONVERSIONS_ENABLED, true );
+		Options::set( OptionDefaults::PIXEL_ENABLED, 'yes' );
+		Options::set( OptionDefaults::CONVERSIONS_ENABLED, 'yes' );
 
 		$assets = new Assets();
 

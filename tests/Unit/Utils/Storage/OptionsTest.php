@@ -42,21 +42,24 @@ class OptionsTest extends WP_UnitTestCase {
 	}
 
 	public function test_get_returns_default_if_option_missing(): void {
-		$this->assertTrue(
+		$this->assertSame(
+			'yes',
 			Options::get( OptionDefaults::PIXEL_ENABLED )
 		);
 	}
 
 	public function test_set_persists_option(): void {
-		Options::set( OptionDefaults::PIXEL_ENABLED, true );
+		Options::set( OptionDefaults::PIXEL_ENABLED, 'yes' );
 
-		$this->assertTrue(
+		$this->assertSame(
+			'yes',
 			get_option( Config::STORE_PREFIX . OptionDefaults::PIXEL_ENABLED )
 		);
 
-		Options::set( OptionDefaults::PIXEL_ENABLED, false );
+		Options::set( OptionDefaults::PIXEL_ENABLED, 'no' );
 
-		$this->assertFalse(
+		$this->assertSame(
+			'no',
 			get_option( Config::STORE_PREFIX . OptionDefaults::PIXEL_ENABLED )
 		);
 	}
