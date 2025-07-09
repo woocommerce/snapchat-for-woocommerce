@@ -31,7 +31,7 @@ const store = createReduxStore( STORE_KEY, {
 			snapchat: null,
 		},
 		snapchat: null,
-		settings: null,
+		enhancedConversions: null,
 	},
 } );
 register( store );

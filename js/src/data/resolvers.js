@@ -12,6 +12,7 @@ import { handleApiError } from '~/utils/handleError';
 import {
 	receiveJetpackAccount,
 	receiveSnapchatAccountDetails,
+	receiveEnhancedConversionsStatus,
 	fetchSnapchatAccount,
 } from './actions';
 
@@ -69,6 +70,35 @@ export function getSnapchatAccountDetails() {
 				error,
 				__(
 					'There was an error loading Snapchat account details info.',
+					'snapchat-for-woo'
+				)
+			);
+		}
+	};
+}
+
+/**
+ * Fetches the status of enhanced conversions from the API.
+ *
+ * @return {Function} An async thunk function that takes a Redux-like dispatch object.
+ */
+export function getEnableEnhancedConversions() {
+	return async function ( { dispatch } ) {
+		try {
+			const response = await apiFetch( {
+				path: `${ API_NAMESPACE }/snapchat/settings`,
+			} );
+
+			dispatch(
+				receiveEnhancedConversionsStatus(
+					Boolean( response.capi_enabled )
+				)
+			);
+		} catch ( error ) {
+			handleApiError(
+				error,
+				__(
+					'There was an error getting the enhanced conversions status.',
 					'snapchat-for-woo'
 				)
 			);

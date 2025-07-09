@@ -38,6 +38,19 @@ export function receiveSnapchatAccount( snapchatAccount ) {
 }
 
 /**
+ * Creates an action to receive the status of enhanced conversions.
+ *
+ * @param {boolean} status - The status of enhanced conversions, true if enabled, false otherwise.
+ * @return {Object} Action object with type RECEIVE_ENHANCED_CONVERSIONS_STATUS.
+ */
+export function receiveEnhancedConversionsStatus( status ) {
+	return {
+		type: TYPES.RECEIVE_ENHANCED_CONVERSIONS_STATUS,
+		status,
+	};
+}
+
+/**
  * Creates an action to receive Snapchat account details.
  *
  * @param {Object} snapchatAccountDetails - The Snapchat account details to be received.
@@ -48,6 +61,35 @@ export function receiveSnapchatAccountDetails( snapchatAccountDetails ) {
 		type: TYPES.RECEIVE_SNAPCHAT_ACCOUNT_DETAILS,
 		snapchatAccountDetails,
 	};
+}
+
+/**
+ * Update the enhanced conversions status.
+ *
+ * @param {boolean} status The status of the enhanced conversions.
+ * @return {Object} Action object to update the enhanced conversions status.
+ */
+export async function updateEnhancedConversionsStatus( status ) {
+	try {
+		await apiFetch( {
+			path: `${ API_NAMESPACE }/snapchat/settings`,
+			method: 'POST',
+			data: {
+				capi_enabled: status,
+			},
+		} );
+
+		return receiveEnhancedConversionsStatus( status );
+	} catch ( error ) {
+		handleApiError(
+			error,
+			__(
+				'There was an error updating the enhanced conversions status.',
+				'snapchat-for-woo'
+			)
+		);
+		throw error;
+	}
 }
 
 /**
@@ -65,7 +107,6 @@ export async function fetchSnapchatAccount( { dispatch } ) {
 			path: `${ API_NAMESPACE }/snapchat/connection`,
 		} );
 
-		console.log( 'Snapchat account response:', response );
 		dispatch( receiveSnapchatAccount( response ) );
 	} catch ( error ) {
 		handleApiError(

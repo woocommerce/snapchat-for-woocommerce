@@ -9,6 +9,7 @@ import { useState, useCallback } from '@wordpress/element';
  * Internal dependencies
  */
 import { useAppDispatch } from '~/data';
+import AppSpinner from '~/components/app-spinner';
 import useEnableEnhancedConversions from '~/hooks/useEnableEnhancedConversions';
 import useDispatchCoreNotices from '~/hooks/useDispatchCoreNotices';
 import AccountCard from '~/components/account-card';
@@ -49,17 +50,24 @@ const TrackConversions = () => {
 				'Send server-side conversion events to improve attribution.',
 				'snapchat-for-woo'
 			) }
-		>
-			<CheckboxControl
-				label={ __(
-					'Enable Conversions API tracking',
-					'snapchat-for-woo'
-				) }
-				checked={ isEnabled }
-				disabled={ isSaving }
-				onChange={ handleOnChange }
-			/>
-		</AccountCard>
+			actions={
+				<>
+					{ hasFinishedResolution && (
+						<CheckboxControl
+							label={ __(
+								'Enable Conversions API tracking',
+								'snapchat-for-woo'
+							) }
+							checked={ isEnabled }
+							disabled={ isSaving }
+							onChange={ handleOnChange }
+						/>
+					) }
+
+					{ ! hasFinishedResolution && <AppSpinner /> }
+				</>
+			}
+		/>
 	);
 };
 
