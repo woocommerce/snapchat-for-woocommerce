@@ -79,7 +79,7 @@ class SnapchatBusinessExtensionControllerTest extends WP_UnitTestCase {
 
 		Options::delete( OptionDefaults::ORGANIZATION_ID );
 		Options::delete( OptionDefaults::ORGANIZATION_NAME );
-		Options::delete( OptionDefaults::ADS_ACCOUNT_ID );
+		Options::delete( OptionDefaults::AD_ACCOUNT_ID );
 		Options::delete( OptionDefaults::PIXEL_ID );
 		Transients::delete( TransientDefaults::PIXEL_SCRIPT );
 		Options::delete( OptionDefaults::ONBOARDING_STATUS );
@@ -95,6 +95,7 @@ class SnapchatBusinessExtensionControllerTest extends WP_UnitTestCase {
 	public function tear_down(): void {
 		remove_action( 'rest_api_init', array( $this, 'register_route' ) );
 		add_action( 'rest_api_init', array( Plugin::class, 'register_rest_routes' ) );
+		do_action( 'rest_api_init' );
 		parent::tear_down();
 	}
 
@@ -160,10 +161,16 @@ class SnapchatBusinessExtensionControllerTest extends WP_UnitTestCase {
 
 		$data = $response->get_data();
 
-		$this->assertSame( array( 'id' => 'hello' ), $data );
+		$this->assertSame( array(
+			'org_id'      => '0877b15f-518h-4e8d-93a7-2e83b8329a00',
+			'org_name'    => 'Seireitei',
+			'ad_acc_id'   => 'be1l1a65-e320-456f-4a49-68999aee29c5',
+			'ad_acc_name' => 'Squad 6',
+			'pixel_id'    => 'a6458d50-44a3-42e2-65e4-ed1943j59da4',
+		), $data );
 		$this->assertSame( $this->options['org_id'], Options::get( OptionDefaults::ORGANIZATION_ID ) );
-		$this->assertSame( '', Options::get( OptionDefaults::ORGANIZATION_NAME ) );
-		$this->assertSame( $this->options['ads_account_id'], Options::get( OptionDefaults::ADS_ACCOUNT_ID ) );
+		$this->assertSame( 'Seireitei', Options::get( OptionDefaults::ORGANIZATION_NAME ) );
+		$this->assertSame( $this->options['ad_account_id'], Options::get( OptionDefaults::AD_ACCOUNT_ID ) );
 		$this->assertSame( $this->options['pixel_id'], Options::get( OptionDefaults::PIXEL_ID ) );
 		$this->assertSame( '', Transients::get( TransientDefaults::PIXEL_SCRIPT ) );
 		$this->assertSame( 'complete', Options::get( OptionDefaults::ONBOARDING_STATUS ) );
