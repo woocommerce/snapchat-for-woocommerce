@@ -49,5 +49,6 @@ class SetupService {
 		( new Controllers\SnapchatBusinessExtensionController( $wcs_client ) )->register_routes();
 		( new Controllers\SnapchatAccountController() )->register_routes();
 		( new Controllers\OnboardingController() )->register_routes();
+		( new Controllers\SettingsController() )->register_routes();
 	}
 }

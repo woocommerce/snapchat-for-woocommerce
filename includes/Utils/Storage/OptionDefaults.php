@@ -178,7 +178,7 @@ final class OptionDefaults {
 			self::AD_ACCOUNT_NAME         => '',
 			self::ORGANIZATION_ID         => '',
 			self::ORGANIZATION_NAME       => '',
-			self::PIXEL_ENABLED           => false,
+			self::PIXEL_ENABLED           => true,
 			self::PIXEL_ID                => '',
 			self::CONVERSIONS_ENABLED     => false,
 			self::CONVERSION_ACCESS_TOKEN => '',
