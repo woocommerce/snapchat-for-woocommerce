@@ -25,26 +25,7 @@ use SnapchatForWooCommerce\Utils\Storage\OptionDefaults;
  *
  * @since 0.1.0
  */
-class SnapchatOrganizationsController extends RESTBaseController {
-
-	/**
-	 * WCS proxy request client.
-	 *
-	 * @var WcsClient
-	 */
-	protected WcsClient $wcs;
-
-	/**
-	 * Class constructor.
-	 *
-	 * @since 0.1.0
-	 *
-	 * @param WcsClient $wcs WCS proxy request client.
-	 */
-	public function __construct( WcsClient $wcs ) {
-		$this->wcs = $wcs;
-	}
-
+class SnapchatAccountController extends RESTBaseController {
 	/**
 	 * Registers REST API routes.
 	 *
@@ -54,49 +35,48 @@ class SnapchatOrganizationsController extends RESTBaseController {
 	 */
 	public function register_routes(): void {
 		/**
-		 * GET /organization
-		 * - Returns an array of OptionDefaults::ORGANIZATION_ID
-		 *   and OptionDefaults::ORGANIZATION_NAME
+		 * GET /account
+		 * - Returns an array of merchant account details.
 		 */
 		register_rest_route(
 			Config::REST_NAMESPACE . '/snapchat',
-			'/organization',
+			'/account',
 			array(
 				array(
 					'methods'             => 'GET',
-					'callback'            => array( $this, 'get_organization' ),
+					'callback'            => array( $this, 'get_account_details' ),
 					'permission_callback' => array( $this, 'permissions_check' ),
 				),
-				'schema' => array( $this, 'organization_schema' ),
+				'schema' => array( $this, 'account_details' ),
 			)
 		);
 	}
 
 	/**
-	 * Returns the currently selected organization.
+	 * Returns an array of Merchant Account details.
 	 *
 	 * @since 0.1.0
 	 *
 	 * @return WP_REST_Response
 	 */
-	public function get_organization() {
-		$org_id   = Options::get( OptionDefaults::ORGANIZATION_ID );
-		$org_name = Options::get( OptionDefaults::ORGANIZATION_NAME );
-
+	public function get_account_details() {
 		return rest_ensure_response(
 			array(
-				'id'   => $org_id,
-				'name' => $org_name,
+				'org_id'      => Options::get( OptionDefaults::ORGANIZATION_ID ),
+				'org_name'    => Options::get( OptionDefaults::ORGANIZATION_NAME ),
+				'ad_acc_id'   => Options::get( OptionDefaults::AD_ACCOUNT_ID ),
+				'ad_acc_name' => Options::get( OptionDefaults::AD_ACCOUNT_NAME ),
+				'pixel_id'    => Options::get( OptionDefaults::PIXEL_ID ),
 			)
 		);
 	}
 
+
 	/**
-	 * Returns the JSON schema for the `/organization` REST endpoint.
+	 * Returns the JSON schema for the `/account` REST endpoint.
 	 *
-	 * This schema defines a single object with a required `id` property
-	 * representing the selected Snapchat organization. It is used to validate
-	 * incoming POST payloads and document the expected data format.
+	 * This schema defines a single object with details about the merchant
+	 * account.
 	 *
 	 * @since 0.1.0
 	 *
@@ -108,16 +88,28 @@ class SnapchatOrganizationsController extends RESTBaseController {
 			'title'      => 'snapchat_organization',
 			'type'       => 'object',
 			'properties' => array(
-				'id'   => array(
-					'description' => 'The unique ID of the selected Snapchat Organization.',
+				'org_id'      => array(
+					'description' => 'Snapchat Organization id.',
 					'type'        => 'string',
 				),
-				'name' => array(
-					'description' => 'The name of the selected Snapchat Organization.',
+				'org_name'    => array(
+					'description' => 'Snapchat Organization name.',
+					'type'        => 'string',
+				),
+				'ad_acc_id'   => array(
+					'description' => 'Snapchat Account id.',
+					'type'        => 'string',
+				),
+				'ad_acc_name' => array(
+					'description' => 'Snapchat Account name.',
+					'type'        => 'string',
+				),
+				'pixel_id'    => array(
+					'description' => 'Pixel id.',
 					'type'        => 'string',
 				),
 			),
-			'required'   => array( 'id', 'name' ),
+			'required'   => array( 'org_id', 'org_name', 'ad_acc_id', 'ad_acc_name', 'pixel_id' ),
 		);
 	}
 }
