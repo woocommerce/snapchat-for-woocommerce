@@ -206,7 +206,7 @@ class JetpackAccountController extends RESTBaseController {
 	 */
 	protected function get_connected_callback(): callable {
 		return function () {
-			if ( $this->is_jetpack_connected() && 'no' !== Options::get( OptionDefaults::WP_TOS_ACCEPTED ) ) {
+			if ( $this->is_jetpack_connected() && 'no' === Options::get( OptionDefaults::WP_TOS_ACCEPTED ) ) {
 				$this->log_wp_tos_accepted();
 			}
 
