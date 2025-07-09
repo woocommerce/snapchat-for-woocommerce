@@ -7,25 +7,19 @@ import { __ } from '@wordpress/i18n';
  * Internal dependencies
  */
 import AppSpinner from '~/components/app-spinner';
-import useSnapchatOrganization from '~/hooks/useSnapchatOrganization';
-import useSnapchatAdsAccount from '~/hooks/useSnapchatAdsAccount';
-import useSnapchatPixel from '~/hooks/useSnapchatPixel';
+import useSnapchatAccountDetails from '~/hooks/useSnapchatAccountDetails';
 import './account-detail.scss';
 
 const AccountDetails = () => {
 	const {
-		name: organizationName,
-		hasFinishedResolution: hasResolvedOrganization,
-	} = useSnapchatOrganization();
-	const {
-		id: adsId,
-		name: adsName,
-		hasFinishedResolution: hasResolvedAds,
-	} = useSnapchatAdsAccount();
-	const { id: pixelId, hasFinishedResolution: hasResolvedPixel } =
-		useSnapchatPixel();
+		org_name: organizationName,
+		ad_acc_id: adsId,
+		ad_acc_name: adsName,
+		pixel_id: pixelId,
+		hasFinishedResolution,
+	} = useSnapchatAccountDetails();
 
-	if ( ! hasResolvedOrganization || ! hasResolvedAds || ! hasResolvedPixel ) {
+	if ( ! hasFinishedResolution ) {
 		return <AppSpinner />;
 	}
 

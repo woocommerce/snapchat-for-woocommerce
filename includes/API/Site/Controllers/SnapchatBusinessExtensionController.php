@@ -298,35 +298,35 @@ class SnapchatBusinessExtensionController extends RESTBaseController {
 
 		$config_id = Options::get( OptionDefaults::CONFIG_ID );
 
-		if ( $config_id ) {
-			$response = $this->wcs->proxy_delete(
-				'/ads/v1/business_extension_configurations/' . $config_id
-			);
+		// if ( $config_id ) {
+		// 	$response = $this->wcs->proxy_delete(
+		// 		'/ads/v1/business_extension_configurations/' . $config_id
+		// 	);
 
-			if ( is_wp_error( $response ) ) {
-				return new WP_REST_Response(
-					array(
-						'status'  => 'error',
-						'message' => $response->get_error_message(),
-						'data'    => $response->get_error_data(),
-					),
-					500
-				);
-			}
+		// 	if ( is_wp_error( $response ) ) {
+		// 		return new WP_REST_Response(
+		// 			array(
+		// 				'status'  => 'error',
+		// 				'message' => $response->get_error_message(),
+		// 				'data'    => $response->get_error_data(),
+		// 			),
+		// 			500
+		// 		);
+		// 	}
 
-			$data = $response->get_data();
+		// 	$data = $response->get_data();
 
-			if ( is_wp_error( $data ) ) {
-				return new WP_REST_Response(
-					array(
-						'status'  => 'error',
-						'message' => $response->get_error_message(),
-						'data'    => $response->get_error_data(),
-					),
-					500
-				);
-			}
-		}
+		// 	if ( is_wp_error( $data ) ) {
+		// 		return new WP_REST_Response(
+		// 			array(
+		// 				'status'  => 'error',
+		// 				'message' => $response->get_error_message(),
+		// 				'data'    => $response->get_error_data(),
+		// 			),
+		// 			500
+		// 		);
+		// 	}
+		// }
 
 		Options::delete( OptionDefaults::CONFIG_ID );
 		Options::delete( OptionDefaults::ORGANIZATION_ID );

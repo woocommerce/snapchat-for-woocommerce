@@ -97,32 +97,16 @@ const reducer = ( state, action ) => {
 			return setIn( state, 'accounts.jetpack', account );
 		}
 
-		case TYPES.RECEIVE_SNAPCHAT_ADS_ACCOUNT: {
-			const { snapchatAdsAccount } = action;
-
-			return setIn( state, 'accounts.ads', snapchatAdsAccount );
-		}
-
-		case TYPES.RECEIVE_SNAPCHAT_ORGANIZATION: {
-			const { snapchatOrganization } = action;
-
-			return setIn(
-				state,
-				'accounts.organization',
-				snapchatOrganization
-			);
-		}
-
 		case TYPES.RECEIVE_SNAPCHAT_ACCOUNT: {
 			const { snapchatAccount } = action;
 
 			return setIn( state, 'accounts.snapchat', snapchatAccount );
 		}
 
-		case TYPES.RECEIVE_SNAPCHAT_PIXEL: {
-			const { snapchatPixel } = action;
+		case TYPES.RECEIVE_SNAPCHAT_ACCOUNT_DETAILS: {
+			const { snapchatAccountDetails } = action;
 
-			return setIn( state, 'accounts.pixel', snapchatPixel );
+			return setIn( state, 'snapchat', snapchatAccountDetails );
 		}
 
 		case TYPES.DISCONNECT_ACCOUNTS_SNAPCHAT: {

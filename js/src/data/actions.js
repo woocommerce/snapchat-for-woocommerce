@@ -25,32 +25,6 @@ export function receiveJetpackAccount( account ) {
 }
 
 /**
- * Creates an action to receive a Snapchat Ads account.
- *
- * @param {Object} snapchatAdsAccount - The Snapchat Ads account data to be received.
- * @return {Object} Action object with type RECEIVE_SNAPCHAT_ADS_ACCOUNT and the Snapchat Ads account data.
- */
-export function receiveSnapchatAdsAccount( snapchatAdsAccount ) {
-	return {
-		type: TYPES.RECEIVE_SNAPCHAT_ADS_ACCOUNT,
-		snapchatAdsAccount,
-	};
-}
-
-/**
- * Creates an action to receive a Snapchat organization.
- *
- * @param {Object} snapchatOrganization - The Snapchat organization data to be received.
- * @return {Object} Action object with type RECEIVE_SNAPCHAT_ORGANIZATION and the Snapchat organization data.
- */
-export function receiveSnapchatOrganization( snapchatOrganization ) {
-	return {
-		type: TYPES.RECEIVE_SNAPCHAT_ORGANIZATION,
-		snapchatOrganization,
-	};
-}
-
-/**
  * Creates an action to receive a Snapchat account.
  *
  * @param {Object} snapchatAccount - The Snapchat account data to be received.
@@ -64,15 +38,15 @@ export function receiveSnapchatAccount( snapchatAccount ) {
 }
 
 /**
- * Creates an action to receive a Snapchat Pixel object.
+ * Creates an action to receive Snapchat account details.
  *
- * @param {Object} snapchatPixel - The Snapchat Pixel data to be received.
- * @return {Object} Action object with type RECEIVE_SNAPCHAT_PIXEL and the Snapchat Pixel data.
+ * @param {Object} snapchatAccountDetails - The Snapchat account details to be received.
+ * @return {Object} Action object with type RECEIVE_SNAPCHAT_ACCOUNT_DETAILS and the Snapchat account details.
  */
-export function receiveSnapchatPixel( snapchatPixel ) {
+export function receiveSnapchatAccountDetails( snapchatAccountDetails ) {
 	return {
-		type: TYPES.RECEIVE_SNAPCHAT_PIXEL,
-		snapchatPixel,
+		type: TYPES.RECEIVE_SNAPCHAT_ACCOUNT_DETAILS,
+		snapchatAccountDetails,
 	};
 }
 
@@ -91,6 +65,7 @@ export async function fetchSnapchatAccount( { dispatch } ) {
 			path: `${ API_NAMESPACE }/snapchat/connection`,
 		} );
 
+		console.log( 'Snapchat account response:', response );
 		dispatch( receiveSnapchatAccount( response ) );
 	} catch ( error ) {
 		handleApiError(
@@ -129,32 +104,6 @@ export async function disconnectSnapchatAccount(
 				'Unable to disconnect your Snapchat account.',
 				'snapchat-for-woo'
 			)
-		);
-		throw error;
-	}
-}
-
-export async function disconnectAllAccounts() {
-	try {
-		await apiFetch( {
-			path: `${ API_NAMESPACE }/connections`,
-			method: 'DELETE',
-		} );
-
-		return {
-			type: TYPES.DISCONNECT_ACCOUNTS_ALL,
-		};
-	} catch ( error ) {
-		// Skip any error related to revoking WPCOM token.
-		if ( error.errors[ `${ API_NAMESPACE }/rest-api/authorize` ] ) {
-			return {
-				type: TYPES.DISCONNECT_ACCOUNTS_ALL,
-			};
-		}
-
-		handleApiError(
-			error,
-			__( 'Unable to disconnect all your accounts.', 'snapchat-for-woo' )
 		);
 		throw error;
 	}
