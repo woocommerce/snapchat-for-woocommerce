@@ -12,9 +12,7 @@ import ConnectSnapchatAccountCard from './connect-snapchat-account-card';
 
 const SnapchatAccountCard = ( { disabled = false } ) => {
 	const { isConnected } = useSnapchatAccount();
-	const { state: stateQuery } = getQuery();
-	const stateQueryParams = new URLSearchParams( stateQuery );
-	const configId = stateQueryParams.get( 'config_id' );
+	const { config_id: configId } = getQuery();
 
 	if ( isConnected ) {
 		return <ConnectedSnapchatAccountCard />;

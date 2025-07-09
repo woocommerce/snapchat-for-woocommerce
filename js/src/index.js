@@ -12,8 +12,8 @@ import { getSetting } from '@woocommerce/settings'; // eslint-disable-line impor
  * Internal dependencies
  */
 import './css/index.scss';
-import withAdminPageShell from '~/components/withAdminPageShell';
 import './data';
+import withAdminPageShell from '~/components/withAdminPageShell';
 import { addBaseEventProperties } from '~/utils/tracks';
 
 const GetStartedPage = lazy( () =>
@@ -149,17 +149,17 @@ if ( hasRunFilter() && ! hasAddedFallback() && ! hasAddedPluginAdminPages ) {
 }
 
 // Ref: https://github.com/woocommerce/woocommerce/blob/6.9.0/plugins/woocommerce/includes/tracks/class-wc-site-tracking.php#L92
-// addFilter(
-// 	'woocommerce_tracks_client_event_properties',
-// 	'woocommerce/snapchat-for-woo/add-base-event-properties-to-page-view',
-// 	( eventProperties, eventName ) => {
-// 		if (
-// 			eventName === 'wcadmin_page_view' &&
-// 			pagePaths.has( eventProperties.path )
-// 		) {
-// 			return addBaseEventProperties( eventProperties );
-// 		}
+addFilter(
+	'woocommerce_tracks_client_event_properties',
+	'woocommerce/snapchat-for-woo/add-base-event-properties-to-page-view',
+	( eventProperties, eventName ) => {
+		if (
+			eventName === 'wcadmin_page_view' &&
+			pagePaths.has( eventProperties.path )
+		) {
+			return addBaseEventProperties( eventProperties );
+		}
 
-// 		return eventProperties;
-// 	}
-// );
+		return eventProperties;
+	}
+);

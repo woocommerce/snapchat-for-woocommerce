@@ -64,3 +64,13 @@ export const getSnapchatAccount = ( state ) => {
 export const getSnapchatPixel = ( state ) => {
 	return state.accounts.pixel;
 };
+
+/**
+ * Retrieves the general settings of the Snapchat for WooCommerce plugin.
+ *
+ * @param {Object} state - The Redux state object.
+ * @return {Object} The general settings object containing version and other properties.
+ */
+export const getGeneral = ( state ) => {
+	return state.general;
+};

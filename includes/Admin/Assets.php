@@ -73,6 +73,7 @@ class Assets {
 				'csvExportAction'    => Helper::with_prefix( 'generate_feed' ),
 				'prefix'             => Helper::with_prefix( '' ),
 				'lastTimestamp'      => Options::get( OptionDefaults::LAST_EXPORT_TIMESTAMP ),
+				'slug'               => 'sfw',
 			)
 		);
 	}
