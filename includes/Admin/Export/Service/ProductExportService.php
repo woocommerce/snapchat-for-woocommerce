@@ -277,8 +277,9 @@ class ProductExportService {
 			}
 
 			$response[ $response_key ] = array(
-				'status'  => $status,
-				'fileUrl' => Options::get( OptionDefaults::EXPORT_FILE_URL ),
+				'status'     => $status,
+				'fileUrl'    => Options::get( OptionDefaults::EXPORT_FILE_URL ),
+				'lastExport' => Options::get( OptionDefaults::LAST_EXPORT_TIMESTAMP ),
 			);
 		}
 
