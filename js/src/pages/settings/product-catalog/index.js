@@ -2,7 +2,7 @@
  * External dependencies
  */
 import { __ } from '@wordpress/i18n';
-import { Flex, FlexItem } from '@wordpress/components';
+import { Flex } from '@wordpress/components';
 import { createInterpolateElement } from '@wordpress/element';
 
 /**
@@ -11,10 +11,12 @@ import { createInterpolateElement } from '@wordpress/element';
 import AppButton from '~/components/app-button';
 import AppDocumentationLink from '~/components/app-documentation-link';
 import AccountCard from '~/components/account-card';
+import './index.scss';
 
 const ProductCatalog = () => {
 	return (
 		<AccountCard
+			className="sfw-product-catalog"
 			title={ __( 'Export Product Catalog', 'snapchat-for-woo' ) }
 			description={ __(
 				'Last exported on July 1 at 7:52 PM.',
@@ -31,7 +33,7 @@ const ProductCatalog = () => {
 				</Flex>
 			}
 		>
-			<div>
+			<div className="sfw-product-catalog__help">
 				<p>
 					{ __(
 						'You can download the latest CSV or regenerate it if you’ve made changes.',

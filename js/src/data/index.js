@@ -29,10 +29,9 @@ const store = createReduxStore( STORE_KEY, {
 		accounts: {
 			jetpack: null,
 			snapchat: null,
-			ads: null,
-			organization: null,
-			pixel: null,
 		},
+		snapchat: null,
+		enhancedConversions: null,
 	},
 } );
 register( store );
