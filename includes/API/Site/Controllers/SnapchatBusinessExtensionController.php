@@ -194,7 +194,7 @@ class SnapchatBusinessExtensionController extends RESTBaseController {
 			Options::set( OptionDefaults::CONVERSION_ACCESS_TOKEN, $client_data['capi_token'] );
 		}
 
-		Options::set( OptionDefaults::ONBOARDING_STATUS, 'complete' );
+		Options::set( OptionDefaults::ONBOARDING_STATUS, 'connected' );
 
 		return rest_ensure_response(
 			array(
