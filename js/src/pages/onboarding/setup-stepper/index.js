@@ -1,9 +1,4 @@
 /**
- * External dependencies
- */
-import { getHistory, getNewPath } from '@woocommerce/navigation';
-
-/**
  * Internal dependencies
  */
 import { STEP_NAME_KEY_MAP } from './constants';
@@ -24,12 +19,7 @@ const SetupStepper = () => {
 		return null;
 	}
 
-	const { status, step } = sfwSetup;
-
-	if ( status === 'complete' ) {
-		getHistory().replace( getNewPath( {}, '/snapchat/settings' ) );
-		return null;
-	}
+	const { step } = sfwSetup;
 
 	return <SavedSetupStepper savedStep={ STEP_NAME_KEY_MAP[ step ] } />;
 };

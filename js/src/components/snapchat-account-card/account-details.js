@@ -6,42 +6,38 @@ import { __ } from '@wordpress/i18n';
 /**
  * Internal dependencies
  */
-import AppSpinner from '~/components/app-spinner';
-import useSnapchatOrganization from '~/hooks/useSnapchatOrganization';
-import useSnapchatAdsAccount from '~/hooks/useSnapchatAdsAccount';
-import useSnapchatPixel from '~/hooks/useSnapchatPixel';
+import useSnapchatAccountDetails from '~/hooks/useSnapchatAccountDetails';
 import './account-detail.scss';
 
 const AccountDetails = () => {
 	const {
-		name: organizationName,
-		hasFinishedResolution: hasResolvedOrganization,
-	} = useSnapchatOrganization();
-	const {
-		id: adsId,
-		name: adsName,
-		hasFinishedResolution: hasResolvedAds,
-	} = useSnapchatAdsAccount();
-	const { id: pixelId, hasFinishedResolution: hasResolvedPixel } =
-		useSnapchatPixel();
-
-	if ( ! hasResolvedOrganization || ! hasResolvedAds || ! hasResolvedPixel ) {
-		return <AppSpinner />;
-	}
+		org_name: organizationName,
+		ad_acc_id: adsId,
+		ad_acc_name: adsName,
+		pixel_id: pixelId,
+	} = useSnapchatAccountDetails();
 
 	return (
 		<div className="sfw-snapchat-account-details">
-			<p>
-				{ __( 'Organization:', 'snapchat-for-woo' ) }{ ' ' }
-				{ organizationName }
-			</p>
-			<p>
-				{ __( 'Ads Account:', 'snapchat-for-woo' ) } { adsName } (
-				{ adsId })
-			</p>
-			<p>
-				{ __( 'Pixel ID:', 'snapchat-for-woo' ) } { pixelId }
-			</p>
+			{ organizationName && (
+				<p>
+					{ __( 'Organization:', 'snapchat-for-woo' ) }{ ' ' }
+					{ organizationName }
+				</p>
+			) }
+
+			{ adsId && adsName && (
+				<p>
+					{ __( 'Ads Account:', 'snapchat-for-woo' ) } { adsName } (
+					{ adsId })
+				</p>
+			) }
+
+			{ pixelId && (
+				<p>
+					{ __( 'Pixel ID:', 'snapchat-for-woo' ) } { pixelId }
+				</p>
+			) }
 		</div>
 	);
 };
