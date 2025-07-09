@@ -28,7 +28,7 @@ class RemotePixelTrackerTest extends WP_UnitTestCase {
 		parent::set_up();
 
 		// Enable pixel tracking.
-		Options::set( OptionDefaults::PIXEL_ENABLED, true );
+		Options::set( OptionDefaults::PIXEL_ENABLED, 'yes' );
 
 		// Provide a default pixel script.
 		Transients::set( TransientDefaults::PIXEL_SCRIPT, '<script src="https://sc-static.net/scevent.min.js"></script>' );
@@ -49,7 +49,7 @@ class RemotePixelTrackerTest extends WP_UnitTestCase {
 	 * Test that the pixel script is rendered from cache if present.
 	 */
 	public function test_maybe_inject_pixel_outputs_cached_script() {
-		Options::set( OptionDefaults::PIXEL_ENABLED, true );
+		Options::set( OptionDefaults::PIXEL_ENABLED, 'yes' );
 		Transients::set( TransientDefaults::PIXEL_SCRIPT, '<script src="https://sc-static.net/scevent.min.js"></script>' );
 
 		$wcs     = $this->createMock( WcsClient::class );

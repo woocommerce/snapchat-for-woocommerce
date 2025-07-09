@@ -97,20 +97,10 @@ const reducer = ( state, action ) => {
 			return setIn( state, 'accounts.jetpack', account );
 		}
 
-		case TYPES.RECEIVE_SNAPCHAT_ADS_ACCOUNT: {
-			const { snapchatAdsAccount } = action;
+		case TYPES.RECEIVE_SETUP: {
+			const { setup } = action;
 
-			return setIn( state, 'accounts.ads', snapchatAdsAccount );
-		}
-
-		case TYPES.RECEIVE_SNAPCHAT_ORGANIZATION: {
-			const { snapchatOrganization } = action;
-
-			return setIn(
-				state,
-				'accounts.organization',
-				snapchatOrganization
-			);
+			return setIn( state, 'setup', setup );
 		}
 
 		case TYPES.RECEIVE_SNAPCHAT_ACCOUNT: {
@@ -119,10 +109,16 @@ const reducer = ( state, action ) => {
 			return setIn( state, 'accounts.snapchat', snapchatAccount );
 		}
 
-		case TYPES.RECEIVE_SNAPCHAT_PIXEL: {
-			const { snapchatPixel } = action;
+		case TYPES.RECEIVE_SNAPCHAT_ACCOUNT_DETAILS: {
+			const { snapchatAccountDetails } = action;
 
-			return setIn( state, 'accounts.pixel', snapchatPixel );
+			return setIn( state, 'snapchat', snapchatAccountDetails );
+		}
+
+		case TYPES.RECEIVE_ENHANCED_CONVERSIONS_STATUS: {
+			const { status } = action;
+
+			return setIn( state, 'enhancedConversions', status );
 		}
 
 		case TYPES.DISCONNECT_ACCOUNTS_SNAPCHAT: {

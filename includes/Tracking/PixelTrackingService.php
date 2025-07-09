@@ -126,7 +126,7 @@ final class PixelTrackingService implements ServiceStatusInterface {
 	 * @return bool True if pixel tracking is enabled; false otherwise.
 	 */
 	public static function is_enabled(): bool {
-		return (bool) Options::get( OptionDefaults::PIXEL_ENABLED );
+		return 'yes' === Options::get( OptionDefaults::PIXEL_ENABLED );
 	}
 
 	/**

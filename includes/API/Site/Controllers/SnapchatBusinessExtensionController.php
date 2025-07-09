@@ -194,7 +194,7 @@ class SnapchatBusinessExtensionController extends RESTBaseController {
 			Options::set( OptionDefaults::CONVERSION_ACCESS_TOKEN, $client_data['capi_token'] );
 		}
 
-		Options::set( OptionDefaults::ONBOARDING_STATUS, 'complete' );
+		Options::set( OptionDefaults::ONBOARDING_STATUS, 'connected' );
 
 		return rest_ensure_response(
 			array(
@@ -276,26 +276,6 @@ class SnapchatBusinessExtensionController extends RESTBaseController {
 	 * @return WP_REST_Response
 	 */
 	public function delete_connection() {
-		$response = $this->stop_connection();
-
-		if ( is_wp_error( $response ) ) {
-			return new WP_REST_Response(
-				array(
-					'status'  => 'error',
-					'message' => $response->get_error_message(),
-					'data'    => $response->get_error_data(),
-				),
-				500
-			);
-		}
-
-		$data         = $response->get_data();
-		$oauth_status = '';
-
-		if ( $data['status'] && 'disconnected' === $data['status'] ) {
-			$oauth_status = $data['status'];
-		}
-
 		$config_id = Options::get( OptionDefaults::CONFIG_ID );
 
 		if ( $config_id ) {
@@ -326,21 +306,53 @@ class SnapchatBusinessExtensionController extends RESTBaseController {
 					500
 				);
 			}
+
+			if ( ! empty( $data['request_status'] ) && 'SUCCESS' === $data['request_status'] ) {
+				$response = $this->stop_connection();
+
+				if ( is_wp_error( $response ) ) {
+					return new WP_REST_Response(
+						array(
+							'status'  => 'error',
+							'message' => $response->get_error_message(),
+							'data'    => $response->get_error_data(),
+						),
+						500
+					);
+				}
+
+				$data         = $response->get_data();
+				$oauth_status = '';
+
+				if ( $data['status'] && 'disconnected' === $data['status'] ) {
+					$oauth_status = $data['status'];
+				}
+
+				Options::delete( OptionDefaults::CONFIG_ID );
+				Options::delete( OptionDefaults::ORGANIZATION_ID );
+				Options::delete( OptionDefaults::ORGANIZATION_NAME );
+				Options::delete( OptionDefaults::AD_ACCOUNT_ID );
+				Options::delete( OptionDefaults::AD_ACCOUNT_NAME );
+				Options::delete( OptionDefaults::CONVERSION_ACCESS_TOKEN );
+				Options::delete( OptionDefaults::PIXEL_ID );
+				Options::delete( OptionDefaults::IS_JETPACK_CONNECTED );
+				Options::delete( OptionDefaults::ONBOARDING_STATUS );
+				Transients::delete( TransientDefaults::PIXEL_SCRIPT );
+
+				return rest_ensure_response(
+					array(
+						'status' => $oauth_status,
+					)
+				);
+			}
 		}
 
-		Options::delete( OptionDefaults::CONFIG_ID );
-		Options::delete( OptionDefaults::ORGANIZATION_ID );
-		Options::delete( OptionDefaults::ORGANIZATION_NAME );
-		Options::delete( OptionDefaults::AD_ACCOUNT_ID );
-		Options::delete( OptionDefaults::AD_ACCOUNT_NAME );
-		Options::delete( OptionDefaults::CONVERSION_ACCESS_TOKEN );
-		Options::delete( OptionDefaults::PIXEL_ID );
-		Transients::delete( TransientDefaults::PIXEL_SCRIPT );
-
-		return rest_ensure_response(
+		return new WP_REST_Response(
 			array(
-				'status' => $oauth_status,
-			)
+				'status'  => 'error',
+				'message' => 'Config id missing',
+			),
+			500
 		);
 	}
 

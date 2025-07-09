@@ -61,7 +61,7 @@ class SettingsController extends RESTBaseController {
 	public function get_settings() {
 		return rest_ensure_response(
 			array(
-				'capi_enabled' => Options::get( OptionDefaults::CONVERSIONS_ENABLED ),
+				'capi_enabled' => 'yes' === Options::get( OptionDefaults::CONVERSIONS_ENABLED ),
 			)
 		);
 	}
@@ -83,12 +83,12 @@ class SettingsController extends RESTBaseController {
 		}
 
 		if ( ! is_null( $capi_token ) ) {
-			Options::set( OptionDefaults::CONVERSIONS_ENABLED, $capi_token );
+			Options::set( OptionDefaults::CONVERSIONS_ENABLED, $capi_token ? 'yes' : 'no' );
 		}
 
 		return rest_ensure_response(
 			array(
-				'capi_enabled' => Options::get( OptionDefaults::CONVERSIONS_ENABLED ),
+				'capi_enabled' => 'yes' === Options::get( OptionDefaults::CONVERSIONS_ENABLED ),
 			)
 		);
 	}

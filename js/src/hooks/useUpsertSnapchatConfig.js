@@ -21,7 +21,7 @@ import useDispatchCoreNotices from '~/hooks/useDispatchCoreNotices';
  */
 const useUpsertSnapchatConfig = ( configId ) => {
 	const { createNotice } = useDispatchCoreNotices();
-	const { fetchSnapchatAccount } = useAppDispatch();
+	const { fetchSnapchatAccount, fetchSetup } = useAppDispatch();
 	const [ loading, setLoading ] = useState( false );
 
 	const [ fetchCreateAccount ] = useApiFetchCallback( {
@@ -47,9 +47,16 @@ const useUpsertSnapchatConfig = ( configId ) => {
 
 		// Update Snapchat account data in the data store after posting an account update.
 		await fetchSnapchatAccount();
+		await fetchSetup();
 
 		setLoading( false );
-	}, [ createNotice, fetchCreateAccount, fetchSnapchatAccount, configId ] );
+	}, [
+		createNotice,
+		fetchCreateAccount,
+		fetchSnapchatAccount,
+		fetchSetup,
+		configId,
+	] );
 
 	return { upsertSnapchatConfig, loading };
 };
