@@ -1,17 +1,35 @@
 /**
- * Hook to manage product catalog export:
- * - Triggers CSV generation via AJAX
- * - Polls status via Heartbeat API
+ * External dependencies
  */
 import { useState, useRef, useCallback, useEffect } from '@wordpress/element';
 
+/**
+ * Internal dependencies
+ */
+import { sfwData } from '~/constants';
+
+/**
+ * @typedef {Object} ExportStatus
+ * @property {string} status The current status of the export (e.g., 'idle', 'in-progress', 'completed', 'error').
+ * @property {string} fileUrl The URL of the exported CSV file, if available.
+ */
+
+/**
+ * @typedef {Object} ProductCatalogExport
+ * @property {boolean} isExportInProgress Indicates if an export is currently in progress.
+ * @property {ExportStatus} exportStatus The current export status and file URL.
+ * @property {Function} generateCsv Function to initiate the CSV export process.
+ */
+
+/**
+ * Custom React hook to handle the export of a product catalog as a CSV file.
+ * Integrates with WordPress Heartbeat API to poll export status and manages export state.
+ *
+ * @return {ProductCatalogExport} The current export status and functions to manage the export process.
+ */
 const useProductCatalogExport = () => {
-	const {
-		csvExportAction,
-		exportNonce,
-		isExportInProgress,
-		prefix,
-	} = snapchatAdsAdminData;
+	const { csvExportAction, exportNonce, isExportInProgress, prefix } =
+		sfwData;
 
 	const [ exportStatus, setExportStatus ] = useState( {
 		status: 'idle',
@@ -20,29 +38,35 @@ const useProductCatalogExport = () => {
 
 	const pollingRef = useRef( false );
 
-	const request_key = `${prefix}check_export_status`;
-	const response_key = `${prefix}export_status`;
+	const request_key = `${ prefix }check_export_status`;
+	const response_key = `${ prefix }export_status`;
 
 	const stopPolling = useCallback( () => {
 		jQuery( document ).off( 'heartbeat-send', onHeartbeatSend );
 		jQuery( document ).off( 'heartbeat-tick', onHeartbeatTick );
 
 		pollingRef.current = false;
-	}, [] );
+	}, [ onHeartbeatSend, onHeartbeatTick ] );
 
-	const onHeartbeatSend = useCallback( ( event, data ) => {
-		data[ request_key ] = true;
-	}, [] );
+	const onHeartbeatSend = useCallback(
+		( event, data ) => {
+			data[ request_key ] = true;
+		},
+		[ request_key ]
+	);
 
-	const onHeartbeatTick = useCallback( ( event, data ) => {
-		if ( data[ response_key ] ) {
-			setExportStatus( data[ response_key ] );
+	const onHeartbeatTick = useCallback(
+		( event, data ) => {
+			if ( data[ response_key ] ) {
+				setExportStatus( data[ response_key ] );
 
-			if ( data[ response_key ].status === 'completed' ) {
-				stopPolling();
+				if ( data[ response_key ].status === 'completed' ) {
+					stopPolling();
+				}
 			}
-		}
-	}, [ stopPolling ] );
+		},
+		[ stopPolling, response_key ]
+	);
 
 	const startPolling = useCallback( () => {
 		if ( pollingRef.current ) {
@@ -60,7 +84,7 @@ const useProductCatalogExport = () => {
 
 	const generateCsv = useCallback( async () => {
 		try {
-			const res = await jQuery.post( ajaxurl, {
+			const res = await jQuery.post( window.ajaxurl, {
 				action: csvExportAction,
 				security: exportNonce,
 			} );
@@ -75,12 +99,12 @@ const useProductCatalogExport = () => {
 			console.error( 'CSV generation failed:', err );
 			setExportStatus( { status: 'error', fileUrl: '' } );
 		}
-	}, [ startPolling ] );
+	}, [ startPolling, csvExportAction, exportNonce ] );
 
 	useEffect( () => {
 		if ( isExportInProgress ) {
 			startPolling();
-			setExportStatus( { status: 'in-progress', fileUrl: '' } )
+			setExportStatus( { status: 'in-progress', fileUrl: '' } );
 		}
 	}, [ isExportInProgress, startPolling ] );
 
