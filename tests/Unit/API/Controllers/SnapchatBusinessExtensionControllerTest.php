@@ -173,6 +173,6 @@ class SnapchatBusinessExtensionControllerTest extends WP_UnitTestCase {
 		$this->assertSame( $this->options['ad_account_id'], Options::get( OptionDefaults::AD_ACCOUNT_ID ) );
 		$this->assertSame( $this->options['pixel_id'], Options::get( OptionDefaults::PIXEL_ID ) );
 		$this->assertSame( '', Transients::get( TransientDefaults::PIXEL_SCRIPT ) );
-		$this->assertSame( 'complete', Options::get( OptionDefaults::ONBOARDING_STATUS ) );
+		$this->assertSame( 'connected', Options::get( OptionDefaults::ONBOARDING_STATUS ) );
 	}
 }
