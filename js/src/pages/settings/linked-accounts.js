@@ -59,7 +59,7 @@ export default function LinkedAccounts() {
 							onClick={ openDisconnectAdsAccountModal }
 						>
 							{ __(
-								'Disconnect Snapchat account only',
+								'Disconnect Snapchat account',
 								'snapchat-for-woo'
 							) }
 						</AppButton>

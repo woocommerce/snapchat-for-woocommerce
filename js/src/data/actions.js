@@ -2,12 +2,13 @@
  * External dependencies
  */
 import { __ } from '@wordpress/i18n';
+import { dispatch } from '@wordpress/data';
 import apiFetch from '@wordpress/api-fetch';
 
 /**
  * Internal dependencies
  */
-import { API_NAMESPACE } from './constants';
+import { API_NAMESPACE, STORE_KEY } from './constants';
 import { handleApiError } from '~/utils/handleError';
 import TYPES from './action-types';
 
@@ -47,6 +48,19 @@ export function receiveEnhancedConversionsStatus( status ) {
 	return {
 		type: TYPES.RECEIVE_ENHANCED_CONVERSIONS_STATUS,
 		status,
+	};
+}
+
+/**
+ * Creates an action to receive the setup data.
+ *
+ * @param {Object} setup - The setup data to be received.
+ * @return {Object} Action object with type RECEIVE_SETUP and the setup data.
+ */
+export function receiveSetup( setup ) {
+	return {
+		type: TYPES.RECEIVE_SETUP,
+		setup,
 	};
 }
 
@@ -95,24 +109,45 @@ export async function updateEnhancedConversionsStatus( status ) {
 /**
  * Fetches the Snapchat account information from the API and dispatches the result.
  *
- * @async
  * @function fetchSnapchatAccount
- * @param {Object} param0 - The function parameters.
- * @param {Function} param0.dispatch - The dispatch function to send actions.
  * @return {Promise<void>} Resolves when the account information has been fetched and dispatched.
  */
-export async function fetchSnapchatAccount( { dispatch } ) {
+export async function fetchSnapchatAccount() {
 	try {
 		const response = await apiFetch( {
 			path: `${ API_NAMESPACE }/snapchat/connection`,
 		} );
 
-		dispatch( receiveSnapchatAccount( response ) );
+		dispatch( STORE_KEY ).receiveSnapchatAccount( response );
 	} catch ( error ) {
 		handleApiError(
 			error,
 			__(
 				'There was an error loading Snapchat account info.',
+				'snapchat-for-woo'
+			)
+		);
+	}
+}
+
+/**
+ * Fetches the Snapchat setup information from the API and dispatches the result.
+ *
+ * @function fetchSetup
+ * @return {Promise<void>} Resolves when the setup information has been fetched and dispatched.
+ */
+export async function fetchSetup() {
+	try {
+		const response = await apiFetch( {
+			path: `${ API_NAMESPACE }/snapchat/setup`,
+		} );
+
+		dispatch( STORE_KEY ).receiveSetup( response );
+	} catch ( error ) {
+		handleApiError(
+			error,
+			__(
+				'There was an error loading Snapchat setup.',
 				'snapchat-for-woo'
 			)
 		);

@@ -10,3 +10,8 @@ export const SNAPCHAT_ACCOUNT_STATUS = {
 	CONNECTED: 'connected',
 	DISCONNECTED: 'disconnected',
 };
+
+export const SETUP_STATUS = {
+	CONNECTED: 'connected',
+	DISCONNECTED: 'disconnected',
+};
