@@ -64,6 +64,7 @@ class Assets {
 				'setupComplete' => Options::get( OptionDefaults::ONBOARDING_STATUS ) === 'connected',
 				'status'        => Options::get( OptionDefaults::ONBOARDING_STATUS ),
 				'step'          => Options::get( OptionDefaults::ONBOARDING_STEP ),
+				'slug'          => 'sfw',
 			)
 		);
 	}

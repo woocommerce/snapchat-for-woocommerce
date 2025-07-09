@@ -20,7 +20,7 @@ const store = createReduxStore( STORE_KEY, {
 	reducer,
 	initialState: {
 		general: {
-			version: null,
+			version: '0.1',
 		},
 		setup: {
 			status: sfwData.status,
@@ -40,3 +40,5 @@ register( store );
 export const useAppDispatch = () => {
 	return useDispatch( STORE_KEY );
 };
+
+export { STORE_KEY };
