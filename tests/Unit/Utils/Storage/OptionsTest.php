@@ -42,7 +42,7 @@ class OptionsTest extends WP_UnitTestCase {
 	}
 
 	public function test_get_returns_default_if_option_missing(): void {
-		$this->assertFalse(
+		$this->assertTrue(
 			Options::get( OptionDefaults::PIXEL_ENABLED )
 		);
 	}

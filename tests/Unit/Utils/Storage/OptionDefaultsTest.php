@@ -34,7 +34,7 @@ class OptionDefaultsTest extends TestCase {
 
 		$this->assertSame( '', $defaults[ OptionDefaults::AD_ACCOUNT_ID ] );
 		$this->assertSame( '', $defaults[ OptionDefaults::ORGANIZATION_ID ] );
-		$this->assertFalse( $defaults[ OptionDefaults::PIXEL_ENABLED ] );
+		$this->assertTrue( $defaults[ OptionDefaults::PIXEL_ENABLED ] );
 	}
 
 	/**
