@@ -88,6 +88,7 @@
 	},
 	"scripts": {
 		"build": "wp-scripts build",
+		"doc:tracking": "woocommerce-grow-jsdoc ./js/src",
 		"format": "wp-scripts format",
 		"lint:css": "wp-scripts lint-style",
 		"lint:js": "wp-scripts lint-js",
