@@ -43,12 +43,12 @@ test.describe( 'Snapchat for WooCommerce', () => {
 		).toBeVisible();
 	} );
 
-	test( '"Snapchat for Woocommerce" menu option', async ( { page } ) => {
+	test( '"Snapchat" menu option', async ( { page } ) => {
 		await page.goto( '/wp-admin/admin.php?page=wc-admin&path=%2Fmarketing' );
 		await expect(
 			await page
 				.locator( '.wp-submenu' )
-				.getByRole( 'link', { name: 'Snapchat for WooCommerce' } )
+				.getByRole( 'link', { name: 'Snapchat' } )
 		).toBeVisible();
 	} );
 } );

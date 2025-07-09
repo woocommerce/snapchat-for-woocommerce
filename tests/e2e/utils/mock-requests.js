@@ -107,32 +107,12 @@ export default class MockRequests {
 	}
 
 	/**
-	 * Fulfill the JetPack Connection request.
-	 *
-	 * @param {Object} payload
-	 * @return {Promise<void>}
-	 */
-	async fulfillJetPackConnection( payload ) {
-		await this.fulfillRequest( /\/wc\/sfw\/jetpack\/connected\b/, payload );
-	}
-
-	/**
-	 * Fulfill the request to connect Jetpack.
-	 *
-	 * @param {Object} payload
-	 * @return {Promise<void>}
-	 */
-	async fulfillConnectJetPack( payload ) {
-		await this.fulfillRequest( /\/wc\/sfw\/jetpack\/connect\b/, payload );
-	}
-
-	/**
 	 * Mock the request to connect Jetpack
 	 *
 	 * @param {string} url
 	 */
 	async mockJetpackConnect( url ) {
-		await this.fulfillConnectJetPack( { url } );
+		await this.fulfillRequest( /\/wc\/sfw\/jetpack\/connect\b/, { url } );
 	}
 
 	/**
@@ -142,10 +122,10 @@ export default class MockRequests {
 	 * @param {string} email
 	 */
 	async mockJetpackConnected(
-		displayName = 'John',
-		email = 'mail@example.com'
+		displayName = 'Test user',
+		email = 'jetpack@example.com'
 	) {
-		await this.fulfillJetPackConnection( {
+		await this.fulfillRequest( /\/wc\/sfw\/jetpack\/connected\b/, {
 			active: 'yes',
 			owner: 'yes',
 			displayName,
@@ -157,7 +137,7 @@ export default class MockRequests {
 	 * Mock Jetpack as not connected.
 	 */
 	async mockJetpackNotConnected() {
-		await this.fulfillJetPackConnection( {
+		await this.fulfillRequest( /\/wc\/sfw\/jetpack\/connected\b/, {
 			active: 'no',
 			displayName: '',
 			email: '',
@@ -165,22 +145,42 @@ export default class MockRequests {
 	}
 
 	/**
-	 * Fulfill the Snapchat Connection request.
+	 * Mock the request to connect Snapchat.
 	 *
-	 * @param {Object} payload
+	 * @param {string} url The redirect URL returned by the Snapchat connect endpoint.
 	 * @return {Promise<void>}
 	 */
-	async fulfillSnapchatConnection( payload ) {
-		await this.fulfillRequest( /\/wc\/sfw\/snapchat\/connected\b/, payload );
+	async mockSnapchatConnect( url ) {
+		await this.fulfillRequest( /\/wc\/sfw\/snapchat\/connect\b/, { url } );
 	}
 
 	/**
-	 * Fulfill the request to connect Snapchat.
+	 * Mock the current Snapchat connection status.
 	 *
-	 * @param {Object} payload
+	 * @param {Object} payload The response payload to return for the connection status.
 	 * @return {Promise<void>}
 	 */
-	async fulfillConnectSnapchat( payload ) {
-		await this.fulfillRequest( /\/wc\/sfw\/snapchat\/connect\b/, payload );
+	async mockSnapchatConnection( payload ) {
+		await this.fulfillRequest( /\/wc\/sfw\/snapchat\/connection\b/, payload );
+	}
+
+	/**
+	 * Mock the onboarding setup endpoint response.
+	 *
+	 * @param {Object} payload The setup state or payload returned from the API.
+	 * @return {Promise<void>}
+	 */
+	async mockOnboardingSetup( payload ) {
+		await this.fulfillRequest( /\/wc\/sfw\/snapchat\/setup\b/, payload );
+	}
+
+	/**
+	 * Mock the Snapchat Ad Account or Business data endpoint.
+	 *
+	 * @param {Object} payload The account or organization data to return.
+	 * @return {Promise<void>}
+	 */
+	async mockSnapchatAccount( payload ) {
+		await this.fulfillRequest( /\/wc\/sfw\/snapchat\/account\b/, payload );
 	}
 }

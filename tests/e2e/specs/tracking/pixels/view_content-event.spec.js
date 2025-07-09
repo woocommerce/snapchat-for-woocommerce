@@ -17,7 +17,7 @@ test.describe( 'VIEW_CONTENT event', () => {
 		const VIEW_CONTENT = findSnaptrEvent( events, 'VIEW_CONTENT' );
 		expect( VIEW_CONTENT ).not.toBe( null );
 
-		const payload = VIEW_CONTENT[2];
+		const [ ,,payload ] = VIEW_CONTENT;
 
 		expect( payload.price ).toBe( 10 );
 		expect( payload.currency ).toBe( 'USD' );

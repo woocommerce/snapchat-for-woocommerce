@@ -1,0 +1,34 @@
+name: JavaScript and CSS Linting
+
+on:
+  push:
+    branches:
+      - trunk
+      - develop
+  pull_request:
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+env:
+  FORCE_COLOR: 2
+
+jobs:
+  E2eTests:
+    name: Playwright Tests
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Prepare node
+        uses: woocommerce/grow/prepare-node@actions-v2
+        with:
+          node-version-file: ".nvmrc"
+
+      - name: Start wp-env
+        run: npm run env:start
+
+      - name: Run e2e tests
+        run: npm run test:e2e
