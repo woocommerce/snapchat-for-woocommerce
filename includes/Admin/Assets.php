@@ -61,7 +61,7 @@ class Assets {
 			'index',
 			'AdminData',
 			array(
-				'setupComplete' => (bool) Options::get( OptionDefaults::ONBOARDING_STATUS ) === 'connected',
+				'setupComplete' => boolval( Options::get( OptionDefaults::ONBOARDING_STATUS ) === 'connected' ),
 				'status'        => Options::get( OptionDefaults::ONBOARDING_STATUS ),
 				'step'          => Options::get( OptionDefaults::ONBOARDING_STEP ),
 				'slug'          => 'sfw',

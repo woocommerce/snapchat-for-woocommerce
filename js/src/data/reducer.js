@@ -97,6 +97,12 @@ const reducer = ( state, action ) => {
 			return setIn( state, 'accounts.jetpack', account );
 		}
 
+		case TYPES.RECEIVE_SETUP: {
+			const { setup } = action;
+
+			return setIn( state, 'setup', setup );
+		}
+
 		case TYPES.RECEIVE_SNAPCHAT_ACCOUNT: {
 			const { snapchatAccount } = action;
 

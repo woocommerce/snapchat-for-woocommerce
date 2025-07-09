@@ -10,10 +10,11 @@ import apiFetch from '@wordpress/api-fetch';
 import { API_NAMESPACE } from './constants';
 import { handleApiError } from '~/utils/handleError';
 import {
+	fetchSetup,
+	fetchSnapchatAccount,
 	receiveJetpackAccount,
 	receiveSnapchatAccountDetails,
 	receiveEnhancedConversionsStatus,
-	fetchSnapchatAccount,
 } from './actions';
 
 /**
@@ -104,4 +105,13 @@ export function getEnableEnhancedConversions() {
 			);
 		}
 	};
+}
+
+/**
+ * Fetches the Snapchat setup information from the API and dispatches the result.
+ *
+ * @return {Function} An async thunk function that takes a Redux-like dispatch object.
+ */
+export function getSetup() {
+	return fetchSetup;
 }
