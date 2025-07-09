@@ -1,4 +1,4 @@
-name: JavaScript and CSS Linting
+name: E2E Tests
 
 on:
   push:
