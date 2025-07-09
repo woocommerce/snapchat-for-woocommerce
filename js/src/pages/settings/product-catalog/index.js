@@ -36,7 +36,9 @@ import './index.scss';
 const ProductCatalog = () => {
 	// Whether we want to connect the heartbeat immediately as soon as the Heartbeat component mounts.
 	const [ connectHearbeatNow, setConnectHeartbeatNow ] = useState( false );
-	const [ exportInProgress, setExportInProgress ] = useState( false );
+	const [ exportInProgress, setExportInProgress ] = useState(
+		sfwData.isExportInProgress === '1'
+	);
 	const [ fileUrl, setFileUrl ] = useState( sfwData.exportFileUrl || null );
 	const [ lastExported, setLastExported ] = useState(
 		sfwData.lastTimestamp || null
