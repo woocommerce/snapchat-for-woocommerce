@@ -7,17 +7,17 @@ import { noop } from 'lodash';
 /**
  * Internal dependencies
  */
+import Section from '~/components/section';
 import AppButton from '~/components/app-button';
 import AppSpinner from '~/components/app-spinner';
+import useJetpackAccount from '~/hooks/useJetpackAccount';
+import useSnapchatAccount from '~/hooks/useSnapchatAccount';
 import StepContent from '~/components/stepper/step-content';
+import WPComAccountCard from '~/components/wpcom-account-card';
+import SnapchatAccountCard from '~/components/snapchat-account-card';
 import StepContentHeader from '~/components/stepper/step-content-header';
 import StepContentFooter from '~/components/stepper/step-content-footer';
 import StepContentActions from '~/components/stepper/step-content-actions';
-import Section from '~/components/section';
-import useJetpackAccount from '~/hooks/useJetpackAccount';
-import useSnapchatAccount from '~/hooks/useSnapchatAccount';
-import WPComAccountCard from '~/components/wpcom-account-card';
-import SnapchatAccountCard from '~/components/snapchat-account-card';
 import './index.scss';
 
 const SetupAccounts = ( props ) => {
