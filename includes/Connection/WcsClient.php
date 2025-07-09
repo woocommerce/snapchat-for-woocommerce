@@ -186,9 +186,9 @@ final class WcsClient {
 		$response = $this->jetpack_client->remote_request(
 			array_merge(
 				$args,
-				array( 'url' => $url )
+				array( 'url' => $url ),
 			),
-			wp_json_encode( $body )
+			'POST' === $method && $body ? wp_json_encode( $body ) : null
 		);
 
 		return $this->handle_response( $response );
