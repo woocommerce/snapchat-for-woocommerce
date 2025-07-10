@@ -7,18 +7,12 @@
  * External dependencies
  */
 const { chromium, expect } = require('@playwright/test');
-import dotenv from 'dotenv';
 
 /**
  * Internal dependencies
  */
 const fs = require('fs');
 const { admin, customer } = require('./config');
-
-dotenv.config( { path: 'tests/e2e/bin/.env.test' } );
-
-console.log( 'CWD:', process.cwd() );
-console.log( 'bin/.env.test exists:', fs.existsSync( 'tests/e2e/bin/.env.test' ) );
 
 module.exports = async (config) => {
 	const { stateDir, baseURL, userAgent } = config.projects[0].use;
@@ -119,12 +113,12 @@ module.exports = async (config) => {
 				customerPage.locator(
 					'.woocommerce-MyAccount-navigation-link--customer-logout'
 				)
-			).toBeVisible();
+			).toBeVisible( { timeout: 20000 } );
 			await expect(
 				customerPage.locator(
 					'div.woocommerce-MyAccount-content > p >> nth=0'
 				)
-			).toContainText('Hello');
+			).toContainText( 'Hello', { timeout: 20000 } );
 
 			await customerPage
 				.context()

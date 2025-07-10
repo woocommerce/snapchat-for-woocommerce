@@ -58,6 +58,9 @@ jobs:
       - name: Setup WP environment
         run: npm run env:start
 
+      - name: Check if the site is running
+        run: curl -I http://localhost:8889
+
       - name: Run E2E tests
         run: npm run test:e2e
 
