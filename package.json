@@ -89,6 +89,7 @@
 		}
 	},
 	"scripts": {
+		"prebuild": "composer install",
 		"build": "wp-scripts build",
 		"doc:tracking": "woocommerce-grow-jsdoc ./js/src",
 		"format": "wp-scripts format",
