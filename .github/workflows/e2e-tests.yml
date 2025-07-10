@@ -61,6 +61,9 @@ jobs:
       - name: Check if the site is running
         run: curl -I http://localhost:8889
 
+      - name: Check WooCommerce /my-account page
+        run: curl -I http://localhost:8889/my-account
+
       - name: Run E2E tests
         run: npm run test:e2e
 
