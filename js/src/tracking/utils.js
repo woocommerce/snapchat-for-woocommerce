@@ -1,4 +1,25 @@
 /**
+ * Internal utility to register click event listeners for given selectors.
+ *
+ * Hooks are attached after DOMContentLoaded to ensure all target elements
+ * are available in the document.
+ *
+ * @since 0.1.0
+ *
+ * @param {string[]} selectors - List of CSS selectors to bind to.
+ * @param {Function} callback - Function to invoke when matching element is clicked.
+ */
+function addEventHook( selectors, callback ) {
+	document.defaultView.addEventListener( 'DOMContentLoaded', function () {
+		selectors.forEach( ( selector ) => {
+			document.querySelectorAll( selector ).forEach( ( button ) => {
+				button.addEventListener( 'click', callback );
+			} );
+		} );
+	} );
+}
+
+/**
  * Registers a callback for Add to Cart button clicks in product loop/catalog views.
  *
  * This includes:
@@ -11,7 +32,7 @@
  *
  * @param {Function} callback - Function to call when a loop add-to-cart button is clicked.
  */
-export function onLoopAddToCartClick( callback, eventId ) {
+export function onLoopAddToCartClick( callback ) {
 	addEventHook(
 		[
 			// Classic loop buttons (not variable/grouped)
@@ -35,27 +56,6 @@ export function onLoopAddToCartClick( callback, eventId ) {
  */
 export function onSingleAddToCartClick( callback ) {
 	addEventHook( [ '.single_add_to_cart_button' ], callback );
-}
-
-/**
- * Internal utility to register click event listeners for given selectors.
- *
- * Hooks are attached after DOMContentLoaded to ensure all target elements
- * are available in the document.
- *
- * @since 0.1.0
- *
- * @param {string[]} selectors - List of CSS selectors to bind to.
- * @param {Function} callback - Function to invoke when matching element is clicked.
- */
-function addEventHook( selectors, callback ) {
-	document.defaultView.addEventListener( 'DOMContentLoaded', function () {
-		selectors.forEach( ( selector ) => {
-			document.querySelectorAll( selector ).forEach( ( button ) => {
-				button.addEventListener( 'click', callback );
-			} );
-		} );
-	} );
 }
 
 /**

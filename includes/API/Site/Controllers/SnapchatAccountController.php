@@ -47,7 +47,6 @@ class SnapchatAccountController extends RESTBaseController {
 					'callback'            => array( $this, 'get_account_details' ),
 					'permission_callback' => array( $this, 'permissions_check' ),
 				),
-				'schema' => array( $this, 'account_details' ),
 			)
 		);
 	}

@@ -128,7 +128,7 @@ final class OptionDefaults {
 	public const CONVERSION_ACCESS_TOKEN = 'conversion_access_token';
 
 	/**
-	 * Option key: Stores the full file system path of the most recent export file.
+	 * Option key to store the full file system path of the most recent export file.
 	 *
 	 * This value is written during the first export batch and reused across
 	 * subsequent batches to avoid recreating the file. It is cleared when a new
@@ -139,7 +139,7 @@ final class OptionDefaults {
 	public const EXPORT_FILE_PATH = 'catalog_export_path';
 
 	/**
-	 * Option key: Stores the public download URL of the most recent export file.
+	 * Option key to store the public download URL of the most recent export file.
 	 *
 	 * This value is generated once the first batch creates the CSV file,
 	 * and is shown to the user as a downloadable link once the export completes.
@@ -149,13 +149,20 @@ final class OptionDefaults {
 	public const EXPORT_FILE_URL = 'catalog_export_url';
 
 	/**
-	 * Option key to stores the list of product IDs to be exported.
+	 * Option key to store the list of product IDs to be exported.
 	 *
 	 * Cached once at export start to support consistent batch processing.
 	 *
 	 * @since 0.1.0
 	 */
 	public const EXPORT_PRODUCT_IDS = 'catalog_export_product_ids';
+
+	/**
+	 * Option key to store a human-readable export timestamp.
+	 *
+	 * @since 0.1.0
+	 */
+	public const LAST_EXPORT_TIMESTAMP = 'last_export_timestamp';
 
 	/**
 	 * Returns default values for all known Ad Partner options.
@@ -185,6 +192,7 @@ final class OptionDefaults {
 			self::EXPORT_FILE_PATH        => '',
 			self::EXPORT_FILE_URL         => '',
 			self::EXPORT_PRODUCT_IDS      => array(),
+			self::LAST_EXPORT_TIMESTAMP   => '',
 		);
 	}
 }
