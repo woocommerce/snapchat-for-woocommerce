@@ -16,6 +16,10 @@ namespace SnapchatForWooCommerce\Admin;
 use SnapchatForWooCommerce\Utils\AssetLoader;
 use SnapchatForWooCommerce\Utils\Storage\Options;
 use SnapchatForWooCommerce\Utils\Storage\OptionDefaults;
+use SnapchatForWooCommerce\ServiceKey;
+use SnapchatForWooCommerce\ServiceContainer;
+use SnapchatForWooCommerce\Admin\Export\Service\ProductExportService;
+use SnapchatForWooCommerce\Utils\Helper;
 
 /**
  * Handles admin script and style enqueues.
@@ -61,10 +65,14 @@ class Assets {
 			'index',
 			'AdminData',
 			array(
-				'setupComplete' => boolval( Options::get( OptionDefaults::ONBOARDING_STATUS ) === 'connected' ),
-				'status'        => Options::get( OptionDefaults::ONBOARDING_STATUS ),
-				'step'          => Options::get( OptionDefaults::ONBOARDING_STEP ),
-				'slug'          => 'sfw',
+				'setupComplete'      => boolval( Options::get( OptionDefaults::ONBOARDING_STATUS ) === 'connected' ),
+				'status'             => Options::get( OptionDefaults::ONBOARDING_STATUS ),
+				'step'               => Options::get( OptionDefaults::ONBOARDING_STEP ),
+				'exportNonce'        => wp_create_nonce( 'export-nonce' ),
+				'isExportInProgress' => ServiceContainer::get( ServiceKey::PRODUCT_EXPORT_SERVICE )->job->is_job_in_progress( ProductExportService::ACTION_HOOK ),
+				'exportFileUrl'      => Options::get( OptionDefaults::EXPORT_FILE_URL ),
+				'lastTimestamp'      => Options::get( OptionDefaults::LAST_EXPORT_TIMESTAMP ),
+				'slug'               => 'sfw',
 			)
 		);
 	}

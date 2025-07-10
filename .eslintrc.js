@@ -38,6 +38,8 @@ module.exports = {
 	},
 	globals: {
 		getComputedStyle: 'readonly',
+		wp_has_consent: 'readonly',
+		jQuery: 'readonly',
 	},
 	rules: {
 		'@wordpress/i18n-text-domain': [

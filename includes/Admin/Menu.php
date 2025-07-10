@@ -54,7 +54,7 @@ class Menu {
 		$this->register_classic_submenu_page(
 			array(
 				'id'       => 'snapchat-for-woocommerce',
-				'title'    => __( 'Snapchat for WooCommerce', 'snapchat-for-woocommerce' ),
+				'title'    => __( 'Snapchat', 'snapchat-for-woocommerce' ),
 				'parent'   => 'woocommerce-marketing',
 				'path'     => '/snapchat/start',
 				'position' => 30,

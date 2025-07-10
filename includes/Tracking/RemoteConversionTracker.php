@@ -161,7 +161,7 @@ class RemoteConversionTracker implements ConversionTrackerInterface {
 		}
 
 		$query   = http_build_query( array( 'access_token' => $token ) );
-		$path    = "{$pixel_id}/events?{$query}";
+		$path    = "/conversions/v3/{$pixel_id}/events?{$query}";
 		$payload = array( 'data' => array( $event_payload ) );
 
 		$this->client->proxy_post( $path, $payload, false );
