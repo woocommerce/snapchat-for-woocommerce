@@ -34,7 +34,7 @@
 		"@wordpress/date": "^4.42.13",
 		"@wordpress/dom": "^3.42.13",
 		"@wordpress/element": "^5.19.13",
-		"@wordpress/hooks": "^3.42.13",
+		"@wordpress/hooks": "^3.58.0",
 		"@wordpress/html-entities": "^3.42.13",
 		"@wordpress/i18n": "^4.42.13",
 		"@wordpress/icons": "^9.33.13",
@@ -90,14 +90,14 @@
 	},
 	"scripts": {
 		"prebuild": "composer install",
-		"build": "wp-scripts build",
+		"build": "NODE_ENV=production wp-scripts build --webpack-src-dir=js/src",
 		"doc:tracking": "woocommerce-grow-jsdoc ./js/src",
 		"format": "wp-scripts format",
+		"i18n": "WP_CLI_PHP_ARGS='-d memory_limit=2048M' ./vendor/bin/wp i18n make-pot ./ languages/$npm_package_name.pot --slug=$npm_package_name --domain=$npm_package_name --exclude=bin,data,js/src,node_modules,tests,vendor",
 		"lint:css": "wp-scripts lint-style",
 		"lint:js": "wp-scripts lint-js",
 		"packages-update": "wp-scripts packages-update",
 		"plugin-zip": "wp-scripts plugin-zip",
-		"start": "wp-scripts start --webpack-src-dir=js/src",
 		"postinstall": "composer install",
 		"archive": "composer archive --file=$npm_package_name --format=zip",
 		"env": "wp-env",
@@ -106,7 +106,8 @@
 		"env:stop": "wp-env stop",
 		"env:destroy": "wp-env destroy",
 		"postenv:start": "bash ./tests/e2e/bin/initialize.sh",
-		"test:e2e": "npx playwright test --config tests/e2e/playwright.config.js"
+		"test:e2e": "npx playwright test --config tests/e2e/playwright.config.js",
+		"start": "wp-scripts start --webpack-src-dir=js/src"
 	},
 	"browserslist": [
 		"extends @wordpress/browserslist-config"
