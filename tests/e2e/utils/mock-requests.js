@@ -83,7 +83,7 @@ export default class MockRequests {
 	 * Chainable method to fulfill a request multiple times.
 	 *
 	 * @param {number} times
-	 * @return {this}
+	 * @return {this} A proxied instance with the fulfill count set.
 	 */
 	withFulfillTimes( times ) {
 		return proxyFulfill( this, { times } );
@@ -161,7 +161,10 @@ export default class MockRequests {
 	 * @return {Promise<void>}
 	 */
 	async mockSnapchatConnection( payload ) {
-		await this.fulfillRequest( /\/wc\/sfw\/snapchat\/connection\b/, payload );
+		await this.fulfillRequest(
+			/\/wc\/sfw\/snapchat\/connection\b/,
+			payload
+		);
 	}
 
 	/**

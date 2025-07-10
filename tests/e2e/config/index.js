@@ -20,10 +20,10 @@ const customer = {
 		zip: '94107',
 		phone: '123456789',
 		email: 'john.doe@example.com',
-	}
+	},
 };
 
 module.exports = {
 	admin,
 	customer,
-}
+};

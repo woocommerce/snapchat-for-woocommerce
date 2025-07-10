@@ -1,22 +1,22 @@
-const { loadConfig } = require('@wordpress/env/lib/config');
-const { defineConfig, devices } = require('@playwright/test');
+const { loadConfig } = require( '@wordpress/env/lib/config' );
+const { defineConfig, devices } = require( '@playwright/test' );
 
 /**
  * @see https://playwright.dev/docs/test-configuration
  */
-module.exports = (async () => {
+module.exports = ( async () => {
 	// Get Base URL from wp-env.
-	const wpEnvConfig = await loadConfig('./');
+	const wpEnvConfig = await loadConfig( './' );
 	let baseUrl = 'http://localhost:8889';
-	if (wpEnvConfig) {
+	if ( wpEnvConfig ) {
 		const port = wpEnvConfig.env.tests.port || null;
 
-		if (port) {
+		if ( port ) {
 			baseUrl = wpEnvConfig.env.tests.config.WP_SITEURL;
 		}
 	}
 
-	return defineConfig({
+	return defineConfig( {
 		testDir: '../../tests',
 
 		/* Maximum time one test can run for. */
@@ -37,7 +37,7 @@ module.exports = (async () => {
 		fullyParallel: false,
 
 		/* Fail the build on CI if you accidentally left test.only in the source code. */
-		forbidOnly: !!process.env.CI,
+		forbidOnly: !! process.env.CI,
 
 		/* Retry on CI only */
 		retries: process.env.CI ? 2 : 0,
@@ -47,7 +47,7 @@ module.exports = (async () => {
 
 		/* Reporter to use. See https://playwright.dev/docs/test-reporters */
 		reporter: [
-			['list'],
+			[ 'list' ],
 			[
 				'html',
 				{
@@ -81,11 +81,11 @@ module.exports = (async () => {
 		projects: [
 			{
 				name: 'chromium',
-				use: { ...devices['Desktop Chrome'] },
+				use: { ...devices[ 'Desktop Chrome' ] },
 			},
 		],
 
 		// path to the global setup files.
-		globalSetup: require.resolve('./global-setup'),
-	});
-})();
+		globalSetup: require.resolve( './global-setup' ),
+	} );
+} )();

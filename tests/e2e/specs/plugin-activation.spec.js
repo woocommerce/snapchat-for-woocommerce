@@ -15,20 +15,21 @@ test.describe( 'Snapchat for WooCommerce', () => {
 			await page
 				.locator( '[data-slug="woocommerce"]' )
 				.locator( '.required-by' )
-		).toContainText( 'Required by: Snapchat for WooCommerce', { exact: false } );
-
+		).toContainText( 'Required by: Snapchat for WooCommerce', {
+			exact: false,
+		} );
 	} );
 
 	test( 'Deactivation', async ( { page } ) => {
 		await page.goto( PLUGINS_PAGE_URL );
 
 		await page
-			.getByRole( 'link', { name: 'Deactivate Snapchat for Woocommerce' } )
+			.getByRole( 'link', {
+				name: 'Deactivate Snapchat for Woocommerce',
+			} )
 			.click();
 
-		await expect(
-			await page.getByText( 'Plugin deactivated.' )
-		).toBeVisible();
+		await expect( page.getByText( 'Plugin deactivated.' ) ).toBeVisible();
 	} );
 
 	test( 'Activation', async ( { page } ) => {
@@ -38,15 +39,15 @@ test.describe( 'Snapchat for WooCommerce', () => {
 			.getByRole( 'link', { name: 'Activate Snapchat for Woocommerce' } )
 			.click();
 
-		await expect(
-			await page.getByText( 'Plugin activated.' )
-		).toBeVisible();
+		await expect( page.getByText( 'Plugin activated.' ) ).toBeVisible();
 	} );
 
 	test( '"Snapchat" menu option', async ( { page } ) => {
-		await page.goto( '/wp-admin/admin.php?page=wc-admin&path=%2Fmarketing' );
+		await page.goto(
+			'/wp-admin/admin.php?page=wc-admin&path=%2Fmarketing'
+		);
 		await expect(
-			await page
+			page
 				.locator( '.wp-submenu' )
 				.getByRole( 'link', { name: 'Snapchat' } )
 		).toBeVisible();

@@ -14,7 +14,6 @@ import ElementLocators from '../utils/element-locators.js';
  */
 let setupPage = null;
 
-
 /**
  * @type {import('../utils/element-locators.js').default} onboardingPage
  */
@@ -80,7 +79,10 @@ test.describe( 'Merchant Onboarding', () => {
 	test( 'Snapchat connected card state', async () => {
 		await setupPage.mockJetpackConnected();
 		await setupPage.mockSnapchatConnection( { status: 'connected' } );
-		await setupPage.mockOnboardingSetup( { status: 'connected', step: 'accounts' } );
+		await setupPage.mockOnboardingSetup( {
+			status: 'connected',
+			step: 'accounts',
+		} );
 		await setupPage.goto();
 
 		await expect( locator.getSnapchatConnectedLabel() ).toBeVisible();
@@ -88,19 +90,25 @@ test.describe( 'Merchant Onboarding', () => {
 
 	test( 'Snapchat card details', async () => {
 		const payload = {
-			org_id: "244753a0-2021-482c-af9b-dd6e7677d562",
-			org_name: "SnapForWooV105",
-			ad_acc_id: "89b3e14b-bac9-409e-857c-ab006cd1c96e",
-			ad_acc_name: "SnapForWooV105 Self Service",
-			pixel_id: "fd014a21-2e25-41a8-9e12-de8c9fe512b4"
-		}
+			org_id: '244753a0-2021-482c-af9b-dd6e7677d562',
+			org_name: 'SnapForWooV105',
+			ad_acc_id: '89b3e14b-bac9-409e-857c-ab006cd1c96e',
+			ad_acc_name: 'SnapForWooV105 Self Service',
+			pixel_id: 'fd014a21-2e25-41a8-9e12-de8c9fe512b4',
+		};
 
 		await setupPage.mockSnapchatAccount( payload );
 		setupPage.goto();
 
-		await expect( locator.getSnapchatAccountCard() ).toContainText( 'Organization: SnapForWooV105' );
-		await expect( locator.getSnapchatAccountCard() ).toContainText( 'Ads Account: SnapForWooV105 Self Service (89b3e14b-bac9-409e-857c-ab006cd1c96e)' );
-		await expect( locator.getSnapchatAccountCard() ).toContainText( 'Pixel ID: fd014a21-2e25-41a8-9e12-de8c9fe512b4' );
+		await expect( locator.getSnapchatAccountCard() ).toContainText(
+			'Organization: SnapForWooV105'
+		);
+		await expect( locator.getSnapchatAccountCard() ).toContainText(
+			'Ads Account: SnapForWooV105 Self Service (89b3e14b-bac9-409e-857c-ab006cd1c96e)'
+		);
+		await expect( locator.getSnapchatAccountCard() ).toContainText(
+			'Pixel ID: fd014a21-2e25-41a8-9e12-de8c9fe512b4'
+		);
 		await expect( locator.getSnapchatConnectedLabel() ).toBeVisible();
 	} );
 } );

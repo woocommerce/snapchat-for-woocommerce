@@ -17,7 +17,9 @@ export default class ElementLocators {
 	 */
 	getCard( title = '' ) {
 		return this.page.locator( '.sfw-account-card', {
-			has: this.page.locator( '.sfw-account-card__title', { hasText: title } ),
+			has: this.page.locator( '.sfw-account-card__title', {
+				hasText: title,
+			} ),
 		} );
 	}
 
@@ -36,11 +38,9 @@ export default class ElementLocators {
 	 * @return {import('@playwright/test').Locator} The connect button locator.
 	 */
 	getWpConnectButton() {
-		return this
-			.getWPAccountCard()
-			.getByRole( 'button', {
-				hasText: 'Connect',
-			} );
+		return this.getWPAccountCard().getByRole( 'button', {
+			hasText: 'Connect',
+		} );
 	}
 
 	/**
@@ -49,11 +49,7 @@ export default class ElementLocators {
 	 * @return {import('@playwright/test').Locator} The connected label locator.
 	 */
 	getWpConnectedLabel() {
-		return this
-			.getWPAccountCard()
-			.locator(
-				'.sfw-connected-icon-label'
-			);
+		return this.getWPAccountCard().locator( '.sfw-connected-icon-label' );
 	}
 
 	/**
@@ -71,11 +67,9 @@ export default class ElementLocators {
 	 * @return {import('@playwright/test').Locator} The connect button locator.
 	 */
 	getSnapchatConnectButton() {
-		return this
-			.getSnapchatAccountCard()
-			.getByRole( 'button', {
-				hasText: 'Connect',
-			} );
+		return this.getSnapchatAccountCard().getByRole( 'button', {
+			hasText: 'Connect',
+		} );
 	}
 
 	/**
@@ -84,11 +78,9 @@ export default class ElementLocators {
 	 * @return {import('@playwright/test').Locator} The connected label locator.
 	 */
 	getSnapchatConnectedLabel() {
-		return this
-			.getSnapchatAccountCard()
-			.locator(
-				'.sfw-connected-icon-label'
-			);
+		return this.getSnapchatAccountCard().locator(
+			'.sfw-connected-icon-label'
+		);
 	}
 
 	/**
@@ -97,8 +89,8 @@ export default class ElementLocators {
 	 * @return {import('@playwright/test').Locator} The checkbox locator.
 	 */
 	getCapiCheckbox() {
-		return this
-			.getCard( 'Conversions API' )
-			.getByLabel( 'Enable Conversions API tracking' );
+		return this.getCard( 'Conversions API' ).getByLabel(
+			'Enable Conversions API tracking'
+		);
 	}
 }
