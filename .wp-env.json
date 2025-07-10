@@ -12,7 +12,7 @@
 	"env": {
 		"tests": {
 			"mappings": {
-				"wp-cli.yml": "./tests/E2E/bin/wp-cli.yml"
+				"wp-cli.yml": "./tests/e2e/bin/wp-cli.yml"
 			},
 			"config": {
 				"JETPACK_AUTOLOAD_DEV": true,

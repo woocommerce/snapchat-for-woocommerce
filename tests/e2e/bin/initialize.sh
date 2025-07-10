@@ -6,6 +6,9 @@ echo "Initializing Snapchat for WooCommerce"
 wp-env run tests-wordpress chmod -c ugo+w /var/www/html
 wp-env run tests-cli wp rewrite structure '/%postname%/' --hard
 
+# Log plugins
+wp-env run tests-cli wp plugin list
+
 # Use storefront theme.
 wp-env run tests-cli wp theme activate storefront
 wp-env run tests-cli wp option update storefront_nux_dismissed 1
