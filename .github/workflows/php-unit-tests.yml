@@ -46,7 +46,7 @@ jobs:
           tools: composer, phpunit
 
       - name: Prepare MySQL
-        uses: woocommerce/grow/prepare-mysql@actions-v2
+        uses: woocommerce/grow/prepare-mysql@da5279aa4d76745ef32970e49b5ef7903a3b457a # v2.2.2
 
       - name: Install svn (used for installing WP versions)
         run: sudo apt-get -y install subversion
