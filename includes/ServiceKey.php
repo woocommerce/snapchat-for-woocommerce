@@ -63,7 +63,8 @@ final class ServiceKey {
 	 *
 	 * @since 0.1.0
 	 */
-	public const ADMIN_SETUP = 'admin_setup';
+	public const ADMIN_SETUP            = 'admin_setup';
+	public const PRODUCT_EXPORT_SERVICE = 'product_export_service';
 
 	/**
 	 * Identifier for the Settings REST Controller Setup

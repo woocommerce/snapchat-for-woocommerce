@@ -20,6 +20,10 @@ namespace SnapchatForWooCommerce\Admin\Export;
 use SnapchatForWooCommerce\Admin\Export\Contract\ExportableEntityProviderInterface;
 use SnapchatForWooCommerce\Admin\Export\Contract\ExportRowBuilderInterface;
 use SnapchatForWooCommerce\Admin\Export\Contract\ExportWriterInterface;
+use SnapchatForWooCommerce\Admin\Export\Contract\CacheBuilderInterface;
+use SnapchatForWooCommerce\Utils\Helper;
+use SnapchatForWooCommerce\Utils\Storage\Options;
+use SnapchatForWooCommerce\Utils\Storage\OptionDefaults;
 
 /**
  * Executes a single export batch for any entity type.
@@ -45,6 +49,13 @@ class BatchExportJob {
 	const BATCH_SIZE = 50;
 
 	/**
+	 * Cache builder used to prepare the exportable product ID list.
+	 *
+	 * @var CacheBuilderInterface
+	 */
+	public CacheBuilderInterface $cache_builder;
+
+	/**
 	 * Supplies entity IDs and objects to be exported.
 	 *
 	 * @var ExportableEntityProviderInterface
@@ -63,25 +74,28 @@ class BatchExportJob {
 	 *
 	 * @var ExportWriterInterface
 	 */
-	protected ExportWriterInterface $writer;
+	public ExportWriterInterface $writer;
 
 	/**
 	 * Constructor.
 	 *
 	 * @since 0.1.0
 	 *
-	 * @param ExportableEntityProviderInterface $provider    Supplies exportable entity IDs and objects.
-	 * @param ExportRowBuilderInterface         $row_builder Builds CSV-compatible row data from entities.
-	 * @param ExportWriterInterface             $writer      Writes data to file and manages file output.
+	 * @param CacheBuilderInterface             $cache_builder Prepares and caches exportable entity IDs ahead of export.
+	 * @param ExportableEntityProviderInterface $provider      Supplies exportable entity IDs and objects.
+	 * @param ExportRowBuilderInterface         $row_builder   Builds CSV-compatible row data from entities.
+	 * @param ExportWriterInterface             $writer        Writes data to file and manages file output.
 	 */
 	public function __construct(
+		CacheBuilderInterface $cache_builder,
 		ExportableEntityProviderInterface $provider,
 		ExportRowBuilderInterface $row_builder,
 		ExportWriterInterface $writer
 	) {
-		$this->provider    = $provider;
-		$this->row_builder = $row_builder;
-		$this->writer      = $writer;
+		$this->cache_builder = $cache_builder;
+		$this->provider      = $provider;
+		$this->row_builder   = $row_builder;
+		$this->writer        = $writer;
 	}
 
 	/**
@@ -141,5 +155,47 @@ class BatchExportJob {
 			'file_url'  => $file_url,
 			'complete'  => $next >= $total,
 		);
+	}
+
+	/**
+	 * Determines whether any export-related Action Scheduler jobs are currently pending.
+	 *
+	 * This method checks if there are any queued or running async jobs associated with
+	 * the export process. It looks for:
+	 * - Scanning jobs triggered by the cache builder (e.g., scan_exportable_product_ids_page)
+	 * - Export writing jobs triggered by this service (e.g., export_product_catalog)
+	 *
+	 * Useful to prevent duplicate job scheduling or overlapping exports.
+	 *
+	 * @since 0.1.0
+	 *
+	 * @param string $entity_export_id Unique export hook name (e.g., export_product_catalog).
+	 * @return bool True if any export or cache jobs are in progress, false otherwise.
+	 */
+	public function is_job_in_progress( string $entity_export_id ): bool {
+		$scan_jobs   = as_has_scheduled_action( Helper::with_prefix( $entity_export_id ) );
+		$export_jobs = as_has_scheduled_action( Helper::with_prefix( get_class( $this->cache_builder )::ACTION_HOOK ) );
+
+		if ( ! ( empty( $scan_jobs ) && empty( $export_jobs ) ) ) {
+			return true;
+		}
+
+		return false;
+	}
+
+	/**
+	 * Updates the last export timestamp in plugin options.
+	 *
+	 * This is stored for audit or display purposes after a successful export run.
+	 *
+	 * @since 0.1.0
+	 *
+	 * @return void
+	 */
+	public function set_timestamp(): void {
+		$timestamp = date_i18n(
+			get_option( 'date_format' ) . ' \a\t ' . get_option( 'time_format' )
+		);
+		Options::set( OptionDefaults::LAST_EXPORT_TIMESTAMP, $timestamp );
 	}
 }
