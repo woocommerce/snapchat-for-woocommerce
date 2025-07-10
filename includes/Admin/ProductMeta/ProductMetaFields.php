@@ -91,6 +91,11 @@ class ProductMetaFields {
 
 		$meta_key = Helper::with_prefix( self::CATALOG_ITEM );
 		$value    = get_post_meta( $post->ID, $meta_key, true );
+
+		if ( '' === $value ) {
+			$value = '1';
+		}
+
 		?>
 		<div id="snapchat_product_data" class="panel woocommerce_options_panel hidden">
 			<p class="form-field">
