@@ -2,14 +2,14 @@
  * External dependencies
  */
 import { __ } from '@wordpress/i18n';
+import { useState } from '@wordpress/element';
 
 /**
  * Internal dependencies
  */
-import { API_NAMESPACE } from '~/data/constants';
+import { useAppDispatch } from '~/data';
 import useSnapchatAuthorization from '~/hooks/useSnapchatAuthorization';
 import useDispatchCoreNotices from '~/hooks/useDispatchCoreNotices';
-import useApiFetchCallback from '~/hooks/useApiFetchCallback';
 
 /**
  * Custom React hook to handle switching Snapchat accounts within the WooCommerce plugin.
@@ -23,12 +23,9 @@ import useApiFetchCallback from '~/hooks/useApiFetchCallback';
  */
 const useSwitchSnapchatAccount = () => {
 	const { createNotice, removeNotice } = useDispatchCoreNotices();
-
-	const [ fetchSnapchatDisconnect, { loading: loadingSnapchatDisconnect } ] =
-		useApiFetchCallback( {
-			path: `${ API_NAMESPACE }/snapchat/connection`,
-			method: 'DELETE',
-		} );
+	const { disconnectSnapchatAccount } = useAppDispatch();
+	const [ loadingSnapchatDisconnect, setLoadingSnapchatDisconnect ] =
+		useState( false );
 
 	const [
 		fetchSnapchatConnect,
@@ -44,10 +41,13 @@ const useSwitchSnapchatAccount = () => {
 			)
 		);
 
+		setLoadingSnapchatDisconnect( true );
 		try {
-			await fetchSnapchatDisconnect();
+			await disconnectSnapchatAccount();
 			const { url } = await fetchSnapchatConnect();
-			window.location.href = url;
+			if ( url ) {
+				window.location.href = url;
+			}
 		} catch ( error ) {
 			removeNotice( notice.id );
 			createNotice(
@@ -57,6 +57,8 @@ const useSwitchSnapchatAccount = () => {
 					'snapchat-for-woo'
 				)
 			);
+		} finally {
+			setLoadingSnapchatDisconnect( false );
 		}
 	};
 

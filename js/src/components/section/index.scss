@@ -1,7 +1,7 @@
 .sfw-section {
 	display: flex;
 	flex-direction: column;
-	margin-bottom: var(--large-gap);
+	margin-bottom: $grid-unit-30;
 
 	&--is-disabled,
 	&--is-disabled-left &__header {
