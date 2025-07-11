@@ -1,10 +1,10 @@
 .sfw-subsection-title {
 	position: relative;
-	font-size: $sfw-font-small;
+	font-size: variables.$sfw-font-small;
 	font-style: normal;
 	font-weight: 600;
-	line-height: $sfw-line-height-medium;
+	line-height: variables.$sfw-line-height-medium;
 	letter-spacing: 0;
 	text-align: left;
-	margin-bottom: $grid-unit;
+	margin-bottom: wpVariables.$grid-unit;
 }

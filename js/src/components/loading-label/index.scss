@@ -1,7 +1,7 @@
 .sfw-loading-label {
 	display: inline-flex;
 	align-items: center;
-	gap: $grid-unit-10;
+	gap: wpVariables.$grid-unit-10;
 	height: $button-size;
 	color: var(--wp-admin-theme-color);
 
@@ -12,7 +12,7 @@
 
 		&__circle {
 			stroke: currentcolor;
-			stroke-width: $grid-unit;
+			stroke-width: wpVariables.$grid-unit;
 		}
 	}
 }

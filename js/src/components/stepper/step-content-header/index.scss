@@ -2,18 +2,18 @@
 	display: flex;
 	flex-direction: column;
 	align-items: center;
-	max-width: $sfw-width-large;
+	max-width: variables.$sfw-width-large;
 	text-align: center;
 	margin: auto;
-	gap: $grid-unit-15;
+	gap: wpVariables.$grid-unit-15;
 	margin-bottom: var(--large-gap);
 
 	h1 {
-		font-size: $sfw-font-large;
+		font-size: variables.$sfw-font-large;
 		padding: 0;
 	}
 
 	&__description {
-		line-height: $sfw-line-height-smaller;
+		line-height: variables.$sfw-line-height-smaller;
 	}
 }
