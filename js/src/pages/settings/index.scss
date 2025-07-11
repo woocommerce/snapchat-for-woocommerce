@@ -11,12 +11,12 @@
 		header {
 			max-width: 328px;
 			padding-top: var(--large-gap);
-			padding-bottom: $grid-unit-10;
+			padding-bottom: wpVariables.$grid-unit-10;
 		}
 	}
 
 	.sfw-subsection-helper-text {
-		margin-top: $grid-unit-10;
-		color: $gray-600;
+		margin-top: wpVariables.$grid-unit-10;
+		color: wpColors.$gray-600;
 	}
 }

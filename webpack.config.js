@@ -138,14 +138,17 @@ const sassTest = /\.(sc|sa)ss$/;
 const updatedSassOptions = {
 	sourceMap: ! isProduction,
 	sassOptions: {
-		includePaths: [ 'js/src/css/abstracts' ],
+		loadPaths: [ 'js/src/css/' ],
 	},
 	additionalData:
-		'@use "sass:color";' +
-		'@import "_colors"; ' +
-		'@import "_variables"; ' +
-		'@import "_mixins"; ' +
-		'@import "_breakpoints"; ',
+		'@use "sass:color" as sassColor;' +
+		'@use "abstracts/colors" as colors;' +
+		'@use "abstracts/variables" as variables;' +
+		'@use "abstracts/mixins" as mixins;' +
+		'@use "@wordpress/base-styles/colors" as wpColors;' +
+		'@use "@wordpress/base-styles/variables" as wpVariables;' +
+		'@use "@wordpress/base-styles/mixins" as wpMixins;' +
+		'@use "@wordpress/base-styles/breakpoints" as wpBreakpoints;',
 };
 
 // Update sass-loader config to prepend imports automatically

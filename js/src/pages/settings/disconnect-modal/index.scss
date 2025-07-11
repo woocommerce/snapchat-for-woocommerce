@@ -1,6 +1,6 @@
 .sfw-disconnect-accounts-modal {
-	@include break-small {
-		max-width: $sfw-width-large;
+	@include wpMixins.break-small {
+		max-width: variables.$sfw-width-large;
 	}
 
 	.components-modal__header-heading {
@@ -9,8 +9,8 @@
 	}
 
 	.gridicon.gridicons-notice-outline {
-		margin-right: $grid-unit-10;
-		fill: $alert-red;
+		margin-right: wpVariables.$grid-unit-10;
+		fill: wpColors.$alert-red;
 	}
 
 	.components-base-control {

@@ -1,6 +1,6 @@
 .sfw-subsection-subtitle {
-	font-size: $sfw-font-smaller;
-	line-height: $sfw-line-height-smaller;
-	color: $gray-700;
-	margin-bottom: $grid-unit-05;
+	font-size: variables.$sfw-font-smaller;
+	line-height: variables.$sfw-line-height-smaller;
+	color: wpColors.$gray-700;
+	margin-bottom: wpVariables.$grid-unit-05;
 }

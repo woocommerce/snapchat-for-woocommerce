@@ -1,5 +1,5 @@
 .sfw-account-card {
-	line-height: $sfw-line-height-smaller;
+	line-height: variables.$sfw-line-height-smaller;
 
 	&--is-disabled {
 		opacity: 0.5;
@@ -29,7 +29,7 @@
 
 	&__icon {
 		grid-area: 1/1/span 2;
-		margin-right: $grid-unit-20;
+		margin-right: wpVariables.$grid-unit-20;
 		line-height: 0;
 	}
 
@@ -39,27 +39,27 @@
 
 	&__indicator {
 		grid-area: 1/3/span 2;
-		margin-left: $grid-unit-20;
+		margin-left: wpVariables.$grid-unit-20;
 
 		&--align-to-detail {
 			grid-area: 2/3;
-			margin-top: $grid-unit-15;
+			margin-top: wpVariables.$grid-unit-15;
 		}
 	}
 
 	&__detail {
 		grid-area: 2/2;
-		margin-top: $grid-unit-15;
+		margin-top: wpVariables.$grid-unit-15;
 	}
 
 	&__actions {
 		grid-area: 3/2/auto/span 2;
-		margin-top: $grid-unit-15;
+		margin-top: wpVariables.$grid-unit-15;
 	}
 
 	&__title {
 		margin: 0;
-		color: $black;
+		color: wpColors.$black;
 	}
 
 	&__description {
@@ -67,8 +67,8 @@
 		flex-direction: column;
 		align-items: flex-start;
 		gap: 1em;
-		margin-top: $grid-unit-05;
-		color: $gray-900;
+		margin-top: wpVariables.$grid-unit-05;
+		color: wpColors.$gray-900;
 
 		> p {
 			margin: 0;
@@ -76,10 +76,10 @@
 	}
 
 	&__helper {
-		margin-top: $grid-unit-05;
+		margin-top: wpVariables.$grid-unit-05;
 		font-style: italic;
-		font-size: $helptext-font-size;
-		color: $gray-700;
+		font-size: wpVariables.$helptext-font-size;
+		color: wpColors.$gray-700;
 	}
 
 	.components-card__footer {
@@ -89,8 +89,8 @@
 		// but the default link style has a smaller size that doesn't meet
 		// the visual design needs. So we override its size here.
 		> .components-button.is-link {
-			min-height: $sfw-size-control-height;
-			padding: calc($grid-unit-15 / 2) $grid-unit-15;
+			min-height: variables.$sfw-size-control-height;
+			padding: calc(wpVariables.$grid-unit-15 / 2) wpVariables.$grid-unit-15;
 		}
 	}
 
@@ -102,19 +102,19 @@
 	.components-notice.is-success {
 		background-color: #edfaef;
 		border: 0;
-		font-size: $helptext-font-size;
+		font-size: wpVariables.$helptext-font-size;
 		margin: 0 var(--large-gap) var(--main-gap);
-		padding: $grid-unit-20;
+		padding: wpVariables.$grid-unit-20;
 	}
 
-	@media (max-width: $break-small) {
+	@media (max-width: wpBreakpoints.$break-small) {
 		&__body-layout {
 			display: flex;
 			flex-direction: column;
 			align-items: flex-start;
 
 			> div {
-				margin: $grid-unit-10;
+				margin: wpVariables.$grid-unit-10;
 			}
 		}
 	}
