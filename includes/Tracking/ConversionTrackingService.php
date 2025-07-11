@@ -64,6 +64,10 @@ class ConversionTrackingService implements ServiceStatusInterface {
 	 * @return void
 	 */
 	public function register_hooks(): void {
+		if ( ! self::is_enabled() ) {
+			return;
+		}
+
 		add_filter( Helper::with_prefix( 'filter_tracking_data' ), array( $this, 'populate_tracking_data' ) );
 		add_action( 'woocommerce_thankyou', array( $this, 'handle_purchase' ) );
 		add_action( 'woocommerce_add_to_cart', array( $this, 'handle_single_product_add_to_cart' ), 10, 3 );
@@ -84,7 +88,7 @@ class ConversionTrackingService implements ServiceStatusInterface {
 	 * @return bool True if pixel tracking is enabled; false otherwise.
 	 */
 	public static function is_enabled(): bool {
-		return (bool) Options::get( OptionDefaults::CONVERSIONS_ENABLED );
+		return 'yes' === Options::get( OptionDefaults::CONVERSIONS_ENABLED );
 	}
 
 	/**

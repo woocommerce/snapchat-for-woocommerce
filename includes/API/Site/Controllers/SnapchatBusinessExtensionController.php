@@ -170,25 +170,41 @@ class SnapchatBusinessExtensionController extends RESTBaseController {
 		$data        = $response->get_data();
 		$client_data = $data['business_extension_configuration'];
 
-		if ( $client_data['organization_id'] ) {
+		if ( ! empty( $client_data['organization_id'] ) ) {
 			Options::set( OptionDefaults::ORGANIZATION_ID, $client_data['organization_id'] );
 		}
 
-		if ( $client_data['ad_account_id'] ) {
-			Options::set( OptionDefaults::ADS_ACCOUNT_ID, $client_data['ad_account_id'] );
+		if ( ! empty( $client_data['organization_name'] ) ) {
+			Options::set( OptionDefaults::ORGANIZATION_NAME, $client_data['organization_name'] );
 		}
 
-		if ( $client_data['pixel_id'] ) {
+		if ( ! empty( $client_data['ad_account_id'] ) ) {
+			Options::set( OptionDefaults::AD_ACCOUNT_ID, $client_data['ad_account_id'] );
+		}
+
+		if ( ! empty( $client_data['ad_account_name'] ) ) {
+			Options::set( OptionDefaults::AD_ACCOUNT_NAME, $client_data['ad_account_name'] );
+		}
+
+		if ( ! empty( $client_data['pixel_id'] ) ) {
 			Options::set( OptionDefaults::PIXEL_ID, $client_data['pixel_id'] );
 		}
 
-		if ( $client_data['capi_token'] ) {
+		if ( ! empty( $client_data['capi_token'] ) ) {
 			Options::set( OptionDefaults::CONVERSION_ACCESS_TOKEN, $client_data['capi_token'] );
 		}
 
-		Options::set( OptionDefaults::ONBOARDING_STATUS, 'complete' );
+		Options::set( OptionDefaults::ONBOARDING_STATUS, 'connected' );
 
-		return rest_ensure_response( ( array( 'id' => $config_id ) ) );
+		return rest_ensure_response(
+			array(
+				'org_id'      => Options::get( OptionDefaults::ORGANIZATION_ID ),
+				'org_name'    => Options::get( OptionDefaults::ORGANIZATION_NAME ),
+				'ad_acc_id'   => Options::get( OptionDefaults::AD_ACCOUNT_ID ),
+				'ad_acc_name' => Options::get( OptionDefaults::AD_ACCOUNT_NAME ),
+				'pixel_id'    => Options::get( OptionDefaults::PIXEL_ID ),
+			)
+		);
 	}
 
 	/**
@@ -197,7 +213,7 @@ class SnapchatBusinessExtensionController extends RESTBaseController {
 	 * @return WP_REST_Response
 	 */
 	public function initiate_oauth() {
-		$return_url = admin_url( 'admin.php?page=wc-admin&path=/snapchat/setup' );
+		$return_url = rawurlencode( admin_url( 'admin.php?page=wc-admin&path=/snapchat/setup' ) );
 		$response   = $this->start_connection( $return_url );
 
 		if ( is_wp_error( $response ) ) {
@@ -260,32 +276,23 @@ class SnapchatBusinessExtensionController extends RESTBaseController {
 	 * @return WP_REST_Response
 	 */
 	public function delete_connection() {
-		$response = $this->stop_connection();
-
-		if ( is_wp_error( $response ) ) {
-			return new WP_REST_Response(
-				array(
-					'status'  => 'error',
-					'message' => $response->get_error_message(),
-					'data'    => $response->get_error_data(),
-				),
-				500
-			);
-		}
-
-		$data         = $response->get_data();
-		$oauth_status = '';
-
-		if ( $data['success'] && 'disconnected' === $data['success'] ) {
-			$oauth_status = $data['success'];
-		}
-
 		$config_id = Options::get( OptionDefaults::CONFIG_ID );
 
 		if ( $config_id ) {
 			$response = $this->wcs->proxy_delete(
 				'/ads/v1/business_extension_configurations/' . $config_id
 			);
+
+			if ( is_wp_error( $response ) ) {
+				return new WP_REST_Response(
+					array(
+						'status'  => 'error',
+						'message' => $response->get_error_message(),
+						'data'    => $response->get_error_data(),
+					),
+					500
+				);
+			}
 
 			$data = $response->get_data();
 
@@ -299,20 +306,53 @@ class SnapchatBusinessExtensionController extends RESTBaseController {
 					500
 				);
 			}
+
+			if ( ! empty( $data['request_status'] ) && 'SUCCESS' === $data['request_status'] ) {
+				$response = $this->stop_connection();
+
+				if ( is_wp_error( $response ) ) {
+					return new WP_REST_Response(
+						array(
+							'status'  => 'error',
+							'message' => $response->get_error_message(),
+							'data'    => $response->get_error_data(),
+						),
+						500
+					);
+				}
+
+				$data         = $response->get_data();
+				$oauth_status = '';
+
+				if ( $data['status'] && 'disconnected' === $data['status'] ) {
+					$oauth_status = $data['status'];
+				}
+
+				Options::delete( OptionDefaults::CONFIG_ID );
+				Options::delete( OptionDefaults::ORGANIZATION_ID );
+				Options::delete( OptionDefaults::ORGANIZATION_NAME );
+				Options::delete( OptionDefaults::AD_ACCOUNT_ID );
+				Options::delete( OptionDefaults::AD_ACCOUNT_NAME );
+				Options::delete( OptionDefaults::CONVERSION_ACCESS_TOKEN );
+				Options::delete( OptionDefaults::PIXEL_ID );
+				Options::delete( OptionDefaults::IS_JETPACK_CONNECTED );
+				Options::delete( OptionDefaults::ONBOARDING_STATUS );
+				Transients::delete( TransientDefaults::PIXEL_SCRIPT );
+
+				return rest_ensure_response(
+					array(
+						'status' => $oauth_status,
+					)
+				);
+			}
 		}
 
-		Options::delete( OptionDefaults::CONFIG_ID );
-		Options::delete( OptionDefaults::ORGANIZATION_ID );
-		Options::delete( OptionDefaults::ORGANIZATION_NAME );
-		Options::delete( OptionDefaults::ADS_ACCOUNT_ID );
-		Options::delete( OptionDefaults::CONVERSION_ACCESS_TOKEN );
-		Options::delete( OptionDefaults::PIXEL_ID );
-		Transients::delete( TransientDefaults::PIXEL_SCRIPT );
-
-		return rest_ensure_response(
+		return new WP_REST_Response(
 			array(
-				'status' => $oauth_status,
-			)
+				'status'  => 'error',
+				'message' => 'Config id missing',
+			),
+			500
 		);
 	}
 
@@ -326,11 +366,27 @@ class SnapchatBusinessExtensionController extends RESTBaseController {
 	public function config_schema() {
 		return array(
 			'$schema'    => 'http://json-schema.org/draft-04/schema#',
-			'title'      => 'snapchat_config',
+			'title'      => 'snapchat_merchant_config',
 			'type'       => 'object',
 			'properties' => array(
-				'id' => array(
-					'description' => 'The unique Snapchat config ID.',
+				'org_id'      => array(
+					'description' => "Selected Organization's id.",
+					'type'        => 'string',
+				),
+				'org_name'    => array(
+					'description' => "Selected Organization's name.",
+					'type'        => 'string',
+				),
+				'ad_acc_id'   => array(
+					'description' => 'Selected Ad Account id.',
+					'type'        => 'string',
+				),
+				'ad_acc_name' => array(
+					'description' => 'Selected Ad Account name.',
+					'type'        => 'string',
+				),
+				'pixel_id'    => array(
+					'description' => 'Selected Pixel id.',
 					'type'        => 'string',
 				),
 			),

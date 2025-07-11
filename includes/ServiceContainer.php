@@ -91,15 +91,21 @@ final class ServiceContainer {
 						self::get( ServiceKey::WCS_CLIENT )
 					)
 				);
-			case ServiceKey::ADMIN_SETUP:
-				return new Admin\Setup(
-					new ProductMeta\ProductMetaFields(),
-					new Export\Service\ProductExportService(
+			case ServiceKey::PRODUCT_EXPORT_SERVICE:
+				return new Export\Service\ProductExportService(
+					new Export\BatchExportJob(
 						new Export\Service\ProductIdCacheBuilder(),
 						new Export\EntityProvider\ProductEntityProvider(),
 						new Export\RowBuilder\ProductRowBuilder(),
 						new Export\Writer\CsvExportWriter(),
 					)
+				);
+			case ServiceKey::ADMIN_SETUP:
+				return new Admin\Setup(
+					new Admin\Assets(),
+					new Admin\Menu(),
+					new Admin\Onboarding(),
+					new ProductMeta\ProductMetaFields(),
 				);
 
 			default:

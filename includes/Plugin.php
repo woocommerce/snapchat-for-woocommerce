@@ -28,7 +28,7 @@ final class Plugin {
 	 */
 	public static function init(): void {
 		self::load_textdomain();
-		self::register_hooks();
+		self::register();
 	}
 
 	/**
@@ -51,10 +51,10 @@ final class Plugin {
 	 *
 	 * @since 0.1.0
 	 */
-	private static function register_hooks(): void {
+	private static function register(): void {
 		add_action( 'rest_api_init', array( self::class, 'register_rest_routes' ) );
-		add_action( 'init', array( self::class, 'bootstrap_features' ) );
-		add_action( 'admin_init', array( self::class, 'bootstrap_admin_features' ) );
+		self::bootstrap_features();
+		self::bootstrap_admin_features();
 	}
 
 	/**
@@ -83,12 +83,7 @@ final class Plugin {
 
 		ServiceContainer::get( ServiceKey::PIXEL_TRACKING )->register_hooks();
 		ServiceContainer::get( ServiceKey::CONVERSION_TRACKING )->register_hooks();
-
-		( new Admin\Setup(
-			new Admin\Menu(),
-			new Admin\Assets(),
-			new Admin\Onboarding(),
-		) )->init();
+		ServiceContainer::get( ServiceKey::PRODUCT_EXPORT_SERVICE )->register_hooks();
 	}
 
 	/**

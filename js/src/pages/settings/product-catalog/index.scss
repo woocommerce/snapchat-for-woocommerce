@@ -1,0 +1,11 @@
+.sfw-product-catalog {
+	.sfw-product-catalog__help {
+		padding: 0 var(--large-gap) var(--large-gap);
+
+		p {
+			color: wpColors.$gray-700;
+			font-size: variables.$sfw-font-smaller;
+			margin: 0;
+		}
+	}
+}

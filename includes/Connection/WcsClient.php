@@ -181,14 +181,14 @@ final class WcsClient {
 
 		if ( 'POST' === $method && ! empty( $body ) ) {
 			$args['headers']['Content-Type'] = 'application/json';
-			$args['body']                    = wp_json_encode( $body );
 		}
 
 		$response = $this->jetpack_client->remote_request(
 			array_merge(
 				$args,
-				array( 'url' => $url )
-			)
+				array( 'url' => $url ),
+			),
+			'POST' === $method && $body ? wp_json_encode( $body ) : null
 		);
 
 		return $this->handle_response( $response );

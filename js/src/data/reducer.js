@@ -8,30 +8,6 @@ import { setWith, clone } from 'lodash';
  */
 import TYPES from './action-types';
 
-const DEFAULT_STATE = {
-	general: {
-		version: null,
-		id: null,
-		adsId: null,
-		organizationId: null,
-	},
-	setup: {
-		status: 'incomplete',
-		step: 'accounts',
-	},
-	accounts: {
-		jetpack: {
-			active: 'no',
-			owner: 'no',
-			email: 'asvin.balloo@10up.com',
-			displayName: 'Asvin Balloo',
-		},
-		snapchat: {},
-		ads: {},
-		organization: {},
-	},
-};
-
 /**
  * @callback chainSet
  * @param {Array<string>|string} path The path of the property to set the new value.
@@ -113,8 +89,47 @@ function setIn( state, path, value ) {
 	return chainState( state ).setIn( path, value ).end();
 }
 
-const reducer = ( state = DEFAULT_STATE, action ) => {
-	return state;
+const reducer = ( state, action ) => {
+	switch ( action.type ) {
+		case TYPES.RECEIVE_ACCOUNTS_JETPACK: {
+			const { account } = action;
+
+			return setIn( state, 'accounts.jetpack', account );
+		}
+
+		case TYPES.RECEIVE_SETUP: {
+			const { setup } = action;
+
+			return setIn( state, 'setup', setup );
+		}
+
+		case TYPES.RECEIVE_SNAPCHAT_ACCOUNT: {
+			const { snapchatAccount } = action;
+
+			return setIn( state, 'accounts.snapchat', snapchatAccount );
+		}
+
+		case TYPES.RECEIVE_SNAPCHAT_ACCOUNT_DETAILS: {
+			const { snapchatAccountDetails } = action;
+
+			return setIn( state, 'snapchat', snapchatAccountDetails );
+		}
+
+		case TYPES.RECEIVE_TRACK_CONVERSIONS_STATUS: {
+			const { status } = action;
+
+			return setIn( state, 'trackConversions', status );
+		}
+
+		case TYPES.DISCONNECT_ACCOUNTS_SNAPCHAT: {
+			return setIn( state, 'accounts.snapchat', null );
+		}
+
+		// Page will be reloaded after all accounts have been disconnected, so no need to mutate state.
+		case TYPES.DISCONNECT_ACCOUNTS_ALL:
+		default:
+			return state;
+	}
 };
 
 export default reducer;

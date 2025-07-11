@@ -7,24 +7,29 @@ import { noop } from 'lodash';
 /**
  * Internal dependencies
  */
+import Section from '~/components/section';
 import AppButton from '~/components/app-button';
 import AppSpinner from '~/components/app-spinner';
+import useJetpackAccount from '~/hooks/useJetpackAccount';
+import useSnapchatAccount from '~/hooks/useSnapchatAccount';
 import StepContent from '~/components/stepper/step-content';
+import WPComAccountCard from '~/components/wpcom-account-card';
+import SnapchatAccountCard from '~/components/snapchat-account-card';
 import StepContentHeader from '~/components/stepper/step-content-header';
 import StepContentFooter from '~/components/stepper/step-content-footer';
 import StepContentActions from '~/components/stepper/step-content-actions';
-import Section from '~/components/section';
-import useJetpackAccount from '~/hooks/useJetpackAccount';
-import WPComAccountCard from '~/components/wpcom-account-card';
-import SnapchatComboAccountCard from '~/components/snapchat-combo-account-card';
 import './index.scss';
 
 const SetupAccounts = ( props ) => {
-	const { onContinue = () => {} } = props;
+	const { onContinue = noop } = props;
 	const { jetpack } = useJetpackAccount();
+	const {
+		isConnected: isSnapchatConnected,
+		hasFinishedResolution: hasResolvedSnapchatAccount,
+	} = useSnapchatAccount();
 
 	/**
-	 * When jetpack is loading, or when snapchat account is loading,
+	 * When jetpack is loading, or when Snapchat account is loading,
 	 *  we display the AppSpinner.
 	 *
 	 * The account loading is in sequential manner, one after another.
@@ -33,12 +38,15 @@ const SetupAccounts = ( props ) => {
 	const isLoadingJetpack = ! jetpack;
 	const isJetpackActive = jetpack?.active === 'yes';
 
-	if ( isLoadingJetpack ) {
+	if ( isLoadingJetpack || ! hasResolvedSnapchatAccount ) {
 		return <AppSpinner />;
 	}
 
-	const handleSubmitCallback = noop;
-	const isContinueButtonDisabled = false;
+	const handleOnClick = () => {
+		onContinue();
+	};
+
+	const isContinueButtonDisabled = ! isJetpackActive || ! isSnapchatConnected;
 	const isSubmitting = false;
 
 	return (
@@ -59,8 +67,7 @@ const SetupAccounts = ( props ) => {
 				) }
 			>
 				<WPComAccountCard jetpack={ jetpack } />
-				{ /* <SnapchatComboAccountCard disabled={ ! isJetpackActive } /> */ }
-				<SnapchatComboAccountCard disabled={ isJetpackActive } />
+				<SnapchatAccountCard disabled={ ! isJetpackActive } />
 			</Section>
 
 			<StepContentFooter>
@@ -70,7 +77,7 @@ const SetupAccounts = ( props ) => {
 						disabled={ isContinueButtonDisabled }
 						loading={ isSubmitting }
 						text={ __( 'Continue', 'snapchat-for-woo' ) }
-						onClick={ handleSubmitCallback }
+						onClick={ handleOnClick }
 					/>
 				</StepContentActions>
 			</StepContentFooter>
