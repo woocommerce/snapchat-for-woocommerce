@@ -8,20 +8,20 @@ import { useSelect } from '@wordpress/data';
  */
 import { STORE_KEY } from '~/data/constants';
 
-const selectorName = 'getEnableEnhancedConversions';
+const selectorName = 'getTrackConversions';
 
 /**
- * @typedef {Object} EnableEnhancedConversions
- * @property {boolean} isEnabled Whether enhanced conversions are enabled.
+ * @typedef {Object} TrackConversions
+ * @property {boolean} isEnabled Whether conversions tracking is enabled.
  * @property {boolean} hasFinishedResolution Whether the resolution for the selector has finished.
  */
 
 /**
- * Retrieves the enabled state and resolution status for the enhanced conversions feature.
+ * Retrieves the enabled state and resolution status for the conversions tracking feature.
  *
- * @return {EnableEnhancedConversions} The data and its state.
+ * @return {TrackConversions} The data and its state.
  */
-const useEnableEnhancedConversions = () => {
+const useTrackConversions = () => {
 	return useSelect( ( select ) => {
 		const selector = select( STORE_KEY );
 
@@ -35,4 +35,4 @@ const useEnableEnhancedConversions = () => {
 	}, [] );
 };
 
-export default useEnableEnhancedConversions;
+export default useTrackConversions;
