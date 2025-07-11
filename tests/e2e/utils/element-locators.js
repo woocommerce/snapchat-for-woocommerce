@@ -73,6 +73,50 @@ export default class ElementLocators {
 	}
 
 	/**
+	 * Get the disconnect button inside the Snapchat account card.
+	 *
+	 * @return {import('@playwright/test').Locator} The disconnect button locator.
+	 */
+	getSnapchatDisconnectButton() {
+		return this.getSnapchatAccountCard().getByRole( 'button', {
+			name: 'Disconnect Snapchat account',
+		} );
+	}
+
+	/**
+	 * Get the Snapchat disconnect confirmation modal.
+	 *
+	 * @return {import('@playwright/test').Locator} The Disconnect confirmation modal.
+	 */
+	getSnapchatDisconnectModal() {
+		return this.page.locator( '.sfw-disconnect-accounts-modal', {
+			hasText: 'I understand that I am disconnecting my Snapchat account from this WooCommerce extension.',
+		} )
+	}
+
+	/**
+	 * Get the Snapchat disconnect confirmation checkbox inside the modal.
+	 *
+	 * @return {import('@playwright/test').Locator} The Disconnect confirmation modal.
+	 */
+	getSnapchatDisconnectConfirmCheckbox() {
+		return this
+		.getSnapchatDisconnectModal()
+		.getByRole( 'checkbox', { name: 'Yes, I want to disconnect my Snapchat account' } );
+	}
+
+	/**
+	 * Get the final disconnect button inside the Snapchat account card.
+	 *
+	 * @return {import('@playwright/test').Locator} The disconnect button locator.
+	 */
+	getSnapchatFinalDisconnectButton() {
+		return this.getSnapchatDisconnectModal().getByRole( 'button', {
+			name: 'Disconnect Snapchat Account',
+		} );
+	}
+
+	/**
 	 * Get the connected label inside the Snapchat account card.
 	 *
 	 * @return {import('@playwright/test').Locator} The connected label locator.

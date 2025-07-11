@@ -111,4 +111,34 @@ test.describe( 'Snapchat Settings', () => {
 		);
 		await expect( locator.getSnapchatConnectedLabel() ).toBeVisible();
 	} );
+
+	test( 'Snapchat account disconnection', async () => {
+		const payload = {
+			org_id: '244753a0-2021-482c-af9b-dd6e7677d562',
+			org_name: 'SnapForWooV105',
+			ad_acc_id: '89b3e14b-bac9-409e-857c-ab006cd1c96e',
+			ad_acc_name: 'SnapForWooV105 Self Service',
+			pixel_id: 'fd014a21-2e25-41a8-9e12-de8c9fe512b4',
+		};
+
+		await settingPage.mockSnapchatAccount( payload );
+		await settingPage.mockSnapchatDisconnection();
+		settingPage.goto();
+
+		await locator.getSnapchatDisconnectButton().click();
+
+		await expect( locator.getSnapchatAccountCard() ).toContainText(
+			'Organization: SnapForWooV105'
+		);
+
+		await expect( locator.getSnapchatFinalDisconnectButton() ).toBeDisabled();
+		await expect( locator.getSnapchatDisconnectConfirmCheckbox() ).not.toBeChecked();
+		await locator.getSnapchatDisconnectConfirmCheckbox().click();
+		await expect( locator.getSnapchatDisconnectConfirmCheckbox() ).toBeChecked();
+		await expect( locator.getSnapchatFinalDisconnectButton() ).toBeEnabled();
+		await locator.getSnapchatFinalDisconnectButton().click();
+
+		await page.waitForURL('**/wp-admin/admin.php?page=wc-admin&path=%2Fsnapchat%2Fsetup');
+		expect( await page.url() ).toContain( `/wp-admin/admin.php?page=wc-admin&path=%2Fsnapchat%2Fsetup` );
+	} );
 } );

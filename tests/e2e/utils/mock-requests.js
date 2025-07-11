@@ -186,4 +186,20 @@ export default class MockRequests {
 	async mockSnapchatAccount( payload ) {
 		await this.fulfillRequest( /\/wc\/sfw\/snapchat\/account\b/, payload );
 	}
+
+	/**
+	 * Mock the DELETE request to disconnect Snapchat.
+	 *
+	 * @param {Object} payload The response payload to return for the disconnection.
+	 * @param {number} [status=200] The HTTP status code to return.
+	 * @return {Promise<void>}
+	 */
+	async mockSnapchatDisconnection( payload = {}, status = 200 ) {
+		await this.fulfillRequest(
+			/\/wc\/sfw\/snapchat\/connection\b/,
+			{ status: 'disconnected' },
+			status,
+			[ 'DELETE' ]
+		);
+	}
 }
