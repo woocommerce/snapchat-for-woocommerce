@@ -9,35 +9,35 @@ import { useState, useCallback } from '@wordpress/element';
  * Internal dependencies
  */
 import { useAppDispatch } from '~/data';
-import useEnableEnhancedConversions from '~/hooks/useEnableEnhancedConversions';
+import useTrackConversions from '~/hooks/useTrackConversions';
 import useDispatchCoreNotices from '~/hooks/useDispatchCoreNotices';
 import AccountCard from '~/components/account-card';
 import SpinnerCard from '~/components/spinner-card';
 
 const TrackConversions = () => {
-	const { isEnabled, hasFinishedResolution } = useEnableEnhancedConversions();
+	const { isEnabled, hasFinishedResolution } = useTrackConversions();
 	const [ isSaving, setIsSaving ] = useState( false );
 	const { createNotice } = useDispatchCoreNotices();
-	const { updateEnhancedConversionsStatus } = useAppDispatch();
+	const { updateTrackConversionsStatus } = useAppDispatch();
 
-	const toggleEnhancedConversions = useCallback( async () => {
-		await updateEnhancedConversionsStatus( ! isEnabled );
-	}, [ updateEnhancedConversionsStatus, isEnabled ] );
+	const toggleTrackConversions = useCallback( async () => {
+		await updateTrackConversionsStatus( ! isEnabled );
+	}, [ updateTrackConversionsStatus, isEnabled ] );
 
 	const handleOnChange = async () => {
 		try {
 			setIsSaving( true );
-			await toggleEnhancedConversions();
+			await toggleTrackConversions();
 
 			createNotice(
 				'success',
 				__(
-					'Enhanced Conversions status updated successfully.',
+					'Conversions API Tracking status updated successfully.',
 					'snapchat-for-woo'
 				)
 			);
 		} catch ( error ) {
-			// Silently fail because the error is handled within `updateEnhancedConversionsStatus` action.
+			// Silently fail because the error is handled within `updateTrackConversionsStatus` action.
 		} finally {
 			setIsSaving( false );
 		}
