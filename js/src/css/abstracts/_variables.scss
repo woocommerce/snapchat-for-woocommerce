@@ -1,14 +1,4 @@
-// Import Gutenberg variables
-@import "node_modules/@wordpress/base-styles/variables";
-
-// Gutenberg Missing Styles
-// $gray-500 is not declared in Gutenberg.
-$gray-500: #bbb;
-
-// Add other variables or adjustments we want below
-
 // Typography
-
 $sfw-font-smallest: 11px;
 $sfw-font-smaller: 12px;
 $sfw-font-base: 13px;
@@ -18,7 +8,6 @@ $sfw-font-medium: 24px;
 $sfw-font-large: 32px;
 
 // Line Heights
-
 $sfw-line-height-smallest: 13px;
 $sfw-line-height-smaller: 16px;
 $sfw-line-height-small: 18px;
@@ -27,7 +16,6 @@ $sfw-line-height-medium-large: 28px;
 $sfw-line-height-large: 32px;
 
 // Dimensions
-
 $sfw-border-radius: 3px;
 $sfw-size-control-height: 36px;
 $sfw-popover-width: 200px;
