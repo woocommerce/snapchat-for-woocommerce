@@ -14,7 +14,7 @@ import {
 	fetchSnapchatAccount,
 	receiveJetpackAccount,
 	receiveSnapchatAccountDetails,
-	receiveEnhancedConversionsStatus,
+	receiveTrackConversionsStatus,
 } from './actions';
 
 /**
@@ -79,11 +79,11 @@ export function getSnapchatAccountDetails() {
 }
 
 /**
- * Fetches the status of enhanced conversions from the API.
+ * Fetches the status of conversions tracking from the API.
  *
  * @return {Function} An async thunk function that takes a Redux-like dispatch object.
  */
-export function getEnableEnhancedConversions() {
+export function getTrackConversions() {
 	return async function ( { dispatch } ) {
 		try {
 			const response = await apiFetch( {
@@ -91,7 +91,7 @@ export function getEnableEnhancedConversions() {
 			} );
 
 			dispatch(
-				receiveEnhancedConversionsStatus(
+				receiveTrackConversionsStatus(
 					Boolean( response.capi_enabled )
 				)
 			);
@@ -99,7 +99,7 @@ export function getEnableEnhancedConversions() {
 			handleApiError(
 				error,
 				__(
-					'There was an error getting the enhanced conversions status.',
+					'There was an error getting the conversions tracking status.',
 					'snapchat-for-woo'
 				)
 			);

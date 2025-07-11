@@ -39,14 +39,14 @@ export function receiveSnapchatAccount( snapchatAccount ) {
 }
 
 /**
- * Creates an action to receive the status of enhanced conversions.
+ * Creates an action to receive the status of conversions tracking.
  *
- * @param {boolean} status - The status of enhanced conversions, true if enabled, false otherwise.
- * @return {Object} Action object with type RECEIVE_ENHANCED_CONVERSIONS_STATUS.
+ * @param {boolean} status - The status of conversions tracking, true if enabled, false otherwise.
+ * @return {Object} Action object with type RECEIVE_TRACK_CONVERSIONS_STATUS.
  */
-export function receiveEnhancedConversionsStatus( status ) {
+export function receiveTrackConversionsStatus( status ) {
 	return {
-		type: TYPES.RECEIVE_ENHANCED_CONVERSIONS_STATUS,
+		type: TYPES.RECEIVE_TRACK_CONVERSIONS_STATUS,
 		status,
 	};
 }
@@ -78,12 +78,12 @@ export function receiveSnapchatAccountDetails( snapchatAccountDetails ) {
 }
 
 /**
- * Update the enhanced conversions status.
+ * Update the conversions tracking status.
  *
- * @param {boolean} status The status of the enhanced conversions.
- * @return {Object} Action object to update the enhanced conversions status.
+ * @param {boolean} status The status of the conversions tracking.
+ * @return {Object} Action object to update the conversions tracking status.
  */
-export async function updateEnhancedConversionsStatus( status ) {
+export async function updateTrackConversionsStatus( status ) {
 	try {
 		await apiFetch( {
 			path: `${ API_NAMESPACE }/snapchat/settings`,
@@ -93,12 +93,12 @@ export async function updateEnhancedConversionsStatus( status ) {
 			},
 		} );
 
-		return receiveEnhancedConversionsStatus( status );
+		return receiveTrackConversionsStatus( status );
 	} catch ( error ) {
 		handleApiError(
 			error,
 			__(
-				'There was an error updating the enhanced conversions status.',
+				'There was an error updating the conversions tracking status.',
 				'snapchat-for-woo'
 			)
 		);
