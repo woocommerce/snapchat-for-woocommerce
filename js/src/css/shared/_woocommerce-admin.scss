@@ -1,3 +1,8 @@
+// additionalData in webpack.config.js is for entry points only. Partials still need to import the use manually.
+@use "@wordpress/base-styles/colors" as wpColors;
+@use "@wordpress/base-styles/breakpoints" as wpBreakpoints;
+@use "@wordpress/base-styles/variables" as wpVariables;
+
 // Used in ~/hooks/useLayout.js
 .sfw-full-content {
 	// #wpbody `margin-top` style is set onto DOM node directly in WC Admin.
@@ -35,7 +40,7 @@
 	// without this, the margin-top would be -32px,
 	// and there would be a visible small grey gap.
 	&.is-wp-toolbar-disabled {
-		@media (min-width: #{ ($break-small) }) and (max-width: #{ ($break-medium) }) {
+		@media (min-width: #{ (wpBreakpoints.$break-small) }) and (max-width: #{ (wpBreakpoints.$break-medium) }) {
 			margin-top: -46px;
 		}
 	}
@@ -60,20 +65,20 @@
 	.woocommerce-stepper__steps {
 		align-items: center;
 		justify-content: center;
-		height: $grid-unit-40 * 2;
-		background-color: $white;
-		box-shadow: inset 0 -1px 0 $gray-400;
+		height: wpVariables.$grid-unit-40 * 2;
+		background-color: wpColors.$white;
+		box-shadow: inset 0 -1px 0 wpColors.$gray-400;
 		margin-bottom: 0;
 
 		.woocommerce-stepper__step-divider {
 			margin-top: 0;
 			align-self: auto;
-			max-width: $grid-unit-60;
+			max-width: wpVariables.$grid-unit-60;
 		}
 	}
 
 	.components-notice:not(.app-notice) {
-		margin-bottom: $grid-unit-15;
+		margin-bottom: wpVariables.$grid-unit-15;
 	}
 }
 

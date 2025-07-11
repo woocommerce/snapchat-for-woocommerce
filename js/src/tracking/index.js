@@ -1,3 +1,5 @@
+/* eslint no-console: 0 */
+
 /**
  * Internal dependencies
  */
@@ -34,16 +36,24 @@ document.addEventListener( 'DOMContentLoaded', () => {
 		const eventId = document.querySelector(
 			`[name=${ TRACKING_DATA_VAR.event_id_el_name }]`
 		).value;
-		isPixelEnabled && singleAddToCartClick( event, eventId );
+
+		if ( isPixelEnabled ) {
+			singleAddToCartClick( event, eventId );
+		}
 	} );
 
 	onLoopAddToCartClick( ( event ) => {
 		const eventId = window.crypto.randomUUID();
-		isPixelEnabled && addToCartClick( event, eventId );
+
+		if ( isPixelEnabled ) {
+			addToCartClick( event, eventId );
+		}
+
 		const data = event.currentTarget.dataset;
-		isConversionEnabled &&
-			data?.product_id &&
+
+		if ( isConversionEnabled && data?.product_id ) {
 			triggerCAPI( eventId, data.product_id, 1 );
+		}
 	} );
 } );
 

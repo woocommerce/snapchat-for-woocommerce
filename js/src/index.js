@@ -12,8 +12,8 @@ import { getSetting } from '@woocommerce/settings'; // eslint-disable-line impor
  * Internal dependencies
  */
 import './css/index.scss';
-import withAdminPageShell from '~/components/withAdminPageShell';
 import './data';
+import withAdminPageShell from '~/components/withAdminPageShell';
 import { addBaseEventProperties } from '~/utils/tracks';
 
 const GetStartedPage = lazy( () =>
@@ -22,10 +22,6 @@ const GetStartedPage = lazy( () =>
 
 const Onboarding = lazy( () =>
 	import( /* webpackChunkName: "onboarding" */ './pages/onboarding' )
-);
-
-const Dashboard = lazy( () =>
-	import( /* webpackChunkName: "dashboard" */ './pages/dashboard' )
 );
 
 const Settings = lazy( () =>
@@ -67,15 +63,6 @@ const registerPluginAdminPages = () => {
 				],
 				container: Onboarding,
 				path: '/snapchat/setup',
-			},
-			{
-				breadcrumbs: [
-					...initialBreadcrumbs,
-					__( 'Dashboard', 'snapchat-for-woo' ),
-				],
-				container: Dashboard,
-				path: '/snapchat/dashboard',
-				wpOpenMenu: 'toplevel_page_woocommerce-marketing',
 			},
 			{
 				breadcrumbs: [

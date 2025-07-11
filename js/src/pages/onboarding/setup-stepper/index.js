@@ -1,15 +1,10 @@
 /**
- * External dependencies
- */
-import { getHistory, getNewPath } from '@woocommerce/navigation';
-
-/**
  * Internal dependencies
  */
+import { STEP_NAME_KEY_MAP } from './constants';
 import AppSpinner from '~/components/app-spinner';
 import SavedSetupStepper from './saved-setup-stepper';
 import useSetup from '~/hooks/useSetup';
-import stepNameKeyMap from './stepNameKeyMap';
 
 const SetupStepper = () => {
 	const { hasFinishedResolution, data: sfwSetup } = useSetup();
@@ -24,14 +19,9 @@ const SetupStepper = () => {
 		return null;
 	}
 
-	const { status, step } = sfwSetup;
+	const { step } = sfwSetup;
 
-	if ( status === 'complete' ) {
-		getHistory().replace( getNewPath( {}, '/snapchat/dashboard' ) );
-		return null;
-	}
-
-	return <SavedSetupStepper savedStep={ stepNameKeyMap[ step ] } />;
+	return <SavedSetupStepper savedStep={ STEP_NAME_KEY_MAP[ step ] } />;
 };
 
 export default SetupStepper;

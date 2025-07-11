@@ -1,6 +1,6 @@
 .sfw-subsection-body {
-	font-size: $default-font-size;
+	font-size: wpVariables.$default-font-size;
 	font-style: normal;
 	font-weight: 400;
-	line-height: $sfw-line-height-smaller;
+	line-height: variables.$sfw-line-height-smaller;
 }

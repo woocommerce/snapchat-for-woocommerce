@@ -1,6 +1,6 @@
 .sfw-settings {
 	.sfw-section {
-		max-width: 780px;
+		max-width: 1032px;
 		margin-left: auto;
 		margin-right: auto;
 
@@ -9,14 +9,14 @@
 		}
 
 		header {
-			@include break-small {
-				max-width: 244px;
-			}
+			max-width: 328px;
+			padding-top: var(--large-gap);
+			padding-bottom: wpVariables.$grid-unit-10;
 		}
 	}
 
 	.sfw-subsection-helper-text {
-		margin-top: $grid-unit-10;
-		color: $gray-600;
+		margin-top: wpVariables.$grid-unit-10;
+		color: wpColors.$gray-600;
 	}
 }

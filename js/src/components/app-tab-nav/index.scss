@@ -2,17 +2,17 @@
 	display: flex;
 	flex-wrap: wrap;
 	align-items: stretch;
-	box-shadow: inset 0 -1px 0 $gray-400;
+	box-shadow: inset 0 -1px 0 wpColors.$gray-400;
 	margin-bottom: var(--main-gap);
 
 	&-item {
 		background: transparent;
 		border: none;
-		box-shadow: inset 0 -1px 0 $gray-400;
+		box-shadow: inset 0 -1px 0 wpColors.$gray-400;
 		border-radius: 0;
 		cursor: pointer;
-		height: $grid-unit-60;
-		padding: calc($grid-unit-15 / 4) $grid-unit-20; // Use padding to offset the is-active border, this benefits Windows High Contrast mode
+		height: wpVariables.$grid-unit-60;
+		padding: calc(wpVariables.$grid-unit-15 / 4) wpVariables.$grid-unit-20; // Use padding to offset the is-active border, this benefits Windows High Contrast mode
 		margin-left: 0;
 		font-weight: 500;
 		box-sizing: border-box;
@@ -42,10 +42,7 @@
 			&::before {
 				content: "";
 				position: absolute;
-				top: 0;
-				bottom: 1px;
-				right: 0;
-				left: 0;
+				inset: 0 0 1px;
 				border-bottom: $border-width-tab solid transparent;
 			}
 		}

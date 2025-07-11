@@ -12,7 +12,7 @@ import AppModal from '~/components/app-modal';
 import AppButton from '~/components/app-button';
 import WarningIcon from '~/components/warning-icon';
 import { useAppDispatch } from '~/data';
-import { ALL_ACCOUNTS } from './constants';
+import { ALL_ACCOUNTS, SNAPCHAT_ACCOUNT } from './constants';
 
 const textDict = {
 	[ ALL_ACCOUNTS ]: {
@@ -34,6 +34,24 @@ const textDict = {
 			),
 		],
 	},
+	[ SNAPCHAT_ACCOUNT ]: {
+		title: __( 'Disconnect Snapchat account', 'snapchat-for-woo' ),
+		confirmButton: __( 'Disconnect Snapchat Account', 'snapchat-for-woo' ),
+		confirmation: __(
+			'Yes, I want to disconnect my Snapchat account.',
+			'snapchat-for-woo'
+		),
+		contents: [
+			__(
+				'I understand that I am disconnecting my Snapchat account from this WooCommerce extension.',
+				'snapchat-for-woo'
+			),
+			__(
+				'Some configurations for Snapchat created through WooCommerce may be lost. This cannot be undone.',
+				'snapchat-for-woo'
+			),
+		],
+	},
 };
 
 export default function ConfirmModal( {
@@ -44,7 +62,7 @@ export default function ConfirmModal( {
 } ) {
 	const [ isAgreed, setAgreed ] = useState( false );
 	const [ isDisconnecting, setDisconnecting ] = useState( false );
-	const { disconnectAllAccounts } = useAppDispatch();
+	const dispatcher = useAppDispatch();
 
 	const { title, confirmButton, confirmation, contents } =
 		textDict[ disconnectTarget ];
@@ -57,7 +75,10 @@ export default function ConfirmModal( {
 	};
 
 	const handleConfirmClick = () => {
-		let disconnect = disconnectAllAccounts;
+		let disconnect =
+			disconnectTarget === ALL_ACCOUNTS
+				? dispatcher.disconnectAllAccounts
+				: dispatcher.disconnectSnapchatAccount;
 
 		if ( disconnectAction ) {
 			disconnect = disconnectAction;

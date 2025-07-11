@@ -14,19 +14,17 @@ import useApiFetchCallback from './useApiFetchCallback';
  * Request a Snapchat Oauth URL.
  *
  * @param {'setup'|'reconnect'} nextPageName Indicates the next page name mapped to the redirect URL when back from Snapchat authorization.
- * @param {string} [loginHint] Specify the email to be requested additional scopes. Set this parameter only if wants to request a partial oauth to Snapchat.
- * @see https://developers.google.com/identity/protocols/oauth2/openid-connect#login-hint
  * @return {Array} The same structure as `useApiFetchCallback`.
  */
-export default function useSnapchatAuthorization( nextPageName, loginHint ) {
+export default function useSnapchatAuthorization( nextPageName ) {
 	const fetchOption = useMemo( () => {
-		const query = { next_page_name: nextPageName, login_hint: loginHint };
+		const query = { next_page_name: nextPageName };
 		const path = addQueryArgs(
 			`${ API_NAMESPACE }/snapchat/connect`,
 			query
 		);
 		return { path };
-	}, [ nextPageName, loginHint ] );
+	}, [ nextPageName ] );
 
 	return useApiFetchCallback( fetchOption );
 }

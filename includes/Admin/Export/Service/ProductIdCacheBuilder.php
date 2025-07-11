@@ -59,6 +59,20 @@ class ProductIdCacheBuilder implements CacheBuilderInterface {
 	const BATCH_SIZE = 50;
 
 	/**
+	 * The constructor function.
+	 *
+	 * @since 0.1.0
+	 */
+	public function __construct() {
+		add_action(
+			'woocommerce_product_data_store_cpt_get_products_query',
+			array( $this, 'query_products_by_meta' ),
+			10,
+			2
+		);
+	}
+
+	/**
 	 * Registers the Action Scheduler hook for scanning product IDs.
 	 *
 	 * This method is typically called during plugin initialization.
@@ -116,14 +130,11 @@ class ProductIdCacheBuilder implements CacheBuilderInterface {
 		$page = $page > 1 ? $page : 1;
 
 		$query_args = array(
-			'limit'      => self::BATCH_SIZE,
-			'page'       => $page,
-			'status'     => 'publish',
-			'return'     => 'ids',
-			// phpcs:ignore WordPress.DB.SlowDBQuery.slow_db_query_meta_key
-			'meta_key'   => Helper::with_prefix( ProductMetaFields::CATALOG_ITEM ),
-			// phpcs:ignore WordPress.DB.SlowDBQuery.slow_db_query_meta_value
-			'meta_value' => true,
+			'limit'         => self::BATCH_SIZE,
+			'page'          => $page,
+			'status'        => 'publish',
+			'return'        => 'ids',
+			'snap_meta_key' => Helper::with_prefix( ProductMetaFields::CATALOG_ITEM ),
 		);
 
 		$query   = new \WC_Product_Query( $query_args );
@@ -157,5 +168,37 @@ class ProductIdCacheBuilder implements CacheBuilderInterface {
 			array( 'page' => $page + 1 ),
 			Config::PLUGIN_SLUG
 		);
+	}
+
+	/**
+	 * Filters product query to only return the product if they
+	 * don't contain the `product_catalog_item` meta key OR
+	 * if they contain the meta key `product_catalog_item` with
+	 * a value of '1'.
+	 *
+	 * @since 0.1.0
+	 *
+	 * @param array $query      WooCommerce Products query args.
+	 * @param array $query_vars Query vars.
+	 *
+	 * @return array
+	 */
+	public function query_products_by_meta( $query, $query_vars ) {
+		if ( ! empty( $query_vars['snap_meta_key'] ) ) {
+			$query['meta_query'][] = array(
+				'relation' => 'OR',
+				array(
+					'key'     => $query_vars['snap_meta_key'],
+					'value'   => '1',
+					'compare' => '=',
+				),
+				array(
+					'key'     => $query_vars['snap_meta_key'],
+					'compare' => 'NOT EXISTS',
+				),
+			);
+		}
+
+		return $query;
 	}
 }

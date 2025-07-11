@@ -7,7 +7,7 @@ import { __ } from '@wordpress/i18n';
  * Internal dependencies
  */
 import AppButton from '~/components/app-button';
-import useSwitchSnapchatAccount from './useSwitchSnapchatAccount';
+import useSwitchSnapchatAccount from '~/hooks/useSwitchSnapchatAccount';
 
 /**
  * Clicking on the "connect to a different Snapchat account" button.
