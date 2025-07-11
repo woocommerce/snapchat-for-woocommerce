@@ -141,7 +141,7 @@ final class RemotePixelTracker implements PixelTrackerInterface {
 	 *
 	 * @since 0.1.0
 	 *
-	 * @return string|null The sanitized pixel script, or null on failure.
+	 * @return string The sanitized pixel script, or empty string on failure.
 	 */
 	private function get_pixel_script() {
 		$pixel_script = Transients::get( TransientDefaults::PIXEL_SCRIPT );
@@ -153,26 +153,26 @@ final class RemotePixelTracker implements PixelTrackerInterface {
 		$pixel_id = Options::get( OptionDefaults::PIXEL_ID );
 
 		if ( empty( $pixel_id ) ) {
-			return null;
+			return '';
 		}
 
 		$path     = sprintf( '/ads/v1/pixels/%s', $pixel_id );
 		$response = $this->wcs_client->proxy_get( $path );
 
 		if ( is_wp_error( $response ) ) {
-			return null;
+			return '';
 		}
 
 		$data = $response->get_data();
 
 		if ( empty( $data ) ) {
-			return null;
+			return '';
 		}
 
-		$pixel_script = $data['pixels'][0]['pixel']['pixel_javascript'] ?? null;
+		$pixel_script = $data['pixels'][0]['pixel']['pixel_javascript'] ?? '';
 
 		if ( ! $pixel_script ) {
-			return null;
+			return '';
 		}
 
 		Transients::set( TransientDefaults::PIXEL_SCRIPT, $pixel_script );

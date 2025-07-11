@@ -33,7 +33,7 @@ class ServiceContainerTest extends WP_UnitTestCase {
 		$ref  = new \ReflectionClass( ServiceContainer::class );
 		$prop = $ref->getProperty( 'instances' );
 		$prop->setAccessible( true );
-		$prop->setValue( array() );
+		$prop->setValue( null, array() );
 	}
 
 	/**
@@ -49,7 +49,7 @@ class ServiceContainerTest extends WP_UnitTestCase {
 
 		$instances         = $prop->getValue();
 		$instances[ $key ] = $instance;
-		$prop->setValue( $instances );
+		$prop->setValue( null, $instances );
 	}
 
 	/**
