@@ -24,10 +24,6 @@ const Onboarding = lazy( () =>
 	import( /* webpackChunkName: "onboarding" */ './pages/onboarding' )
 );
 
-const Dashboard = lazy( () =>
-	import( /* webpackChunkName: "dashboard" */ './pages/dashboard' )
-);
-
 const Settings = lazy( () =>
 	import( /* webpackChunkName: "settings" */ './pages/settings' )
 );
@@ -67,15 +63,6 @@ const registerPluginAdminPages = () => {
 				],
 				container: Onboarding,
 				path: '/snapchat/setup',
-			},
-			{
-				breadcrumbs: [
-					...initialBreadcrumbs,
-					__( 'Dashboard', 'snapchat-for-woo' ),
-				],
-				container: Dashboard,
-				path: '/snapchat/dashboard',
-				wpOpenMenu: 'toplevel_page_woocommerce-marketing',
 			},
 			{
 				breadcrumbs: [
