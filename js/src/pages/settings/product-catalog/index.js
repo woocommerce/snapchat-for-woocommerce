@@ -112,7 +112,7 @@ const ProductCatalog = () => {
 				title={ __( 'Export Product Catalog', 'snapchat-for-woo' ) }
 				description={ getDescription() }
 				indicator={
-					<Flex spacing={ 4 }>
+					<Flex spacing={ 4 } wrap="wrap">
 						<AppButton
 							variant="secondary"
 							onClick={ handleOnRegenerateCsvClick }
