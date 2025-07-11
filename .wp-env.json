@@ -1,10 +1,25 @@
 {
 	"phpVersion": null,
 	"core": null,
-	"plugins": ["https://downloads.wordpress.org/plugin/woocommerce.zip", "."],
-	"config": {
-		"JETPACK_AUTOLOAD_DEV": true,
-		"WP_DEBUG": true,
-		"SCRIPT_DEBUG": true
+	"plugins": [
+		"https://downloads.wordpress.org/plugin/woocommerce.zip",
+		".",
+		"./tests/e2e/plugins/snapchat-options.php"
+	],
+	"themes": [
+		"https://downloads.wordpress.org/theme/storefront.zip"
+	],
+	"env": {
+		"tests": {
+			"mappings": {
+				"wp-cli.yml": "./tests/e2e/bin/wp-cli.yml"
+			},
+			"config": {
+				"JETPACK_AUTOLOAD_DEV": true,
+				"WP_DEBUG": true,
+				"SCRIPT_DEBUG": true,
+				"E2E_CONTEXT": true
+			}
+		}
 	}
 }

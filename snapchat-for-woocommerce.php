@@ -1,6 +1,6 @@
 <?php
 /**
- * Plugin Name: Snapchat For Woocommerce
+ * Plugin Name: Snapchat for WooCommerce
  * Version: 0.1.0
  * Author: WooCommerce
  * Author URI: https://woocommerce.com/

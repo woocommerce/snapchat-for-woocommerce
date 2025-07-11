@@ -34,14 +34,17 @@
 		"lodash": "^4.17.21"
 	},
 	"devDependencies": {
-		"@playwright/test": "^1.45.3",
+		"@playwright/test": "^1.53.1",
 		"@testing-library/dom": "^10.4.0",
 		"@testing-library/jest-dom": "^6.6.3",
 		"@testing-library/react": "^16.0.0",
 		"@testing-library/user-event": "^14.5.2",
 		"@woocommerce/dependency-extraction-webpack-plugin": "^4.0.0",
 		"@woocommerce/eslint-plugin": "^2.3.0",
-		"@wordpress/env": "^10.4.0",
+		"@wordpress/env": "^10.26.0",
+		"axios": "^1.7.2",
+		"bundlewatch": "^0.4.0",
+		"dotenv": "^17.0.0",
 		"@wordpress/jest-preset-default": "^12.26.0",
 		"@wordpress/prettier-config": "^4.26.0",
 		"@wordpress/scripts": "^30.19.0",
@@ -70,10 +73,10 @@
 	},
 	"scripts": {
 		"prebuild": "composer install",
+		"build": "NODE_ENV=production wp-scripts build --webpack-src-dir=js/src",
 		"postbuild": "npm run archive",
 		"archive": "composer archive --file=$npm_package_name --format=zip",
 		"postarchive": "rm -rf $npm_package_name && unzip $npm_package_name.zip -d $npm_package_name && rm $npm_package_name.zip && zip -r $npm_package_name.zip $npm_package_name && rm -rf $npm_package_name",
-		"build": "NODE_ENV=production wp-scripts build --webpack-src-dir=js/src",
 		"doc:tracking": "woocommerce-grow-jsdoc ./js/src",
 		"format": "wp-scripts format",
 		"i18n": "WP_CLI_PHP_ARGS='-d memory_limit=2048M' ./vendor/bin/wp i18n make-pot ./ languages/$npm_package_name.pot --slug=$npm_package_name --domain=$npm_package_name --exclude=bin,data,js/src,node_modules,tests,vendor",
@@ -82,10 +85,14 @@
 		"packages-update": "wp-scripts packages-update",
 		"plugin-zip": "wp-scripts plugin-zip",
 		"postinstall": "composer install",
-		"start": "wp-scripts start --webpack-src-dir=js/src",
-		"wp-env": "wp-env",
-		"wp-env:up": "npm run -- wp-env start --update",
-		"wp-env:down": "npm run wp-env stop"
+		"env": "wp-env",
+		"env:start": "wp-env start",
+		"env:clean": "wp-env clean",
+		"env:stop": "wp-env stop",
+		"env:destroy": "wp-env destroy",
+		"postenv:start": "bash ./tests/e2e/bin/initialize.sh",
+		"test:e2e": "npx playwright test --config tests/e2e/playwright.config.js",
+		"start": "wp-scripts start --webpack-src-dir=js/src"
 	},
 	"browserslist": [
 		"extends @wordpress/browserslist-config"
