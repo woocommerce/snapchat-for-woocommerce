@@ -1,0 +1,42 @@
+name: 'Prepare New Release'
+run-name:  Prepare New Release `${{ github.event.inputs.type }}/${{ github.event.inputs.version }}` from by @${{ github.actor }}
+
+# **What it does**: Does release preparation: creates the release branch and the PR with a checklist.
+# **Why we have it**: To support devs automating a few manual steps, and to leave a nice reference for consumers.
+
+on:
+  workflow_dispatch:
+    inputs:
+      ## In the future we could infer that version from the changelog, or bump it via major|minor|patch.
+      version:
+        description: 'Version number to be released'
+        required: true
+      type:
+        description: 'Type of the release (release|hotfix)'
+        required: true
+        default: 'release'
+      wp-version:
+        description: 'WordPress tested up to'
+      wc-version:
+        description: 'WooCommerce tested up to'
+
+
+jobs:
+  PrepareRelease:
+    name: Prepare Release
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
+
+      - name: Create branch & PR
+        uses: woocommerce/grow/prepare-extension-release@ da5279aa4d76745ef32970e49b5ef7903a3b457a # v2.2.2
+        with:
+          version: ${{ github.event.inputs.version }}
+          type: ${{ github.event.inputs.type }}
+          wp-version: ${{ github.event.inputs.wp-version }}
+          wc-version: ${{ github.event.inputs.wc-version }}
+          main-branch: 'trunk'
+          pre-steps: |
+            1. [ ] Remove older changelog entries from `readme.txt` (keep the last two versions, since we will be adding a third during the release), commit changes.
+            1. [ ] :exclamation: If this release has updated composer packages, we should test Composer package conflicts with other plugins.
