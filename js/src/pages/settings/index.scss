@@ -9,9 +9,9 @@
 		}
 
 		header {
-			@include break-small {
-				max-width: 244px;
-			}
+			max-width: 328px;
+			padding-top: var(--large-gap);
+			padding-bottom: $grid-unit-10;
 		}
 	}
 

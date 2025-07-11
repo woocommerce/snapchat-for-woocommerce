@@ -81,11 +81,11 @@ export const getSnapchatAccountDetails = ( state ) => {
 };
 
 /**
- * Retrieves the status of enhanced conversions.
+ * Retrieves the status of conversions tracking.
  *
  * @param {Object} state - The Redux state object.
- * @return {boolean} The status of enhanced conversions, true if enabled, false otherwise or null if not set.
+ * @return {boolean} The status of conversions tracking, true if enabled, false otherwise or null if not set.
  */
-export const getEnableEnhancedConversions = ( state ) => {
-	return state.enhancedConversions;
+export const getTrackConversions = ( state ) => {
+	return state.trackConversions;
 };
