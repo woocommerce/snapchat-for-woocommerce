@@ -72,7 +72,7 @@ test.describe( 'Snapchat Settings', () => {
 		await expect(
 			page
 				.getByText(
-					'Enhanced Conversions status updated successfully.'
+					'Conversions API Tracking status updated successfully.'
 				)
 				.first()
 		).toBeVisible();
@@ -82,7 +82,7 @@ test.describe( 'Snapchat Settings', () => {
 		await expect(
 			page
 				.getByText(
-					'Enhanced Conversions status updated successfully.'
+					'Conversions API Tracking status updated successfully.'
 				)
 				.first()
 		).toBeVisible();
@@ -131,14 +131,26 @@ test.describe( 'Snapchat Settings', () => {
 			'Organization: SnapForWooV105'
 		);
 
-		await expect( locator.getSnapchatFinalDisconnectButton() ).toBeDisabled();
-		await expect( locator.getSnapchatDisconnectConfirmCheckbox() ).not.toBeChecked();
+		await expect(
+			locator.getSnapchatFinalDisconnectButton()
+		).toBeDisabled();
+		await expect(
+			locator.getSnapchatDisconnectConfirmCheckbox()
+		).not.toBeChecked();
 		await locator.getSnapchatDisconnectConfirmCheckbox().click();
-		await expect( locator.getSnapchatDisconnectConfirmCheckbox() ).toBeChecked();
-		await expect( locator.getSnapchatFinalDisconnectButton() ).toBeEnabled();
+		await expect(
+			locator.getSnapchatDisconnectConfirmCheckbox()
+		).toBeChecked();
+		await expect(
+			locator.getSnapchatFinalDisconnectButton()
+		).toBeEnabled();
 		await locator.getSnapchatFinalDisconnectButton().click();
 
-		await page.waitForURL('**/wp-admin/admin.php?page=wc-admin&path=%2Fsnapchat%2Fsetup');
-		expect( await page.url() ).toContain( `/wp-admin/admin.php?page=wc-admin&path=%2Fsnapchat%2Fsetup` );
+		await page.waitForURL(
+			'**/wp-admin/admin.php?page=wc-admin&path=%2Fsnapchat%2Fsetup'
+		);
+		expect( await page.url() ).toContain(
+			`/wp-admin/admin.php?page=wc-admin&path=%2Fsnapchat%2Fsetup`
+		);
 	} );
 } );

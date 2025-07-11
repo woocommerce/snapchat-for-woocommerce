@@ -2,8 +2,6 @@
 /**
  * Plugin Name: Snapchat Options
  * Description: This plugin is used to seed Options and Transients to test the Snapchat for WooCommerce plugin.
- *
- * Requires Plugins: snapchat-for-woocommerce
  */
 use SnapchatForWooCommerce\Utils\Storage\Options;
 use SnapchatForWooCommerce\Utils\Storage\TransientDefaults;

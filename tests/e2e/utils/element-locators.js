@@ -90,8 +90,9 @@ export default class ElementLocators {
 	 */
 	getSnapchatDisconnectModal() {
 		return this.page.locator( '.sfw-disconnect-accounts-modal', {
-			hasText: 'I understand that I am disconnecting my Snapchat account from this WooCommerce extension.',
-		} )
+			hasText:
+				'I understand that I am disconnecting my Snapchat account from this WooCommerce extension.',
+		} );
 	}
 
 	/**
@@ -100,9 +101,9 @@ export default class ElementLocators {
 	 * @return {import('@playwright/test').Locator} The Disconnect confirmation modal.
 	 */
 	getSnapchatDisconnectConfirmCheckbox() {
-		return this
-		.getSnapchatDisconnectModal()
-		.getByRole( 'checkbox', { name: 'Yes, I want to disconnect my Snapchat account' } );
+		return this.getSnapchatDisconnectModal().getByRole( 'checkbox', {
+			name: 'Yes, I want to disconnect my Snapchat account',
+		} );
 	}
 
 	/**
