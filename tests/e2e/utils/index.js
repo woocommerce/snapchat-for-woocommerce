@@ -1,1 +1,1 @@
-export { findSnaptrEvent } from './findSnapEvent';
+export { findSnaptrEvent } from './findSnaptrEvent';
