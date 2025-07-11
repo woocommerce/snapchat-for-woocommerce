@@ -43,6 +43,7 @@ const ProductCatalog = () => {
 	const [ lastExported, setLastExported ] = useState(
 		sfwData.lastTimestamp || null
 	);
+	const hasExport = fileUrl && lastExported;
 
 	// Trigger a heartbeat connection as soon as we get a successfull response from the server
 	// when the user clicks on the "Regenerate CSV" button.
@@ -65,7 +66,7 @@ const ProductCatalog = () => {
 		onGenerateCsvError
 	);
 
-	const handleOnRegenerateCsvClick = () => {
+	const handleOnGenerateCsvClick = () => {
 		generateCsv();
 		setExportInProgress( true );
 	};
@@ -78,14 +79,58 @@ const ProductCatalog = () => {
 	};
 
 	const getDescription = () => {
+		if ( exportInProgress ) {
+			return __(
+				'We’re generating your CSV file… This may take a few seconds.',
+				'snapchat-for-woo'
+			);
+		}
+
 		if ( ! lastExported ) {
-			return null;
+			return __(
+				'Your product catalog is not synced to Snapchat yet. Generate a CSV to manually upload.',
+				'snapchat-for-woo'
+			);
 		}
 
 		return sprintf(
 			// translators: %s: The date and time when the product catalog was last exported.
 			__( 'Last exported on %s.', 'snapchat-for-woo' ),
 			lastExported
+		);
+	};
+
+	const getIndicator = () => {
+		if ( hasExport ) {
+			return (
+				<Flex spacing={ 4 } wrap="wrap">
+					<AppButton
+						variant="secondary"
+						onClick={ handleOnGenerateCsvClick }
+						loading={ exportInProgress }
+					>
+						{ __( 'Regenerate CSV', 'snapchat-for-woo' ) }
+					</AppButton>
+					<AppButton
+						variant="primary"
+						href={ fileUrl }
+						disabled={ ! fileUrl }
+						download
+					>
+						{ __( 'Download CSV', 'snapchat-for-woo' ) }
+					</AppButton>
+				</Flex>
+			);
+		}
+
+		return (
+			<AppButton
+				variant="secondary"
+				onClick={ handleOnGenerateCsvClick }
+				loading={ exportInProgress }
+			>
+				{ __( 'Generate CSV', 'snapchat-for-woo' ) }
+			</AppButton>
 		);
 	};
 
@@ -111,51 +156,35 @@ const ProductCatalog = () => {
 				className="sfw-product-catalog"
 				title={ __( 'Export Product Catalog', 'snapchat-for-woo' ) }
 				description={ getDescription() }
-				indicator={
-					<Flex spacing={ 4 }>
-						<AppButton
-							variant="secondary"
-							onClick={ handleOnRegenerateCsvClick }
-							loading={ exportInProgress }
-						>
-							{ __( 'Regenerate CSV', 'snapchat-for-woo' ) }
-						</AppButton>
-						<AppButton
-							variant="primary"
-							href={ fileUrl }
-							disabled={ ! fileUrl }
-							download
-						>
-							{ __( 'Download CSV', 'snapchat-for-woo' ) }
-						</AppButton>
-					</Flex>
-				}
+				indicator={ getIndicator() }
 			>
-				<div className="sfw-product-catalog__help">
-					<p>
-						{ __(
-							'You can download the latest CSV or regenerate it if you’ve made changes.',
-							'snapchat-for-woo'
-						) }
-					</p>
-					<p>
-						{ createInterpolateElement(
-							__(
-								'Need help? Learn how to <link>upload</link> your CSV to Snapchat.',
+				{ hasExport && (
+					<div className="sfw-product-catalog__help">
+						<p>
+							{ __(
+								'You can download the latest CSV or regenerate it if you’ve made changes.',
 								'snapchat-for-woo'
-							),
-							{
-								link: (
-									<AppDocumentationLink
-										context="settings"
-										linkId="csv-learn-more"
-										href="https://tbd"
-									/>
+							) }
+						</p>
+						<p>
+							{ createInterpolateElement(
+								__(
+									'Need help? Learn how to <link>upload</link> your CSV to Snapchat.',
+									'snapchat-for-woo'
 								),
-							}
-						) }
-					</p>
-				</div>
+								{
+									link: (
+										<AppDocumentationLink
+											context="settings"
+											linkId="csv-learn-more"
+											href="https://tbd"
+										/>
+									),
+								}
+							) }
+						</p>
+					</div>
+				) }
 			</AccountCard>
 		</>
 	);

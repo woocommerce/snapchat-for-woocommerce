@@ -11,7 +11,6 @@ import { getHistory } from '@woocommerce/navigation';
 import useMenuEffect from '~/hooks/useMenuEffect';
 import LinkedAccounts from './linked-accounts';
 import Section from '~/components/section';
-import MainTabNav from '~/components/main-tab-nav';
 import ProductCatalog from './product-catalog';
 import TrackConversions from './track-conversions';
 import useSnapchatAccount from '~/hooks/useSnapchatAccount';
@@ -32,8 +31,6 @@ const Settings = () => {
 
 	return (
 		<div className="sfw-settings">
-			<MainTabNav />
-
 			<Section title={ __( 'Product Catalog', 'snapchat-for-woo' ) }>
 				<ProductCatalog />
 			</Section>
