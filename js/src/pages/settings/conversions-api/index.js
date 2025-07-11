@@ -16,15 +16,15 @@ import SpinnerCard from '~/components/spinner-card';
 import './index.scss';
 
 /**
- * TrackConversions component for managing the Conversions API tracking setting.
+ * ConversionsAPI component for managing the tracking setting.
  *
  * Renders a card UI allowing users to enable or disable server-side conversion event tracking.
  * Handles asynchronous state updates and displays success notifications upon status change.
  * Shows a loading spinner while the current tracking status is being resolved.
  *
- * @return {JSX.Element} The rendered TrackConversions settings card.
+ * @return {JSX.Element} The rendered ConversionsAPI settings card.
  */
-const TrackConversions = () => {
+const ConversionsAPI = () => {
 	const { isEnabled, hasFinishedResolution } = useTrackConversions();
 	const [ isSaving, setIsSaving ] = useState( false );
 	const { createNotice } = useDispatchCoreNotices();
@@ -82,4 +82,4 @@ const TrackConversions = () => {
 	);
 };
 
-export default TrackConversions;
+export default ConversionsAPI;

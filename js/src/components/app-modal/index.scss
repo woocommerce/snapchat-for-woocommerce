@@ -6,8 +6,8 @@
 	 */
 	overflow: hidden;
 
-	@include break-large {
-		width: $sfw-width-large;
+	@include wpMixins.break-large {
+		width: variables.$sfw-width-large;
 	}
 
 	.sfw-app-modal__footer {
@@ -16,7 +16,7 @@
 		gap: calc(var(--main-gap) / 2);
 		margin-top: var(--large-gap);
 
-		@include break-mobile {
+		@include wpMixins.break-mobile {
 			flex-direction: row;
 			justify-content: flex-end;
 		}

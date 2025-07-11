@@ -1,35 +1,35 @@
 .sfw-section {
 	display: flex;
 	flex-direction: column;
-	margin-bottom: $grid-unit-30;
+	margin-bottom: wpVariables.$grid-unit-30;
 
 	&--is-disabled,
 	&--is-disabled-left &__header {
 		opacity: 0.5;
 	}
 
-	@include break-small {
+	@include wpMixins.break-small {
 		flex-direction: row;
 		gap: var(--main-gap);
 	}
 
 	&__header {
-		@include break-small {
+		@include wpMixins.break-small {
 			width: 33%;
 			padding-top: var(--main-gap);
 		}
 
 		h1 {
-			font-size: $editor-font-size;
+			font-size: wpVariables.$editor-font-size;
 			font-style: normal;
 			font-weight: 600;
-			margin-bottom: $grid-unit;
+			margin-bottom: wpVariables.$grid-unit;
 			padding: 0;
 		}
 
 		p {
-			margin: 0 0 $grid-unit;
-			line-height: $sfw-line-height-smaller;
+			margin: 0 0 wpVariables.$grid-unit;
+			line-height: variables.$sfw-line-height-smaller;
 		}
 	}
 
