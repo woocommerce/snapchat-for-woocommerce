@@ -12,7 +12,7 @@ import useMenuEffect from '~/hooks/useMenuEffect';
 import LinkedAccounts from './linked-accounts';
 import Section from '~/components/section';
 import ProductCatalog from './product-catalog';
-import TrackConversions from './track-conversions';
+import ConversionsAPI from './conversions-api';
 import useSnapchatAccount from '~/hooks/useSnapchatAccount';
 import { getOnboardingUrl } from '~/utils/urls';
 import './index.scss';
@@ -42,7 +42,7 @@ const Settings = () => {
 					'snapchat-for-woo'
 				) }
 			>
-				<TrackConversions />
+				<ConversionsAPI />
 			</Section>
 
 			<Section
