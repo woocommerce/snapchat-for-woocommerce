@@ -1,0 +1,51 @@
+.sfw-onboarding-success-modal {
+
+	.components-modal__header {
+		left: 0;
+		position: absolute;
+		top: 0;
+	}
+
+	.components-modal__content {
+		margin: 0;
+		padding: 0;
+	}
+
+	.sfw-onboarding-success-modal__logos {
+		align-items: center;
+		background-color: #f3f4f5;
+		display: flex;
+		justify-content: center;
+		min-height: 160px;
+	}
+
+	.sfw-onboarding-success-modal__logo-separator-line {
+		background-color: wpColors.$gray-600;
+		height: 63px;
+		width: 1px;
+	}
+
+	.sfw-onboarding-success-modal__content {
+		color: wpColors.$gray-700;
+		padding: wpVariables.$grid-unit-30;
+	}
+
+	.sfw-onboarding-success-modal__title {
+		color: wpColors.$gray-700;
+		font-size: variables.$sfw-font-medium;
+		font-weight: 400;
+		line-height: 1.5;
+		margin: 0 0 wpVariables.$grid-unit-30;
+	}
+
+	.sfw-onboarding-success-modal__description {
+		font-size: 16px;
+		line-height: 1.5;
+		margin: 0;
+	}
+
+	.sfw-app-modal__footer {
+		margin: 0;
+		padding: 0 wpVariables.$grid-unit-30 wpVariables.$grid-unit-30;
+	}
+}

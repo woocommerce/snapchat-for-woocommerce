@@ -3,7 +3,7 @@
  */
 import { __ } from '@wordpress/i18n';
 import { useEffect } from '@wordpress/element';
-import { getHistory } from '@woocommerce/navigation';
+import { getHistory, getQuery } from '@woocommerce/navigation';
 
 /**
  * Internal dependencies
@@ -14,14 +14,18 @@ import Section from '~/components/section';
 import ProductCatalog from './product-catalog';
 import ConversionsAPI from './conversions-api';
 import useSnapchatAccount from '~/hooks/useSnapchatAccount';
+import OnboardingSuccessModal from '~/components/onboarding-success-modal';
 import { getOnboardingUrl } from '~/utils/urls';
 import './index.scss';
 
 const Settings = () => {
 	// Make the component highlight SFW entry in the WC legacy menu.
 	useMenuEffect();
-
 	const { isConnected, hasFinishedResolution } = useSnapchatAccount();
+
+	// Show onboarding success guide modal by visiting the path with a specific query `onboarding=success`.
+	// For example: `/wp-admin/admin.php?page=wc-admin&path=%2Fsnapchat%2Fsettings&onboarding=success`.
+	const isOnboardingSuccessModalOpen = getQuery()?.onboarding === 'success';
 
 	useEffect( () => {
 		if ( ! isConnected && hasFinishedResolution ) {
@@ -31,6 +35,8 @@ const Settings = () => {
 
 	return (
 		<div className="sfw-settings">
+			{ isOnboardingSuccessModalOpen && <OnboardingSuccessModal /> }
+
 			<Section title={ __( 'Product Catalog', 'snapchat-for-woo' ) }>
 				<ProductCatalog />
 			</Section>
