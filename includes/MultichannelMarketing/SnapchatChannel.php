@@ -47,7 +47,7 @@ class SnapchatChannel implements MarketingChannelInterface {
 	 * @return string
 	 */
 	public function get_name(): string {
-		return __( 'Snapchat for WooCommerce', 'snapchat-for-woocommerce' );
+		return __( 'Snapchat', 'snapchat-for-woocommerce' );
 	}
 
 	/**
