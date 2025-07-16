@@ -8,8 +8,8 @@ import { useEffect } from '@wordpress/element';
  *
  * @see https://github.com/woocommerce/woocommerce-admin/blob/release/2.7.1/client/layout/controller.js#L240-L244
  */
-const dashboardPage = {
-	match: { url: '/snapchat/dashboard' },
+const startPage = {
+	match: { url: '/snapchat/start' },
 	wpOpenMenu: 'toplevel_page_woocommerce-marketing',
 };
 
@@ -25,6 +25,6 @@ const dashboardPage = {
  */
 export default function useMenuEffect() {
 	return useEffect( () => {
-		window.wpNavMenuClassChange( dashboardPage, dashboardPage.match.url );
+		window.wpNavMenuClassChange( startPage, startPage.match.url );
 	} );
 }
