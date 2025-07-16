@@ -73,6 +73,37 @@ export default class ElementLocators {
 	}
 
 	/**
+	 * Get the continue button that navigates to the setup screen after click.
+	 *
+	 * @return {import('@playwright/test').Locator} The continue button locator.
+	 */
+	getContinueToSetupButton() {
+		return this.page.getByRole( 'button', { name: 'Continue' } );
+	}
+
+	/**
+	 * Get the modal shown after successful onboarding.
+	 *
+	 * @return {import('@playwright/test').Locator} The onboarding successful modal.
+	 */
+	getOnboardingSuccessfulModal() {
+		return this.page.locator( '.sfw-onboarding-success-modal', {
+			hasText: 'You’ve successfully set up Snapchat for WooCommerce! 🎉',
+		} );
+	}
+
+	/**
+	 * Get the modal shown after successful onboarding.
+	 *
+	 * @return {import('@playwright/test').Locator} The onboarding successful modal.
+	 */
+	getOnboardingSuccessfulCloseModalButton() {
+		return this.getOnboardingSuccessfulModal().getByRole( 'button', {
+			name: 'Close',
+		} );
+	}
+
+	/**
 	 * Get the disconnect button inside the Snapchat account card.
 	 *
 	 * @return {import('@playwright/test').Locator} The disconnect button locator.
