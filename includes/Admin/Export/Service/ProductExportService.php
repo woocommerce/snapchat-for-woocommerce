@@ -95,10 +95,9 @@ class ProductExportService {
 		);
 
 		add_filter(
-			'heartbeat_received',
+			'wp_ajax_' . Helper::with_prefix( 'export_status' ),
 			array( $this, 'check_export_status' ),
-			10,
-			2
+			10
 		);
 	}
 
@@ -257,32 +256,27 @@ class ProductExportService {
 	 *
 	 * @since 0.1.0
 	 *
-	 * @param array $response Existing Heartbeat response data.
-	 * @param array $data     Heartbeat data received from the client.
-	 * @return array Modified response including export status if requested.
+	 * @return void
 	 */
-	public function check_export_status( $response, $data ) {
-		$request_key  = Helper::with_prefix( 'check_export_status' );
-		$response_key = Helper::with_prefix( 'export_status' );
+	public function check_export_status() {
+		check_ajax_referer( 'export-nonce', 'security' );
 
-		if ( ! empty( $data[ $request_key ] ) ) {
-			$is_job_in_progress = $this->job->is_job_in_progress( self::ACTION_HOOK );
-			$file_url           = Options::get( OptionDefaults::EXPORT_FILE_URL );
-			$status             = 'idle';
+		$is_job_in_progress = $this->job->is_job_in_progress( self::ACTION_HOOK );
+		$file_url           = Options::get( OptionDefaults::EXPORT_FILE_URL );
+		$status             = 'idle';
 
-			if ( $is_job_in_progress && empty( $file_url ) ) {
-				$status = 'in-progress';
-			} elseif ( ! empty( $file_url ) && ! $is_job_in_progress ) {
-				$status = 'completed';
-			}
-
-			$response[ $response_key ] = array(
-				'status'     => $status,
-				'fileUrl'    => Options::get( OptionDefaults::EXPORT_FILE_URL ),
-				'lastExport' => Options::get( OptionDefaults::LAST_EXPORT_TIMESTAMP ),
-			);
+		if ( $is_job_in_progress && empty( $file_url ) ) {
+			$status = 'in-progress';
+		} elseif ( ! empty( $file_url ) && ! $is_job_in_progress ) {
+			$status = 'completed';
 		}
 
-		return $response;
+		$response = array(
+			'status'     => $status,
+			'fileUrl'    => Options::get( OptionDefaults::EXPORT_FILE_URL ),
+			'lastExport' => Options::get( OptionDefaults::LAST_EXPORT_TIMESTAMP ),
+		);
+
+		wp_send_json( $response );
 	}
 }
