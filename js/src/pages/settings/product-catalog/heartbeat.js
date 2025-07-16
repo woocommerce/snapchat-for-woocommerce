@@ -23,7 +23,7 @@ import { EXPORT_REQUEST_KEY, EXPORT_RESPONSE_KEY } from './constants';
  * @param {HeartbeatProps} props The properties for the Heartbeat component.
  * @return {null} Returns null as this component does not render anything.
  */
-const Heartbeat = ( { onCompleted, connectNow } ) => {
+const Heartbeat = ( { onCompleted, connectNow, onStatusUpdate } ) => {
 	const handleHeartbeatTick = useCallback(
 		( data ) => {
 			if ( ! data[ EXPORT_RESPONSE_KEY ] ) {
@@ -34,6 +34,8 @@ const Heartbeat = ( { onCompleted, connectNow } ) => {
 			if ( response.status === 'completed' ) {
 				onCompleted( response );
 			}
+
+			onStatusUpdate( response.status );
 		},
 		[ onCompleted ]
 	);

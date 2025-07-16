@@ -78,6 +78,21 @@ const ProductCatalog = () => {
 		setLastExported( response.lastExport );
 	};
 
+	const handleOnStatusUpdate = ( status ) => {
+		switch ( status ) {
+			case 'idle':
+			case 'completed':
+				setExportInProgress( false );
+				break;
+			case 'in-progress':
+				setExportInProgress( true );
+				break;
+
+			default:
+				break;
+		}
+	}
+
 	const getDescription = () => {
 		if ( exportInProgress ) {
 			return __(
@@ -148,6 +163,7 @@ const ProductCatalog = () => {
 			{ exportInProgress && (
 				<Heartbeat
 					onCompleted={ handleOnRegenerateCsvCompleted }
+					onStatusUpdate={ handleOnStatusUpdate }
 					connectNow={ connectHearbeatNow }
 				/>
 			) }
