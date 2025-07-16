@@ -72,7 +72,7 @@
 		}
 	},
 	"scripts": {
-		"prebuild": "composer install",
+		"prebuild": "composer install --no-dev",
 		"build": "NODE_ENV=production wp-scripts build --webpack-src-dir=js/src",
 		"postbuild": "npm run archive",
 		"archive": "composer archive --file=$npm_package_name --format=zip",
@@ -84,7 +84,6 @@
 		"lint:js": "wp-scripts lint-js",
 		"packages-update": "wp-scripts packages-update",
 		"plugin-zip": "wp-scripts plugin-zip",
-		"postinstall": "composer install",
 		"env": "wp-env",
 		"env:start": "wp-env start",
 		"env:clean": "wp-env clean",
