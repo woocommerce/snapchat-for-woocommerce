@@ -5,6 +5,7 @@ import { __ } from '@wordpress/i18n';
 import { useState } from '@wordpress/element';
 import { Stepper } from '@woocommerce/components';
 import { getHistory } from '@woocommerce/navigation';
+import { addQueryArgs } from '@wordpress/url';
 
 /**
  * Internal dependencies
@@ -23,7 +24,11 @@ const SavedSetupStepper = ( { savedStep } ) => {
 
 	const handleSetupAccountsContinue = () => {
 		const settingsUrl = getSettingsUrl();
-		getHistory().push( settingsUrl );
+		getHistory().push(
+			addQueryArgs( settingsUrl, {
+				onboarding: 'success',
+			} )
+		);
 	};
 
 	const handleStepClick = ( stepKey ) => {
