@@ -71,18 +71,17 @@ const ProductCatalog = () => {
 		setExportInProgress( true );
 	};
 
-	const handleOnRegenerateCsvCompleted = ( response ) => {
-		setExportInProgress( false );
+	const handleOnTick = ( response ) => {
+		const { status } = response;
 
-		setFileUrl( response.fileUrl );
-		setLastExported( response.lastExport );
-	};
-
-	const handleOnStatusUpdate = ( status ) => {
 		switch ( status ) {
 			case 'idle':
+				setExportInProgress( false );
+				break;
 			case 'completed':
 				setExportInProgress( false );
+				setFileUrl( response.fileUrl );
+				setLastExported( response.lastExport );
 				break;
 			case 'in-progress':
 				setExportInProgress( true );
@@ -91,7 +90,7 @@ const ProductCatalog = () => {
 			default:
 				break;
 		}
-	}
+	};
 
 	const getDescription = () => {
 		if ( exportInProgress ) {
@@ -162,8 +161,7 @@ const ProductCatalog = () => {
 		<>
 			{ exportInProgress && (
 				<Heartbeat
-					onCompleted={ handleOnRegenerateCsvCompleted }
-					onStatusUpdate={ handleOnStatusUpdate }
+					onTick={ handleOnTick }
 					connectNow={ connectHearbeatNow }
 				/>
 			) }
