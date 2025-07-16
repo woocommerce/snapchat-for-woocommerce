@@ -8,6 +8,9 @@
  * Domain Path: /languages
  * Requires Plugins: woocommerce
  * Requires PHP: 7.4
+ * Requires at least: 6.6
+ * WC requires at least: 9.7
+ * WC tested up to: 9.9.5
  *
  * License: GNU General Public License v3.0
  * License URI: http://www.gnu.org/licenses/gpl-3.0.html
