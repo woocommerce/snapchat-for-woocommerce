@@ -44,6 +44,37 @@ test.describe( 'Snapchat Settings', () => {
 		await settingPage.closePage();
 	} );
 
+	test( 'Can see onboarding success modal', async () => {
+		await settingPage.mockJetpackConnected();
+		await settingPage.mockSnapchatConnection( { status: 'connected' } );
+		await page.goto(
+			'/wp-admin/admin.php?page=wc-admin&path=%2Fsnapchat%2Fsetup',
+			{ waitUntil: 'domcontentloaded' }
+		);
+
+		await locator.getContinueToSetupButton().click();
+
+		await page.waitForURL(
+			'**/wp-admin/admin.php?page=wc-admin&path=%2Fsnapchat%2Fsettings&onboarding=success'
+		);
+		expect( await page.url() ).toContain(
+			'/wp-admin/admin.php?page=wc-admin&path=%2Fsnapchat%2Fsettings&onboarding=success'
+		);
+
+		await expect( locator.getOnboardingSuccessfulModal() ).toBeVisible();
+
+		await locator.getOnboardingSuccessfulCloseModalButton().first().click();
+		await expect(
+			locator.getOnboardingSuccessfulModal()
+		).not.toBeVisible();
+		await page.waitForURL(
+			'**/wp-admin/admin.php?page=wc-admin&path=%2Fsnapchat%2Fsettings'
+		);
+		expect( await page.url() ).toContain(
+			'/wp-admin/admin.php?page=wc-admin&path=%2Fsnapchat%2Fsettings'
+		);
+	} );
+
 	test( 'Shows all sections', async () => {
 		settingPage.goto();
 

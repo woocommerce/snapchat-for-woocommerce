@@ -177,7 +177,7 @@ const ProductCatalog = () => {
 										<AppDocumentationLink
 											context="settings"
 											linkId="csv-learn-more"
-											href="https://tbd"
+											href="https://businesshelp.snapchat.com/s/article/manual-add-catalog?language=en_GB"
 										/>
 									),
 								}
