@@ -11,7 +11,7 @@ import { EXPORT_REQUEST_KEY, EXPORT_RESPONSE_KEY } from './constants';
 
 /**
  * @typedef {Object} HeartbeatProps
- * @property {Function} onCompleted Callback function to be called when the export is completed.
+ * @property {Function} onTick Callback function to be called when there's a heartbeat tick.
  * @property {boolean} connectNow Flag to determine if the heartbeat should connect immediately.
  */
 
@@ -23,7 +23,7 @@ import { EXPORT_REQUEST_KEY, EXPORT_RESPONSE_KEY } from './constants';
  * @param {HeartbeatProps} props The properties for the Heartbeat component.
  * @return {null} Returns null as this component does not render anything.
  */
-const Heartbeat = ( { onCompleted, connectNow, onStatusUpdate } ) => {
+const Heartbeat = ( { connectNow, onTick } ) => {
 	const handleHeartbeatTick = useCallback(
 		( data ) => {
 			if ( ! data[ EXPORT_RESPONSE_KEY ] ) {
@@ -31,13 +31,9 @@ const Heartbeat = ( { onCompleted, connectNow, onStatusUpdate } ) => {
 			}
 
 			const response = data[ EXPORT_RESPONSE_KEY ];
-			if ( response.status === 'completed' ) {
-				onCompleted( response );
-			}
-
-			onStatusUpdate( response.status );
+			onTick( response );
 		},
-		[ onCompleted ]
+		[ onTick ]
 	);
 
 	const handleHeartbeatSend = useCallback( ( data ) => {
