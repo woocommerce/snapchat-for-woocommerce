@@ -1,6 +1,7 @@
 <?php
 /**
  * Plugin Name: Snapchat for WooCommerce
+ * Description: Seamlessly integrates your WooCommerce store with Snapchat's powerful advertising platform, enabling you to reach millions of potential customers through engaging visual ads.
  * Version: 0.1.0
  * Author: WooCommerce
  * Author URI: https://woocommerce.com/
