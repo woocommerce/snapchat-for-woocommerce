@@ -7,6 +7,7 @@ import {
 	createInterpolateElement,
 	useState,
 	useEffect,
+	useCallback,
 } from '@wordpress/element';
 
 /**
@@ -16,7 +17,7 @@ import { sfwData } from '~/constants';
 import AppButton from '~/components/app-button';
 import AppDocumentationLink from '~/components/app-documentation-link';
 import AccountCard from '~/components/account-card';
-import Heartbeat from './heartbeat';
+import useExportPoller from './useExportPoller';
 import useProductCatalogExport from './useProductCatalogExport';
 import './index.scss';
 
@@ -35,7 +36,6 @@ import './index.scss';
  */
 const ProductCatalog = () => {
 	// Whether we want to connect the heartbeat immediately as soon as the Heartbeat component mounts.
-	const [ connectHearbeatNow, setConnectHeartbeatNow ] = useState( false );
 	const [ exportInProgress, setExportInProgress ] = useState(
 		sfwData.isExportInProgress === '1'
 	);
@@ -48,14 +48,13 @@ const ProductCatalog = () => {
 	// Trigger a heartbeat connection as soon as we get a successfull response from the server
 	// when the user clicks on the "Regenerate CSV" button.
 	const onGenerateCsvSuccess = () => {
-		setConnectHeartbeatNow( true );
+		setExportInProgress( true );
 	};
 
 	// If the CSV generation fails, we reset the state to ensure the UI reflects that no export is in progress.
 	// This prevents the UI from showing a download link or last exported timestamp when there is no valid export.
 	// It also stops the heartbeat connection to avoid unnecessary requests.
 	const onGenerateCsvError = () => {
-		setConnectHeartbeatNow( false );
 		setExportInProgress( false );
 		setFileUrl( null );
 		setLastExported( null );
@@ -68,15 +67,28 @@ const ProductCatalog = () => {
 
 	const handleOnGenerateCsvClick = () => {
 		generateCsv();
-		setExportInProgress( true );
 	};
 
-	const handleOnRegenerateCsvCompleted = ( response ) => {
-		setExportInProgress( false );
+	const handleOnTick = useCallback( ( response ) => {
+		const { status } = response;
 
-		setFileUrl( response.fileUrl );
-		setLastExported( response.lastExport );
-	};
+		switch ( status ) {
+			case 'idle':
+				setExportInProgress( false );
+				break;
+			case 'completed':
+				setExportInProgress( false );
+				setFileUrl( response.fileUrl );
+				setLastExported( response.lastExport );
+				break;
+			case 'in-progress':
+				setExportInProgress( true );
+				break;
+
+			default:
+				break;
+		}
+	}, [] );
 
 	const getDescription = () => {
 		if ( exportInProgress ) {
@@ -134,6 +146,8 @@ const ProductCatalog = () => {
 		);
 	};
 
+	useExportPoller( exportInProgress, handleOnTick );
+
 	useEffect( () => {
 		if ( ! exportInProgress ) {
 			return;
@@ -145,13 +159,6 @@ const ProductCatalog = () => {
 
 	return (
 		<>
-			{ exportInProgress && (
-				<Heartbeat
-					onCompleted={ handleOnRegenerateCsvCompleted }
-					connectNow={ connectHearbeatNow }
-				/>
-			) }
-
 			<AccountCard
 				className="sfw-product-catalog"
 				title={ __( 'Export Product Catalog', 'snapchat-for-woo' ) }
