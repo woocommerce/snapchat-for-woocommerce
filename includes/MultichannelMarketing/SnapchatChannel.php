@@ -69,7 +69,7 @@ class SnapchatChannel implements MarketingChannelInterface {
 	 * @return string
 	 */
 	public function get_icon_url(): string {
-		return sprintf( '%s/js/build/images/js/src/images/logo/snapchat.svg', SNAPCHAT_ADS_PLUGIN_URL );
+		return sprintf( '%s/js/build/images/js/src/images/logo/snapchat.svg', SNAPCHAT_FOR_WOOCOMMERCE_PLUGIN_URL );
 	}
 
 	/**

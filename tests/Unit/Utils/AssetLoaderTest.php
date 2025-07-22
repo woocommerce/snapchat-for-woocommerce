@@ -17,16 +17,16 @@ class AssetLoaderTest extends WP_UnitTestCase {
 		parent::set_up();
 
 		// Ensure build directory exists inside the plugin.
-		wp_mkdir_p( SNAPCHAT_ADS_PLUGIN_BUILD_PATH . 'js' );
-		wp_mkdir_p( SNAPCHAT_ADS_PLUGIN_BUILD_PATH . 'css' );
+		wp_mkdir_p( SNAPCHAT_FOR_WOOCOMMERCE_PLUGIN_BUILD_PATH . 'js' );
+		wp_mkdir_p( SNAPCHAT_FOR_WOOCOMMERCE_PLUGIN_BUILD_PATH . 'css' );
 	}
 
 	public function tear_down(): void {
-		@unlink( SNAPCHAT_ADS_PLUGIN_BUILD_PATH . 'js/test-script.js' );
-		@unlink( SNAPCHAT_ADS_PLUGIN_BUILD_PATH . 'js/test-script.js.asset.php' );
-		@unlink( SNAPCHAT_ADS_PLUGIN_BUILD_PATH . 'css/test-style.css' );
-		@unlink( SNAPCHAT_ADS_PLUGIN_BUILD_PATH . 'js/localize.js' );
-		@unlink( SNAPCHAT_ADS_PLUGIN_BUILD_PATH . 'js/localize.js.asset.php' );
+		@unlink( SNAPCHAT_FOR_WOOCOMMERCE_PLUGIN_BUILD_PATH . 'js/test-script.js' );
+		@unlink( SNAPCHAT_FOR_WOOCOMMERCE_PLUGIN_BUILD_PATH . 'js/test-script.js.asset.php' );
+		@unlink( SNAPCHAT_FOR_WOOCOMMERCE_PLUGIN_BUILD_PATH . 'css/test-style.css' );
+		@unlink( SNAPCHAT_FOR_WOOCOMMERCE_PLUGIN_BUILD_PATH . 'js/localize.js' );
+		@unlink( SNAPCHAT_FOR_WOOCOMMERCE_PLUGIN_BUILD_PATH . 'js/localize.js.asset.php' );
 
 		parent::tear_down();
 	}
@@ -44,7 +44,7 @@ class AssetLoaderTest extends WP_UnitTestCase {
 		$handle      = 'test-script';
 		$script_name = 'js/test-script.js';
 
-		$script_path       = SNAPCHAT_ADS_PLUGIN_BUILD_PATH . $script_name;
+		$script_path       = SNAPCHAT_FOR_WOOCOMMERCE_PLUGIN_BUILD_PATH . $script_name;
 		$script_asset_path = $script_path . '.asset.php';
 
 		file_put_contents( $script_path, '// js file' );
@@ -56,7 +56,7 @@ class AssetLoaderTest extends WP_UnitTestCase {
 
 		$this->assertNotNull( $registered );
 		$this->assertSame(
-			SNAPCHAT_ADS_PLUGIN_BUILD_URL . $script_name . '.js',
+			SNAPCHAT_FOR_WOOCOMMERCE_BUILD_URL . $script_name . '.js',
 			$registered->src
 		);
 		$this->assertContains( 'jquery', $registered->deps );
@@ -74,7 +74,7 @@ class AssetLoaderTest extends WP_UnitTestCase {
 	public function test_enqueue_style_falls_back_to_filemtime() {
 		$handle     = 'test-style';
 		$style_name = 'css/test-style.css';
-		$style_path = SNAPCHAT_ADS_PLUGIN_BUILD_PATH . $style_name;
+		$style_path = SNAPCHAT_FOR_WOOCOMMERCE_PLUGIN_BUILD_PATH . $style_name;
 
 		file_put_contents( $style_path, 'body { color: red; }' );
 		$mtime = filemtime( $style_path );
@@ -100,9 +100,9 @@ class AssetLoaderTest extends WP_UnitTestCase {
 		$handle      = 'localize';
 		$script_name = 'js/localize.js';
 
-		file_put_contents( SNAPCHAT_ADS_PLUGIN_BUILD_PATH . $script_name, '// js' );
+		file_put_contents( SNAPCHAT_FOR_WOOCOMMERCE_PLUGIN_BUILD_PATH . $script_name, '// js' );
 		file_put_contents(
-			SNAPCHAT_ADS_PLUGIN_BUILD_PATH . $script_name . '.asset.php',
+			SNAPCHAT_FOR_WOOCOMMERCE_PLUGIN_BUILD_PATH . $script_name . '.asset.php',
 			'<?php return [ "dependencies" => [], "version" => "0.1.0" ];'
 		);
 
