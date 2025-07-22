@@ -248,6 +248,15 @@ class SnapchatBusinessExtensionController extends RESTBaseController {
 	 * @return WP_REST_Response
 	 */
 	public function check_connection() {
+		// Bail early if WCS is not connected.
+		if ( 'yes' !== Options::get( OptionDefaults::IS_JETPACK_CONNECTED ) ) {
+			return rest_ensure_response(
+				array(
+					'status' => 'disconnected',
+				)
+			);
+		}
+
 		$response = $this->get_connection_status();
 
 		if ( is_wp_error( $response ) ) {
