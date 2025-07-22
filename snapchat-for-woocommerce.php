@@ -43,6 +43,10 @@ if ( ! defined( 'SNAPCHAT_ADS_PLUGIN_BUILD_URL' ) ) {
 	define( 'SNAPCHAT_ADS_PLUGIN_BUILD_URL', SNAPCHAT_ADS_PLUGIN_URL . 'js/build/' );
 }
 
+if ( ! defined( 'SNAPCHAT_FOR_WOOCOMMERCE_DEBUG' ) ) {
+	define( 'SNAPCHAT_FOR_WOOCOMMERCE_DEBUG', false );
+}
+
 require_once plugin_dir_path( __FILE__ ) . '/vendor/autoload_packages.php';
 
 register_activation_hook(
