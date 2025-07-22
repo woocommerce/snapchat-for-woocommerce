@@ -57,7 +57,14 @@ class Assets {
 	 * @return void
 	 */
 	public function enqueue_assets(): void {
-		// @todo: Conditionally load for only plugin specific page.
+		// phpcs:ignore WordPress.Security.NonceVerification.Recommended
+		$page = sanitize_text_field( wp_unslash( $_GET['page'] ?? '' ) );
+		// phpcs:ignore WordPress.Security.NonceVerification.Recommended
+		$path = sanitize_text_field( wp_unslash( $_GET['path'] ?? '' ) );
+
+		if ( ! ( 'wc-admin' === $page && str_contains( $path, '/snapchat' ) ) ) {
+			return;
+		}
 
 		AssetLoader::enqueue_script( 'index', 'index' );
 		AssetLoader::enqueue_style( 'index', 'index' );
