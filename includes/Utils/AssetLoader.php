@@ -33,8 +33,8 @@ class AssetLoader {
 	 * @param string $file_name The script file name.
 	 */
 	public static function enqueue_script( $handle, $file_name ) {
-		$script_path       = SNAPCHAT_ADS_PLUGIN_BUILD_PATH . $file_name;
-		$script_url        = SNAPCHAT_ADS_PLUGIN_BUILD_URL . $file_name . '.js';
+		$script_path       = SNAPCHAT_FOR_WOOCOMMERCE_PLUGIN_BUILD_PATH . $file_name;
+		$script_url        = SNAPCHAT_FOR_WOOCOMMERCE_BUILD_URL . $file_name . '.js';
 		$script_asset_path = $script_path . '.asset.php';
 
 		if ( file_exists( $script_asset_path ) ) {
@@ -64,8 +64,8 @@ class AssetLoader {
 	 * @param string $file_name The script file name.
 	 */
 	public static function enqueue_style( $handle, $file_name ) {
-		$style_path       = SNAPCHAT_ADS_PLUGIN_BUILD_PATH . $file_name;
-		$style_url        = SNAPCHAT_ADS_PLUGIN_BUILD_URL . $file_name . '.css';
+		$style_path       = SNAPCHAT_FOR_WOOCOMMERCE_PLUGIN_BUILD_PATH . $file_name;
+		$style_url        = SNAPCHAT_FOR_WOOCOMMERCE_BUILD_URL . $file_name . '.css';
 		$style_asset_path = $style_path . '.asset.php';
 
 		if ( file_exists( $style_asset_path ) ) {
