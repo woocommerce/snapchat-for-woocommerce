@@ -164,6 +164,17 @@ class RemoteConversionTracker implements ConversionTrackerInterface {
 		$path    = "/conversions/v3/{$pixel_id}/events?{$query}";
 		$payload = array( 'data' => array( $event_payload ) );
 
+		if ( defined( 'SNAPCHAT_FOR_WOOCOMMERCE_DEBUG' ) && SNAPCHAT_FOR_WOOCOMMERCE_DEBUG ) {
+			wc_get_logger()->debug(
+				'Snapchat for WooCommerce: Conversion Payload',
+				array(
+					'context' => 'tracking',
+					'payload' => $payload,
+					'args'    => $args,
+				)
+			);
+		}
+
 		$this->client->proxy_post( $path, $payload, false );
 
 		/**

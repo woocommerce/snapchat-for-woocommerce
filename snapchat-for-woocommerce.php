@@ -27,20 +27,24 @@ if ( ! defined( 'SNAPCHAT_FOR_WOOCOMMERCE_FILE' ) ) {
 	define( 'SNAPCHAT_FOR_WOOCOMMERCE_FILE', __FILE__ );
 }
 
-if ( ! defined( 'SNAPCHAT_ADS_PLUGIN_DIR' ) ) {
-	define( 'SNAPCHAT_ADS_PLUGIN_DIR', plugin_dir_path( __FILE__ ) );
+if ( ! defined( 'SNAPCHAT_FOR_WOOCOMMERCE_PLUGIN_DIR' ) ) {
+	define( 'SNAPCHAT_FOR_WOOCOMMERCE_PLUGIN_DIR', plugin_dir_path( __FILE__ ) );
 }
 
-if ( ! defined( 'SNAPCHAT_ADS_PLUGIN_URL' ) ) {
-	define( 'SNAPCHAT_ADS_PLUGIN_URL', plugin_dir_url( __FILE__ ) );
+if ( ! defined( 'SNAPCHAT_FOR_WOOCOMMERCE_PLUGIN_URL' ) ) {
+	define( 'SNAPCHAT_FOR_WOOCOMMERCE_PLUGIN_URL', plugin_dir_url( __FILE__ ) );
 }
 
-if ( ! defined( 'SNAPCHAT_ADS_PLUGIN_BUILD_PATH' ) ) {
-	define( 'SNAPCHAT_ADS_PLUGIN_BUILD_PATH', SNAPCHAT_ADS_PLUGIN_DIR . 'js/build/' );
+if ( ! defined( 'SNAPCHAT_FOR_WOOCOMMERCE_PLUGIN_BUILD_PATH' ) ) {
+	define( 'SNAPCHAT_FOR_WOOCOMMERCE_PLUGIN_BUILD_PATH', SNAPCHAT_FOR_WOOCOMMERCE_PLUGIN_DIR . 'js/build/' );
 }
 
-if ( ! defined( 'SNAPCHAT_ADS_PLUGIN_BUILD_URL' ) ) {
-	define( 'SNAPCHAT_ADS_PLUGIN_BUILD_URL', SNAPCHAT_ADS_PLUGIN_URL . 'js/build/' );
+if ( ! defined( 'SNAPCHAT_FOR_WOOCOMMERCE_BUILD_URL' ) ) {
+	define( 'SNAPCHAT_FOR_WOOCOMMERCE_BUILD_URL', SNAPCHAT_FOR_WOOCOMMERCE_PLUGIN_URL . 'js/build/' );
+}
+
+if ( ! defined( 'SNAPCHAT_FOR_WOOCOMMERCE_DEBUG' ) ) {
+	define( 'SNAPCHAT_FOR_WOOCOMMERCE_DEBUG', false );
 }
 
 require_once plugin_dir_path( __FILE__ ) . '/vendor/autoload_packages.php';

@@ -22,12 +22,12 @@ final class AssetsTest extends WP_UnitTestCase {
 	public function set_up(): void {
 		parent::set_up();
 
-		wp_mkdir_p( SNAPCHAT_ADS_PLUGIN_BUILD_PATH );
+		wp_mkdir_p( SNAPCHAT_FOR_WOOCOMMERCE_PLUGIN_BUILD_PATH );
 
-		file_put_contents( SNAPCHAT_ADS_PLUGIN_BUILD_PATH . 'tracking', '// fallback for filemtime' );
-		file_put_contents( SNAPCHAT_ADS_PLUGIN_BUILD_PATH . 'tracking.js', '// dummy script' );
+		file_put_contents( SNAPCHAT_FOR_WOOCOMMERCE_PLUGIN_BUILD_PATH . 'tracking', '// fallback for filemtime' );
+		file_put_contents( SNAPCHAT_FOR_WOOCOMMERCE_PLUGIN_BUILD_PATH . 'tracking.js', '// dummy script' );
 		file_put_contents(
-			SNAPCHAT_ADS_PLUGIN_BUILD_PATH . 'tracking.js.asset.php',
+			SNAPCHAT_FOR_WOOCOMMERCE_PLUGIN_BUILD_PATH . 'tracking.js.asset.php',
 			'<?php return [ "dependencies" => [], "version" => "1.0.0" ];'
 		);
 
@@ -36,9 +36,9 @@ final class AssetsTest extends WP_UnitTestCase {
 
 
 	public function tear_down(): void {
-		@unlink( SNAPCHAT_ADS_PLUGIN_BUILD_PATH . 'tracking' );
-		@unlink( SNAPCHAT_ADS_PLUGIN_BUILD_PATH . 'tracking.js' );
-		@unlink( SNAPCHAT_ADS_PLUGIN_BUILD_PATH . 'tracking.js.asset.php' );
+		@unlink( SNAPCHAT_FOR_WOOCOMMERCE_PLUGIN_BUILD_PATH . 'tracking' );
+		@unlink( SNAPCHAT_FOR_WOOCOMMERCE_PLUGIN_BUILD_PATH . 'tracking.js' );
+		@unlink( SNAPCHAT_FOR_WOOCOMMERCE_PLUGIN_BUILD_PATH . 'tracking.js.asset.php' );
 		parent::tear_down();
 	}
 
