@@ -1,1 +1,2 @@
 export { findSnaptrEvent } from './findSnaptrEvent';
+export { switchTheme, getThemes } from './switchTheme';
