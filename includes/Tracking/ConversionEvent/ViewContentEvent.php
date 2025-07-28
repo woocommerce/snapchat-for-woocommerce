@@ -54,7 +54,7 @@ final class ViewContentEvent implements ConversionEventInterface {
 
 		if ( $product->is_type( 'variation' ) ) {
 			$content_type = 'product_group';
-		} else if ( $product->is_type( 'grouped' ) ) {
+		} elseif ( $product->is_type( 'grouped' ) ) {
 			$content_type = 'product_group';
 		} else {
 			$content_type = 'product';

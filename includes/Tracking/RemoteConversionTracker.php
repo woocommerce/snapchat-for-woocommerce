@@ -165,7 +165,7 @@ class RemoteConversionTracker implements ConversionTrackerInterface {
 
 		$payload = $event->build_payload(
 			array(
-				'event_id'  => $body->eventId ?? '',
+				'event_id'  => $body->eventId ?? '', // phpcs:ignore WordPress.NamingConventions.ValidVariableName.UsedPropertyNotSnakeCase
 				'user_data' => UserIdentifier::get_user_data(),
 			)
 		);

@@ -187,6 +187,8 @@ final class RemotePixelTracker implements PixelTrackerInterface {
 	 *
 	 * Hooked into `woocommerce_after_single_product`.
 	 *
+	 * @param array $tracking_data Localized data for the frontend tracking script.
+	 *
 	 * @since 0.1.0
 	 */
 	public function filter_view_content_event_data( $tracking_data ): array {

@@ -250,12 +250,12 @@ class ConversionTrackingService implements ServiceStatusInterface {
 			array(
 				'methods'             => \WP_REST_Server::CREATABLE,
 				'callback'            => array( $this->tracker, 'track_view_content' ),
-				'permission_callback' => function( \WP_REST_Request $request ) {
+				'permission_callback' => function ( \WP_REST_Request $request ) {
 					$raw_body = $request->get_body();
 					$parsed   = json_decode( $raw_body );
 
 					return isset( $parsed->security ) && wp_verify_nonce( $parsed->security, 'wp_rest' );
-				}
+				},
 			)
 		);
 	}
