@@ -60,6 +60,7 @@ final class PurchaseEvent implements ConversionEventInterface {
 		}
 
 		$contents = array();
+		$skus     = array();
 
 		/**
 		 * Product from the Order Line Item.
@@ -68,6 +69,7 @@ final class PurchaseEvent implements ConversionEventInterface {
 		 */
 		foreach ( $this->order->get_items() as $item ) {
 			$product = $item->get_product();
+
 			if ( ! $product ) {
 				continue;
 			}
@@ -77,19 +79,24 @@ final class PurchaseEvent implements ConversionEventInterface {
 				'quantity'   => (string) $item->get_quantity(),
 				'item_price' => (string) $product->get_price(),
 			);
+
+			$skus[] = (string) $product->get_sku();
 		}
 
 		$default = array(
 			'event_name'       => 'PURCHASE',
 			'event_time'       => time(),
+			'event_source_url' => $this->order->get_checkout_order_received_url(),
 			'event_id'         => EventIdRegistry::get_purchase_id( $this->order->get_id() ),
 			'action_source'    => 'WEB',
-			'event_source_url' => $this->order->get_checkout_order_received_url(),
 			'user_data'        => array(),
 			'custom_data'      => array(
-				'currency' => $this->order->get_currency(),
-				'value'    => $this->order->get_total(),
-				'contents' => $contents,
+				'content_ids' => array_filter( $skus, fn( $sku ) => ! empty( $sku ) ),
+				'contents'    => $contents,
+				'currency'    => $this->order->get_currency(),
+				'num_items'   => $this->order->get_item_count(),
+				'order_id'    => (string) $this->order->get_id(),
+				'value'       => $this->order->get_total(),
 			),
 		);
 

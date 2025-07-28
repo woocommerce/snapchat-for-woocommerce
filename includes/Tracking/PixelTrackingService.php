@@ -13,6 +13,7 @@ namespace SnapchatForWooCommerce\Tracking;
 
 use SnapchatForWooCommerce\Utils\Storage\OptionDefaults;
 use SnapchatForWooCommerce\Utils\Storage\Options;
+use SnapchatForWooCommerce\Utils\Helper;
 use SnapchatForWooCommerce\Config;
 use WC_Product;
 
@@ -69,6 +70,11 @@ final class PixelTrackingService implements ServiceStatusInterface {
 			return;
 		}
 
+		add_filter(
+			Helper::with_prefix( 'filter_tracking_data' ),
+			array( $this->tracker, 'filter_view_content_event_data' )
+		);
+
 		add_action(
 			'wp_head',
 			array( $this->tracker, 'maybe_inject_pixel' )
@@ -103,11 +109,6 @@ final class PixelTrackingService implements ServiceStatusInterface {
 					$this->add_product_data( $product );
 				}
 			}
-		);
-
-		add_action(
-			'woocommerce_after_single_product',
-			array( $this->tracker, 'track_view_content_event' )
 		);
 
 		add_action(

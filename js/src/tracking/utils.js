@@ -1,4 +1,12 @@
 /**
+ * Internal dependencies
+ */
+import { TRACKING_DATA_VAR } from './constants';
+import { SnapchatEvent } from './pixel/events';
+import { trackEvent } from './pixel/utils';
+import { sendCapiEvent } from './conversions/utils';
+
+/**
  * Internal utility to register click event listeners for given selectors.
  *
  * Hooks are attached after DOMContentLoaded to ensure all target elements
@@ -104,5 +112,57 @@ export function setSnapChatClickId() {
 
 	if ( scClickId ) {
 		document.cookie = `ScCid=${ encodeURIComponent( scClickId ) }; path=/;`;
+	}
+}
+
+/**
+ * Determines whether the current page load is a fresh navigation
+ * (e.g., from a link, address bar, or redirect) and not a reload.
+ *
+ * Uses the Performance Navigation API (Level 2 where supported) to inspect
+ * the navigation type. Falls back to legacy `performance.navigation.type`
+ * if needed.
+ *
+ * Returns `true` only for:
+ * - 'navigate' (link click, address bar entry, redirect)
+ * - 'back_forward' (history traversal – optional, still counts as non-reload)
+ *
+ * Returns `false` for:
+ * - 'reload' (user manually reloaded the page)
+ *
+ * @since 0.1.0
+ *
+ * @returns {boolean} Whether the page load was a fresh visit.
+ */
+export function isFreshPageVisit() {
+	if ( typeof performance === 'undefined' ) {
+		return true;
+	}
+
+	if ( performance.getEntriesByType ) {
+		const entries = performance.getEntriesByType( 'navigation' );
+
+		if ( entries.length > 0 ) {
+			const type = entries[ 0 ].type;
+			return type === 'navigate' || type === 'back_forward';
+		}
+	}
+
+	// Fallback for older browsers (0 = TYPE_NAVIGATE)
+	return performance.navigation?.type === 0;
+}
+
+export const onSingleProductPageVisit = () => {
+	if ( isFreshPageVisit() && TRACKING_DATA_VAR.VIEW_CONTENT ) {
+		const eventId = window.crypto.randomUUID();
+
+		const eventData = {
+			...TRACKING_DATA_VAR.VIEW_CONTENT,
+			eventId,
+			client_dedup_id: eventId,
+		};
+
+		trackEvent( SnapchatEvent.VIEW_CONTENT, eventData );
+		sendCapiEvent( SnapchatEvent.VIEW_CONTENT, { ...eventData, security: TRACKING_DATA_VAR.event_tracking_nonce } );
 	}
 }

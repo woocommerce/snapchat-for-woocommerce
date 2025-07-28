@@ -17,6 +17,7 @@ use SnapchatForWooCommerce\Utils\Helper;
 use SnapchatForWooCommerce\Config;
 use SnapchatForWooCommerce\Tracking\ConversionEvent\AddToCartEvent;
 use SnapchatForWooCommerce\Tracking\ConversionEvent\PurchaseEvent;
+use SnapchatForWooCommerce\Tracking\ConversionEvent\ViewContentEvent;
 use SnapchatForWooCommerce\Utils\Storage\Options;
 use SnapchatForWooCommerce\Utils\Storage\OptionDefaults;
 use SnapchatForWooCommerce\Utils\UserIdentifier;
@@ -124,6 +125,47 @@ class RemoteConversionTracker implements ConversionTrackerInterface {
 		$payload = $event->build_payload(
 			array(
 				'event_id'  => $event_id,
+				'user_data' => UserIdentifier::get_user_data(),
+			)
+		);
+
+		as_enqueue_async_action(
+			Helper::with_prefix( 'send_conversion_event' ),
+			array(
+				'event_payload' => $payload,
+				'args'          => array(),
+			),
+			Config::PLUGIN_SLUG
+		);
+	}
+
+	/**
+	 * Tracks a WooCommerce view content event.
+	 *
+	 * This method is triggered by a REST API endpoint when a product detail page is viewed.
+	 * It extracts the product ID and event ID from the request body, builds a ViewContentEvent
+	 * payload, and schedules it for asynchronous dispatch to the Ad Partner via Action Scheduler.
+	 *
+	 * The payload includes basic product information, deduplication ID, and user identifiers
+	 * for improved event matching and attribution.
+	 *
+	 * @since 0.1.0
+	 *
+	 * @param \WP_REST_Request $request The REST request containing item_ids and event_id.
+	 * @return void
+	 */
+	public function track_view_content( \WP_REST_Request $request ) {
+		if ( ! Consent::has_marketing_consent() ) {
+			return;
+		}
+
+		$body       = json_decode( $request->get_body() );
+		$product_id = is_array( $body->item_ids ) && ! empty( $body->item_ids ) ? (int) $body->item_ids[0] : 0;
+		$event      = new ViewContentEvent( $product_id );
+
+		$payload = $event->build_payload(
+			array(
+				'event_id'  => $body->eventId ?? '',
 				'user_data' => UserIdentifier::get_user_data(),
 			)
 		);

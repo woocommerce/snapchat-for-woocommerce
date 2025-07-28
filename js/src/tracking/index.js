@@ -9,8 +9,12 @@ import {
 	onLoopAddToCartClick,
 	hasUserConsent,
 	setSnapChatClickId,
+	onSingleProductPageVisit,
 } from './utils';
-import { singleAddToCartClick, addToCartClick } from './pixel/utils';
+import {
+	singleAddToCartClick,
+	addToCartClick,
+} from './pixel/utils';
 import { triggerCAPI } from './conversions/utils';
 
 const isPixelEnabled = TRACKING_DATA_VAR.is_pixel_enabled;
@@ -55,6 +59,8 @@ document.addEventListener( 'DOMContentLoaded', () => {
 			triggerCAPI( eventId, data.product_id, 1 );
 		}
 	} );
+
+	onSingleProductPageVisit();
 } );
 
 /**

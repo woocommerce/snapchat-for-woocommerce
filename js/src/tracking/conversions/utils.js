@@ -38,3 +38,35 @@ export const triggerCAPI = async ( eventId, productId, quantity ) => {
 		body: formData,
 	} );
 };
+
+/**
+ * Sends a Conversion API (CAPI) tracking signal to the server using `fetch` with `keepalive`.
+ *
+ * This utility is generic and can be used to send any event payload to a REST endpoint.
+ * Useful for non-blocking tracking events like ViewContent, AddToCart, etc.
+ *
+ * @param {string} event - The Event name.
+ * @param {Object} payload - Key-value data to include in the request body.
+ *
+ * @since 0.1.0
+ */
+export function sendCapiEvent( event, payload = {} ) {
+	if (
+		typeof event !== 'string' ||
+		! event ||
+		typeof payload !== 'object'
+	) {
+		return;
+	}
+
+	fetch( `${ TRACKING_DATA_VAR.tracking_rest_url }/${ event }`, {
+		method: 'POST',
+		body: JSON.stringify( payload ),
+		headers: {
+			'Content-Type': 'application/json',
+			'X-WP-Nonce': TRACKING_DATA_VAR.event_tracking_nonce,
+		},
+		keepalive: true,
+		credentials: 'same-origin',
+	} );
+}

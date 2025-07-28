@@ -189,30 +189,29 @@ final class RemotePixelTracker implements PixelTrackerInterface {
 	 *
 	 * @since 0.1.0
 	 */
-	public function track_view_content_event(): void {
+	public function filter_view_content_event_data( $tracking_data ): array {
 		if ( ! Consent::has_marketing_consent() ) {
-			return;
+			return $tracking_data;
+		}
+
+		if ( ! is_product() ) {
+			return $tracking_data;
 		}
 
 		$product_id = get_the_ID();
 		$product    = wc_get_product( $product_id );
 
 		if ( ! $product instanceof WC_Product ) {
-			return;
+			return $tracking_data;
 		}
 
-		$tracking_data = sprintf(
-			'snaptr("track", "VIEW_CONTENT", %s);',
-			wp_json_encode(
-				array(
-					'price'    => wc_get_price_to_display( $product ),
-					'currency' => get_woocommerce_currency(),
-					'item_ids' => array( $product_id ),
-				)
-			)
+		$tracking_data['VIEW_CONTENT'] = array(
+			'price'    => wc_get_price_to_display( $product ),
+			'currency' => get_woocommerce_currency(),
+			'item_ids' => array( $product_id ),
 		);
 
-		wp_add_inline_script( Config::ASSET_HANDLE_PREFIX . 'tracking', $tracking_data );
+		return $tracking_data;
 	}
 
 	/**

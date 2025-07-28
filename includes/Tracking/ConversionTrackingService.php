@@ -15,6 +15,7 @@ namespace SnapchatForWooCommerce\Tracking;
 use SnapchatForWooCommerce\Utils\Storage\OptionDefaults;
 use SnapchatForWooCommerce\Utils\Storage\Options;
 use SnapchatForWooCommerce\Utils\Helper;
+use SnapchatForWooCommerce\Config;
 
 /**
  * Service class for registering WooCommerce conversion tracking hooks.
@@ -76,6 +77,7 @@ class ConversionTrackingService implements ServiceStatusInterface {
 		add_action( 'woocommerce_after_add_to_cart_quantity', array( $this, 'render_event_id_field' ) );
 		add_action( Helper::with_prefix( 'send_conversion_event' ), array( $this->tracker, 'send' ), 10, 2 );
 		add_action( Helper::with_prefix( 'conversion_sent' ), array( $this, 'mark_as_tracked' ), 10, 2 );
+		add_action( 'rest_api_init', array( $this, 'register_view_content_tracking_endpoint' ) );
 	}
 
 	/**
@@ -125,33 +127,6 @@ class ConversionTrackingService implements ServiceStatusInterface {
 	 */
 	public function handle_purchase( int $order_id ): void {
 		$this->tracker->track_purchase( $order_id );
-	}
-
-	/**
-	 * Callback for WooCommerce add-to-cart actions.
-	 *
-	 * Triggered when a product is added to the cart.
-	 * Passes product ID and quantity to the tracker for building the tracking payload.
-	 *
-	 * @since 0.1.0
-	 *
-	 * @param string $cart_item_key Unique key for the cart item.
-	 * @param int    $product_id    WooCommerce product ID added to the cart.
-	 * @param int    $quantity      Quantity of product added.
-	 * @return void
-	 */
-	public function handle_add_to_cart_old( string $cart_item_key, int $product_id, int $quantity ): void {
-		/**
-		 * Bail early if the Add to Cart event is handled asynchronously.
-		 *
-		 * @see ConversionTrackingService::handle_single_product_add_to_cart()
-		 * for more details on why we bail early.
-		 */
-		if ( Helper::is_request_async() ) {
-			return;
-		}
-
-		$this->tracker->track_add_to_cart( $product_id, $quantity );
 	}
 
 	/**
@@ -253,6 +228,36 @@ class ConversionTrackingService implements ServiceStatusInterface {
 		$event_id   = sanitize_text_field( wp_unslash( $_POST['event_id'] ?? '' ) );
 
 		$this->tracker->track_add_to_cart( $product_id, $quantity, $event_id );
+	}
+
+	/**
+	 * Registers the REST API endpoint for tracking view content events.
+	 *
+	 * This endpoint allows the frontend to trigger a `VIEW_CONTENT` event programmatically
+	 * (e.g., via JavaScript beacon), which is processed by the conversion tracker
+	 * and dispatched to the Ad Partner's Conversions API.
+	 *
+	 * Endpoint: /wp-json/snapchat-for-woocommerce/v1/event_tracking/VIEW_CONTENT
+	 *
+	 * @since 0.1.0
+	 *
+	 * @return void
+	 */
+	public function register_view_content_tracking_endpoint() {
+		register_rest_route(
+			Config::PLUGIN_SLUG,
+			'v1/event_tracking/VIEW_CONTENT',
+			array(
+				'methods'             => \WP_REST_Server::CREATABLE,
+				'callback'            => array( $this->tracker, 'track_view_content' ),
+				'permission_callback' => function( \WP_REST_Request $request ) {
+					$raw_body = $request->get_body();
+					$parsed   = json_decode( $raw_body );
+
+					return isset( $parsed->security ) && wp_verify_nonce( $parsed->security, 'wp_rest' );
+				}
+			)
+		);
 	}
 
 	/**

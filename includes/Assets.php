@@ -100,9 +100,11 @@ class Assets {
 				Helper::with_prefix( 'filter_tracking_data' ),
 				array(
 					'ajax_url'              => admin_url( 'admin-ajax.php' ),
+					'tracking_rest_url'     => rest_url( Config::PLUGIN_SLUG . '/v1/event_tracking' ),
 					'is_pixel_enabled'      => PixelTrackingService::is_enabled(),
 					'is_conversion_enabled' => ConversionTrackingService::is_enabled(),
 					'capi_nonce'            => wp_create_nonce( 'capi_nonce' ),
+					'event_tracking_nonce'  => wp_create_nonce( 'wp_rest' ),
 				)
 			)
 		);
