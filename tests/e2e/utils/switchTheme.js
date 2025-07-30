@@ -9,24 +9,31 @@
  * @throws {Error} If the request fails or the response indicates an error.
  */
 export async function switchTheme( page, themeSlug ) {
-	const response = await page.request.post( '/wp-json/snapchat-e2e/v1/switch-theme', {
-		data: {
-			theme: themeSlug,
-		},
-		headers: {
-			'Content-Type': 'application/json',
-		},
-	} );
+	const response = await page.request.post(
+		'/wp-json/snapchat-e2e/v1/switch-theme',
+		{
+			data: {
+				theme: themeSlug,
+			},
+			headers: {
+				'Content-Type': 'application/json',
+			},
+		}
+	);
 
-	if ( !response.ok() ) {
+	if ( ! response.ok() ) {
 		const errorBody = await response.text();
-		throw new Error( `Failed to switch theme. HTTP ${ response.status() }: ${ errorBody }` );
+		throw new Error(
+			`Failed to switch theme. HTTP ${ response.status() }: ${ errorBody }`
+		);
 	}
 
 	const result = await response.json();
 
 	if ( ! result.success ) {
-		throw new Error( `Theme switch failed: ${ result.error || 'Unknown error' }` );
+		throw new Error(
+			`Theme switch failed: ${ result.error || 'Unknown error' }`
+		);
 	}
 }
 
@@ -35,12 +42,12 @@ export async function switchTheme( page, themeSlug ) {
  *
  * Used in E2E tests to programmatically switch between classic and block themes.
  *
- * @returns {Object} An object where keys are theme types (e.g. 'classic', 'block')
+ * @return {Object} An object where keys are theme types (e.g. 'classic', 'block')
  *                   and values are corresponding WordPress theme slugs.
  */
 export function getThemes() {
 	return {
-		'classic': 'storefront',
-		'block': 'twentytwentyfive',
+		classic: 'storefront',
+		block: 'twentytwentyfive',
 	};
 }

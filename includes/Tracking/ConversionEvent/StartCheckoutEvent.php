@@ -13,6 +13,7 @@
 namespace SnapchatForWooCommerce\Tracking\ConversionEvent;
 
 use WC_Cart;
+use WC_Product;
 
 /**
  * Constructs a Conversion request payload for the START_CHECKOUT event type.
@@ -58,12 +59,12 @@ final class StartCheckoutEvent implements ConversionEventInterface {
 		$contents = array();
 		$skus     = array();
 
-		/**
-		 * Product from the Order Line Item.
-		 *
-		 * @var \WC_Order_Item_Product $item Product item.
-		 */
 		foreach ( $this->cart->get_cart() as $item ) {
+			/**
+			 * WooCommerce product object.
+			 *
+			 * @var WC_Product $product Product object.
+			 */
 			$product = $item['data'];
 
 			if ( ! $product ) {
@@ -72,7 +73,7 @@ final class StartCheckoutEvent implements ConversionEventInterface {
 
 			$contents[] = array(
 				'id'         => (string) $product->get_id(),
-				'quantity'   => (string) $item->get_quantity(),
+				'quantity'   => (string) $item['quantity'],
 				'item_price' => (string) $product->get_price(),
 			);
 
@@ -80,7 +81,7 @@ final class StartCheckoutEvent implements ConversionEventInterface {
 		}
 
 		$default = array(
-			'event_name'       => 'PURCHASE',
+			'event_name'       => 'START_CHECKOUT',
 			'event_time'       => time(),
 			'event_source_url' => wc_get_raw_referer(),
 			'action_source'    => 'WEB',
@@ -90,7 +91,7 @@ final class StartCheckoutEvent implements ConversionEventInterface {
 				'contents'    => $contents,
 				'currency'    => get_woocommerce_currency(),
 				'num_items'   => (string) $this->cart->get_cart_contents_count(),
-				'value'       => $this->cart->get_cart_contents_total(),
+				'value'       => wc_format_decimal( $this->cart->total ),
 			),
 		);
 

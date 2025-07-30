@@ -35,8 +35,8 @@ use WC_Cart;
  * |--------------|------------------------------------------------------------|-------------------------------------|
  * | 🔴 Critical  | Missing this breaks ROAS, attribution, and ad optimization | Use Action Scheduler or job queue   |
  * | 🟠 High      | Important for funnels and retargeting                      | Use Action Scheduler where feasible |
- * | 🟡 Medium    | Useful for remarketing and behavior signals                | Use async `sendBeacon()` + batching |
- * | 🟢 Low       | Low impact analytics or audience seeding                   | Use lightweight async request (AJAX)|
+ * | 🟡 Medium    | Useful for remarketing and behavior signals                | Use async request (AJAX)            |
+ * | 🟢 Low       | Low impact analytics or audience seeding                   | Use async request (AJAX)            |
  * ---
  *
  * @since 0.1.0
@@ -85,8 +85,8 @@ interface ConversionTrackerInterface {
 	 * @since 0.1.0
 	 * @impact 🟠 high — Key funnel milestone; essential for retargeting and conversion tracking.
 	 *
-	 * @param string  $event_id The unique event ID used for deduplication.
 	 * @param WC_Cart $cart     The WooCommerce cart object containing current session data.
+	 * @param string  $event_id The unique event ID used for deduplication.
 	 * @return void
 	 */
 	public function track_start_checkout( WC_Cart $cart, string $event_id = '' ): void;

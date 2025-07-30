@@ -6,11 +6,7 @@ const { test, expect } = require( '@playwright/test' );
 /**
  * Internal dependencies
  */
-import {
-	findSnaptrEvent,
-	getThemes,
-	switchTheme,
-} from '../../../utils';
+import { findSnaptrEvent, getThemes, switchTheme } from '../../../utils';
 
 const anyUuidRegex =
 	/^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
@@ -27,7 +23,11 @@ test.describe( 'ADD_CART event', () => {
 
 			await page
 				.getByRole( 'link', { name: 'Add to cart: “Product Five”' } )
-				.or( page.getByRole( 'button', { name: 'Add to cart: “Product Five”' } ) )
+				.or(
+					page.getByRole( 'button', {
+						name: 'Add to cart: “Product Five”',
+					} )
+				)
 				.click();
 			const events = await page.evaluate( () => window.snaptr.queue );
 			const ADD_CART = findSnaptrEvent( events, 'ADD_CART' );

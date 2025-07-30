@@ -74,10 +74,10 @@ class ConversionTrackingService implements ServiceStatusInterface {
 		add_action( 'woocommerce_add_to_cart', array( $this, 'handle_single_product_add_to_cart' ), 10, 3 );
 		Helper::register_ajax_action( 'add_cart', array( $this, 'handle_async_add_to_cart' ) );
 		Helper::register_ajax_action( 'view_content', array( $this, 'handle_async_view_content' ) );
+		Helper::register_ajax_action( 'start_checkout', array( $this, 'handle_async_start_checkout' ) );
 		add_action( 'woocommerce_after_add_to_cart_quantity', array( $this, 'render_event_id_field' ) );
 		add_action( Helper::with_prefix( 'send_conversion_event' ), array( $this->tracker, 'send' ), 10, 2 );
 		add_action( Helper::with_prefix( 'conversion_sent' ), array( $this, 'mark_as_tracked' ), 10, 2 );
-		add_action( 'rest_api_init', array( $this, 'register_view_content_tracking_endpoint' ) );
 	}
 
 	/**
@@ -248,39 +248,28 @@ class ConversionTrackingService implements ServiceStatusInterface {
 		$raw_input  = wp_unslash( $raw_input );
 		$data       = json_decode( $raw_input, true );
 		$product_id = isset( $data['item_ids'][0] ) ? absint( $data['item_ids'][0] ) : 0;
-		$event_id   = isset( $data['eventId'] ) ? sanitize_text_field( $data['eventId'] ) : '';
+		$event_id   = isset( $data['event_id'] ) ? sanitize_text_field( $data['event_id'] ) : '';
 
 		$this->tracker->track_view_content( $product_id, $event_id );
 	}
 
 	/**
-	 * Registers the REST API endpoint for tracking view content events.
+	 * Handles asynchronous Start Checkout tracking requests.
 	 *
-	 * This endpoint allows the frontend to trigger a `VIEW_CONTENT` event programmatically
-	 * (e.g., via JavaScript beacon), which is processed by the conversion tracker
-	 * and dispatched to the Ad Partner's Conversions API.
-	 *
-	 * Endpoint: /wp-json/snapchat-for-woocommerce/v1/event_tracking/VIEW_CONTENT
+	 * This method is called via AJAX when the checkout page is visited.
+	 * It extracts the event ID from the request and triggers the tracker.
 	 *
 	 * @since 0.1.0
 	 *
 	 * @return void
 	 */
-	public function register_view_content_tracking_endpoint() {
-		register_rest_route(
-			Config::PLUGIN_SLUG,
-			'v1/event_tracking/VIEW_CONTENT',
-			array(
-				'methods'             => \WP_REST_Server::CREATABLE,
-				'callback'            => array( $this->tracker, 'track_view_content' ),
-				'permission_callback' => function ( \WP_REST_Request $request ) {
-					$raw_body = $request->get_body();
-					$parsed   = json_decode( $raw_body );
+	public function handle_async_start_checkout(): void {
+		check_ajax_referer( 'capi_nonce', 'security' );
 
-					return isset( $parsed->security ) && wp_verify_nonce( $parsed->security, 'wp_rest' );
-				},
-			)
-		);
+		$event_id = sanitize_text_field( wp_unslash( $_POST['event_id'] ?? '' ) );
+		$cart     = WC() ? WC()->cart : null;
+
+		$this->tracker->track_start_checkout( $cart, $event_id );
 	}
 
 	/**

@@ -72,7 +72,12 @@ final class PixelTrackingService implements ServiceStatusInterface {
 
 		add_filter(
 			Helper::with_prefix( 'filter_tracking_data' ),
-			array( $this->tracker, 'filter_view_content_event_data' )
+			array( $this, 'filter_view_content_event_data' )
+		);
+
+		add_filter(
+			Helper::with_prefix( 'filter_tracking_data' ),
+			array( $this, 'filter_start_checkout_event_data' )
 		);
 
 		add_action(
@@ -190,5 +195,77 @@ final class PixelTrackingService implements ServiceStatusInterface {
 		$this->products[ $product_id ] = array(
 			'price' => wc_get_price_to_display( $product ),
 		);
+	}
+
+	/**
+	 * Filters the localized tracking data to include the `VIEW_CONTENT` event payload.
+	 *
+	 * This hook is applied during page rendering when the user is on a single product page
+	 * and has granted marketing consent. It populates the localized JavaScript variable
+	 * with data required for frontend pixel and CAPI `VIEW_CONTENT` tracking.
+	 *
+	 * @since 0.1.0
+	 *
+	 * @param array $tracking_data Localized data to be passed to the frontend tracking script.
+	 * @return array Filtered tracking data with `VIEW_CONTENT` event properties.
+	 */
+	public function filter_view_content_event_data( $tracking_data ): array {
+		if ( ! Consent::has_marketing_consent() ) {
+			return $tracking_data;
+		}
+
+		if ( ! is_product() ) {
+			return $tracking_data;
+		}
+
+		$product_id = get_the_ID();
+		$product    = wc_get_product( $product_id );
+
+		if ( ! $product instanceof WC_Product ) {
+			return $tracking_data;
+		}
+
+		$tracking_data['VIEW_CONTENT'] = array(
+			'price'    => wc_get_price_to_display( $product ),
+			'currency' => get_woocommerce_currency(),
+			'item_ids' => array( $product_id ),
+		);
+
+		return $tracking_data;
+	}
+
+	/**
+	 * Filters the localized tracking data to include the `START_CHECKOUT` event payload.
+	 *
+	 * This hook is applied when the user lands on the Checkout page (excluding the
+	 * Order Received page) and has granted marketing consent. It collects cart metadata
+	 * such as total value, item count, currency, and product IDs, and appends this information
+	 * to the localized frontend tracking object.
+	 *
+	 * @since 0.1.0
+	 *
+	 * @param array $tracking_data Localized data to be passed to the frontend tracking script.
+	 * @return array Filtered tracking data with `START_CHECKOUT` event properties.
+	 */
+	public function filter_start_checkout_event_data( $tracking_data ): array {
+		if ( ! Consent::has_marketing_consent() ) {
+			return $tracking_data;
+		}
+
+		if ( ! ( is_checkout() && ! is_order_received_page() ) ) {
+			return $tracking_data;
+		}
+
+		if ( isset( WC()->cart ) && WC()->cart->get_cart_contents_count() > 0 ) {
+			$product_ids                     = array_values( array_map( fn( $item ) => $item['product_id'], WC()->cart->get_cart() ) );
+			$tracking_data['START_CHECKOUT'] = array(
+				'currency'     => get_woocommerce_currency(),
+				'price'        => wc_format_decimal( WC()->cart->total ),
+				'item_ids'     => array_map( 'strval', $product_ids ),
+				'number_items' => (string) WC()->cart->get_cart_contents_count(),
+			);
+		}
+
+		return $tracking_data;
 	}
 }

@@ -6,11 +6,7 @@ const { test, expect } = require( '@playwright/test' );
 /**
  * Internal dependencies
  */
-import {
-	findSnaptrEvent,
-	getThemes,
-	switchTheme,
-} from '../../../utils';
+import { findSnaptrEvent, getThemes, switchTheme } from '../../../utils';
 
 test.describe( 'PAGE_VIEW event', () => {
 	test.use( { storageState: process.env.ADMINSTATE } );

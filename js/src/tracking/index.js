@@ -10,11 +10,9 @@ import {
 	hasUserConsent,
 	setSnapChatClickId,
 	onSingleProductPageVisit,
+	onCheckoutPageVisit,
 } from './utils';
-import {
-	singleAddToCartClick,
-	addToCartClick,
-} from './pixel/utils';
+import { singleAddToCartClick, addToCartClick } from './pixel/utils';
 import { sendCapiEvent } from './conversions/utils';
 import { SnapchatEvent } from './pixel/events';
 
@@ -60,12 +58,13 @@ document.addEventListener( 'DOMContentLoaded', () => {
 			sendCapiEvent( SnapchatEvent.ADD_CART, {
 				event_id: eventId,
 				product_id: data.product_id,
-				quantity: 1
+				quantity: 1,
 			} );
 		}
 	} );
 
 	onSingleProductPageVisit();
+	onCheckoutPageVisit();
 } );
 
 /**

@@ -145,7 +145,6 @@ class RemoteConversionTracker implements ConversionTrackerInterface {
 			),
 			Config::PLUGIN_SLUG
 		);
-
 	}
 	/**
 	 * Tracks a WooCommerce add-to-cart event.
@@ -209,7 +208,7 @@ class RemoteConversionTracker implements ConversionTrackerInterface {
 		$event   = new ViewContentEvent( $product_id );
 		$payload = $event->build_payload(
 			array(
-				'event_id'  => $body->eventId ?? '', // phpcs:ignore WordPress.NamingConventions.ValidVariableName.UsedPropertyNotSnakeCase
+				'event_id'  => $body->event_id ?? '',
 				'user_data' => UserIdentifier::get_user_data(),
 			)
 		);

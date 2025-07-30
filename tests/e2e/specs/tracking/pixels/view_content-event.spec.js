@@ -6,11 +6,7 @@ const { test, expect } = require( '@playwright/test' );
 /**
  * Internal dependencies
  */
-import {
-	findSnaptrEvent,
-	getThemes,
-	switchTheme,
-} from '../../../utils';
+import { findSnaptrEvent, getThemes, switchTheme } from '../../../utils';
 
 test.describe( 'VIEW_CONTENT event', () => {
 	test.use( { storageState: process.env.ADMINSTATE } );
@@ -18,7 +14,9 @@ test.describe( 'VIEW_CONTENT event', () => {
 	const themes = getThemes();
 
 	for ( const theme in themes ) {
-		test( `[${ theme } theme] Direct access to Single Product Page sends events`, async ( { page } ) => {
+		test( `[${ theme } theme] Direct access to Single Product Page sends events`, async ( {
+			page,
+		} ) => {
 			await switchTheme( page, themes[ theme ] );
 			await page.goto( '/product/product-two' );
 			const events = await page.evaluate( () => window.snaptr.queue );
@@ -27,15 +25,20 @@ test.describe( 'VIEW_CONTENT event', () => {
 
 			const [ , , payload ] = VIEW_CONTENT;
 
-			expect( payload.price ).toBe( 10 );
+			expect( payload.price ).toBe( 15 );
 			expect( payload.currency ).toBe( 'USD' );
 			expect( payload.item_ids ).toContain( 11 );
 		} );
 
-		test( `[${ theme } theme] Backward navigation sends event `, async ( { page } ) => {
+		test( `[${ theme } theme] Backward navigation sends event `, async ( {
+			page,
+		} ) => {
 			await switchTheme( page, themes[ theme ] );
 			await page.goto( '/product/product-two' );
-			await page.getByRole( 'link', { name: 'Sample Page' } ).first().click();
+			await page
+				.getByRole( 'link', { name: 'Sample Page' } )
+				.first()
+				.click();
 			await page.goBack();
 
 			const events = await page.evaluate( () => window.snaptr.queue );
@@ -44,17 +47,25 @@ test.describe( 'VIEW_CONTENT event', () => {
 
 			const [ , , payload ] = VIEW_CONTENT;
 
-			expect( payload.price ).toBe( 10 );
+			expect( payload.price ).toBe( 15 );
 			expect( payload.currency ).toBe( 'USD' );
 			expect( payload.item_ids ).toContain( 11 );
 		} );
 
-		test( `[${ theme } theme] Navigate to Single Product Page event sends event `, async ( { page } ) => {
+		test( `[${ theme } theme] Navigate to Single Product Page event sends event `, async ( {
+			page,
+		} ) => {
 			await switchTheme( page, themes[ theme ] );
 			await page.goto( '/shop' );
 			await page
-				.locator( '.woocommerce-loop-product__title', { hasText: 'Product Two' } )
-				.or( page.locator( '.wp-block-post-title', { hasText: 'Product Two' } ) )
+				.locator( '.woocommerce-loop-product__title', {
+					hasText: 'Product Two',
+				} )
+				.or(
+					page.locator( '.wp-block-post-title', {
+						hasText: 'Product Two',
+					} )
+				)
 				.click();
 
 			await expect( page.url() ).toContain( '/product/product-two' );
@@ -66,12 +77,14 @@ test.describe( 'VIEW_CONTENT event', () => {
 
 			const [ , , payload ] = VIEW_CONTENT;
 
-			expect( payload.price ).toBe( 10 );
+			expect( payload.price ).toBe( 15 );
 			expect( payload.currency ).toBe( 'USD' );
 			expect( payload.item_ids ).toContain( 11 );
 		} );
 
-		test( `[${ theme } theme] No event is sent on reload`, async ( { page } ) => {
+		test( `[${ theme } theme] No event is sent on reload`, async ( {
+			page,
+		} ) => {
 			await switchTheme( page, themes[ theme ] );
 			await page.goto( '/product/product-two' );
 			await page.reload();

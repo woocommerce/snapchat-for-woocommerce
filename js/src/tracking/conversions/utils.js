@@ -55,11 +55,7 @@ export function with_prefix( $action = '' ) {
  * @since 0.1.0
  */
 export function sendCapiEvent( event, payload = {} ) {
-	if (
-		typeof event !== 'string' ||
-		! event ||
-		typeof payload !== 'object'
-	) {
+	if ( typeof event !== 'string' || ! event || typeof payload !== 'object' ) {
 		return;
 	}
 
