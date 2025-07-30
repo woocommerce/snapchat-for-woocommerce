@@ -166,3 +166,23 @@ export const onSingleProductPageVisit = () => {
 		sendCapiEvent( SnapchatEvent.VIEW_CONTENT, eventData );
 	}
 }
+
+export const onCheckoutPageVisit = () => {
+	if ( isFreshPageVisit() && TRACKING_DATA_VAR.START_CHECKOUT ) {
+		const eventId = window.crypto.randomUUID();
+
+		const eventData = {
+			...TRACKING_DATA_VAR.START_CHECKOUT,
+			event_id: eventId,
+			client_dedup_id: eventId,
+		};
+
+		if ( TRACKING_DATA_VAR.is_pixel_enabled ) {
+			sendPixelEvent( SnapchatEvent.START_CHECKOUT, eventData );
+		}
+
+		if ( TRACKING_DATA_VAR.is_conversion_enabled ) {
+			sendCapiEvent( SnapchatEvent.START_CHECKOUT, eventData );
+		}
+	}
+}

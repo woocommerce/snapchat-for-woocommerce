@@ -11,7 +11,8 @@ namespace SnapchatForWooCommerce\Tracking\ConversionEvent;
 /**
  * Constructs a Conversion request payload for the VIEW_CONTENT event type.
  *
- * This class captures minimal single product page data for tracking view content conversions.
+ * This class captures minimal single product page data for tracking
+ * view content conversions.
  *
  * @since 0.1.0
  */

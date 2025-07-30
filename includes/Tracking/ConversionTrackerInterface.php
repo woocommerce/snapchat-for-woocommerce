@@ -13,6 +13,8 @@
 
 namespace SnapchatForWooCommerce\Tracking;
 
+use WC_Cart;
+
 /**
  * Interface for sending server-side conversion events to an Ad Partner API.
  *
@@ -60,6 +62,34 @@ interface ConversionTrackerInterface {
 	 * @return void
 	 */
 	public function track_purchase( int $order ): void;
+
+	/**
+	 * Tracks a checkout initiation event via the Ad Partner’s Conversions API.
+	 *
+	 * This method should be called when a user first reaches the Checkout page from a previous step
+	 * in the funnel (e.g., cart or mini-cart). The implementing class is expected to extract contextual
+	 * user data (e.g., session ID, IP address, user agent) and any available cart metadata at that point.
+	 * A deduplication identifier (e.g., `event_id`) should be included to reconcile this event with a matching
+	 * client-side pixel signal, if present.
+	 *
+	 * ⚠️ This event should **not** be triggered on simple page reloads to avoid inflating analytics.
+	 * However, if the user navigates away from the Checkout and later returns (e.g., using back/forward
+	 * buttons or repeating the funnel), it **should** be considered a new and unique `start_checkout` event.
+	 *
+	 * As a high-priority funnel milestone, this event is critical for tracking drop-off rates,
+	 * powering retargeting campaigns, and improving checkout conversion strategies.
+	 *
+	 * To ensure reliable delivery — even if the user exits the session or disconnects mid-checkout —
+	 * this event should be enqueued using a background job processor such as Action Scheduler.
+	 *
+	 * @since 0.1.0
+	 * @impact 🟠 high — Key funnel milestone; essential for retargeting and conversion tracking.
+	 *
+	 * @param string  $event_id The unique event ID used for deduplication.
+	 * @param WC_Cart $cart     The WooCommerce cart object containing current session data.
+	 * @return void
+	 */
+	public function track_start_checkout( WC_Cart $cart, string $event_id = '' ): void;
 
 	/**
 	 * Tracks a product add-to-cart event via the Ad Partner’s Conversions API.

@@ -15,14 +15,15 @@ namespace SnapchatForWooCommerce\Tracking;
 use SnapchatForWooCommerce\Connection\WcsClient;
 use SnapchatForWooCommerce\Utils\Helper;
 use SnapchatForWooCommerce\Config;
-use SnapchatForWooCommerce\Tracking\ConversionEvent\AddToCartEvent;
 use SnapchatForWooCommerce\Tracking\ConversionEvent\PurchaseEvent;
+use SnapchatForWooCommerce\Tracking\ConversionEvent\StartCheckoutEvent;
+use SnapchatForWooCommerce\Tracking\ConversionEvent\AddToCartEvent;
 use SnapchatForWooCommerce\Tracking\ConversionEvent\ViewContentEvent;
 use SnapchatForWooCommerce\Utils\Storage\Options;
 use SnapchatForWooCommerce\Utils\Storage\OptionDefaults;
 use SnapchatForWooCommerce\Utils\UserIdentifier;
 use SnapchatForWooCommerce\Tracking\Consent;
-use WP_REST_Response;
+use WC_Cart;
 
 /**
  * Handles conversion tracking by sending server-side events to the Ad Partner Conversions API.
@@ -102,6 +103,50 @@ class RemoteConversionTracker implements ConversionTrackerInterface {
 		);
 	}
 
+	/**
+	 * Tracks a WooCommerce checkout initiation event.
+	 *
+	 * This method should be called when a user first reaches the Checkout page
+	 * (i.e., transitions from Cart or Mini-Cart to Checkout). It instantiates a
+	 * {@see StartCheckoutEvent} object using the active cart, generates a structured
+	 * conversion payload, and schedules it for asynchronous dispatch to the Ad Partner
+	 * using Action Scheduler.
+	 *
+	 * ⚠️ This event should not be triggered on simple page reloads. However, if a user
+	 * navigates away and later returns to the Checkout page, it should be treated as a
+	 * new `start_checkout` event.
+	 *
+	 * The payload includes cart contents, currency, value, and contextual identifiers
+	 * such as IP and user agent to support deduplication and targeting.
+	 *
+	 * @since 0.1.0
+	 *
+	 * @param WC_Cart $cart     WooCommerce cart object representing the current session.
+	 * @param string  $event_id The unique event ID used for deduplication (optional).
+	 * @return void
+	 */
+	public function track_start_checkout( WC_Cart $cart, string $event_id = '' ): void {
+		if ( ! Consent::has_marketing_consent() ) {
+			return;
+		}
+
+		$event   = new StartCheckoutEvent( $cart );
+		$payload = $event->build_payload(
+			array(
+				'user_data' => UserIdentifier::get_user_data(),
+			)
+		);
+
+		as_enqueue_async_action(
+			Helper::with_prefix( 'send_conversion_event' ),
+			array(
+				'event_payload' => $payload,
+				'args'          => array(),
+			),
+			Config::PLUGIN_SLUG
+		);
+
+	}
 	/**
 	 * Tracks a WooCommerce add-to-cart event.
 	 *
