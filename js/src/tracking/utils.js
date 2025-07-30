@@ -3,7 +3,7 @@
  */
 import { TRACKING_DATA_VAR } from './constants';
 import { SnapchatEvent } from './pixel/events';
-import { trackEvent } from './pixel/utils';
+import { sendPixelEvent } from './pixel/utils';
 import { sendCapiEvent } from './conversions/utils';
 
 /**
@@ -162,7 +162,7 @@ export const onSingleProductPageVisit = () => {
 			client_dedup_id: eventId,
 		};
 
-		trackEvent( SnapchatEvent.VIEW_CONTENT, eventData );
-		sendCapiEvent( SnapchatEvent.VIEW_CONTENT, { ...eventData, security: TRACKING_DATA_VAR.event_tracking_nonce } );
+		sendPixelEvent( SnapchatEvent.VIEW_CONTENT, eventData );
+		sendCapiEvent( SnapchatEvent.VIEW_CONTENT, eventData );
 	}
 }

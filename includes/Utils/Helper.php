@@ -52,4 +52,19 @@ class Helper {
 	public static function is_request_async() {
 		return ( wp_doing_ajax() || wp_is_serving_rest_request() );
 	}
+
+	/**
+	 * Register an AJAX action for both logged-in and non-logged-in users (frontend).
+	 *
+	 * @since 0.1.1
+	 *
+	 * @param string   $action    Action name (will be prefixed automatically).
+	 * @param callable $callback  Callback function to handle the AJAX request.
+	 */
+	public static function register_ajax_action( string $action, callable $callback ): void {
+		$prefixed_action = self::with_prefix( $action );
+
+		add_action( 'wp_ajax_' . $prefixed_action, $callback );
+		add_action( 'wp_ajax_nopriv_' . $prefixed_action, $callback );
+	}
 }

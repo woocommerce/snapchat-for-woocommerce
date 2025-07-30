@@ -151,18 +151,17 @@ class RemoteConversionTracker implements ConversionTrackerInterface {
 	 *
 	 * @since 0.1.0
 	 *
-	 * @param \WP_REST_Request $request The REST request containing item_ids and event_id.
+	 * @param int    $product_id WooCommerce product ID being viewed.
+	 * @param string $event_id   The unique event ID used for deduplication.
+	 *
 	 * @return void
 	 */
-	public function track_view_content( \WP_REST_Request $request ) {
+	public function track_view_content( int $product_id, string $event_id = '' ): void {
 		if ( ! Consent::has_marketing_consent() ) {
 			return;
 		}
 
-		$body       = json_decode( $request->get_body() );
-		$product_id = is_array( $body->item_ids ) && ! empty( $body->item_ids ) ? (int) $body->item_ids[0] : 0;
-		$event      = new ViewContentEvent( $product_id );
-
+		$event   = new ViewContentEvent( $product_id );
 		$payload = $event->build_payload(
 			array(
 				'event_id'  => $body->eventId ?? '', // phpcs:ignore WordPress.NamingConventions.ValidVariableName.UsedPropertyNotSnakeCase
@@ -170,14 +169,7 @@ class RemoteConversionTracker implements ConversionTrackerInterface {
 			)
 		);
 
-		as_enqueue_async_action(
-			Helper::with_prefix( 'send_conversion_event' ),
-			array(
-				'event_payload' => $payload,
-				'args'          => array(),
-			),
-			Config::PLUGIN_SLUG
-		);
+		$this->send( $payload );
 	}
 
 	/**
@@ -194,7 +186,7 @@ class RemoteConversionTracker implements ConversionTrackerInterface {
 	 * @param array               $args          Additional args.
 	 * @return void
 	 */
-	public function send( array $event_payload, array $args ): void {
+	public function send( array $event_payload, array $args = array() ): void {
 		$token    = Options::get( OptionDefaults::CONVERSION_ACCESS_TOKEN );
 		$pixel_id = Options::get( OptionDefaults::PIXEL_ID );
 

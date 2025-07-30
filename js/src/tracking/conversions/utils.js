@@ -39,6 +39,10 @@ export const triggerCAPI = async ( eventId, productId, quantity ) => {
 	} );
 };
 
+export function with_prefix( $action = '' ) {
+	return `${ TRACKING_DATA_VAR.prefix }${ $action }`;
+}
+
 /**
  * Sends a Conversion API (CAPI) tracking signal to the server using `fetch` with `keepalive`.
  *
@@ -59,14 +63,14 @@ export function sendCapiEvent( event, payload = {} ) {
 		return;
 	}
 
-	fetch( `${ TRACKING_DATA_VAR.tracking_rest_url }/${ event }`, {
+	fetch( `${ TRACKING_DATA_VAR.ajax_url }`, {
 		method: 'POST',
-		body: JSON.stringify( payload ),
-		headers: {
-			'Content-Type': 'application/json',
-			'X-WP-Nonce': TRACKING_DATA_VAR.event_tracking_nonce,
-		},
-		keepalive: true,
 		credentials: 'same-origin',
+		keepalive: true,
+		body: new URLSearchParams( {
+			action: with_prefix( event.toLowerCase() ),
+			payload: JSON.stringify( payload ),
+			security: TRACKING_DATA_VAR.capi_nonce,
+		} ),
 	} );
 }
