@@ -32,7 +32,9 @@ test.describe( 'PAGE_VIEW event', () => {
 			} );
 		}
 
-		test( `[${ theme } themme] Does not send on Single Product page`, async ( { page } ) => {
+		test( `[${ theme } themme] Does not send on Single Product page`, async ( {
+			page,
+		} ) => {
 			await switchTheme( page, themes[ theme ] );
 			await page.goto( '/product/product-two' );
 			const events = await page.evaluate( () => window.snaptr.queue );
