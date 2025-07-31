@@ -164,7 +164,7 @@ const ProductCatalog = () => {
 		 * Trigger catalog CSV generation as soon as the
 		 * merchant has successfully onboarded.
 		 */
-		if ( 'success' === onboarding ) {
+		if ( onboarding === 'success' ) {
 			generateCsv();
 		}
 	}, [ onboarding ] );

@@ -79,6 +79,11 @@ class ProductExportService {
 
 		add_action(
 			Helper::with_prefix( 'onboarding_complete' ),
+			array( $this, 'start_export_after_onboarding' )
+		);
+
+		add_action(
+			Helper::with_prefix( 'recurring_catalog_export' ),
 			array( $this, 'start_export' )
 		);
 
@@ -104,6 +109,49 @@ class ProductExportService {
 			array( $this, 'check_export_status' ),
 			10
 		);
+	}
+
+	/**
+	 * Initiates the export process immediately after onboarding and schedules daily recurring exports.
+	 *
+	 * This method is triggered via the {@see Helper::with_prefix( 'onboarding_complete' )} hook.
+	 * It performs the following:
+	 * - Initiates a one-time product catalog export by calling {@see self::start_export()}.
+	 * - Schedules a daily recurring export job using Action Scheduler if not already scheduled.
+	 *
+	 * This ensures that merchants begin with a fresh export and that exports continue automatically.
+	 *
+	 * @since 0.2.0
+	 *
+	 * @return void
+	 */
+	public function start_export_after_onboarding(): void {
+		$this->start_export();
+		$this->maybe_schedule_recurring_export();
+	}
+
+	/**
+	 * Schedules the recurring catalog export job if not already scheduled.
+	 *
+	 * This method registers a daily recurring job via Action Scheduler using the hook:
+	 * {@see Helper::with_prefix( 'recurring_catalog_export' )}.
+	 *
+	 * The job is set to begin one day after the current time and repeats every 24 hours.
+	 *
+	 * @since 0.2.0
+	 *
+	 * @return void
+	 */
+	private function maybe_schedule_recurring_export(): void {
+		if ( ! as_has_scheduled_action( Helper::with_prefix( 'recurring_catalog_export' ) ) ) {
+			as_schedule_recurring_action(
+				time() + DAY_IN_SECONDS,
+				DAY_IN_SECONDS,
+				Helper::with_prefix( 'recurring_catalog_export' ),
+				array(),
+				Config::PLUGIN_SLUG
+			);
+		}
 	}
 
 	/**
