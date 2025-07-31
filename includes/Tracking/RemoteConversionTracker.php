@@ -15,13 +15,16 @@ namespace SnapchatForWooCommerce\Tracking;
 use SnapchatForWooCommerce\Connection\WcsClient;
 use SnapchatForWooCommerce\Utils\Helper;
 use SnapchatForWooCommerce\Config;
-use SnapchatForWooCommerce\Tracking\ConversionEvent\AddToCartEvent;
 use SnapchatForWooCommerce\Tracking\ConversionEvent\PurchaseEvent;
+use SnapchatForWooCommerce\Tracking\ConversionEvent\StartCheckoutEvent;
+use SnapchatForWooCommerce\Tracking\ConversionEvent\AddToCartEvent;
+use SnapchatForWooCommerce\Tracking\ConversionEvent\ViewContentEvent;
+use SnapchatForWooCommerce\Tracking\ConversionEvent\PageViewEvent;
 use SnapchatForWooCommerce\Utils\Storage\Options;
 use SnapchatForWooCommerce\Utils\Storage\OptionDefaults;
 use SnapchatForWooCommerce\Utils\UserIdentifier;
 use SnapchatForWooCommerce\Tracking\Consent;
-use WP_REST_Response;
+use WC_Cart;
 
 /**
  * Handles conversion tracking by sending server-side events to the Ad Partner Conversions API.
@@ -49,14 +52,26 @@ class RemoteConversionTracker implements ConversionTrackerInterface {
 	protected WcsClient $client;
 
 	/**
+	 * Logger instance for tracking conversion events.
+	 *
+	 * This logger is used to log successful and failed event transmissions,
+	 * as well as debug information about the payloads being sent.
+	 *
+	 * @var ConversionEventLogger
+	 */
+	protected ConversionEventLogger $logger;
+
+	/**
 	 * Constructor.
 	 *
 	 * @since 0.1.0
 	 *
-	 * @param WcsClient $client WCS API proxy client.
+	 * @param WcsClient             $client WCS API proxy client.
+	 * @param ConversionEventLogger $logger Logger instance for tracking conversion events.
 	 */
-	public function __construct( WcsClient $client ) {
+	public function __construct( WcsClient $client, ConversionEventLogger $logger ) {
 		$this->client = $client;
+		$this->logger = $logger;
 	}
 
 	/**
@@ -102,6 +117,49 @@ class RemoteConversionTracker implements ConversionTrackerInterface {
 	}
 
 	/**
+	 * Tracks a WooCommerce checkout initiation event.
+	 *
+	 * This method should be called when a user first reaches the Checkout page
+	 * (i.e., transitions from Cart or Mini-Cart to Checkout). It instantiates a
+	 * {@see StartCheckoutEvent} object using the active cart, generates a structured
+	 * conversion payload, and schedules it for asynchronous dispatch to the Ad Partner
+	 * using Action Scheduler.
+	 *
+	 * ⚠️ This event should not be triggered on simple page reloads. However, if a user
+	 * navigates away and later returns to the Checkout page, it should be treated as a
+	 * new `start_checkout` event.
+	 *
+	 * The payload includes cart contents, currency, value, and contextual identifiers
+	 * such as IP and user agent to support deduplication and targeting.
+	 *
+	 * @since 0.1.0
+	 *
+	 * @param WC_Cart $cart     WooCommerce cart object representing the current session.
+	 * @param string  $event_id The unique event ID used for deduplication (optional).
+	 * @return void
+	 */
+	public function track_start_checkout( WC_Cart $cart, string $event_id = '' ): void {
+		if ( ! Consent::has_marketing_consent() ) {
+			return;
+		}
+
+		$event   = new StartCheckoutEvent( $cart );
+		$payload = $event->build_payload(
+			array(
+				'user_data' => UserIdentifier::get_user_data(),
+			)
+		);
+
+		as_enqueue_async_action(
+			Helper::with_prefix( 'send_conversion_event' ),
+			array(
+				'event_payload' => $payload,
+				'args'          => array(),
+			),
+			Config::PLUGIN_SLUG
+		);
+	}
+	/**
 	 * Tracks a WooCommerce add-to-cart event.
 	 *
 	 * Instantiates an {@see AddToCartEvent} using the given product ID and quantity,
@@ -139,6 +197,78 @@ class RemoteConversionTracker implements ConversionTrackerInterface {
 	}
 
 	/**
+	 * Tracks a view content event.
+	 *
+	 * This method should be called when a Single Product page is viewed.
+	 * It extracts the product ID and event ID from the request body, builds a ViewContentEvent
+	 * payload, and send the event immediately via the Conversions API using the internal
+	 * `send()` method.
+	 *
+	 * The payload includes basic product information, deduplication ID, and user identifiers
+	 * for improved event matching and attribution.
+	 *
+	 * Unlike critical events such as purchases or checkout starts, view content are considered
+	 * low-impact and are dispatched directly without enqueuing in Action Scheduler.
+	 *
+	 * @since 0.1.0
+	 *
+	 * @param int    $product_id WooCommerce product ID being viewed.
+	 * @param string $event_id   The unique event ID used for deduplication.
+	 *
+	 * @return void
+	 */
+	public function track_view_content( int $product_id, string $event_id = '' ): void {
+		if ( ! Consent::has_marketing_consent() ) {
+			return;
+		}
+
+		$event   = new ViewContentEvent( $product_id );
+		$payload = $event->build_payload(
+			array(
+				'event_id'  => $event_id,
+				'user_data' => UserIdentifier::get_user_data(),
+			)
+		);
+
+		$this->send( $payload );
+	}
+
+	/**
+	 * Tracks a generic page view event.
+	 *
+	 * This method should be called when any frontend page (e.g., homepage, category,
+	 * blog post) is viewed by a user. It instantiates a {@see PageViewEvent} object,
+	 * constructs the event payload, and sends it immediately via the Conversions API
+	 * using the internal `send()` method.
+	 *
+	 * The payload includes contextual user metadata and an optional deduplication identifier
+	 * (`event_id`) to align with a corresponding client-side pixel event.
+	 *
+	 * Unlike critical events such as purchases or checkout starts, page view events are considered
+	 * low-impact and are dispatched directly without enqueuing in Action Scheduler.
+	 *
+	 * @since 0.1.0
+	 *
+	 * @param string $event_id Optional unique event ID for deduplication.
+	 * @return void
+	 */
+	public function track_page_view( string $event_id = '' ): void {
+		if ( ! Consent::has_marketing_consent() ) {
+			return;
+		}
+
+		$event   = new PageViewEvent();
+		$payload = $event->build_payload(
+			array(
+				'event_id'  => $event_id,
+				'user_data' => UserIdentifier::get_user_data(),
+			)
+		);
+
+		$this->send( $payload );
+	}
+
+	/**
 	 * Sends a previously built payload to the Ad Partner Conversions API via WCS.
 	 *
 	 * This method is intended to be triggered asynchronously by Action Scheduler
@@ -152,7 +282,7 @@ class RemoteConversionTracker implements ConversionTrackerInterface {
 	 * @param array               $args          Additional args.
 	 * @return void
 	 */
-	public function send( array $event_payload, array $args ): void {
+	public function send( array $event_payload, array $args = array() ): void {
 		$token    = Options::get( OptionDefaults::CONVERSION_ACCESS_TOKEN );
 		$pixel_id = Options::get( OptionDefaults::PIXEL_ID );
 
@@ -164,18 +294,38 @@ class RemoteConversionTracker implements ConversionTrackerInterface {
 		$path    = "/conversions/v3/{$pixel_id}/events?{$query}";
 		$payload = array( 'data' => array( $event_payload ) );
 
-		if ( defined( 'SNAPCHAT_FOR_WOOCOMMERCE_DEBUG' ) && SNAPCHAT_FOR_WOOCOMMERCE_DEBUG ) {
-			wc_get_logger()->debug(
-				'Snapchat for WooCommerce: Conversion Payload',
-				array(
+		/* @var WP_REST_Response|WP_Error $response The response from the WCS proxy. */
+		$response = $this->client->proxy_post( $path, $payload, false );
+
+		if ( Helper::is_logging_enabled() ) {
+			$event = $event_payload['event_name'];
+
+			if ( is_wp_error( $response ) ) {
+				$error_data = $response->get_error_data();
+				$status     = $error_data['response']['code'];
+				$message    = $error_data['response']['message'];
+
+				$info = array(
 					'context' => 'tracking',
 					'payload' => $payload,
 					'args'    => $args,
-				)
+					'error'   => $message,
+				);
+			} else {
+				$status = $response->get_status();
+				$info   = array(
+					'context' => 'tracking',
+					'payload' => $payload,
+					'args'    => $args,
+				);
+			}
+
+			$this->logger->log_event(
+				$event,
+				$status,
+				$info
 			);
 		}
-
-		$this->client->proxy_post( $path, $payload, false );
 
 		/**
 		 * Fires after a conversion event has been sent to the Ad Partner.

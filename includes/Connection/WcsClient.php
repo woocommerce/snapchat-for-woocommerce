@@ -221,7 +221,7 @@ final class WcsClient {
 		return new WP_Error(
 			'wcs_error',
 			__( 'WCS request failed', 'snapchat-for-woocommerce' ),
-			array( 'response' => $response )
+			$response
 		);
 	}
 }

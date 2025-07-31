@@ -14,6 +14,7 @@ use SnapchatForWooCommerce\Config;
 use SnapchatForWooCommerce\Utils\Helper;
 use SnapchatForWooCommerce\Utils\Storage\Options;
 use SnapchatForWooCommerce\Utils\Storage\OptionDefaults;
+use SnapchatForWooCommerce\Tracking\ConversionEventLogger;
 
 /**
  * @covers \SnapchatForWooCommerce\Tracking\RemoteConversionTracker
@@ -41,7 +42,12 @@ class RemoteConversionTrackerTest extends WP_UnitTestCase {
 		parent::set_up();
 
 		$this->client  = $this->createMock( WcsClient::class );
-		$this->tracker = new RemoteConversionTracker( $this->client );
+		$this->tracker = new RemoteConversionTracker(
+			$this->client,
+			new ConversionEventLogger(
+				wc_get_logger()
+			)
+		);
 	}
 
 	public function tear_down(): void {

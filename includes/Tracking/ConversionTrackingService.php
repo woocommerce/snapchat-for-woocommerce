@@ -15,6 +15,7 @@ namespace SnapchatForWooCommerce\Tracking;
 use SnapchatForWooCommerce\Utils\Storage\OptionDefaults;
 use SnapchatForWooCommerce\Utils\Storage\Options;
 use SnapchatForWooCommerce\Utils\Helper;
+use SnapchatForWooCommerce\Config;
 
 /**
  * Service class for registering WooCommerce conversion tracking hooks.
@@ -71,8 +72,10 @@ class ConversionTrackingService implements ServiceStatusInterface {
 		add_filter( Helper::with_prefix( 'filter_tracking_data' ), array( $this, 'populate_tracking_data' ) );
 		add_action( 'woocommerce_thankyou', array( $this, 'handle_purchase' ) );
 		add_action( 'woocommerce_add_to_cart', array( $this, 'handle_single_product_add_to_cart' ), 10, 3 );
-		add_action( 'wp_ajax_' . Helper::with_prefix( 'add_to_cart' ), array( $this, 'handle_async_add_to_cart' ) );
-		add_action( 'wp_ajax_nopriv_' . Helper::with_prefix( 'add_to_cart' ), array( $this, 'handle_async_add_to_cart' ) );
+		Helper::register_ajax_action( 'start_checkout', array( $this, 'handle_async_start_checkout' ) );
+		Helper::register_ajax_action( 'add_cart', array( $this, 'handle_async_add_to_cart' ) );
+		Helper::register_ajax_action( 'view_content', array( $this, 'handle_async_view_content' ) );
+		Helper::register_ajax_action( 'page_view', array( $this, 'handle_async_page_view' ) );
 		add_action( 'woocommerce_after_add_to_cart_quantity', array( $this, 'render_event_id_field' ) );
 		add_action( Helper::with_prefix( 'send_conversion_event' ), array( $this->tracker, 'send' ), 10, 2 );
 		add_action( Helper::with_prefix( 'conversion_sent' ), array( $this, 'mark_as_tracked' ), 10, 2 );
@@ -125,33 +128,6 @@ class ConversionTrackingService implements ServiceStatusInterface {
 	 */
 	public function handle_purchase( int $order_id ): void {
 		$this->tracker->track_purchase( $order_id );
-	}
-
-	/**
-	 * Callback for WooCommerce add-to-cart actions.
-	 *
-	 * Triggered when a product is added to the cart.
-	 * Passes product ID and quantity to the tracker for building the tracking payload.
-	 *
-	 * @since 0.1.0
-	 *
-	 * @param string $cart_item_key Unique key for the cart item.
-	 * @param int    $product_id    WooCommerce product ID added to the cart.
-	 * @param int    $quantity      Quantity of product added.
-	 * @return void
-	 */
-	public function handle_add_to_cart_old( string $cart_item_key, int $product_id, int $quantity ): void {
-		/**
-		 * Bail early if the Add to Cart event is handled asynchronously.
-		 *
-		 * @see ConversionTrackingService::handle_single_product_add_to_cart()
-		 * for more details on why we bail early.
-		 */
-		if ( Helper::is_request_async() ) {
-			return;
-		}
-
-		$this->tracker->track_add_to_cart( $product_id, $quantity );
 	}
 
 	/**
@@ -253,6 +229,77 @@ class ConversionTrackingService implements ServiceStatusInterface {
 		$event_id   = sanitize_text_field( wp_unslash( $_POST['event_id'] ?? '' ) );
 
 		$this->tracker->track_add_to_cart( $product_id, $quantity, $event_id );
+	}
+
+	/**
+	 * Handles asynchronous View Content tracking requests.
+	 *
+	 * This method is called via AJAX when a single product page is viewed.
+	 * It extracts the product ID and event ID from the request and triggers
+	 * the tracker.
+	 *
+	 * @since 0.1.0
+	 *
+	 * @return void
+	 */
+	public function handle_async_view_content(): void {
+		check_ajax_referer( 'capi_nonce', 'security' );
+
+		$raw_input  = filter_input( INPUT_POST, 'payload', FILTER_UNSAFE_RAW );
+		$raw_input  = wp_unslash( $raw_input );
+		$data       = json_decode( $raw_input, true );
+		$product_id = isset( $data['item_ids'][0] ) ? absint( $data['item_ids'][0] ) : 0;
+		$event_id   = isset( $data['event_id'] ) ? sanitize_text_field( $data['event_id'] ) : '';
+
+		$this->tracker->track_view_content( $product_id, $event_id );
+	}
+
+	/**
+	 * Handles asynchronous Start Checkout tracking requests.
+	 *
+	 * This method is called via AJAX when the checkout page is visited.
+	 * It extracts the event ID from the request and triggers the tracker.
+	 *
+	 * @since 0.1.0
+	 *
+	 * @return void
+	 */
+	public function handle_async_start_checkout(): void {
+		check_ajax_referer( 'capi_nonce', 'security' );
+
+		$raw_input = filter_input( INPUT_POST, 'payload', FILTER_UNSAFE_RAW );
+		$raw_input = wp_unslash( $raw_input );
+		$data      = json_decode( $raw_input, true );
+		$event_id  = isset( $data['event_id'] ) ? sanitize_text_field( $data['event_id'] ) : '';
+		$cart      = WC() ? WC()->cart : null;
+
+		$this->tracker->track_start_checkout( $cart, $event_id );
+	}
+
+	/**
+	 * Handles asynchronous Page View tracking requests.
+	 *
+	 * This method is called via AJAX when any page view event is triggered by frontend JavaScript.
+	 * It extracts the `event_id` from the request and delegates tracking to the configured
+	 * {@see ConversionTrackerInterface} implementation.
+	 *
+	 * This handler is used in low-priority tracking scenarios (e.g., audience seeding, general analytics)
+	 * where page views are recorded. It is intended for broad usage across all site pages,
+	 * including product and content pages, in an MVP setup.
+	 *
+	 * @since 0.1.0
+	 *
+	 * @return void
+	 */
+	public function handle_async_page_view(): void {
+		check_ajax_referer( 'capi_nonce', 'security' );
+
+		$raw_input = filter_input( INPUT_POST, 'payload', FILTER_UNSAFE_RAW );
+		$raw_input = wp_unslash( $raw_input );
+		$data      = json_decode( $raw_input, true );
+		$event_id  = isset( $data['event_id'] ) ? sanitize_text_field( $data['event_id'] ) : '';
+
+		$this->tracker->track_page_view( $event_id );
 	}
 
 	/**

@@ -94,6 +94,13 @@ final class RemotePixelTracker implements PixelTrackerInterface {
 	 * @return string Personalized pixel script.
 	 */
 	protected static function personalize_tracking_script( string $script ): string {
+		// Will be implemented client-side.
+		$script = str_replace(
+			"snaptr('track', 'PAGE_VIEW');",
+			'',
+			$script
+		);
+
 		// @todo: use this once we integrate with Consent API.
 		if ( 0 && is_user_logged_in() ) { // for future use.
 			$user       = wp_get_current_user();
@@ -180,41 +187,6 @@ final class RemotePixelTracker implements PixelTrackerInterface {
 		return self::personalize_tracking_script( $pixel_script );
 	}
 
-
-
-	/**
-	 * Emits the Snapchat `VIEW_CONTENT` tracking event for single product views.
-	 *
-	 * Hooked into `woocommerce_after_single_product`.
-	 *
-	 * @since 0.1.0
-	 */
-	public function track_view_content_event(): void {
-		if ( ! Consent::has_marketing_consent() ) {
-			return;
-		}
-
-		$product_id = get_the_ID();
-		$product    = wc_get_product( $product_id );
-
-		if ( ! $product instanceof WC_Product ) {
-			return;
-		}
-
-		$tracking_data = sprintf(
-			'snaptr("track", "VIEW_CONTENT", %s);',
-			wp_json_encode(
-				array(
-					'price'    => wc_get_price_to_display( $product ),
-					'currency' => get_woocommerce_currency(),
-					'item_ids' => array( $product_id ),
-				)
-			)
-		);
-
-		wp_add_inline_script( Config::ASSET_HANDLE_PREFIX . 'tracking', $tracking_data );
-	}
-
 	/**
 	 * Emits the Snapchat `PURCHASE` tracking event after a successful order.
 	 *
@@ -259,7 +231,7 @@ final class RemotePixelTracker implements PixelTrackerInterface {
 			 */
 			$product = $item->get_product();
 			if ( $product ) {
-				$item_ids[]    = $product->get_id();
+				$item_ids[]    = (string) $product->get_id();
 				$number_items += $item->get_quantity();
 
 				$terms = get_the_terms( $product->get_id(), 'product_cat' );
