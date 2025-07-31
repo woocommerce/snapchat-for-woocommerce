@@ -23,6 +23,7 @@ use SnapchatForWooCommerce\Utils\Storage\Options;
 use SnapchatForWooCommerce\Utils\Storage\OptionDefaults;
 use SnapchatForWooCommerce\Utils\Storage\Transients;
 use SnapchatForWooCommerce\Utils\Storage\TransientDefaults;
+use SnapchatForWooCommerce\Utils\Helper;
 
 /**
  * Controller for setting up and managing the Snapchat account connection.
@@ -195,6 +196,13 @@ class SnapchatBusinessExtensionController extends RESTBaseController {
 		}
 
 		Options::set( OptionDefaults::ONBOARDING_STATUS, 'connected' );
+
+		/**
+		 * Triggers when the Snapchat onboarding process is completed.
+		 *
+		 * @since 0.1.0
+		 */
+		do_action( Helper::with_prefix( 'onboarding_complete' ) );
 
 		return rest_ensure_response(
 			array(

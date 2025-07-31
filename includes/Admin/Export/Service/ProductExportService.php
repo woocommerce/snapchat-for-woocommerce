@@ -78,6 +78,11 @@ class ProductExportService {
 		$this->job->cache_builder->register();
 
 		add_action(
+			Helper::with_prefix( 'onboarding_complete' ),
+			array( $this, 'start_export' )
+		);
+
+		add_action(
 			Helper::with_prefix( 'export_products_cache_completed' ),
 			array( $this, 'start_writing' )
 		);
