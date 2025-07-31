@@ -142,7 +142,7 @@ class ProductExportService {
 	 *
 	 * @return void
 	 */
-	private function maybe_schedule_recurring_export(): void {
+	public function maybe_schedule_recurring_export(): void {
 		if ( ! as_has_scheduled_action( Helper::with_prefix( 'recurring_catalog_export' ) ) ) {
 			as_schedule_recurring_action(
 				time() + DAY_IN_SECONDS,

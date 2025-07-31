@@ -20,6 +20,11 @@
  */
 
 use SnapchatForWooCommerce\Utils\Storage\Options;
+use SnapchatForWooCommerce\Utils\Storage\OptionDefaults;
+use SnapchatForWooCommerce\ServiceContainer;
+use SnapchatForWooCommerce\ServiceKey;
+use SnapchatForWooCommerce\Config;
+use SnapchatForWooCommerce\Utils\Helper;
 
 defined( 'ABSPATH' ) || exit;
 
@@ -53,6 +58,24 @@ register_activation_hook(
 	__FILE__,
 	function () {
 		Options::preload_defaults();
+
+		// Schedule recurring CSV export task when the plugin is activated.
+		if ( 'connected' === Options::get( OptionDefaults::ONBOARDING_STATUS ) ) {
+			$export_service = ServiceContainer::get( ServiceKey::PRODUCT_EXPORT_SERVICE );
+			$export_service->maybe_schedule_recurring_export();
+		}
+	}
+);
+
+register_deactivation_hook(
+	__FILE__,
+	function () {
+		// Unschedule all tasks related to product catalog export.
+		as_unschedule_all_actions(
+			Helper::with_prefix( 'recurring_catalog_export' ),
+			array(),
+			Config::PLUGIN_SLUG
+		);
 	}
 );
 
