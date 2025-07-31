@@ -3,6 +3,7 @@
  */
 import { __, sprintf } from '@wordpress/i18n';
 import { Flex } from '@wordpress/components';
+import { getQuery } from '@woocommerce/navigation';
 import {
 	createInterpolateElement,
 	useState,
@@ -35,6 +36,7 @@ import './index.scss';
  * @return {JSX.Element} The rendered ProductCatalog settings UI.
  */
 const ProductCatalog = () => {
+	const { onboarding } = getQuery();
 	// Whether we want to connect the heartbeat immediately as soon as the Heartbeat component mounts.
 	const [ exportInProgress, setExportInProgress ] = useState(
 		sfwData.isExportInProgress === '1'
@@ -156,6 +158,16 @@ const ProductCatalog = () => {
 		setFileUrl( null );
 		setLastExported( null );
 	}, [ exportInProgress ] );
+
+	useEffect( () => {
+		/**
+		 * Trigger catalog CSV generation as soon as the
+		 * merchant has successfully onboarded.
+		 */
+		if ( 'success' === onboarding ) {
+			generateCsv();
+		}
+	}, [ onboarding ] );
 
 	return (
 		<>
