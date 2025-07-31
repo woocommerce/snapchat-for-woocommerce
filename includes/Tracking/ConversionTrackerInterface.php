@@ -142,6 +142,25 @@ interface ConversionTrackerInterface {
 	public function track_view_content( int $product_id, string $event_id = '' ): void;
 
 	/**
+	 * Tracks a page view event via the Ad Partner’s Conversions API.
+	 *
+	 * This method should be called when a user views a non-product page (e.g., homepage, category page, blog).
+	 * The implementing class is expected to gather contextual metadata such as the current URL,
+	 * referrer, session ID, user agent, and IP address. A deduplication identifier (e.g., `event_id`)
+	 * should be included if possible to match client-side tracking.
+	 *
+	 * To avoid performance bottlenecks, this event should be dispatched using a lightweight async method
+	 * such as an AJAX call. Avoid queuing it in background job systems like Action Scheduler.
+	 *
+	 * @since 0.1.0
+	 * @impact 🟢 low — General analytics or audience seeding.
+	 *
+	 * @param string $event_id  The unique event ID used for deduplication.
+	 * @return void
+	 */
+	public function track_page_view( string $event_id = '' ): void;
+
+	/**
 	 * Sends a previously constructed conversion event payload to the Ad Partner’s Conversions API.
 	 *
 	 * This method is typically triggered asynchronously by background job processors such as

@@ -80,6 +80,11 @@ final class PixelTrackingService implements ServiceStatusInterface {
 			array( $this, 'filter_start_checkout_event_data' )
 		);
 
+		add_filter(
+			Helper::with_prefix( 'filter_tracking_data' ),
+			array( $this, 'filter_page_view_event_data' )
+		);
+
 		add_action(
 			'wp_head',
 			array( $this->tracker, 'maybe_inject_pixel' )
@@ -265,6 +270,34 @@ final class PixelTrackingService implements ServiceStatusInterface {
 				'number_items' => (string) WC()->cart->get_cart_contents_count(),
 			);
 		}
+
+		return $tracking_data;
+	}
+
+	/**
+	 * Filters the localized tracking data to include the `PAGE_VIEW` event payload.
+	 *
+	 * This hook is applied when the user visits a general site page — including the homepage,
+	 * category archives, or content pages — and has granted marketing consent. It excludes
+	 * pages already covered by more specific events such as `VIEW_CONTENT` (product pages)
+	 * and `START_CHECKOUT` (checkout page), to avoid redundant tracking.
+	 *
+	 * When eligible, the method appends a simple `PAGE_VIEW` flag to the localized tracking
+	 * data, which is later used by frontend scripts to dispatch pixel and CAPI page view events.
+	 *
+	 * @since 0.1.0
+	 *
+	 * @param array $tracking_data Localized data to be passed to the frontend tracking script.
+	 * @return array Filtered tracking data with `PAGE_VIEW` event properties.
+	 */
+	public function filter_page_view_event_data( $tracking_data ): array {
+		$is_valid_page = ! ( is_checkout() || is_product() );
+
+		if ( ! Consent::has_marketing_consent() || ! $is_valid_page ) {
+			return $tracking_data;
+		}
+
+		$tracking_data['PAGE_VIEW'] = true;
 
 		return $tracking_data;
 	}

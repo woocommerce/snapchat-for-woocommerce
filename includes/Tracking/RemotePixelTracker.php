@@ -94,6 +94,13 @@ final class RemotePixelTracker implements PixelTrackerInterface {
 	 * @return string Personalized pixel script.
 	 */
 	protected static function personalize_tracking_script( string $script ): string {
+		// Will be implemented client-side.
+		$script = str_replace(
+			"snaptr('track', 'PAGE_VIEW');",
+			'',
+			$script
+		);
+
 		// @todo: use this once we integrate with Consent API.
 		if ( 0 && is_user_logged_in() ) { // for future use.
 			$user       = wp_get_current_user();

@@ -20,6 +20,15 @@ use SnapchatForWooCommerce\Tracking\EventIdRegistry;
 final class AddToCartEvent implements ConversionEventInterface {
 
 	/**
+	 * Unique identifier for this event type.
+	 *
+	 * Used to register and identify the event in the system.
+	 *
+	 * @since 0.1.0
+	 */
+	public const ID = 'ADD_CART';
+
+	/**
 	 * Product ID being added to the cart.
 	 *
 	 * @since 0.1.0
@@ -59,7 +68,7 @@ final class AddToCartEvent implements ConversionEventInterface {
 	 */
 	public function build_payload( array $args = array() ): array {
 		$default = array(
-			'event_name'       => 'ADD_CART',
+			'event_name'       => self::ID,
 			'event_time'       => time(),
 			'action_source'    => 'WEB',
 			'event_source_url' => wc_get_raw_referer(),

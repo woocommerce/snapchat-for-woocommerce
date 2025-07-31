@@ -26,6 +26,15 @@ use WC_Product;
 final class StartCheckoutEvent implements ConversionEventInterface {
 
 	/**
+	 * Unique identifier for this event type.
+	 *
+	 * Used to register and identify the event in the system.
+	 *
+	 * @since 0.1.0
+	 */
+	public const ID = 'START_CHECKOUT';
+
+	/**
 	 * WooCommerce Cart object.
 	 *
 	 * @since 0.1.0
@@ -81,7 +90,7 @@ final class StartCheckoutEvent implements ConversionEventInterface {
 		}
 
 		$default = array(
-			'event_name'       => 'START_CHECKOUT',
+			'event_name'       => self::ID,
 			'event_time'       => time(),
 			'event_source_url' => wc_get_raw_referer(),
 			'action_source'    => 'WEB',

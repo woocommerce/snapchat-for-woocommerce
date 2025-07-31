@@ -25,6 +25,15 @@ use SnapchatForWooCommerce\Tracking\EventIdRegistry;
 final class PurchaseEvent implements ConversionEventInterface {
 
 	/**
+	 * Unique identifier for this event type.
+	 *
+	 * Used to register and identify the event in the system.
+	 *
+	 * @since 0.1.0
+	 */
+	public const ID = 'PURCHASE';
+
+	/**
 	 * WooCommerce order object.
 	 *
 	 * @since 0.1.0
@@ -84,7 +93,7 @@ final class PurchaseEvent implements ConversionEventInterface {
 		}
 
 		$default = array(
-			'event_name'       => 'PURCHASE',
+			'event_name'       => self::ID,
 			'event_time'       => time(),
 			'event_source_url' => $this->order->get_checkout_order_received_url(),
 			'event_id'         => EventIdRegistry::get_purchase_id( $this->order->get_id() ),

@@ -56,7 +56,7 @@ class Helper {
 	/**
 	 * Register an AJAX action for both logged-in and non-logged-in users (frontend).
 	 *
-	 * @since 0.1.1
+	 * @since 0.1.0
 	 *
 	 * @param string   $action    Action name (will be prefixed automatically).
 	 * @param callable $callback  Callback function to handle the AJAX request.
@@ -66,5 +66,16 @@ class Helper {
 
 		add_action( 'wp_ajax_' . $prefixed_action, $callback );
 		add_action( 'wp_ajax_nopriv_' . $prefixed_action, $callback );
+	}
+
+	/**
+	 * Returns true if the plugin debugging mode is enabled.
+	 *
+	 * @since 0.1.0
+	 *
+	 * @return bool True if debugging is enabled, false otherwise.
+	 */
+	public static function is_logging_enabled(): bool {
+		return defined( 'SNAPCHAT_FOR_WOOCOMMERCE_DEBUG' ) && SNAPCHAT_FOR_WOOCOMMERCE_DEBUG;
 	}
 }

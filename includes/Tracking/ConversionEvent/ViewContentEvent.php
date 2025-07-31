@@ -19,7 +19,16 @@ namespace SnapchatForWooCommerce\Tracking\ConversionEvent;
 final class ViewContentEvent implements ConversionEventInterface {
 
 	/**
-	 * Product ID being added to the cart.
+	 * Unique identifier for this event type.
+	 *
+	 * Used to register and identify the event in the system.
+	 *
+	 * @since 0.1.0
+	 */
+	public const ID = 'VIEW_CONTENT';
+
+	/**
+	 * Product ID being viewed.
 	 *
 	 * @since 0.1.0
 	 * @var int
@@ -62,7 +71,7 @@ final class ViewContentEvent implements ConversionEventInterface {
 		}
 
 		$default = array(
-			'event_name'       => 'VIEW_CONTENT',
+			'event_name'       => self::ID,
 			'event_time'       => time(),
 			'event_source_url' => wc_get_raw_referer(),
 			'action_source'    => 'WEB',

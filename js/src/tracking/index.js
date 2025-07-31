@@ -11,6 +11,7 @@ import {
 	setSnapChatClickId,
 	onSingleProductPageVisit,
 	onCheckoutPageVisit,
+	onPageView,
 } from './utils';
 import { singleAddToCartClick, addToCartClick } from './pixel/utils';
 import { sendCapiEvent } from './conversions/utils';
@@ -65,6 +66,7 @@ document.addEventListener( 'DOMContentLoaded', () => {
 
 	onSingleProductPageVisit();
 	onCheckoutPageVisit();
+	onPageView();
 } );
 
 /**
