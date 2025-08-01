@@ -87,7 +87,7 @@ class ProductExportServiceTest extends WP_UnitTestCase {
 		$this->writer->method( 'create_file' )
 			->willReturn( '/tmp/dummy.csv' );
 
-		$this->assertFalse( $this->service->start_export() );
+		$this->assertNull( $this->service->start_export() );
 	}
 
 	/**
