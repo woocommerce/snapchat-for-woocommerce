@@ -90,6 +90,7 @@ class ConversionEventLogger {
 			case ConversionEvent\StartCheckoutEvent::ID:
 			case ConversionEvent\AddToCartEvent::ID:
 			case ConversionEvent\ViewContentEvent::ID:
+			case ConversionEvent\PageViewEvent::ID:
 				return 'warning';
 		}
 
