@@ -36,27 +36,6 @@ class ConversionEventLogger {
 	protected $logger;
 
 	/**
-	 * Maps conversion event names to log severity levels.
-	 *
-	 * These levels correspond to logging method names in the WooCommerce logger,
-	 * such as `critical()`, `error()`, `warning()`, `info()`, etc.
-	 *
-	 * Example:
-	 * - `purchase` - critical
-	 * - `add_to_cart` - high
-	 *
-	 * @since 0.1.0
-	 *
-	 * @var array<string, string>
-	 */
-	protected $event_impact = array(
-		ConversionEvent\PurchaseEvent::ID      => 'critical', // 🔴
-		ConversionEvent\StartCheckoutEvent::ID => 'high',     // 🟠
-		ConversionEvent\AddToCartEvent::ID     => 'high',     // 🟠
-		ConversionEvent\ViewContentEvent::ID   => 'high',     // 🟠
-	);
-
-	/**
 	 * Constructor.
 	 *
 	 * @param WC_Logger_Interface $logger WooCommerce logger instance.
