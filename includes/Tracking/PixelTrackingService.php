@@ -57,11 +57,11 @@ final class PixelTrackingService implements ServiceStatusInterface {
 	}
 
 	/**
-	 * Registers WordPress hooks used for pixel injection and route initialization.
+	 * Registers WordPress hooks used for pixel injection and WooCommerce event hooks.
 	 *
-	 * - Hooks into `wp_head` to optionally output the pixel on frontend pages.
-	 * - Registers global site tag logic.
-	 * - Enqueues external tracking assets.
+	 * - Hooks into `wp_head` to optionally inject the pixel.
+	 * - Enqueues inline pixel data in `wp_footer`.
+	 * - Hooks into WooCommerce templates to collect product data for pixel events.
 	 *
 	 * @since 0.1.0
 	 */
@@ -77,10 +77,7 @@ final class PixelTrackingService implements ServiceStatusInterface {
 
 		add_action(
 			'wp_footer',
-			array(
-				$this,
-				'populate_tracking_data',
-			)
+			array( $this, 'populate_tracking_data' )
 		);
 
 		add_filter(
@@ -99,7 +96,6 @@ final class PixelTrackingService implements ServiceStatusInterface {
 			'woocommerce_after_add_to_cart_button',
 			function () {
 				global $product;
-
 				if ( $product instanceof WC_Product ) {
 					$this->add_product_data( $product );
 				}
@@ -113,53 +109,45 @@ final class PixelTrackingService implements ServiceStatusInterface {
 	}
 
 	/**
-	 * Determines whether Pixel tracking is currently enabled.
-	 *
-	 * This checks the persisted plugin option configured via the admin interface or defaults.
+	 * Checks whether Pixel tracking is enabled in plugin settings.
 	 *
 	 * @since 0.1.0
 	 *
-	 * @return bool True if pixel tracking is enabled; false otherwise.
+	 * @return bool True if tracking is enabled; false otherwise.
 	 */
 	public static function is_enabled(): bool {
 		return 'yes' === Options::get( OptionDefaults::PIXEL_ENABLED );
 	}
 
 	/**
-	 * Returns the localized data structure to be passed to the frontend via JavaScript.
+	 * Returns pixel-specific metadata to be localized to the frontend.
+	 *
+	 * Includes currency settings and collected product pricing info.
 	 *
 	 * @since 0.1.0
 	 *
-	 * @return array Associative array of currency settings and collected product data.
+	 * @return array Associative array of pixel metadata.
 	 */
 	public function get_pixel_data(): array {
-		$data = array(
+		return array(
 			'currency_minor_unit' => wc_get_price_decimals(),
 			'currency'            => get_woocommerce_currency(),
 			'products'            => $this->products,
 		);
-
-		return $data;
 	}
 
 	/**
-	 * Injects localized pixel tracking data into the page footer.
+	 * Injects inline tracking data into the page footer.
 	 *
-	 * This method outputs a `<script>` block that attaches collected pixel metadata
-	 * (currency, product prices, etc.) to a global JavaScript variable defined by the
-	 * plugin. This data is later used by frontend scripts to dispatch tne Ad Partner Pixel
-	 * tracking events.
-	 *
-	 * The output is injected via `wp_add_inline_script` and attached to the
-	 * pixel tracking script handle defined in {@see Config::ASSET_HANDLE_PREFIX}.
+	 * Conditionally populates tracking data with relevant event payloads
+	 * such as `VIEW_CONTENT`, `START_CHECKOUT`, and `PAGE_VIEW`, then
+	 * localizes it to the frontend as a global JS variable.
 	 *
 	 * @since 0.1.0
-	 *
-	 * @return void
 	 */
 	public function populate_tracking_data(): void {
 		$tracking_data = array(
-			'pixel_data' => $this->get_pixel_data()
+			'pixel_data' => $this->get_pixel_data(),
 		);
 
 		if ( ! Consent::has_marketing_consent() ) {
@@ -188,16 +176,14 @@ final class PixelTrackingService implements ServiceStatusInterface {
 	}
 
 	/**
-	 * Adds product-specific tracking metadata to the internal product list.
+	 * Collects product pricing data for use in pixel tracking.
 	 *
-	 * This method is called during both loop rendering and single product display,
-	 * collecting price information for each product encountered. The data is later
-	 * localized for use by frontend tracking scripts via {@see get_pixel_data()}.
+	 * Used during loop and single-product rendering to build a list of products
+	 * and their display prices for later localization.
 	 *
 	 * @since 0.1.0
 	 *
-	 * @param WC_Product $product WooCommerce product instance whose data should be collected.
-	 * @return void
+	 * @param WC_Product $product Product instance being rendered.
 	 */
 	protected function add_product_data( WC_Product $product ): void {
 		$product_id = $product->get_id();
@@ -208,15 +194,14 @@ final class PixelTrackingService implements ServiceStatusInterface {
 	}
 
 	/**
-	 * Filters the localized tracking data to include the `VIEW_CONTENT` event payload.
+	 * Adds `VIEW_CONTENT` tracking event to the data structure.
 	 *
-	 * This hook is applied during page rendering when the user is on a single product page
-	 * and has granted marketing consent. It populates the localized JavaScript variable
-	 * with data required for frontend pixel and CAPI `VIEW_CONTENT` tracking.
+	 * Called when rendering a single product page, appending the price,
+	 * currency, and item ID for frontend tracking. Modifies $tracking_data in-place.
 	 *
 	 * @since 0.1.0
 	 *
-	 * @param array $tracking_data Localized data to be passed to the frontend tracking script.
+	 * @param array $tracking_data Reference to tracking data array being localized.
 	 */
 	public function filter_view_content_event_data( &$tracking_data ): void {
 		$product_id = get_the_ID();
@@ -235,20 +220,24 @@ final class PixelTrackingService implements ServiceStatusInterface {
 	}
 
 	/**
-	 * Filters the localized tracking data to include the `START_CHECKOUT` event payload.
+	 * Adds `START_CHECKOUT` tracking event to the data structure.
 	 *
-	 * This hook is applied when the user lands on the Checkout page (excluding the
-	 * Order Received page) and has granted marketing consent. It collects cart metadata
-	 * such as total value, item count, currency, and product IDs, and appends this information
-	 * to the localized frontend tracking object.
+	 * Called when the customer lands on the checkout page. Adds
+	 * cart totals, currency, item count, and product IDs to $tracking_data.
 	 *
 	 * @since 0.1.0
 	 *
-	 * @param array $tracking_data Localized data to be passed to the frontend tracking script.
+	 * @param array $tracking_data Reference to tracking data array being localized.
 	 */
 	public function filter_start_checkout_event_data( &$tracking_data ): void {
 		if ( isset( WC()->cart ) && WC()->cart->get_cart_contents_count() > 0 ) {
-			$product_ids                     = array_values( array_map( fn( $item ) => $item['product_id'], WC()->cart->get_cart() ) );
+			$product_ids                     = array_values(
+				array_map(
+					fn( $item ) => $item['product_id'],
+					WC()->cart->get_cart()
+				)
+			);
+
 			$tracking_data['START_CHECKOUT'] = array(
 				'currency'     => get_woocommerce_currency(),
 				'price'        => wc_format_decimal( WC()->cart->total ),
@@ -259,19 +248,13 @@ final class PixelTrackingService implements ServiceStatusInterface {
 	}
 
 	/**
-	 * Filters the localized tracking data to include the `PAGE_VIEW` event payload.
+	 * Adds `PAGE_VIEW` tracking flag to the data structure.
 	 *
-	 * This hook is applied when the user visits a general site page — including the homepage,
-	 * category archives, or content pages — and has granted marketing consent. It excludes
-	 * pages already covered by more specific events such as `VIEW_CONTENT` (product pages)
-	 * and `START_CHECKOUT` (checkout page), to avoid redundant tracking.
-	 *
-	 * When eligible, the method appends a simple `PAGE_VIEW` flag to the localized tracking
-	 * data, which is later used by frontend scripts to dispatch pixel and CAPI page view events.
+	 * Only applies on general site pages (excluding product and checkout pages).
 	 *
 	 * @since 0.1.0
 	 *
-	 * @param array $tracking_data Localized data to be passed to the frontend tracking script.
+	 * @param array $tracking_data Reference to tracking data array being localized.
 	 */
 	public function filter_page_view_event_data( &$tracking_data ): void {
 		$tracking_data['PAGE_VIEW'] = true;
