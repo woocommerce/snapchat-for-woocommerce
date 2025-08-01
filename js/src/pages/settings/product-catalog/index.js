@@ -112,10 +112,29 @@ const ProductCatalog = () => {
 			);
 		}
 
-		return sprintf(
-			// translators: %s: The date and time when the product catalog was last exported.
-			__( 'Last exported on %s.', 'snapchat-for-woo' ),
-			lastExported
+		const noFileUrl = ! fileUrl
+			? __(
+					'The CSV file may have been deleted and could not be found. Click "Generate CSV" to regenerate a new one.',
+					'snapchat-for-woo'
+			  )
+			: '';
+
+		return (
+			<>
+				{ sprintf(
+					// translators: %s: The date and time when the product catalog was last exported.
+					__( 'Last exported on %s.', 'snapchat-for-woo' ),
+					lastExported
+				) }
+				{ noFileUrl && (
+					<div
+						className="sfw-product-catalog__help"
+						style={ { paddingLeft: 0 } }
+					>
+						<p>{ noFileUrl }</p>
+					</div>
+				) }
+			</>
 		);
 	};
 

@@ -84,7 +84,7 @@ export const getSnapchatAccountDetails = ( state ) => {
  * Retrieves the settings state.
  *
  * @param {Object} state - The Redux state.
- * @return {{ trackConversions: boolean, triggerExport: boolean }} The settings object.
+ * @return {{ trackConversions: boolean, triggerExport: boolean, lastExportTimeStamp: string, exportFileUrl: string }} The settings object.
  */
 export const getSettings = ( state ) => {
 	return state.settings;
