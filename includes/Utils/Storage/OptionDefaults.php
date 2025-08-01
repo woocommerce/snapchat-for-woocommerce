@@ -192,7 +192,7 @@ final class OptionDefaults {
 			self::EXPORT_FILE_PATH        => '',
 			self::EXPORT_FILE_URL         => '',
 			self::EXPORT_PRODUCT_IDS      => array(),
-			self::LAST_EXPORT_TIMESTAMP   => '',
+			self::LAST_EXPORT_TIMESTAMP   => 0,
 		);
 	}
 }

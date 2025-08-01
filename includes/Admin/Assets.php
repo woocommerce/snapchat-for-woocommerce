@@ -78,7 +78,7 @@ class Assets {
 				'exportNonce'        => wp_create_nonce( 'export-nonce' ),
 				'isExportInProgress' => ServiceContainer::get( ServiceKey::PRODUCT_EXPORT_SERVICE )->job->is_job_in_progress( ProductExportService::ACTION_HOOK ),
 				'exportFileUrl'      => Options::get( OptionDefaults::EXPORT_FILE_URL ),
-				'lastTimestamp'      => Options::get( OptionDefaults::LAST_EXPORT_TIMESTAMP ),
+				'lastTimestamp'      => Helper::get_formatted_timestamp( Options::get( OptionDefaults::LAST_EXPORT_TIMESTAMP ) ),
 				'slug'               => 'sfw',
 			)
 		);

@@ -354,7 +354,18 @@ class SnapchatBusinessExtensionController extends RESTBaseController {
 				Options::delete( OptionDefaults::PIXEL_ID );
 				Options::delete( OptionDefaults::IS_JETPACK_CONNECTED );
 				Options::delete( OptionDefaults::ONBOARDING_STATUS );
+				Options::delete( OptionDefaults::LAST_EXPORT_TIMESTAMP );
+				Options::delete( OptionDefaults::EXPORT_FILE_PATH );
+				Options::delete( OptionDefaults::EXPORT_FILE_URL );
+				Options::delete( OptionDefaults::EXPORT_PRODUCT_IDS );
 				Transients::delete( TransientDefaults::PIXEL_SCRIPT );
+
+				/**
+				 * Triggers when Snapchat is disconnected.
+				 *
+				 * @since 0.1.0
+				 */
+				do_action( Helper::with_prefix( 'snapchat_disconnected' ) );
 
 				return rest_ensure_response(
 					array(

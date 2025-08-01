@@ -14,7 +14,7 @@ import {
 	fetchSnapchatAccount,
 	receiveJetpackAccount,
 	receiveSnapchatAccountDetails,
-	receiveTrackConversionsStatus,
+	receiveSettings,
 } from './actions';
 
 /**
@@ -79,11 +79,11 @@ export function getSnapchatAccountDetails() {
 }
 
 /**
- * Fetches the status of conversions tracking from the API.
+ * Fetches the settings data from the API.
  *
  * @return {Function} An async thunk function that takes a Redux-like dispatch object.
  */
-export function getTrackConversions() {
+export function getSettings() {
 	return async function ( { dispatch } ) {
 		try {
 			const response = await apiFetch( {
@@ -91,15 +91,18 @@ export function getTrackConversions() {
 			} );
 
 			dispatch(
-				receiveTrackConversionsStatus(
-					Boolean( response.capi_enabled )
-				)
+				receiveSettings( {
+					trackConversions: Boolean( response.capi_enabled ),
+					triggerExport: Boolean( response.trigger_export ),
+					lastExportTimeStamp: response.last_export_timestamp,
+					exportFileUrl: response.export_file_url,
+				} )
 			);
 		} catch ( error ) {
 			handleApiError(
 				error,
 				__(
-					'There was an error getting the conversions tracking status.',
+					'There was an error fetching settings.',
 					'snapchat-for-woo'
 				)
 			);

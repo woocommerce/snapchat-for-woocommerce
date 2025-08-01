@@ -3,7 +3,6 @@
  */
 import { __, sprintf } from '@wordpress/i18n';
 import { Flex } from '@wordpress/components';
-import { getQuery } from '@woocommerce/navigation';
 import {
 	createInterpolateElement,
 	useState,
@@ -18,6 +17,7 @@ import { sfwData } from '~/constants';
 import AppButton from '~/components/app-button';
 import AppDocumentationLink from '~/components/app-documentation-link';
 import AccountCard from '~/components/account-card';
+import useSettings from '~/hooks/useSettings';
 import useExportPoller from './useExportPoller';
 import useProductCatalogExport from './useProductCatalogExport';
 import './index.scss';
@@ -36,7 +36,12 @@ import './index.scss';
  * @return {JSX.Element} The rendered ProductCatalog settings UI.
  */
 const ProductCatalog = () => {
-	const { onboarding } = getQuery();
+	const {
+		shouldTriggerExport,
+		lastExportTimeStamp,
+		exportFileUrl,
+		hasFinishedResolution,
+	} = useSettings();
 	// Whether we want to connect the heartbeat immediately as soon as the Heartbeat component mounts.
 	const [ exportInProgress, setExportInProgress ] = useState(
 		sfwData.isExportInProgress === '1'
@@ -164,10 +169,20 @@ const ProductCatalog = () => {
 		 * Trigger catalog CSV generation as soon as the
 		 * merchant has successfully onboarded.
 		 */
-		if ( onboarding === 'success' ) {
+		if ( shouldTriggerExport && hasFinishedResolution ) {
 			generateCsv();
 		}
-	}, [ onboarding ] );
+	}, [ shouldTriggerExport, hasFinishedResolution ] );
+
+	useEffect( () => {
+		if ( lastExportTimeStamp ) {
+			setLastExported( lastExportTimeStamp );
+		}
+
+		if ( exportFileUrl ) {
+			setFileUrl( exportFileUrl );
+		}
+	}, [ lastExportTimeStamp, exportFileUrl ] );
 
 	return (
 		<>

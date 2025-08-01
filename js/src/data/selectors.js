@@ -81,11 +81,11 @@ export const getSnapchatAccountDetails = ( state ) => {
 };
 
 /**
- * Retrieves the status of conversions tracking.
+ * Retrieves the settings state.
  *
- * @param {Object} state - The Redux state object.
- * @return {boolean} The status of conversions tracking, true if enabled, false otherwise or null if not set.
+ * @param {Object} state - The Redux state.
+ * @return {{ trackConversions: boolean, triggerExport: boolean }} The settings object.
  */
-export const getTrackConversions = ( state ) => {
-	return state.trackConversions;
+export const getSettings = ( state ) => {
+	return state.settings;
 };

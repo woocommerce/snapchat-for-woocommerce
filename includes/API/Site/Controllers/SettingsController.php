@@ -11,6 +11,7 @@ use WP_REST_Response;
 use SnapchatForWooCommerce\Config;
 use SnapchatForWooCommerce\Utils\Storage\Options;
 use SnapchatForWooCommerce\Utils\Storage\OptionDefaults;
+use SnapchatForWooCommerce\Utils\Helper;
 
 /**
  * Controller for the `/settings` endpoint.
@@ -59,10 +60,10 @@ class SettingsController extends RESTBaseController {
 	 * @return WP_REST_Response
 	 */
 	public function get_settings() {
+		$timestamp = Options::get( OptionDefaults::LAST_EXPORT_TIMESTAMP );
+
 		return rest_ensure_response(
-			array(
-				'capi_enabled' => 'yes' === Options::get( OptionDefaults::CONVERSIONS_ENABLED ),
-			)
+			$this->get_settings_response()
 		);
 	}
 
@@ -87,8 +88,28 @@ class SettingsController extends RESTBaseController {
 		}
 
 		return rest_ensure_response(
+			$this->get_settings_response()
+		);
+	}
+
+	/**
+	 * Returns the settings response structure.
+	 *
+	 * This method encapsulates the logic to build the response for the settings endpoint.
+	 *
+	 * @since 0.1.0
+	 *
+	 * @return WP_REST_Response
+	 */
+	private function get_settings_response() {
+		$timestamp = Options::get( OptionDefaults::LAST_EXPORT_TIMESTAMP );
+
+		return rest_ensure_response(
 			array(
-				'capi_enabled' => 'yes' === Options::get( OptionDefaults::CONVERSIONS_ENABLED ),
+				'capi_enabled'          => 'yes' === Options::get( OptionDefaults::CONVERSIONS_ENABLED ),
+				'trigger_export'        => (int) $timestamp < ( time() - DAY_IN_SECONDS ),
+				'last_export_timestamp' => Helper::get_formatted_timestamp( $timestamp ),
+				'export_file_url'       => Options::get( OptionDefaults::EXPORT_FILE_URL ),
 			)
 		);
 	}

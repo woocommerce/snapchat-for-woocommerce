@@ -83,6 +83,11 @@ class ProductExportService {
 		);
 
 		add_action(
+			Helper::with_prefix( 'snapchat_disconnected' ),
+			array( $this, 'maybe_unschedule_export_jobs' )
+		);
+
+		add_action(
 			Helper::with_prefix( 'recurring_catalog_export' ),
 			array( $this, 'start_export' )
 		);
@@ -155,6 +160,25 @@ class ProductExportService {
 	}
 
 	/**
+	 * Unschedules all export-related Action Scheduler jobs.
+	 *
+	 * This method clears any scheduled export actions, including:
+	 * - The main export job.
+	 * - Recurring export jobs.
+	 *
+	 * It is typically called when the Snapchat connection is removed or during plugin deactivation.
+	 *
+	 * @since 0.1.0
+	 *
+	 * @return void
+	 */
+	public function maybe_unschedule_export_jobs(): void {
+		as_unschedule_all_actions( Helper::with_prefix( self::ACTION_HOOK ) );
+		as_unschedule_all_actions( Helper::with_prefix( get_class( $this->job->cache_builder )::ACTION_HOOK ) );
+		as_unschedule_all_actions( Helper::with_prefix( 'recurring_catalog_export' ) );
+	}
+
+	/**
 	 * Validates that the export writer can create and delete a file.
 	 *
 	 * This method ensures the filesystem is writable before any export jobs begin.
@@ -202,9 +226,9 @@ class ProductExportService {
 	 *
 	 * @since 0.1.0
 	 *
-	 * @return bool
+	 * @return bool|null
 	 */
-	public function start_export(): bool {
+	public function start_export() {
 		try {
 			$this->validate_export_environment();
 		} catch ( \RuntimeException $e ) {
@@ -212,7 +236,7 @@ class ProductExportService {
 		}
 
 		if ( $this->job->is_job_in_progress( self::ACTION_HOOK ) ) {
-			return false;
+			return null;
 		}
 
 		Options::delete( OptionDefaults::EXPORT_FILE_PATH );
@@ -294,7 +318,9 @@ class ProductExportService {
 	public function trigger_export_callback(): void {
 		check_ajax_referer( 'export-nonce', 'security' );
 
-		if ( $this->start_export() ) {
+		$status = $this->start_export();
+
+		if ( true === $status || null === $status ) {
 			wp_send_json_success();
 		}
 
@@ -327,7 +353,7 @@ class ProductExportService {
 		$response = array(
 			'status'     => $status,
 			'fileUrl'    => Options::get( OptionDefaults::EXPORT_FILE_URL ),
-			'lastExport' => Options::get( OptionDefaults::LAST_EXPORT_TIMESTAMP ),
+			'lastExport' => Helper::get_formatted_timestamp( Options::get( OptionDefaults::LAST_EXPORT_TIMESTAMP ) ),
 		);
 
 		wp_send_json( $response );
