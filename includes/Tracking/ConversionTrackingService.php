@@ -15,7 +15,6 @@ namespace SnapchatForWooCommerce\Tracking;
 use SnapchatForWooCommerce\Utils\Storage\OptionDefaults;
 use SnapchatForWooCommerce\Utils\Storage\Options;
 use SnapchatForWooCommerce\Utils\Helper;
-use SnapchatForWooCommerce\Config;
 
 /**
  * Service class for registering WooCommerce conversion tracking hooks.
@@ -69,7 +68,6 @@ class ConversionTrackingService implements ServiceStatusInterface {
 			return;
 		}
 
-		add_filter( Helper::with_prefix( 'filter_tracking_data' ), array( $this, 'populate_tracking_data' ) );
 		add_action( 'woocommerce_thankyou', array( $this, 'handle_purchase' ) );
 		add_action( 'woocommerce_add_to_cart', array( $this, 'handle_single_product_add_to_cart' ), 10, 3 );
 		Helper::register_ajax_action( 'start_checkout', array( $this, 'handle_async_start_checkout' ) );
@@ -92,27 +90,6 @@ class ConversionTrackingService implements ServiceStatusInterface {
 	 */
 	public static function is_enabled(): bool {
 		return 'yes' === Options::get( OptionDefaults::CONVERSIONS_ENABLED );
-	}
-
-	/**
-	 * Filters and adds localized tracking data sent to the frontend.
-	 *
-	 * Adds:
-	 * - `capi_trigger_action`: The AJAX action name for triggering the async Add to Cart handler job.
-	 * - `event_id_el_name`: The name attribute for the event ID hidden input field.
-	 *
-	 * These values are used by frontend JavaScript to properly associate the event ID with the product.
-	 *
-	 * @since 0.1.0
-	 *
-	 * @param array<string, mixed> $tracking_data Existing tracking data array.
-	 * @return array<string, mixed> Modified tracking data with CAPI enhancements.
-	 */
-	public function populate_tracking_data( $tracking_data ) {
-		$tracking_data['capi_trigger_action'] = Helper::with_prefix( 'add_to_cart' );
-		$tracking_data['event_id_el_name']    = Helper::with_prefix( 'event_id' );
-
-		return $tracking_data;
 	}
 
 	/**

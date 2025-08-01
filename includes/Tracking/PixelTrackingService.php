@@ -70,21 +70,6 @@ final class PixelTrackingService implements ServiceStatusInterface {
 			return;
 		}
 
-		add_filter(
-			Helper::with_prefix( 'filter_tracking_data' ),
-			array( $this, 'filter_view_content_event_data' )
-		);
-
-		add_filter(
-			Helper::with_prefix( 'filter_tracking_data' ),
-			array( $this, 'filter_start_checkout_event_data' )
-		);
-
-		add_filter(
-			Helper::with_prefix( 'filter_tracking_data' ),
-			array( $this, 'filter_page_view_event_data' )
-		);
-
 		add_action(
 			'wp_head',
 			array( $this->tracker, 'maybe_inject_pixel' )
@@ -172,12 +157,32 @@ final class PixelTrackingService implements ServiceStatusInterface {
 	 *
 	 * @return void
 	 */
-	public function populate_tracking_data() {
+	public function populate_tracking_data(): void {
+		$tracking_data = array(
+			'pixel_data' => $this->get_pixel_data()
+		);
+
+		if ( ! Consent::has_marketing_consent() ) {
+			return;
+		}
+
+		if ( is_product() ) {
+			$this->filter_view_content_event_data( $tracking_data );
+		}
+
+		if ( is_checkout() && ! is_order_received_page() ) {
+			$this->filter_start_checkout_event_data( $tracking_data );
+		}
+
+		if ( ! ( is_checkout() || is_product() ) ) {
+			$this->filter_page_view_event_data( $tracking_data );
+		}
+
 		wp_add_inline_script(
 			Config::ASSET_HANDLE_PREFIX . 'tracking',
 			'
 			window.snapchatAdsTrackingData = window.snapchatAdsTrackingData || {};
-			window.snapchatAdsTrackingData = Object.assign( window.snapchatAdsTrackingData, ' . wp_json_encode( array( 'pixel_data' => $this->get_pixel_data() ) ) . ' );
+			window.snapchatAdsTrackingData = Object.assign( window.snapchatAdsTrackingData, ' . wp_json_encode( $tracking_data ) . ' );
 			'
 		);
 	}
@@ -212,31 +217,21 @@ final class PixelTrackingService implements ServiceStatusInterface {
 	 * @since 0.1.0
 	 *
 	 * @param array $tracking_data Localized data to be passed to the frontend tracking script.
-	 * @return array Filtered tracking data with `VIEW_CONTENT` event properties.
 	 */
-	public function filter_view_content_event_data( $tracking_data ): array {
-		if ( ! Consent::has_marketing_consent() ) {
-			return $tracking_data;
-		}
-
-		if ( ! is_product() ) {
-			return $tracking_data;
-		}
-
+	public function filter_view_content_event_data( &$tracking_data ): void {
 		$product_id = get_the_ID();
 		$product    = wc_get_product( $product_id );
 
 		if ( ! $product instanceof WC_Product ) {
-			return $tracking_data;
+			return;
 		}
 
-		$tracking_data['VIEW_CONTENT'] = array(
+		$tracking_data['event_id_el_name'] = Helper::with_prefix( 'event_id' );
+		$tracking_data['VIEW_CONTENT']     = array(
 			'price'    => wc_get_price_to_display( $product ),
 			'currency' => get_woocommerce_currency(),
 			'item_ids' => array( $product_id ),
 		);
-
-		return $tracking_data;
 	}
 
 	/**
@@ -250,17 +245,8 @@ final class PixelTrackingService implements ServiceStatusInterface {
 	 * @since 0.1.0
 	 *
 	 * @param array $tracking_data Localized data to be passed to the frontend tracking script.
-	 * @return array Filtered tracking data with `START_CHECKOUT` event properties.
 	 */
-	public function filter_start_checkout_event_data( $tracking_data ): array {
-		if ( ! Consent::has_marketing_consent() ) {
-			return $tracking_data;
-		}
-
-		if ( ! ( is_checkout() && ! is_order_received_page() ) ) {
-			return $tracking_data;
-		}
-
+	public function filter_start_checkout_event_data( &$tracking_data ): void {
 		if ( isset( WC()->cart ) && WC()->cart->get_cart_contents_count() > 0 ) {
 			$product_ids                     = array_values( array_map( fn( $item ) => $item['product_id'], WC()->cart->get_cart() ) );
 			$tracking_data['START_CHECKOUT'] = array(
@@ -270,8 +256,6 @@ final class PixelTrackingService implements ServiceStatusInterface {
 				'number_items' => (string) WC()->cart->get_cart_contents_count(),
 			);
 		}
-
-		return $tracking_data;
 	}
 
 	/**
@@ -288,17 +272,8 @@ final class PixelTrackingService implements ServiceStatusInterface {
 	 * @since 0.1.0
 	 *
 	 * @param array $tracking_data Localized data to be passed to the frontend tracking script.
-	 * @return array Filtered tracking data with `PAGE_VIEW` event properties.
 	 */
-	public function filter_page_view_event_data( $tracking_data ): array {
-		$is_valid_page = ! ( is_checkout() || is_product() );
-
-		if ( ! Consent::has_marketing_consent() || ! $is_valid_page ) {
-			return $tracking_data;
-		}
-
+	public function filter_page_view_event_data( &$tracking_data ): void {
 		$tracking_data['PAGE_VIEW'] = true;
-
-		return $tracking_data;
 	}
 }
