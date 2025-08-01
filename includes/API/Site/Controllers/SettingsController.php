@@ -108,7 +108,7 @@ class SettingsController extends RESTBaseController {
 		return rest_ensure_response(
 			array(
 				'capi_enabled'          => 'yes' === Options::get( OptionDefaults::CONVERSIONS_ENABLED ),
-				'trigger_export'        => (int) $timestamp < ( time() - DAY_IN_SECONDS ),
+				'trigger_export'        => ! file_exists( $csv_path ) && Helper::has_products() && (int) $timestamp <= ( time() - DAY_IN_SECONDS ),
 				'last_export_timestamp' => Helper::get_formatted_timestamp( $timestamp ),
 				'export_file_url'       => file_exists( $csv_path ) ? Options::get( OptionDefaults::EXPORT_FILE_URL ) : '',
 			)

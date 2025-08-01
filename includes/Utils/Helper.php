@@ -100,4 +100,24 @@ class Helper {
 			(int) $timestamp
 		);
 	}
+
+	/**
+	 * Checks if the site has products.
+	 *
+	 * This method checks if there are any published products in the WooCommerce store.
+	 *
+	 * @since 0.1.0
+	 *
+	 * @return bool True if there are published products, false otherwise.
+	 */
+	public static function has_products(): bool {
+		$product = wc_get_products(
+			array(
+				'limit'  => 1,
+				'status' => 'publish',
+			)
+		);
+
+		return count( $product ) > 0;
+	}
 }

@@ -320,6 +320,10 @@ class ProductExportService {
 	public function trigger_export_callback(): void {
 		check_ajax_referer( 'export-nonce', 'security' );
 
+		if ( ! Helper::has_products() ) {
+			wp_send_json_error( array( 'code' => Helper::with_prefix( 'no_products_found' ) ) );
+		}
+
 		$status = $this->start_export();
 
 		if ( true === $status || null === $status ) {
