@@ -172,7 +172,7 @@ const ProductCatalog = () => {
 		if ( shouldTriggerExport && hasFinishedResolution ) {
 			generateCsv();
 		}
-	}, [ shouldTriggerExport, hasFinishedResolution ] );
+	}, [ shouldTriggerExport, hasFinishedResolution, generateCsv ] );
 
 	useEffect( () => {
 		if ( lastExportTimeStamp ) {

@@ -90,14 +90,14 @@ class Helper {
 	 * @param int $timestamp Unix timestamp to format.
 	 * @return string Formatted date and time string, or empty if no timestamp is provided.
 	 */
-	public static function get_formatted_timestamp( int $timestamp ): string {
+	public static function get_formatted_timestamp( $timestamp = 0 ): string {
 		if ( ! $timestamp ) {
 			return '';
 		}
 
 		return date_i18n(
 			get_option( 'date_format' ) . ' \a\t ' . get_option( 'time_format' ),
-			$timestamp
+			(int) $timestamp
 		);
 	}
 }

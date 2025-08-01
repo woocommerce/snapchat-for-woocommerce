@@ -66,6 +66,8 @@ class Assets {
 			return;
 		}
 
+		$csv_path = Options::get( OptionDefaults::EXPORT_FILE_PATH );
+
 		AssetLoader::enqueue_script( 'index', 'index' );
 		AssetLoader::enqueue_style( 'index', 'index' );
 		AssetLoader::localize_script(
@@ -77,7 +79,7 @@ class Assets {
 				'step'               => Options::get( OptionDefaults::ONBOARDING_STEP ),
 				'exportNonce'        => wp_create_nonce( 'export-nonce' ),
 				'isExportInProgress' => ServiceContainer::get( ServiceKey::PRODUCT_EXPORT_SERVICE )->job->is_job_in_progress( ProductExportService::ACTION_HOOK ),
-				'exportFileUrl'      => Options::get( OptionDefaults::EXPORT_FILE_URL ),
+				'exportFileUrl'      => file_exists( $csv_path ) ? Options::get( OptionDefaults::EXPORT_FILE_URL ) : '',
 				'lastTimestamp'      => Helper::get_formatted_timestamp( Options::get( OptionDefaults::LAST_EXPORT_TIMESTAMP ) ),
 				'slug'               => 'sfw',
 			)

@@ -103,13 +103,14 @@ class SettingsController extends RESTBaseController {
 	 */
 	private function get_settings_response() {
 		$timestamp = Options::get( OptionDefaults::LAST_EXPORT_TIMESTAMP );
+		$csv_path  = Options::get( OptionDefaults::EXPORT_FILE_PATH );
 
 		return rest_ensure_response(
 			array(
 				'capi_enabled'          => 'yes' === Options::get( OptionDefaults::CONVERSIONS_ENABLED ),
 				'trigger_export'        => (int) $timestamp < ( time() - DAY_IN_SECONDS ),
 				'last_export_timestamp' => Helper::get_formatted_timestamp( $timestamp ),
-				'export_file_url'       => Options::get( OptionDefaults::EXPORT_FILE_URL ),
+				'export_file_url'       => file_exists( $csv_path ) ? Options::get( OptionDefaults::EXPORT_FILE_URL ) : '',
 			)
 		);
 	}

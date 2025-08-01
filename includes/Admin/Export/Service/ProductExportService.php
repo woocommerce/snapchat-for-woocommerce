@@ -14,6 +14,7 @@
 
 namespace SnapchatForWooCommerce\Admin\Export\Service;
 
+use Google\Protobuf\Option;
 use SnapchatForWooCommerce\Config;
 use SnapchatForWooCommerce\Utils\Helper;
 use SnapchatForWooCommerce\Admin\Export\BatchExportJob;
@@ -241,6 +242,7 @@ class ProductExportService {
 
 		Options::delete( OptionDefaults::EXPORT_FILE_PATH );
 		Options::delete( OptionDefaults::EXPORT_FILE_URL );
+		Options::delete( OptionDefaults::EXPORT_PRODUCT_IDS );
 
 		if ( method_exists( $this->job->cache_builder, 'build_and_cache' ) ) {
 			$this->job->cache_builder->build_and_cache();
@@ -352,7 +354,7 @@ class ProductExportService {
 
 		$response = array(
 			'status'     => $status,
-			'fileUrl'    => Options::get( OptionDefaults::EXPORT_FILE_URL ),
+			'fileUrl'    => $file_url,
 			'lastExport' => Helper::get_formatted_timestamp( Options::get( OptionDefaults::LAST_EXPORT_TIMESTAMP ) ),
 		);
 
