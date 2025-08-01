@@ -230,7 +230,8 @@ final class PixelTrackingService implements ServiceStatusInterface {
 			return $tracking_data;
 		}
 
-		$tracking_data['VIEW_CONTENT'] = array(
+		$tracking_data['event_id_el_name'] = Helper::with_prefix( 'event_id' );
+		$tracking_data['VIEW_CONTENT']     = array(
 			'price'    => wc_get_price_to_display( $product ),
 			'currency' => get_woocommerce_currency(),
 			'item_ids' => array( $product_id ),
