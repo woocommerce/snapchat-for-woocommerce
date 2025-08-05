@@ -17,7 +17,7 @@
 
 namespace SnapchatForWooCommerce\API\AdPartner;
 
-use SnapchatForWooCommerce\Api\AdPartner\BaseAdPartnerApi;
+use SnapchatForWooCommerce\API\AdPartner\BaseAdPartnerApi;
 use SnapchatForWooCommerce\Utils\Storage\Options;
 use SnapchatForWooCommerce\Utils\Storage\OptionDefaults;
 use SnapchatForWooCommerce\Utils\Helper;
