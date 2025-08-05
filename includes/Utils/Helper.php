@@ -120,4 +120,26 @@ class Helper {
 
 		return count( $product ) > 0;
 	}
+
+	/**
+	 * Generates a unique store name based on the site's home URL and the current timestamp.
+	 *
+	 * This function removes the protocol (http:// or https://) from the home URL
+	 * and appends the current Unix timestamp to ensure uniqueness.
+	 *
+	 * @param string $suffix Suffix to be appended to the store name.
+	 *
+	 * @return string A string composed of the cleaned home URL and the current timestamp.
+	 */
+	public static function get_store_name( string $suffix = '' ): string {
+		$home_url   = get_home_url();
+		$clean_url  = preg_replace( '#^https?://#', '', $home_url );
+		$store_name = $clean_url . '_woocommerce_' . time();
+
+		if ( $suffix ) {
+			$store_name .= '_' . $suffix;
+		}
+
+		return $store_name;
+	}
 }

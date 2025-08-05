@@ -20,7 +20,9 @@ use SnapchatForWooCommerce\Admin;
 use SnapchatForWooCommerce\Admin\Export;
 use SnapchatForWooCommerce\Admin\ProductMeta;
 use SnapchatForWooCommerce\Tracking\ConversionEventLogger;
-use WC_Logger;
+use SnapchatForWooCommerce\API\AdPartner\AdPartnerApi;
+use function wc_get_logger;
+
 
 /**
  * Static service container for resolving shared instances across the Ad Partner plugin.
@@ -103,6 +105,9 @@ final class ServiceContainer {
 						new Export\EntityProvider\ProductEntityProvider(),
 						new Export\RowBuilder\ProductRowBuilder(),
 						new Export\Writer\CsvExportWriter(),
+						AdPartnerApi::get_instance(
+							self::get( ServiceKey::WCS_CLIENT )
+						),
 					)
 				);
 			case ServiceKey::ADMIN_SETUP:

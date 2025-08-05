@@ -128,6 +128,20 @@ final class OptionDefaults {
 	public const CONVERSION_ACCESS_TOKEN = 'conversion_access_token';
 
 	/**
+	 * Option key for the Ad Partner's Catalog ID.
+	 *
+	 * @since 0.1.0
+	 */
+	public const CATALOG_ID = 'catalog_id';
+
+	/**
+	 * Option key for the Ad Partner's Product Feed ID.
+	 *
+	 * @since 0.1.0
+	 */
+	public const PRODUCT_FEED_ID = 'product_feed_id';
+
+	/**
 	 * Option key to store the full file system path of the most recent export file.
 	 *
 	 * This value is written during the first export batch and reused across
@@ -189,6 +203,8 @@ final class OptionDefaults {
 			self::PIXEL_ID                => '',
 			self::CONVERSIONS_ENABLED     => 'no',
 			self::CONVERSION_ACCESS_TOKEN => '',
+			self::CATALOG_ID              => '',
+			self::PRODUCT_FEED_ID         => '',
 			self::EXPORT_FILE_PATH        => '',
 			self::EXPORT_FILE_URL         => '',
 			self::EXPORT_PRODUCT_IDS      => array(),

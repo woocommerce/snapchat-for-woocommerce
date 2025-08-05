@@ -24,6 +24,7 @@ use SnapchatForWooCommerce\Utils\Storage\OptionDefaults;
 use SnapchatForWooCommerce\Utils\Storage\Transients;
 use SnapchatForWooCommerce\Utils\Storage\TransientDefaults;
 use SnapchatForWooCommerce\Utils\Helper;
+use SnapchatForWooCommerce\API\AdPartner\AdPartnerApi;
 
 /**
  * Controller for setting up and managing the Snapchat account connection.
@@ -40,12 +41,21 @@ class SnapchatBusinessExtensionController extends RESTBaseController {
 	protected WcsClient $wcs;
 
 	/**
+	 * Instance of the Ad Partner API.
+	 *
+	 * @var AdPartnerApi
+	 */
+	protected AdPartnerApi $ad_partner_api;
+
+	/**
 	 * Constructor.
 	 *
-	 * @param WcsClient $wcs WCS proxy request client.
+	 * @param WcsClient    $wcs            WCS proxy request client.
+	 * @param AdPartnerApi $ad_partner_api Ad Partner API.
 	 */
-	public function __construct( WcsClient $wcs ) {
-		$this->wcs = $wcs;
+	public function __construct( WcsClient $wcs, AdPartnerApi $ad_partner_api ) {
+		$this->wcs            = $wcs;
+		$this->ad_partner_api = $ad_partner_api;
 	}
 
 	/**
@@ -197,6 +207,27 @@ class SnapchatBusinessExtensionController extends RESTBaseController {
 
 		Options::set( OptionDefaults::ONBOARDING_STATUS, 'connected' );
 
+		$response = $this->ad_partner_api->catalog->create();
+
+		if ( is_wp_error( $response ) ) {
+			return new WP_REST_Response(
+				array(
+					'status'  => 'error',
+					'message' => $response->get_error_message(),
+				),
+				500
+			);
+		}
+
+		$data         = $response->get_data();
+		$catalog_data = $data['catalogs'];
+
+		if ( ! empty( $catalog_data ) && ! empty( $catalog_data[0] ) ) {
+			$catalog = $catalog_data[0]['catalog'];
+
+			Options::set( OptionDefaults::CATALOG_ID, $catalog['id'] );
+		}
+
 		/**
 		 * Triggers when the Snapchat onboarding process is completed.
 		 *
@@ -211,6 +242,7 @@ class SnapchatBusinessExtensionController extends RESTBaseController {
 				'ad_acc_id'   => Options::get( OptionDefaults::AD_ACCOUNT_ID ),
 				'ad_acc_name' => Options::get( OptionDefaults::AD_ACCOUNT_NAME ),
 				'pixel_id'    => Options::get( OptionDefaults::PIXEL_ID ),
+				'catalog_id'  => Options::get( OptionDefaults::CATALOG_ID ),
 			)
 		);
 	}
@@ -415,6 +447,10 @@ class SnapchatBusinessExtensionController extends RESTBaseController {
 				),
 				'pixel_id'    => array(
 					'description' => 'Selected Pixel id.',
+					'type'        => 'string',
+				),
+				'catalog_id'  => array(
+					'description' => 'Created Catalog id.',
 					'type'        => 'string',
 				),
 			),
