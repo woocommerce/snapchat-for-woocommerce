@@ -130,14 +130,6 @@ const ProductCatalog = () => {
 					>
 						{ __( 'Regenerate CSV', 'snapchat-for-woo' ) }
 					</AppButton>
-					<AppButton
-						variant="primary"
-						href={ fileUrl }
-						disabled={ ! fileUrl }
-						download
-					>
-						{ __( 'Download CSV', 'snapchat-for-woo' ) }
-					</AppButton>
 				</Flex>
 			);
 		}
