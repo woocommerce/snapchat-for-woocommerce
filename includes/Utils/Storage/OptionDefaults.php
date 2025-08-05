@@ -179,6 +179,14 @@ final class OptionDefaults {
 	public const LAST_EXPORT_TIMESTAMP = 'last_export_timestamp';
 
 	/**
+	 * Option key to store the WCS token to create file name for
+	 * generating catalog CSV filename.
+	 *
+	 * @since 0.1.0
+	 */
+	public const WCS_PRODUCTS_TOKEN = 'wcs_products_token';
+
+	/**
 	 * Returns default values for all known Ad Partner options.
 	 *
 	 * Used by {@see Options} to provide fallbacks when option values
@@ -209,6 +217,7 @@ final class OptionDefaults {
 			self::EXPORT_FILE_URL         => '',
 			self::EXPORT_PRODUCT_IDS      => array(),
 			self::LAST_EXPORT_TIMESTAMP   => 0,
+			self::WCS_PRODUCTS_TOKEN      => '',
 		);
 	}
 }

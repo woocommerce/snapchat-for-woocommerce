@@ -26,10 +26,14 @@ import useApiFetchCallback from '~/hooks/useApiFetchCallback';
 /**
  * @fires sfw_snapchat_account_connect_button_click
  */
-const ConnectSnapchatAccountCard = ( { disabled, configId } ) => {
+const ConnectSnapchatAccountCard = ( {
+	disabled,
+	configId,
+	productsToken,
+} ) => {
 	const { createNotice } = useDispatchCoreNotices();
 	const { upsertSnapchatConfig, loading: loadingUpsertSnapchatConfig } =
-		useUpsertSnapchatConfig( configId );
+		useUpsertSnapchatConfig( configId, productsToken );
 	const nextPageName = sfwData?.setupComplete
 		? 'reconnect'
 		: 'setup-snapchat';
@@ -43,7 +47,7 @@ const ConnectSnapchatAccountCard = ( { disabled, configId } ) => {
 		if ( configId ) {
 			upsertSnapchatConfig( configId );
 		}
-	}, [ configId, upsertSnapchatConfig ] );
+	}, [ configId, productsToken, upsertSnapchatConfig ] );
 
 	const handleConnectClick = async () => {
 		try {

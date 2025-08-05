@@ -21,6 +21,7 @@ use SnapchatForWooCommerce\Api\AdPartner\BaseAdPartnerApi;
 use SnapchatForWooCommerce\Utils\Storage\Options;
 use SnapchatForWooCommerce\Utils\Storage\OptionDefaults;
 use SnapchatForWooCommerce\Utils\Helper;
+use SnapchatForWooCommerce\Admin\Export\Writer\CsvExportWriter;
 use WP_Error;
 
 /**
@@ -71,7 +72,12 @@ class FeedApi extends BaseAdPartnerApi {
 					'schedule'         => array(
 						'interval_type' => 'DAILY',
 						'timezone'      => get_option( 'timezone_string' ),
-						'url'           => Options::get( OptionDefaults::EXPORT_FILE_URL ),
+						'url'           => sprintf(
+							'%1$s/%2$s/products-%3$s.csv',
+							$this->wcs->get_wcs_url(),
+							CsvExportWriter::EXPORT_FOLDER,
+							Options::get( OptionDefaults::WCS_PRODUCTS_TOKEN )
+						),
 					),
 				),
 			),

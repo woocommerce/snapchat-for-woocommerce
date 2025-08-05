@@ -98,8 +98,13 @@ class SnapchatBusinessExtensionController extends RESTBaseController {
 					'callback'            => array( $this, 'set_config' ),
 					'permission_callback' => array( $this, 'permissions_check' ),
 					'args'                => array(
-						'id' => array(
+						'id'             => array(
 							'description' => 'The config_id returned by Snapchat.',
+							'type'        => 'string',
+							'required'    => true,
+						),
+						'products_token' => array(
+							'description' => 'The products_token returned by WCS.',
 							'type'        => 'string',
 							'required'    => true,
 						),
@@ -158,13 +163,23 @@ class SnapchatBusinessExtensionController extends RESTBaseController {
 	 * @return WP_REST_Response|WP_Error
 	 */
 	public function set_config( $request ) {
-		$config_id = sanitize_text_field( $request['id'] );
+		$config_id      = sanitize_text_field( $request['id'] );
+		$products_token = sanitize_text_field( $request['products_token'] );
 
 		if ( empty( $config_id ) ) {
 			return rest_ensure_response( ( array( 'id' => '' ) ) );
 		}
 
 		Options::set( OptionDefaults::CONFIG_ID, $config_id );
+
+		if ( empty( $products_token ) ) {
+			$logger = wc_get_logger();
+			$logger->warning(
+				'products_token not set. Auto product feed creation will fail.'
+			);
+		} else {
+			Options::set( OptionDefaults::WCS_PRODUCTS_TOKEN, $products_token );
+		}
 
 		$response = $this->wcs->proxy_get( '/ads/v1/business_extension_configurations/' . $config_id );
 

@@ -100,7 +100,7 @@ final class WcsClient {
 	 *
 	 * @return string
 	 */
-	private function get_wcs_url(): string {
+	public function get_wcs_url(): string {
 		/**
 		 * Filters the base URL for the WCS (Web Conversion Service) endpoint.
 		 *
