@@ -101,7 +101,7 @@ class BatchExportJob {
 		ExportableEntityProviderInterface $provider,
 		ExportRowBuilderInterface $row_builder,
 		ExportWriterInterface $writer,
-		AdPartnerApi $ad_partner_api,
+		AdPartnerApi $ad_partner_api
 	) {
 		$this->cache_builder  = $cache_builder;
 		$this->provider       = $provider;
