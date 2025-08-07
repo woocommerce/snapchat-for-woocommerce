@@ -3,19 +3,13 @@
  */
 import { __, sprintf } from '@wordpress/i18n';
 import { Flex } from '@wordpress/components';
-import {
-	createInterpolateElement,
-	useState,
-	useEffect,
-	useCallback,
-} from '@wordpress/element';
+import { useState, useEffect, useCallback } from '@wordpress/element';
 
 /**
  * Internal dependencies
  */
 import { sfwData } from '~/constants';
 import AppButton from '~/components/app-button';
-import AppDocumentationLink from '~/components/app-documentation-link';
 import AccountCard from '~/components/account-card';
 import useSettings from '~/hooks/useSettings';
 import useExportPoller from './useExportPoller';
