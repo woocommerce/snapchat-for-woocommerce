@@ -194,33 +194,6 @@ const ProductCatalog = () => {
 						</p>
 					</div>
 				) }
-				{ hasExport && (
-					<div className="sfw-product-catalog__help">
-						<p>
-							{ __(
-								'You can download the latest CSV or regenerate it if you’ve made changes.',
-								'snapchat-for-woo'
-							) }
-						</p>
-						<p>
-							{ createInterpolateElement(
-								__(
-									'Need help? Learn how to <link>upload</link> your CSV to Snapchat.',
-									'snapchat-for-woo'
-								),
-								{
-									link: (
-										<AppDocumentationLink
-											context="settings"
-											linkId="csv-learn-more"
-											href="https://businesshelp.snapchat.com/s/article/manual-add-catalog?language=en_GB"
-										/>
-									),
-								}
-							) }
-						</p>
-					</div>
-				) }
 			</AccountCard>
 		</>
 	);
