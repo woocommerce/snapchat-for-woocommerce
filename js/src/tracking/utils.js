@@ -1,4 +1,12 @@
 /**
+ * Internal dependencies
+ */
+import { TRACKING_DATA_VAR } from './constants';
+import { SnapchatEvent } from './pixel/events';
+import { sendPixelEvent } from './pixel/utils';
+import { sendCapiEvent } from './conversions/utils';
+
+/**
  * Internal utility to register click event listeners for given selectors.
  *
  * Hooks are attached after DOMContentLoaded to ensure all target elements
@@ -106,3 +114,143 @@ export function setSnapChatClickId() {
 		document.cookie = `ScCid=${ encodeURIComponent( scClickId ) }; path=/;`;
 	}
 }
+
+/**
+ * Determines whether the current page load is a fresh navigation
+ * (e.g., from a link, address bar, or redirect) and not a reload.
+ *
+ * Uses the Performance Navigation API (Level 2 where supported) to inspect
+ * the navigation type. Falls back to legacy `performance.navigation.type`
+ * if needed.
+ *
+ * Returns `true` only for:
+ * - 'navigate' (link click, address bar entry, redirect)
+ * - 'back_forward' (history traversal – optional, still counts as non-reload)
+ *
+ * Returns `false` for:
+ * - 'reload' (user manually reloaded the page)
+ *
+ * @since 0.1.0
+ *
+ * @return {boolean} Whether the page load was a fresh visit.
+ */
+export function isFreshPageVisit() {
+	if ( typeof performance === 'undefined' ) {
+		return true;
+	}
+
+	if ( performance.getEntriesByType ) {
+		const entries = performance.getEntriesByType( 'navigation' );
+
+		if ( entries.length > 0 ) {
+			const type = entries[ 0 ].type;
+			return type === 'navigate' || type === 'back_forward';
+		}
+	}
+
+	// Fallback for older browsers (0 = TYPE_NAVIGATE)
+	return performance.navigation?.type === 0;
+}
+
+/**
+ * Fires a Snapchat `VIEW_CONTENT` event when a user lands on a single product page.
+ *
+ * This method is designed to be called on Single Product pages.
+ * It ensures the event is only fired only on fresh navigations — such as arriving
+ * via a link click, redirect, or back/forward traversal — and not on manual page reloads
+ * to inflating analytics or triggering duplicate events.
+ *
+ * A unique `eventId` is generated and included in both the Pixel and Conversions API payloads
+ * to support deduplication.
+ *
+ * @since 0.1.0
+ *
+ * @return {void}
+ */
+export const onSingleProductPageVisit = () => {
+	if ( isFreshPageVisit() && TRACKING_DATA_VAR.VIEW_CONTENT ) {
+		const eventId = window.crypto.randomUUID();
+
+		const eventData = {
+			...TRACKING_DATA_VAR.VIEW_CONTENT,
+			event_id: eventId,
+			client_dedup_id: eventId,
+		};
+
+		if ( TRACKING_DATA_VAR.is_pixel_enabled ) {
+			sendPixelEvent( SnapchatEvent.VIEW_CONTENT, eventData );
+		}
+
+		if ( TRACKING_DATA_VAR.is_conversion_enabled ) {
+			sendCapiEvent( SnapchatEvent.VIEW_CONTENT, eventData );
+		}
+	}
+};
+
+/**
+ * Fires a Snapchat `START_CHECKOUT` event when a user reaches the Checkout page.
+ *
+ * This method is designed to be called on the Checkout page.
+ * It ensures the event is only fired only on fresh navigations — such as arriving
+ * via a link click, redirect, or back/forward traversal — and not on manual page reloads
+ * to inflating analytics or triggering duplicate events.
+ *
+ * A unique `eventId` is generated and included in both the Pixel and Conversions API payloads
+ * to support deduplication.
+ *
+ * @since 0.1.0
+ *
+ * @return {void}
+ */
+export const onCheckoutPageVisit = () => {
+	if ( isFreshPageVisit() && TRACKING_DATA_VAR.START_CHECKOUT ) {
+		const eventId = window.crypto.randomUUID();
+
+		const eventData = {
+			...TRACKING_DATA_VAR.START_CHECKOUT,
+			event_id: eventId,
+			client_dedup_id: eventId,
+		};
+
+		if ( TRACKING_DATA_VAR.is_pixel_enabled ) {
+			sendPixelEvent( SnapchatEvent.START_CHECKOUT, eventData );
+		}
+
+		if ( TRACKING_DATA_VAR.is_conversion_enabled ) {
+			sendCapiEvent( SnapchatEvent.START_CHECKOUT, eventData );
+		}
+	}
+};
+
+/**
+ * Fires a Snapchat `PAGE_VIEW` event when a user visits any page on the site.
+ *
+ * This method is designed to run on all frontend pages where general page view tracking
+ * is required — including content, category, and landing pages.
+ *
+ * It ensures the event is only fired only on fresh navigations — such as arriving
+ * via a link click, redirect, or back/forward traversal — and not on manual page reloads
+ * to inflating analytics or triggering duplicate events.
+ *
+ * @since 0.1.0
+ *
+ * @return {void}
+ */
+export const onPageView = () => {
+	if ( isFreshPageVisit() && TRACKING_DATA_VAR.PAGE_VIEW ) {
+		const eventId = window.crypto.randomUUID();
+
+		const eventData = {
+			event_id: eventId,
+			client_dedup_id: eventId,
+		};
+
+		if ( TRACKING_DATA_VAR.is_pixel_enabled ) {
+			sendPixelEvent( SnapchatEvent.PAGE_VIEW, eventData );
+		}
+
+		if ( TRACKING_DATA_VAR.is_conversion_enabled ) {
+			sendCapiEvent( SnapchatEvent.PAGE_VIEW, eventData );
+		}
+	}
+};

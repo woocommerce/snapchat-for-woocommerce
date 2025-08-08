@@ -1,6 +1,7 @@
 <?php
 /**
- * Server-side Ad Partner Conversion event representing a completed purchase.
+ * Server-side Ad Partner Conversion event representing user intent
+ * to purchase.
  *
  * Builds a structured payload using WooCommerce order details
  * to send to the Ad Partner's Conversions API.
@@ -11,18 +12,18 @@
 
 namespace SnapchatForWooCommerce\Tracking\ConversionEvent;
 
-use WC_Order;
-use SnapchatForWooCommerce\Tracking\EventIdRegistry;
+use WC_Cart;
+use WC_Product;
 
 /**
- * Constructs a Conversion request payload for the PURCHASE event type.
+ * Constructs a Conversion request payload for the START_CHECKOUT event type.
  *
- * Extracts item details, order totals, and identifiers from
- * the WooCommerce order object to track conversions accurately.
+ * This class captures minimal single product page data for tracking
+ * start checkout conversions.
  *
  * @since 0.1.0
  */
-final class PurchaseEvent implements ConversionEventInterface {
+final class StartCheckoutEvent implements ConversionEventInterface {
 
 	/**
 	 * Unique identifier for this event type.
@@ -31,25 +32,25 @@ final class PurchaseEvent implements ConversionEventInterface {
 	 *
 	 * @since 0.1.0
 	 */
-	public const ID = 'PURCHASE';
+	public const ID = 'START_CHECKOUT';
 
 	/**
-	 * WooCommerce order object.
+	 * WooCommerce Cart object.
 	 *
 	 * @since 0.1.0
-	 * @var WC_Order|null
+	 * @var WC_Cart
 	 */
-	private $order;
+	private $cart;
 
 	/**
 	 * Constructor.
 	 *
 	 * @since 0.1.0
 	 *
-	 * @param int $order_id WooCommerce order ID.
+	 * @param WC_Cart $cart WooCommerce Cart object.
 	 */
-	public function __construct( int $order_id ) {
-		$this->order = wc_get_order( $order_id );
+	public function __construct( WC_Cart $cart ) {
+		$this->cart = $cart;
 	}
 
 	/**
@@ -64,20 +65,16 @@ final class PurchaseEvent implements ConversionEventInterface {
 	 * @return array<string,mixed> Conversion event payload.
 	 */
 	public function build_payload( array $args = array() ): array {
-		if ( ! $this->order ) {
-			return array();
-		}
-
 		$contents = array();
 		$skus     = array();
 
-		/**
-		 * Product from the Order Line Item.
-		 *
-		 * @var \WC_Order_Item_Product $item Product item.
-		 */
-		foreach ( $this->order->get_items() as $item ) {
-			$product = $item->get_product();
+		foreach ( $this->cart->get_cart() as $item ) {
+			/**
+			 * WooCommerce product object.
+			 *
+			 * @var WC_Product $product Product object.
+			 */
+			$product = $item['data'];
 
 			if ( ! $product ) {
 				continue;
@@ -85,7 +82,7 @@ final class PurchaseEvent implements ConversionEventInterface {
 
 			$contents[] = array(
 				'id'         => (string) $product->get_id(),
-				'quantity'   => (string) $item->get_quantity(),
+				'quantity'   => (string) $item['quantity'],
 				'item_price' => (string) $product->get_price(),
 			);
 
@@ -95,17 +92,15 @@ final class PurchaseEvent implements ConversionEventInterface {
 		$default = array(
 			'event_name'       => self::ID,
 			'event_time'       => time(),
-			'event_source_url' => $this->order->get_checkout_order_received_url(),
-			'event_id'         => EventIdRegistry::get_purchase_id( $this->order->get_id() ),
+			'event_source_url' => wc_get_raw_referer(),
 			'action_source'    => 'WEB',
 			'user_data'        => array(),
 			'custom_data'      => array(
 				'content_ids' => array_filter( $skus, fn( $sku ) => ! empty( $sku ) ),
 				'contents'    => $contents,
-				'currency'    => $this->order->get_currency(),
-				'num_items'   => (string) $this->order->get_item_count(),
-				'order_id'    => (string) $this->order->get_id(),
-				'value'       => $this->order->get_total(),
+				'currency'    => get_woocommerce_currency(),
+				'num_items'   => (string) $this->cart->get_cart_contents_count(),
+				'value'       => wc_format_decimal( $this->cart->total ),
 			),
 		);
 

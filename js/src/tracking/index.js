@@ -9,9 +9,13 @@ import {
 	onLoopAddToCartClick,
 	hasUserConsent,
 	setSnapChatClickId,
+	onSingleProductPageVisit,
+	onCheckoutPageVisit,
+	onPageView,
 } from './utils';
 import { singleAddToCartClick, addToCartClick } from './pixel/utils';
-import { triggerCAPI } from './conversions/utils';
+import { sendCapiEvent } from './conversions/utils';
+import { SnapchatEvent } from './pixel/events';
 
 const isPixelEnabled = TRACKING_DATA_VAR.is_pixel_enabled;
 const isConversionEnabled = TRACKING_DATA_VAR.is_conversion_enabled;
@@ -52,9 +56,17 @@ document.addEventListener( 'DOMContentLoaded', () => {
 		const data = event.currentTarget.dataset;
 
 		if ( isConversionEnabled && data?.product_id ) {
-			triggerCAPI( eventId, data.product_id, 1 );
+			sendCapiEvent( SnapchatEvent.ADD_CART, {
+				event_id: eventId,
+				product_id: data.product_id,
+				quantity: 1,
+			} );
 		}
 	} );
+
+	onSingleProductPageVisit();
+	onCheckoutPageVisit();
+	onPageView();
 } );
 
 /**
