@@ -78,4 +78,46 @@ class Helper {
 	public static function is_logging_enabled(): bool {
 		return defined( 'SNAPCHAT_FOR_WOOCOMMERCE_DEBUG' ) && SNAPCHAT_FOR_WOOCOMMERCE_DEBUG;
 	}
+
+	/**
+	 * Formats a timestamp into a human-readable date and time string.
+	 *
+	 * Uses the site's date and time format settings to display the timestamp
+	 * in a localized format.
+	 *
+	 * @since 0.1.0
+	 *
+	 * @param int $timestamp Unix timestamp to format.
+	 * @return string Formatted date and time string, or empty if no timestamp is provided.
+	 */
+	public static function get_formatted_timestamp( $timestamp = 0 ): string {
+		if ( ! $timestamp ) {
+			return '';
+		}
+
+		return date_i18n(
+			get_option( 'date_format' ) . ' \a\t ' . get_option( 'time_format' ),
+			(int) $timestamp
+		);
+	}
+
+	/**
+	 * Checks if the site has products.
+	 *
+	 * This method checks if there are any published products in the WooCommerce store.
+	 *
+	 * @since 0.1.0
+	 *
+	 * @return bool True if there are published products, false otherwise.
+	 */
+	public static function has_products(): bool {
+		$product = wc_get_products(
+			array(
+				'limit'  => 1,
+				'status' => 'publish',
+			)
+		);
+
+		return count( $product ) > 0;
+	}
 }

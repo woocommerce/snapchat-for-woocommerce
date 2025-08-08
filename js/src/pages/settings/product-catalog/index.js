@@ -17,6 +17,7 @@ import { sfwData } from '~/constants';
 import AppButton from '~/components/app-button';
 import AppDocumentationLink from '~/components/app-documentation-link';
 import AccountCard from '~/components/account-card';
+import useSettings from '~/hooks/useSettings';
 import useExportPoller from './useExportPoller';
 import useProductCatalogExport from './useProductCatalogExport';
 import './index.scss';
@@ -35,6 +36,12 @@ import './index.scss';
  * @return {JSX.Element} The rendered ProductCatalog settings UI.
  */
 const ProductCatalog = () => {
+	const {
+		shouldTriggerExport,
+		lastExportTimeStamp,
+		exportFileUrl,
+		hasFinishedResolution,
+	} = useSettings();
 	// Whether we want to connect the heartbeat immediately as soon as the Heartbeat component mounts.
 	const [ exportInProgress, setExportInProgress ] = useState(
 		sfwData.isExportInProgress === '1'
@@ -157,6 +164,26 @@ const ProductCatalog = () => {
 		setLastExported( null );
 	}, [ exportInProgress ] );
 
+	useEffect( () => {
+		/**
+		 * Trigger catalog CSV generation as soon as the
+		 * merchant has successfully onboarded.
+		 */
+		if ( shouldTriggerExport && hasFinishedResolution ) {
+			generateCsv();
+		}
+	}, [ shouldTriggerExport, hasFinishedResolution ] );
+
+	useEffect( () => {
+		if ( lastExportTimeStamp ) {
+			setLastExported( lastExportTimeStamp );
+		}
+
+		if ( exportFileUrl ) {
+			setFileUrl( exportFileUrl );
+		}
+	}, [ lastExportTimeStamp, exportFileUrl ] );
+
 	return (
 		<>
 			<AccountCard
@@ -165,6 +192,16 @@ const ProductCatalog = () => {
 				description={ getDescription() }
 				indicator={ getIndicator() }
 			>
+				{ lastExported && ! fileUrl && (
+					<div className="sfw-product-catalog__help">
+						<p>
+							{ __(
+								'The CSV file may have been deleted and could not be found. Click "Generate CSV" to regenerate a new one.',
+								'snapchat-for-woo'
+							) }
+						</p>
+					</div>
+				) }
 				{ hasExport && (
 					<div className="sfw-product-catalog__help">
 						<p>

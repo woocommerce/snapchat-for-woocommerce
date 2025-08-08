@@ -96,6 +96,20 @@ final class Options {
 	}
 
 	/**
+	 * Returns the full option key with the plugin prefix.
+	 *
+	 * This is used to ensure consistent key formatting across the plugin.
+	 *
+	 * @since 0.1.0
+	 *
+	 * @param string $key The option key (without prefix).
+	 * @return string The full option key with prefix.
+	 */
+	public static function get_key( string $key ): string {
+		return Config::STORE_PREFIX . $key;
+	}
+
+	/**
 	 * Initializes all defined option keys with default values, if not already set.
 	 *
 	 * Should be called during plugin activation to ensure consistent defaults.

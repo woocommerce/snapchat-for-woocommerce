@@ -193,9 +193,6 @@ class BatchExportJob {
 	 * @return void
 	 */
 	public function set_timestamp(): void {
-		$timestamp = date_i18n(
-			get_option( 'date_format' ) . ' \a\t ' . get_option( 'time_format' )
-		);
-		Options::set( OptionDefaults::LAST_EXPORT_TIMESTAMP, $timestamp );
+		Options::set( OptionDefaults::LAST_EXPORT_TIMESTAMP, time() );
 	}
 }
