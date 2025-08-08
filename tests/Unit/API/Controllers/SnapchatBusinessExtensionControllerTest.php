@@ -21,6 +21,8 @@ use SnapchatForWooCommerce\Connection\WcsClient;
 use SnapchatForWooCommerce\Connection\JetpackAuthenticator;
 use SnapchatForWooCommerce\Connection\JetpackClient;
 use SnapchatForWooCommerce\Plugin;
+use SnapchatForWooCommerce\API\AdPartner\AdPartnerApi;
+use SnapchatForWooCommerce\API\AdPartner\CatalogApi;
 
 /**
  * Tests the SnapchatOrganizationsController REST API endpoints.
@@ -103,19 +105,38 @@ class SnapchatBusinessExtensionControllerTest extends WP_UnitTestCase {
 	 * Register the REST route with mocked Jetpack client.
 	 */
 	public function register_route(): void {
-		$controller = new SnapchatBusinessExtensionController(
-			new WcsClient(
-				new JetpackAuthenticator(),
-				$this->jetpack_client
+		$wcs = new WcsClient(
+			new JetpackAuthenticator(),
+			$this->jetpack_client
+		);
+		$mock_ad_partner_api = $this->createMock( AdPartnerApi::class );
+		$mock_catalog        = $this->createMock( CatalogApi::class );
+
+		// Mock `create()` to return a mock response with `get_data()`.
+		$mock_catalog->method( 'create' )->willReturn(
+			new \WP_REST_Response(
+				array(
+					'catalogs' => array(
+						array(
+							'catalog' => array(
+								'id' => 'mock-catalog-id',
+							),
+						),
+					),
+				)
 			)
 		);
+
+		$mock_ad_partner_api->catalog = $mock_catalog;
+
+		$controller = new SnapchatBusinessExtensionController( $wcs, $mock_ad_partner_api );
 		$controller->register_routes();
 	}
 
 	/**
 	 * Test: API returns errors without config id.
 	 */
-	public function test_get_config_without_config_id(): void {
+	public function test_get_config_without_config_id_and_products_token(): void {
 		$this->jetpack_client
 			->method( 'remote_request' )
 			->willReturn( array(
@@ -132,7 +153,7 @@ class SnapchatBusinessExtensionControllerTest extends WP_UnitTestCase {
 		$data = $response->get_data();
 
 		$this->assertSame( 'rest_missing_callback_param', $data['code'] );
-		$this->assertSame( 'Missing parameter(s): id', $data['message'] );
+		$this->assertSame( 'Missing parameter(s): id, products_token', $data['message'] );
 	}
 
 	/**
@@ -151,7 +172,7 @@ class SnapchatBusinessExtensionControllerTest extends WP_UnitTestCase {
 		$request->set_header( 'Content-Type', 'application/json' );
 		$request->set_body(
 			wp_json_encode(
-				array( 'id' => 'hello' )
+				array( 'id' => 'hello', 'products_token' => 'abc123' )
 			)
 		);
 
@@ -167,6 +188,7 @@ class SnapchatBusinessExtensionControllerTest extends WP_UnitTestCase {
 			'ad_acc_id'   => 'be1l1a65-e320-456f-4a49-68999aee29c5',
 			'ad_acc_name' => 'Squad 6',
 			'pixel_id'    => 'a6458d50-44a3-42e2-65e4-ed1943j59da4',
+			'catalog_id'  => 'mock-catalog-id',
 		), $data );
 		$this->assertSame( $this->options['org_id'], Options::get( OptionDefaults::ORGANIZATION_ID ) );
 		$this->assertSame( 'Seireitei', Options::get( OptionDefaults::ORGANIZATION_NAME ) );

@@ -17,6 +17,7 @@ use SnapchatForWooCommerce\ServiceContainer;
 use SnapchatForWooCommerce\ServiceKey;
 use SnapchatForWooCommerce\Config;
 use SnapchatForWooCommerce\API\Site\Controllers;
+use SnapchatForWooCommerce\API\AdPartner\AdPartnerApi;
 
 /**
  * Bootstrap class for registering REST API routes related to plugin settings.
@@ -42,11 +43,12 @@ class SetupService {
 	 * @return void
 	 */
 	public function register_routes(): void {
-		$wcs_client = ServiceContainer::get( ServiceKey::WCS_CLIENT );
-		$manager    = new Manager( Config::PLUGIN_SLUG );
+		$wcs_client     = ServiceContainer::get( ServiceKey::WCS_CLIENT );
+		$manager        = new Manager( Config::PLUGIN_SLUG );
+		$ad_partner_api = AdPartnerApi::get_instance( $wcs_client );
 
 		( new Controllers\JetpackAccountController( $wcs_client, $manager ) )->register_routes();
-		( new Controllers\SnapchatBusinessExtensionController( $wcs_client ) )->register_routes();
+		( new Controllers\SnapchatBusinessExtensionController( $wcs_client, $ad_partner_api ) )->register_routes();
 		( new Controllers\SnapchatAccountController() )->register_routes();
 		( new Controllers\OnboardingController() )->register_routes();
 		( new Controllers\SettingsController() )->register_routes();

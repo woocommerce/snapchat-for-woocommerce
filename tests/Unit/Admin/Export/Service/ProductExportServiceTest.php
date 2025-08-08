@@ -24,6 +24,8 @@ use SnapchatForWooCommerce\Admin\Export\Contract\ExportWriterInterface;
 use SnapchatForWooCommerce\Admin\Export\BatchExportJob;
 use SnapchatForWooCommerce\Utils\Storage\Options;
 use SnapchatForWooCommerce\Utils\Storage\OptionDefaults;
+use SnapchatForWooCommerce\Connection\WcsClient;
+use SnapchatForWooCommerce\API\AdPartner\AdPartnerApi;
 
 /**
  * @covers \SnapchatForWooCommerce\Admin\Export\Service\ProductExportService
@@ -38,6 +40,7 @@ class ProductExportServiceTest extends WP_UnitTestCase {
 	private $row_builder;
 	private $writer;
 	private $job;
+	private $api;
 
 	/**
 	 * Service under test.
@@ -53,7 +56,8 @@ class ProductExportServiceTest extends WP_UnitTestCase {
 		$this->entity_provider = $this->createMock( ExportableEntityProviderInterface::class );
 		$this->row_builder     = $this->createMock( ExportRowBuilderInterface::class );
 		$this->writer          = $this->createMock( ExportWriterInterface::class );
-		$this->job             = new BatchExportJob( $this->cache_builder, $this->entity_provider, $this->row_builder, $this->writer );
+		$this->api             = $this->createMock( AdPartnerApi::class );
+		$this->job             = new BatchExportJob( $this->cache_builder, $this->entity_provider, $this->row_builder, $this->writer, $this->api );
 
 		$this->service = new ProductExportService( $this->job );
 	}
@@ -129,7 +133,7 @@ class ProductExportServiceTest extends WP_UnitTestCase {
 		$entity_provider = new ProductEntityProvider();
 		$row_builder     = new ProductRowBuilder();
 		$writer          = new CsvExportWriter();
-		$job             = new BatchExportJob( $this->cache_builder, $entity_provider, $row_builder, $writer );
+		$job             = new BatchExportJob( $this->cache_builder, $entity_provider, $row_builder, $writer, $this->api );
 
 		$service = new ProductExportService( $job );
 

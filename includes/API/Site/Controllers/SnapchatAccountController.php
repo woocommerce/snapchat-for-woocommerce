@@ -16,7 +16,6 @@ namespace SnapchatForWooCommerce\API\Site\Controllers;
 
 use WP_REST_Response;
 use SnapchatForWooCommerce\Config;
-use SnapchatForWooCommerce\Connection\WcsClient;
 use SnapchatForWooCommerce\Utils\Storage\Options;
 use SnapchatForWooCommerce\Utils\Storage\OptionDefaults;
 

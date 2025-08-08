@@ -27,7 +27,7 @@ import useDispatchCoreNotices from '~/hooks/useDispatchCoreNotices';
  *
  * @see useApiFetchCallback
  */
-const useUpsertSnapchatConfig = ( configId ) => {
+const useUpsertSnapchatConfig = ( configId, productsToken ) => {
 	const { createNotice } = useDispatchCoreNotices();
 	const { fetchSnapchatAccount, fetchSetup } = useAppDispatch();
 	const [ loading, setLoading ] = useState( false );
@@ -37,11 +37,12 @@ const useUpsertSnapchatConfig = ( configId ) => {
 		method: 'POST',
 		data: {
 			id: configId,
+			products_token: productsToken,
 		},
 	} );
 
 	const upsertSnapchatConfig = useCallback( async () => {
-		if ( ! configId ) {
+		if ( ! configId || ! productsToken ) {
 			return false;
 		}
 
@@ -67,6 +68,7 @@ const useUpsertSnapchatConfig = ( configId ) => {
 		fetchSnapchatAccount,
 		fetchSetup,
 		configId,
+		productsToken,
 	] );
 
 	return { upsertSnapchatConfig, loading };

@@ -7,6 +7,8 @@ namespace SnapchatForWooCommerce\Tests\Unit\Admin\Export\Writer;
 
 use WP_UnitTestCase;
 use SnapchatForWooCommerce\Admin\Export\Writer\CsvExportWriter;
+use SnapchatForWooCommerce\Utils\Storage\Options;
+use SnapchatForWooCommerce\Utils\Storage\OptionDefaults;
 
 /**
  * @covers \SnapchatForWooCommerce\Admin\Export\Writer\CsvExportWriter
@@ -72,10 +74,11 @@ class CsvExportWriterTest extends WP_UnitTestCase {
 	 * Tests that generate_url() returns a valid download URL based on file path.
 	 */
 	public function test_generate_url_returns_valid_download_link() {
+		Options::set( OptionDefaults::WCS_PRODUCTS_TOKEN, 'abc123' );
 		$file = $this->writer->create_file();
 		$url  = $this->writer->generate_url( $file );
 
-		$this->assertStringContainsString( '/wp-content/uploads/snapchat-exports/', $url );
+		$this->assertStringContainsString( '/wp-content/uploads/snapchat/', $url );
 		$this->assertStringEndsWith( '.csv', $url );
 
 		// Clean up

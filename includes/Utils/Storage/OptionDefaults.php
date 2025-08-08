@@ -128,6 +128,20 @@ final class OptionDefaults {
 	public const CONVERSION_ACCESS_TOKEN = 'conversion_access_token';
 
 	/**
+	 * Option key for the Ad Partner's Catalog ID.
+	 *
+	 * @since 0.1.0
+	 */
+	public const CATALOG_ID = 'catalog_id';
+
+	/**
+	 * Option key for the Ad Partner's Product Feed ID.
+	 *
+	 * @since 0.1.0
+	 */
+	public const PRODUCT_FEED_ID = 'product_feed_id';
+
+	/**
 	 * Option key to store the full file system path of the most recent export file.
 	 *
 	 * This value is written during the first export batch and reused across
@@ -165,6 +179,14 @@ final class OptionDefaults {
 	public const LAST_EXPORT_TIMESTAMP = 'last_export_timestamp';
 
 	/**
+	 * Option key to store the WCS token to create file name for
+	 * generating catalog CSV filename.
+	 *
+	 * @since 0.1.0
+	 */
+	public const WCS_PRODUCTS_TOKEN = 'wcs_products_token';
+
+	/**
 	 * Returns default values for all known Ad Partner options.
 	 *
 	 * Used by {@see Options} to provide fallbacks when option values
@@ -189,10 +211,13 @@ final class OptionDefaults {
 			self::PIXEL_ID                => '',
 			self::CONVERSIONS_ENABLED     => 'no',
 			self::CONVERSION_ACCESS_TOKEN => '',
+			self::CATALOG_ID              => '',
+			self::PRODUCT_FEED_ID         => '',
 			self::EXPORT_FILE_PATH        => '',
 			self::EXPORT_FILE_URL         => '',
 			self::EXPORT_PRODUCT_IDS      => array(),
 			self::LAST_EXPORT_TIMESTAMP   => 0,
+			self::WCS_PRODUCTS_TOKEN      => '',
 		);
 	}
 }
