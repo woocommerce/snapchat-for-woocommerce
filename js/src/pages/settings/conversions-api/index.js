@@ -9,7 +9,7 @@ import { useState, useCallback } from '@wordpress/element';
  * Internal dependencies
  */
 import { useAppDispatch } from '~/data';
-import useTrackConversions from '~/hooks/useTrackConversions';
+import useSettings from '~/hooks/useSettings';
 import useDispatchCoreNotices from '~/hooks/useDispatchCoreNotices';
 import AccountCard from '~/components/account-card';
 import SpinnerCard from '~/components/spinner-card';
@@ -25,14 +25,14 @@ import './index.scss';
  * @return {JSX.Element} The rendered ConversionsAPI settings card.
  */
 const ConversionsAPI = () => {
-	const { isEnabled, hasFinishedResolution } = useTrackConversions();
+	const { isCapiEnabled, hasFinishedResolution } = useSettings();
 	const [ isSaving, setIsSaving ] = useState( false );
 	const { createNotice } = useDispatchCoreNotices();
-	const { updateTrackConversionsStatus } = useAppDispatch();
+	const { updateSettings } = useAppDispatch();
 
 	const toggleTrackConversions = useCallback( async () => {
-		await updateTrackConversionsStatus( ! isEnabled );
-	}, [ updateTrackConversionsStatus, isEnabled ] );
+		await updateSettings( { trackConversions: ! isCapiEnabled } );
+	}, [ updateSettings, isCapiEnabled ] );
 
 	const handleOnChange = async () => {
 		try {
@@ -47,7 +47,7 @@ const ConversionsAPI = () => {
 				)
 			);
 		} catch ( error ) {
-			// Silently fail because the error is handled within `updateTrackConversionsStatus` action.
+			// Silently fail because the error is handled within `updateSettings` action.
 		} finally {
 			setIsSaving( false );
 		}
@@ -72,7 +72,7 @@ const ConversionsAPI = () => {
 							'Enable Conversions API tracking',
 							'snapchat-for-woo'
 						) }
-						checked={ isEnabled }
+						checked={ isCapiEnabled }
 						disabled={ isSaving }
 						onChange={ handleOnChange }
 					/>

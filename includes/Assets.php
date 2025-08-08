@@ -103,6 +103,7 @@ class Assets {
 					'is_pixel_enabled'      => PixelTrackingService::is_enabled(),
 					'is_conversion_enabled' => ConversionTrackingService::is_enabled(),
 					'capi_nonce'            => wp_create_nonce( 'capi_nonce' ),
+					'prefix'                => Helper::with_prefix( '' ),
 				)
 			)
 		);

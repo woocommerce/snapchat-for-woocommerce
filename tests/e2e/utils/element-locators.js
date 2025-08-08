@@ -88,7 +88,7 @@ export default class ElementLocators {
 	 */
 	getOnboardingSuccessfulModal() {
 		return this.page.locator( '.sfw-onboarding-success-modal', {
-			hasText: 'You’ve successfully set up Snapchat for WooCommerce! 🎉',
+			hasText: 'You’ve successfully set up Snapchat for WooCommerce!',
 		} );
 	}
 

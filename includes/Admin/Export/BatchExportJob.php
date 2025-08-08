@@ -24,6 +24,8 @@ use SnapchatForWooCommerce\Admin\Export\Contract\CacheBuilderInterface;
 use SnapchatForWooCommerce\Utils\Helper;
 use SnapchatForWooCommerce\Utils\Storage\Options;
 use SnapchatForWooCommerce\Utils\Storage\OptionDefaults;
+use SnapchatForWooCommerce\API\AdPartner\AdPartnerApi;
+use WC_Logger_Interface;
 
 /**
  * Executes a single export batch for any entity type.
@@ -77,25 +79,35 @@ class BatchExportJob {
 	public ExportWriterInterface $writer;
 
 	/**
+	 * Provides access to the Ad Partner APIs.
+	 *
+	 * @var AdPartnerApi
+	 */
+	public AdPartnerApi $ad_partner_api;
+
+	/**
 	 * Constructor.
 	 *
 	 * @since 0.1.0
 	 *
-	 * @param CacheBuilderInterface             $cache_builder Prepares and caches exportable entity IDs ahead of export.
-	 * @param ExportableEntityProviderInterface $provider      Supplies exportable entity IDs and objects.
-	 * @param ExportRowBuilderInterface         $row_builder   Builds CSV-compatible row data from entities.
-	 * @param ExportWriterInterface             $writer        Writes data to file and manages file output.
+	 * @param CacheBuilderInterface             $cache_builder  Prepares and caches exportable entity IDs ahead of export.
+	 * @param ExportableEntityProviderInterface $provider       Supplies exportable entity IDs and objects.
+	 * @param ExportRowBuilderInterface         $row_builder    Builds CSV-compatible row data from entities.
+	 * @param ExportWriterInterface             $writer         Writes data to file and manages file output.
+	 * @param AdPartnerApi                      $ad_partner_api Exposes Ad Partner APIs.
 	 */
 	public function __construct(
 		CacheBuilderInterface $cache_builder,
 		ExportableEntityProviderInterface $provider,
 		ExportRowBuilderInterface $row_builder,
-		ExportWriterInterface $writer
+		ExportWriterInterface $writer,
+		AdPartnerApi $ad_partner_api
 	) {
-		$this->cache_builder = $cache_builder;
-		$this->provider      = $provider;
-		$this->row_builder   = $row_builder;
-		$this->writer        = $writer;
+		$this->cache_builder  = $cache_builder;
+		$this->provider       = $provider;
+		$this->row_builder    = $row_builder;
+		$this->writer         = $writer;
+		$this->ad_partner_api = $ad_partner_api;
 	}
 
 	/**
@@ -193,9 +205,36 @@ class BatchExportJob {
 	 * @return void
 	 */
 	public function set_timestamp(): void {
-		$timestamp = date_i18n(
-			get_option( 'date_format' ) . ' \a\t ' . get_option( 'time_format' )
-		);
-		Options::set( OptionDefaults::LAST_EXPORT_TIMESTAMP, $timestamp );
+		Options::set( OptionDefaults::LAST_EXPORT_TIMESTAMP, time() );
+	}
+
+	/**
+	 * Finalizes the export batch and triggers post-export actions.
+	 *
+	 * This method is called when a batch export process has completed. It performs
+	 * post-export tasks.
+	 *
+	 * This is typically invoked by the export orchestration layer after all entities
+	 * in the batch have been successfully exported.
+	 *
+	 * @since 0.1.0
+	 *
+	 * @param callable $callback A user-defined function or method to be executed after export completion.
+	 * @return void
+	 */
+	public function on_complete( callable $callback ): void {
+		if ( is_callable( $callback ) ) {
+			$callback();
+		}
+
+		/**
+		 * Fires when a batch export job has been completed.
+		 *
+		 * This hook indicates that all export tasks in the current batch have finished processing.
+		 * It can be used to trigger post-export actions, such as cleanup, notification, or further data processing.
+		 *
+		 * @since 0.1.0
+		 */
+		do_action( Helper::with_prefix( 'batch_export_job_complete' ) );
 	}
 }

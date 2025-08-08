@@ -34,7 +34,7 @@ wp-env run tests-cli wp wc product create --user=1 \
   --name="Product Two" \
   --slug="product-two" \
   --type="simple" \
-  --regular_price="10"
+  --regular_price="15"
 
 wp-env run tests-cli wp wc product create --user=1 \
   --name="Product Three" \

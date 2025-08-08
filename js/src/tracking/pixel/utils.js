@@ -13,7 +13,7 @@ import { SnapchatEvent } from './events';
  * @param {Object} eventParams Additional event parameters to send.
  * @throws Will throw an error if `snaptr` is not available globally.
  */
-export const trackEvent = ( eventName, eventParams ) => {
+export const sendPixelEvent = ( eventName, eventParams ) => {
 	if ( typeof snaptr !== 'function' ) {
 		throw new Error( 'Function snaptr not implemented.' );
 	}
@@ -104,7 +104,7 @@ const trackAddToCartEvent = ( product, quantity = 1, eventId = null ) => {
 		data.client_dedup_id = eventId;
 	}
 
-	trackEvent( SnapchatEvent.ADD_CART, data );
+	sendPixelEvent( SnapchatEvent.ADD_CART, data );
 };
 
 /**

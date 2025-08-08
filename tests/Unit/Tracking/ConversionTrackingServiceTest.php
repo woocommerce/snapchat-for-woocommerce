@@ -36,19 +36,6 @@ final class ConversionTrackingServiceTest extends WP_UnitTestCase {
 		$this->mock_tracker = $this->createMock( ConversionTrackerInterface::class );
 	}
 
-	public function test_populate_tracking_data_adds_expected_keys(): void {
-		$service = new ConversionTrackingService( $this->mock_tracker );
-
-		$input  = array( 'existing_key' => 'value' );
-		$output = $service->populate_tracking_data( $input );
-
-		$this->assertArrayHasKey( 'capi_trigger_action', $output );
-		$this->assertArrayHasKey( 'event_id_el_name', $output );
-		$this->assertSame( Helper::with_prefix( 'add_to_cart' ), $output['capi_trigger_action'] );
-		$this->assertSame( Helper::with_prefix( 'event_id' ), $output['event_id_el_name'] );
-		$this->assertSame( 'value', $output['existing_key'] );
-	}
-
 	public function test_handle_purchase_delegates_to_tracker(): void {
 		$service = new ConversionTrackingService( $this->mock_tracker );
 

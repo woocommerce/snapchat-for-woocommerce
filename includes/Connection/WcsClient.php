@@ -100,7 +100,7 @@ final class WcsClient {
 	 *
 	 * @return string
 	 */
-	private function get_wcs_url(): string {
+	public function get_wcs_url(): string {
 		/**
 		 * Filters the base URL for the WCS (Web Conversion Service) endpoint.
 		 *
@@ -221,7 +221,7 @@ final class WcsClient {
 		return new WP_Error(
 			'wcs_error',
 			__( 'WCS request failed', 'snapchat-for-woocommerce' ),
-			array( 'response' => $response )
+			$response
 		);
 	}
 }

@@ -83,6 +83,7 @@
 		"lint": "npm run lint:php && npm run lint:js && npm run lint:css",
 		"lint:css": "wp-scripts lint-style",
 		"lint:js": "wp-scripts lint-js",
+		"lint:js:fix": "wp-scripts lint-js --fix",
 		"lint:php": "vendor/bin/phpcs",
 		"packages-update": "wp-scripts packages-update",
 		"plugin-zip": "wp-scripts plugin-zip",

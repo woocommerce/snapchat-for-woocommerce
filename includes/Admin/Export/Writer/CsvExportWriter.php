@@ -12,6 +12,8 @@
 namespace SnapchatForWooCommerce\Admin\Export\Writer;
 
 use SnapchatForWooCommerce\Admin\Export\Contract\ExportWriterInterface;
+use SnapchatForWooCommerce\Utils\Storage\Options;
+use SnapchatForWooCommerce\Utils\Storage\OptionDefaults;
 use WP_Filesystem_Direct;
 
 /**
@@ -30,7 +32,7 @@ class CsvExportWriter implements ExportWriterInterface {
 	 *
 	 * @since 0.1.0
 	 */
-	const EXPORT_FOLDER = 'snapchat-exports';
+	const EXPORT_FOLDER = 'snapchat';
 
 	/**
 	 * Filesystem handler.
@@ -84,7 +86,7 @@ class CsvExportWriter implements ExportWriterInterface {
 			}
 		}
 
-		$filename = 'catalog-export-' . gmdate( 'Ymd-His' ) . '.csv';
+		$filename = 'products-' . Options::get( OptionDefaults::WCS_PRODUCTS_TOKEN ) . '.csv';
 		$file     = trailingslashit( $dir_path ) . $filename;
 
 		$success = $this->fs->put_contents( $file, '' );

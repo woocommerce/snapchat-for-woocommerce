@@ -32,6 +32,12 @@ const store = createReduxStore( STORE_KEY, {
 		},
 		snapchat: null,
 		trackConversions: null,
+		settings: {
+			trackConversions: false,
+			triggerExport: false,
+			lastExportTimeStamp: '',
+			exportFileUrl: '',
+		},
 	},
 } );
 register( store );

@@ -1,6 +1,6 @@
 <?php
 /**
- * Server-side Ad Partner Conversion event representing an "Add to Cart" action.
+ * Server-side Ad Partner Conversion event representing an "View Content" action.
  *
  * @package SnapchatForWooCommerce\Tracking\ConversionEvent
  * @since 0.1.0
@@ -8,16 +8,15 @@
 
 namespace SnapchatForWooCommerce\Tracking\ConversionEvent;
 
-use SnapchatForWooCommerce\Tracking\EventIdRegistry;
-
 /**
- * Constructs a Conversion request payload for the ADD_CART event type.
+ * Constructs a Conversion request payload for the VIEW_CONTENT event type.
  *
- * This class captures minimal cart data for tracking add-to-cart conversions.
+ * This class captures minimal single product page data for tracking
+ * view content conversions.
  *
  * @since 0.1.0
  */
-final class AddToCartEvent implements ConversionEventInterface {
+final class ViewContentEvent implements ConversionEventInterface {
 
 	/**
 	 * Unique identifier for this event type.
@@ -26,10 +25,10 @@ final class AddToCartEvent implements ConversionEventInterface {
 	 *
 	 * @since 0.1.0
 	 */
-	public const ID = 'ADD_CART';
+	public const ID = 'VIEW_CONTENT';
 
 	/**
-	 * Product ID being added to the cart.
+	 * Product ID being viewed.
 	 *
 	 * @since 0.1.0
 	 * @var int
@@ -37,24 +36,14 @@ final class AddToCartEvent implements ConversionEventInterface {
 	private $product_id;
 
 	/**
-	 * Quantity of the product added.
-	 *
-	 * @since 0.1.0
-	 * @var int
-	 */
-	private $quantity;
-
-	/**
 	 * Constructor.
 	 *
 	 * @since 0.1.0
 	 *
 	 * @param int $product_id Product ID.
-	 * @param int $quantity   Quantity added.
 	 */
-	public function __construct( int $product_id, int $quantity ) {
+	public function __construct( int $product_id ) {
 		$this->product_id = $product_id;
-		$this->quantity   = $quantity;
 	}
 
 	/**
@@ -67,19 +56,30 @@ final class AddToCartEvent implements ConversionEventInterface {
 	 * @return array<string,mixed> Conversion event payload.
 	 */
 	public function build_payload( array $args = array() ): array {
+		$product = wc_get_product( $this->product_id );
+
+		if ( ! $product instanceof \WC_Product ) {
+			return array();
+		}
+
+		if ( $product->is_type( 'variation' ) ) {
+			$content_type = 'product_group';
+		} elseif ( $product->is_type( 'grouped' ) ) {
+			$content_type = 'product_group';
+		} else {
+			$content_type = 'product';
+		}
+
 		$default = array(
 			'event_name'       => self::ID,
 			'event_time'       => time(),
-			'action_source'    => 'WEB',
 			'event_source_url' => wc_get_raw_referer(),
+			'action_source'    => 'WEB',
 			'user_data'        => array(),
 			'custom_data'      => array(
-				'contents' => array(
-					array(
-						'id'       => (string) $this->product_id,
-						'quantity' => (string) $this->quantity,
-					),
-				),
+				'content_ids'  => array( $product->get_sku() ),
+				'content_type' => $content_type,
+				'currency'     => get_woocommerce_currency(),
 			),
 		);
 

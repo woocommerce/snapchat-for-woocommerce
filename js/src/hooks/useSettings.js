@@ -8,7 +8,7 @@ import { useSelect } from '@wordpress/data';
  */
 import { STORE_KEY } from '~/data/constants';
 
-const selectorName = 'getTrackConversions';
+const selectorName = 'getSettings';
 
 /**
  * @typedef {Object} TrackConversions
@@ -21,12 +21,16 @@ const selectorName = 'getTrackConversions';
  *
  * @return {TrackConversions} The data and its state.
  */
-const useTrackConversions = () => {
+const useSettings = () => {
 	return useSelect( ( select ) => {
 		const selector = select( STORE_KEY );
+		const settings = selector[ selectorName ]();
 
 		return {
-			isEnabled: selector[ selectorName ](),
+			isCapiEnabled: settings.trackConversions,
+			shouldTriggerExport: settings.triggerExport,
+			lastExportTimeStamp: settings.lastExportTimeStamp,
+			exportFileUrl: settings.exportFileUrl,
 			hasFinishedResolution: selector.hasFinishedResolution(
 				selectorName,
 				[]
@@ -35,4 +39,4 @@ const useTrackConversions = () => {
 	}, [] );
 };
 
-export default useTrackConversions;
+export default useSettings;
