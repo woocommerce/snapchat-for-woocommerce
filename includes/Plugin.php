@@ -28,19 +28,7 @@ final class Plugin {
 	 * Loads text domain and registers plugin-level hooks.
 	 */
 	public static function init(): void {
-		self::load_textdomain();
 		self::register();
-	}
-
-	/**
-	 * Loads the plugin’s translation files from the `languages` directory.
-	 *
-	 * This enables localization support via `.pot`/`.mo` files.
-	 *
-	 * @since 0.1.0
-	 */
-	private static function load_textdomain(): void {
-		load_plugin_textdomain( 'snapchat-for-woocommerce', false, dirname( plugin_basename( __FILE__ ) ) . '/../languages' );
 	}
 
 	/**
