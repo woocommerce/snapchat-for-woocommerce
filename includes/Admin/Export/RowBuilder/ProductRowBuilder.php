@@ -38,7 +38,7 @@ class ProductRowBuilder implements ExportRowBuilderInterface {
 	 * returns `null` to skip the row.
 	 *
 	 * The resulting row includes:
-	 * - Core attributes like ID, title, description, image, and price
+	 * - Core attributes like SKU, title, description, image, and price
 	 * - Inventory status
 	 * - Optional metadata: brand, GTIN, and MPN
 	 *
@@ -59,7 +59,7 @@ class ProductRowBuilder implements ExportRowBuilderInterface {
 		$currency = get_woocommerce_currency();
 
 		return array(
-			'id'           => (string) $product->get_id(),
+			'id'           => (string) $product->get_sku(),
 			'title'        => $product->get_name(),
 			'description'  => $product->get_description(),
 			'link'         => get_permalink( $product->get_id() ),
