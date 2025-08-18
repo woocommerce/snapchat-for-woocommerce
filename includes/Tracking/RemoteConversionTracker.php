@@ -146,6 +146,7 @@ class RemoteConversionTracker implements ConversionTrackerInterface {
 		$event   = new StartCheckoutEvent( $cart );
 		$payload = $event->build_payload(
 			array(
+				'event_id'  => $event_id,
 				'user_data' => UserIdentifier::get_user_data(),
 			)
 		);
