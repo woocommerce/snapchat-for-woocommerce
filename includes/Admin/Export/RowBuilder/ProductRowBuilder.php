@@ -15,6 +15,7 @@ namespace SnapchatForWooCommerce\Admin\Export\RowBuilder;
 
 use WC_Product;
 use SnapchatForWooCommerce\Admin\Export\Contract\ExportRowBuilderInterface;
+use SnapchatForWooCommerce\Admin\Export\Contract\RowBuilderAdditionalData;
 
 /**
  * Converts WooCommerce products into catalog-compatible row arrays.
@@ -29,6 +30,27 @@ use SnapchatForWooCommerce\Admin\Export\Contract\ExportRowBuilderInterface;
  * @since 0.1.0
  */
 class ProductRowBuilder implements ExportRowBuilderInterface {
+	/**
+	 * Additional data providers that can enrich the export row.
+	 *
+	 * @var RowBuilderAdditionalData[]
+	 */
+	protected $additional_data_providers = array();
+
+	/**
+	 * Constructor.
+	 *
+	 * Accepts an array of {@see RowBuilderAdditionalData} providers which will
+	 * contribute extra fields to the final row. This allows for a clean
+	 * separation between core attributes and optional enrichments.
+	 *
+	 * @since 0.1.0
+	 *
+	 * @param RowBuilderAdditionalData[] $additional_data_providers One or more providers.
+	 */
+	public function __construct( array $additional_data_providers = array() ) {
+		$this->additional_data_providers = $additional_data_providers;
+	}
 
 	/**
 	 * Builds a single exportable row from a product entity.
@@ -58,7 +80,7 @@ class ProductRowBuilder implements ExportRowBuilderInterface {
 		$price    = $product->get_price();
 		$currency = get_woocommerce_currency();
 
-		return array(
+		$row = array(
 			'id'           => (string) $product->get_id(),
 			'title'        => $product->get_name(),
 			'description'  => $product->get_description(),
@@ -68,5 +90,12 @@ class ProductRowBuilder implements ExportRowBuilderInterface {
 			'price'        => $price . ' ' . $currency,
 			'gtin'         => $product->get_global_unique_id(),
 		);
+
+		// Merge additional data from all providers.
+		foreach ( $this->additional_data_providers as $provider ) {
+			$row = array_merge( $row, $provider->get_additional_data( $product ) );
+		}
+
+		return $row;
 	}
 }
