@@ -9,6 +9,7 @@
 namespace SnapchatForWooCommerce\Utils;
 
 use SnapchatForWooCommerce\Config;
+use WC_Product;
 
 /**
  * Class Helper

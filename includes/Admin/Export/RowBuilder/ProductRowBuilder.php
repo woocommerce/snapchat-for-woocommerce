@@ -55,8 +55,9 @@ class ProductRowBuilder implements ExportRowBuilderInterface {
 		$image_id  = $product->get_image_id();
 		$image_url = $image_id ? wp_get_attachment_url( $image_id ) : '';
 
-		$price    = $product->get_price();
-		$currency = get_woocommerce_currency();
+		$price        = $product->get_price();
+		$is_price_set = '' !== $price;
+		$currency     = get_woocommerce_currency();
 
 		return array(
 			'id'           => (string) $product->get_id(),
@@ -64,8 +65,15 @@ class ProductRowBuilder implements ExportRowBuilderInterface {
 			'description'  => $product->get_description(),
 			'link'         => get_permalink( $product->get_id() ),
 			'image_link'   => $image_url,
-			'availability' => $product->is_in_stock() && '' !== $price ? 'In stock' : 'Out of stock',
-			'price'        => ( '' === $price ? '0' : $price ) . ' ' . $currency,
+			/**
+			 * In case the price is not set, we set the availability to 'Out of stock'
+			 * as that indicates the product is not available for purchase.
+			 *
+			 * However, if the price is explicitly set to `0`, we consider it as 'In stock'
+			 * as the product can be sold as a free product (for example, a free digital download).
+			 */
+			'availability' => $product->is_in_stock() && $is_price_set ? 'In stock' : 'Out of stock',
+			'price'        => ( $is_price_set ? $price : '0' ) . ' ' . $currency,
 			'gtin'         => $product->get_global_unique_id(),
 		);
 	}
