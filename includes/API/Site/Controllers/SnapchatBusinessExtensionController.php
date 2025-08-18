@@ -241,6 +241,7 @@ class SnapchatBusinessExtensionController extends RESTBaseController {
 			$catalog = $catalog_data[0]['catalog'];
 
 			Options::set( OptionDefaults::CATALOG_ID, $catalog['id'] );
+			Options::set( OptionDefaults::CATALOG_STATUS, 'created' );
 		}
 
 		/**
@@ -405,6 +406,8 @@ class SnapchatBusinessExtensionController extends RESTBaseController {
 				Options::delete( OptionDefaults::EXPORT_FILE_PATH );
 				Options::delete( OptionDefaults::EXPORT_FILE_URL );
 				Options::delete( OptionDefaults::EXPORT_PRODUCT_IDS );
+				Options::delete( OptionDefaults::CATALOG_STATUS );
+				Options::delete( OptionDefaults::FEED_STATUS );
 				Transients::delete( TransientDefaults::PIXEL_SCRIPT );
 
 				/**

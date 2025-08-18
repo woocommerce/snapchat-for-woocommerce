@@ -135,11 +135,25 @@ final class OptionDefaults {
 	public const CATALOG_ID = 'catalog_id';
 
 	/**
+	 * Option key indicating whether the catalog has been created.
+	 *
+	 * @since 0.1.0
+	 */
+	public const CATALOG_STATUS = 'catalog_status';
+
+	/**
 	 * Option key for the Ad Partner's Product Feed ID.
 	 *
 	 * @since 0.1.0
 	 */
 	public const PRODUCT_FEED_ID = 'product_feed_id';
+
+	/**
+	 * Option key indicating whether the feed has been created.
+	 *
+	 * @since 0.1.0
+	 */
+	public const FEED_STATUS = 'feed_status';
 
 	/**
 	 * Option key to store the full file system path of the most recent export file.
@@ -211,8 +225,10 @@ final class OptionDefaults {
 			self::PIXEL_ID                => '',
 			self::CONVERSIONS_ENABLED     => 'no',
 			self::CONVERSION_ACCESS_TOKEN => '',
+			self::CATALOG_STATUS          => 'empty',
 			self::CATALOG_ID              => '',
 			self::PRODUCT_FEED_ID         => '',
+			self::FEED_STATUS             => 'empty',
 			self::EXPORT_FILE_PATH        => '',
 			self::EXPORT_FILE_URL         => '',
 			self::EXPORT_PRODUCT_IDS      => array(),

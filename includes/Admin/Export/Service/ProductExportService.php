@@ -393,13 +393,20 @@ class ProductExportService {
 	 * @return void
 	 */
 	public function create_feed() {
-		$response = $this->job->ad_partner_api->feed->create();
+		/**
+		 * Only create the feed if it hasn't been created yet.
+		 */
+		if ( 'empty' === Options::get( OptionDefaults::FEED_STATUS ) ) {
+			$response = $this->job->ad_partner_api->feed->create();
 
-		if ( is_wp_error( $response ) ) {
-			$logger = wc_get_logger();
-			$logger->alert(
-				'Feed generation failed with error code' . $response->get_error_code(),
-			);
+			if ( is_wp_error( $response ) ) {
+				$logger = wc_get_logger();
+				$logger->alert(
+					'Feed generation failed with error code' . $response->get_error_code(),
+				);
+			} else {
+				Options::set( OptionDefaults::FEED_STATUS, 'created' );
+			}
 		}
 	}
 }
