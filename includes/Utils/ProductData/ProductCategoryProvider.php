@@ -19,6 +19,7 @@
 namespace SnapchatForWooCommerce\Utils\ProductData;
 
 use WC_Product;
+use WP_Term;
 use SnapchatForWooCommerce\Admin\Export\Contract\RowBuilderAdditionalData;
 
 /**
@@ -69,12 +70,17 @@ class ProductCategoryProvider implements RowBuilderAdditionalData {
 		$primary = array_shift( $terms );
 
 		// Build breadcrumb-style hierarchy.
-		$ancestors  = array_reverse( get_ancestors( $primary->term_id, 'product_cat' ) );
+		$ancestors = array_reverse( get_ancestors( $primary->term_id, 'product_cat' ) );
+
+		// Prime caches for all ancestor terms in a single call.
+		_prime_term_caches( $ancestors, 'product_cat' );
+
 		$categories = array();
 
 		foreach ( $ancestors as $ancestor_id ) {
 			$ancestor = get_term( $ancestor_id, 'product_cat' );
-			if ( ! is_wp_error( $ancestor ) && $ancestor ) {
+
+			if ( ! is_wp_error( $ancestor ) && $ancestor instanceof WP_Term ) {
 				$categories[] = $ancestor->name;
 			}
 		}
