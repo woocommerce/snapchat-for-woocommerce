@@ -14,7 +14,6 @@
 
 namespace SnapchatForWooCommerce\Admin\Export\Service;
 
-use Google\Protobuf\Option;
 use SnapchatForWooCommerce\Config;
 use SnapchatForWooCommerce\Utils\Helper;
 use SnapchatForWooCommerce\Admin\Export\BatchExportJob;
@@ -400,10 +399,12 @@ class ProductExportService {
 			$response = $this->job->ad_partner_api->feed->create();
 
 			if ( is_wp_error( $response ) ) {
-				$logger = wc_get_logger();
-				$logger->alert(
-					'Feed generation failed with error code' . $response->get_error_code(),
-				);
+				if ( Helper::is_logging_enabled() ) {
+					$logger = wc_get_logger();
+					$logger->alert(
+						'Feed generation failed with error code' . $response->get_error_code(),
+					);
+				}
 			} else {
 				Options::set( OptionDefaults::FEED_STATUS, 'created' );
 			}

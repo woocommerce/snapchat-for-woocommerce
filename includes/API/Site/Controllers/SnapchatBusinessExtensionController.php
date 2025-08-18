@@ -173,10 +173,12 @@ class SnapchatBusinessExtensionController extends RESTBaseController {
 		Options::set( OptionDefaults::CONFIG_ID, $config_id );
 
 		if ( empty( $products_token ) ) {
-			$logger = wc_get_logger();
-			$logger->warning(
-				'products_token not set. Auto product feed creation will fail.'
-			);
+			if ( Helper::is_logging_enabled() ) {
+				$logger = wc_get_logger();
+				$logger->warning(
+					'products_token not set. Auto product feed creation will fail.'
+				);
+			}
 		} else {
 			Options::set( OptionDefaults::WCS_PRODUCTS_TOKEN, $products_token );
 		}
