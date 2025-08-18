@@ -53,7 +53,7 @@ class StartCheckoutEventTest extends TestCase {
 		$this->assertEquals( (string) $product->get_price(), $item['item_price'] );
 
 		$this->assertArrayHasKey( 'content_ids', $custom );
-		$this->assertContains( $product->get_sku(), $custom['content_ids'] );
+		$this->assertContains( $product->get_id(), $custom['content_ids'] );
 
 		$this->assertEquals( get_woocommerce_currency(), $custom['currency'] );
 		$this->assertEquals( '2', $custom['num_items'] );

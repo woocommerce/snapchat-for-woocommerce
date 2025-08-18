@@ -69,7 +69,7 @@ final class PurchaseEvent extends EventPayloadBase implements ConversionEventInt
 		}
 
 		$contents = array();
-		$skus     = array();
+		$ids      = array();
 
 		/**
 		 * Product from the Order Line Item.
@@ -89,7 +89,7 @@ final class PurchaseEvent extends EventPayloadBase implements ConversionEventInt
 				'item_price' => (string) $product->get_price(),
 			);
 
-			$skus[] = (string) $product->get_sku();
+			$ids[] = (string) $product->get_id();
 		}
 
 		$base    = parent::build_payload();
@@ -99,7 +99,7 @@ final class PurchaseEvent extends EventPayloadBase implements ConversionEventInt
 			'event_id'         => EventIdRegistry::get_purchase_id( $this->order->get_id() ),
 			'user_data'        => array(),
 			'custom_data'      => array(
-				'content_ids' => array_filter( $skus, fn( $sku ) => ! empty( $sku ) ),
+				'content_ids' => array_filter( $ids, fn( $id ) => ! empty( $id ) ),
 				'contents'    => $contents,
 				'currency'    => $this->order->get_currency(),
 				'num_items'   => (string) $this->order->get_item_count(),

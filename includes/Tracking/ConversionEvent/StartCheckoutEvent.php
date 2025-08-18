@@ -66,7 +66,7 @@ final class StartCheckoutEvent extends EventPayloadBase implements ConversionEve
 	 */
 	public function build_payload( array $args = array() ): array {
 		$contents = array();
-		$skus     = array();
+		$ids      = array();
 
 		foreach ( $this->cart->get_cart() as $item ) {
 			/**
@@ -86,7 +86,7 @@ final class StartCheckoutEvent extends EventPayloadBase implements ConversionEve
 				'item_price' => (string) $product->get_price(),
 			);
 
-			$skus[] = (string) $product->get_sku();
+			$ids[] = (string) $product->get_id();
 		}
 
 		$base    = parent::build_payload();
@@ -94,7 +94,7 @@ final class StartCheckoutEvent extends EventPayloadBase implements ConversionEve
 			'event_name'  => self::ID,
 			'user_data'   => array(),
 			'custom_data' => array(
-				'content_ids' => array_filter( $skus, fn( $sku ) => ! empty( $sku ) ),
+				'content_ids' => array_filter( $ids, fn( $id ) => ! empty( $id ) ),
 				'contents'    => $contents,
 				'currency'    => get_woocommerce_currency(),
 				'num_items'   => (string) $this->cart->get_cart_contents_count(),

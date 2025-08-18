@@ -59,7 +59,7 @@ class ProductRowBuilder implements ExportRowBuilderInterface {
 		$currency = get_woocommerce_currency();
 
 		return array(
-			'id'           => (string) $product->get_sku(),
+			'id'           => (string) $product->get_id(),
 			'title'        => $product->get_name(),
 			'description'  => $product->get_description(),
 			'link'         => get_permalink( $product->get_id() ),
