@@ -47,7 +47,7 @@ if ( ! defined( 'SNAPCHAT_FOR_WOOCOMMERCE_BUILD_URL' ) ) {
 }
 
 if ( ! defined( 'SNAPCHAT_FOR_WOOCOMMERCE_DEBUG' ) ) {
-	define( 'SNAPCHAT_FOR_WOOCOMMERCE_DEBUG', true );
+	define( 'SNAPCHAT_FOR_WOOCOMMERCE_DEBUG', false );
 }
 
 require_once plugin_dir_path( __FILE__ ) . '/vendor/autoload_packages.php';
