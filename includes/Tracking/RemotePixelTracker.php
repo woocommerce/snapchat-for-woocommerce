@@ -193,10 +193,8 @@ final class RemotePixelTracker implements PixelTrackerInterface {
 	 * Hooked into `woocommerce_before_thankyou`. Avoids duplicate firing via meta key.
 	 *
 	 * @since 0.1.0
-	 *
-	 * @param int $order_id WooCommerce order ID.
 	 */
-	public function track_purchase_event( $order_id ) {
+	public function track_purchase_event() {
 		if ( ! is_order_received_page() ) {
 			return;
 		}
@@ -205,7 +203,8 @@ final class RemotePixelTracker implements PixelTrackerInterface {
 			return;
 		}
 
-		$order = wc_get_order( $order_id );
+		$order_id = (int) get_query_var( 'order-received' );
+		$order    = wc_get_order( $order_id );
 
 		// Make sure there is a valid order object and it is not already marked as tracked.
 		if ( ! $order || 1 === (int) $order->get_meta( self::ORDER_PIXEL_TRACKED_META_KEY, true ) ) {

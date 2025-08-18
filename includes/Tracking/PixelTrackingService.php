@@ -103,8 +103,9 @@ final class PixelTrackingService implements ServiceStatusInterface {
 		);
 
 		add_action(
-			'woocommerce_before_thankyou',
-			array( $this->tracker, 'track_purchase_event' )
+			'wp_footer',
+			array( $this->tracker, 'track_purchase_event' ),
+			11
 		);
 	}
 
