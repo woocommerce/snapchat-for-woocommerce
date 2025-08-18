@@ -64,8 +64,8 @@ class ProductRowBuilder implements ExportRowBuilderInterface {
 			'description'  => $product->get_description(),
 			'link'         => get_permalink( $product->get_id() ),
 			'image_link'   => $image_url,
-			'availability' => $product->is_in_stock() ? 'In stock' : 'Out of stock',
-			'price'        => $price . ' ' . $currency,
+			'availability' => $product->is_in_stock() && '' !== $price ? 'In stock' : 'Out of stock',
+			'price'        => ( '' === $price ? '0' : $price ) . ' ' . $currency,
 			'gtin'         => $product->get_global_unique_id(),
 		);
 	}
