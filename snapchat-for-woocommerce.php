@@ -23,8 +23,6 @@ use SnapchatForWooCommerce\Utils\Storage\Options;
 use SnapchatForWooCommerce\Utils\Storage\OptionDefaults;
 use SnapchatForWooCommerce\ServiceContainer;
 use SnapchatForWooCommerce\ServiceKey;
-use SnapchatForWooCommerce\Config;
-use SnapchatForWooCommerce\Utils\Helper;
 
 defined( 'ABSPATH' ) || exit;
 
@@ -49,7 +47,7 @@ if ( ! defined( 'SNAPCHAT_FOR_WOOCOMMERCE_BUILD_URL' ) ) {
 }
 
 if ( ! defined( 'SNAPCHAT_FOR_WOOCOMMERCE_DEBUG' ) ) {
-	define( 'SNAPCHAT_FOR_WOOCOMMERCE_DEBUG', false );
+	define( 'SNAPCHAT_FOR_WOOCOMMERCE_DEBUG', true );
 }
 
 require_once plugin_dir_path( __FILE__ ) . '/vendor/autoload_packages.php';

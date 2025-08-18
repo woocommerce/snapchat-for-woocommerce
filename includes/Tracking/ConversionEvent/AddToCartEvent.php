@@ -17,7 +17,7 @@ use SnapchatForWooCommerce\Tracking\EventIdRegistry;
  *
  * @since 0.1.0
  */
-final class AddToCartEvent implements ConversionEventInterface {
+final class AddToCartEvent extends EventPayloadBase implements ConversionEventInterface {
 
 	/**
 	 * Unique identifier for this event type.
@@ -67,13 +67,11 @@ final class AddToCartEvent implements ConversionEventInterface {
 	 * @return array<string,mixed> Conversion event payload.
 	 */
 	public function build_payload( array $args = array() ): array {
+		$base    = parent::build_payload();
 		$default = array(
-			'event_name'       => self::ID,
-			'event_time'       => time(),
-			'action_source'    => 'WEB',
-			'event_source_url' => wc_get_raw_referer(),
-			'user_data'        => array(),
-			'custom_data'      => array(
+			'event_name'  => self::ID,
+			'user_data'   => array(),
+			'custom_data' => array(
 				'contents' => array(
 					array(
 						'id'       => (string) $this->product_id,
@@ -83,6 +81,6 @@ final class AddToCartEvent implements ConversionEventInterface {
 			),
 		);
 
-		return array_merge( $default, $args );
+		return array_merge( $base, $default, $args );
 	}
 }

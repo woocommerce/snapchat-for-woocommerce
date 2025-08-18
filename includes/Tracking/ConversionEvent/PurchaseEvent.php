@@ -22,7 +22,7 @@ use SnapchatForWooCommerce\Tracking\EventIdRegistry;
  *
  * @since 0.1.0
  */
-final class PurchaseEvent implements ConversionEventInterface {
+final class PurchaseEvent extends EventPayloadBase implements ConversionEventInterface {
 
 	/**
 	 * Unique identifier for this event type.
@@ -92,12 +92,11 @@ final class PurchaseEvent implements ConversionEventInterface {
 			$skus[] = (string) $product->get_sku();
 		}
 
+		$base    = parent::build_payload();
 		$default = array(
 			'event_name'       => self::ID,
-			'event_time'       => time(),
 			'event_source_url' => $this->order->get_checkout_order_received_url(),
 			'event_id'         => EventIdRegistry::get_purchase_id( $this->order->get_id() ),
-			'action_source'    => 'WEB',
 			'user_data'        => array(),
 			'custom_data'      => array(
 				'content_ids' => array_filter( $skus, fn( $sku ) => ! empty( $sku ) ),
@@ -109,6 +108,6 @@ final class PurchaseEvent implements ConversionEventInterface {
 			),
 		);
 
-		return array_merge( $default, $args );
+		return array_merge( $base, $default, $args );
 	}
 }

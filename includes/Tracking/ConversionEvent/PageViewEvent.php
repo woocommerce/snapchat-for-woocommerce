@@ -16,7 +16,7 @@ namespace SnapchatForWooCommerce\Tracking\ConversionEvent;
  *
  * @since 0.1.0
  */
-final class PageViewEvent implements ConversionEventInterface {
+final class PageViewEvent extends EventPayloadBase implements ConversionEventInterface {
 
 	/**
 	 * Unique identifier for this event type.
@@ -38,14 +38,16 @@ final class PageViewEvent implements ConversionEventInterface {
 	 * @return array<string,mixed> Conversion event payload.
 	 */
 	public function build_payload( array $args = array() ): array {
+		$base    = parent::build_payload();
 		$default = array(
 			'event_name'       => self::ID,
 			'event_time'       => time(),
+			'integration'      => 'woocommerce-v1',
 			'event_source_url' => wc_get_raw_referer(),
 			'action_source'    => 'WEB',
 			'user_data'        => array(),
 		);
 
-		return array_merge( $default, $args );
+		return array_merge( $base, $default, $args );
 	}
 }

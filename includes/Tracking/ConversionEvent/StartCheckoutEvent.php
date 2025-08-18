@@ -23,7 +23,7 @@ use WC_Product;
  *
  * @since 0.1.0
  */
-final class StartCheckoutEvent implements ConversionEventInterface {
+final class StartCheckoutEvent extends EventPayloadBase implements ConversionEventInterface {
 
 	/**
 	 * Unique identifier for this event type.
@@ -89,13 +89,11 @@ final class StartCheckoutEvent implements ConversionEventInterface {
 			$skus[] = (string) $product->get_sku();
 		}
 
+		$base    = parent::build_payload();
 		$default = array(
-			'event_name'       => self::ID,
-			'event_time'       => time(),
-			'event_source_url' => wc_get_raw_referer(),
-			'action_source'    => 'WEB',
-			'user_data'        => array(),
-			'custom_data'      => array(
+			'event_name'  => self::ID,
+			'user_data'   => array(),
+			'custom_data' => array(
 				'content_ids' => array_filter( $skus, fn( $sku ) => ! empty( $sku ) ),
 				'contents'    => $contents,
 				'currency'    => get_woocommerce_currency(),
@@ -104,6 +102,6 @@ final class StartCheckoutEvent implements ConversionEventInterface {
 			),
 		);
 
-		return array_merge( $default, $args );
+		return array_merge( $base, $default, $args );
 	}
 }
