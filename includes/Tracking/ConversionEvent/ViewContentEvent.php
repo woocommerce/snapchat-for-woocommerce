@@ -78,6 +78,13 @@ final class ViewContentEvent extends EventPayloadBase implements ConversionEvent
 				'content_ids'  => array( (string) $product->get_id() ),
 				'content_type' => $content_type,
 				'currency'     => get_woocommerce_currency(),
+				'contents'     => array(
+					array(
+						'id'         => (string) $product->get_id(),
+						'quantity'   => '1',
+						'item_price' => (string) $product->get_price(),
+					),
+				),
 			),
 		);
 

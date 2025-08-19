@@ -8,8 +8,6 @@
 
 namespace SnapchatForWooCommerce\Tracking\ConversionEvent;
 
-use SnapchatForWooCommerce\Tracking\EventIdRegistry;
-
 /**
  * Constructs a Conversion request payload for the ADD_CART event type.
  *
@@ -67,6 +65,12 @@ final class AddToCartEvent extends EventPayloadBase implements ConversionEventIn
 	 * @return array<string,mixed> Conversion event payload.
 	 */
 	public function build_payload( array $args = array() ): array {
+		$product = wc_get_product( $this->product_id );
+
+		if ( ! $product instanceof \WC_Product ) {
+			return array();
+		}
+
 		$base    = parent::build_payload();
 		$default = array(
 			'event_name'  => self::ID,
@@ -74,8 +78,9 @@ final class AddToCartEvent extends EventPayloadBase implements ConversionEventIn
 			'custom_data' => array(
 				'contents' => array(
 					array(
-						'id'       => (string) $this->product_id,
-						'quantity' => (string) $this->quantity,
+						'id'         => (string) $this->product_id,
+						'quantity'   => (string) $this->quantity,
+						'item_price' => (string) $product->get_price(),
 					),
 				),
 			),

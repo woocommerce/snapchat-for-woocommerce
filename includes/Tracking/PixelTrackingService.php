@@ -234,7 +234,7 @@ final class PixelTrackingService implements ServiceStatusInterface {
 		if ( isset( WC()->cart ) && WC()->cart->get_cart_contents_count() > 0 ) {
 			$product_ids = array_values(
 				array_map(
-					fn( $item ) => $item['product_id'],
+					fn( $item ) => ! empty( $item['variation_id'] ) ? $item['variation_id'] : $item['product_id'],
 					WC()->cart->get_cart()
 				)
 			);

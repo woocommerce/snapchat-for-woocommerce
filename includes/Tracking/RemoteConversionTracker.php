@@ -299,7 +299,7 @@ class RemoteConversionTracker implements ConversionTrackerInterface {
 		$response = $this->client->proxy_post( $path, $payload, false );
 
 		if ( Helper::is_logging_enabled() ) {
-			$event = $event_payload['event_name'];
+			$event = $event_payload['event_name'] ?? '';
 
 			if ( is_wp_error( $response ) ) {
 				$error_data = $response->get_error_data();
