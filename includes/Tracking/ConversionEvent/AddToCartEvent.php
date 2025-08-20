@@ -83,6 +83,7 @@ final class AddToCartEvent extends EventPayloadBase implements ConversionEventIn
 						'item_price' => (string) $product->get_price(),
 					),
 				),
+				'currency' => get_woocommerce_currency(),
 			),
 		);
 
