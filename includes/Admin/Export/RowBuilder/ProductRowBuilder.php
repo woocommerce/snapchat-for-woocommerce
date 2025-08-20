@@ -38,7 +38,7 @@ class ProductRowBuilder implements ExportRowBuilderInterface {
 	 * returns `null` to skip the row.
 	 *
 	 * The resulting row includes:
-	 * - Core attributes like SKU, title, description, image, and price
+	 * - Core attributes like ID, title, description, image, and price
 	 * - Inventory status
 	 * - Optional metadata: brand, GTIN, and MPN
 	 *
