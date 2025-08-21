@@ -69,7 +69,7 @@ class ConversionTrackingService implements ServiceStatusInterface {
 		}
 
 		add_action( 'woocommerce_thankyou', array( $this, 'handle_purchase' ) );
-		add_action( 'woocommerce_add_to_cart', array( $this, 'handle_single_product_add_to_cart' ), 10, 3 );
+		add_action( 'woocommerce_add_to_cart', array( $this, 'handle_single_product_add_to_cart' ), 10, 4 );
 		Helper::register_ajax_action( 'start_checkout', array( $this, 'handle_async_start_checkout' ) );
 		Helper::register_ajax_action( 'add_cart', array( $this, 'handle_async_add_to_cart' ) );
 		Helper::register_ajax_action( 'view_content', array( $this, 'handle_async_view_content' ) );
@@ -147,9 +147,10 @@ class ConversionTrackingService implements ServiceStatusInterface {
 	 * @param string $cart_item_key Unique key for the cart item.
 	 * @param int    $product_id    WooCommerce product ID added to the cart.
 	 * @param int    $quantity      Quantity of product added.
+	 * @param int    $variation_id  WooCommerce product variation ID added to the cart.
 	 * @return void
 	 */
-	public function handle_single_product_add_to_cart( string $cart_item_key, int $product_id, int $quantity ): void {
+	public function handle_single_product_add_to_cart( string $cart_item_key, int $product_id, int $quantity, int $variation_id ): void {
 		/**
 		 * We only track synchronous Add to Cart events in this handler.
 		 *
@@ -185,7 +186,7 @@ class ConversionTrackingService implements ServiceStatusInterface {
 
 		//phpcs:ignore WordPress.Security.NonceVerification.Missing
 		$event_id = sanitize_text_field( wp_unslash( $_POST[ Helper::with_prefix( 'event_id' ) ] ?? '' ) );
-		$this->tracker->track_add_to_cart( $product_id, $quantity, $event_id );
+		$this->tracker->track_add_to_cart( $variation_id ? $variation_id : $product_id, $quantity, $event_id );
 	}
 
 	/**

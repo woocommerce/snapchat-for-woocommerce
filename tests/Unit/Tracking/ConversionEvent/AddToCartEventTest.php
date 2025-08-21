@@ -10,19 +10,13 @@ declare( strict_types=1 );
 namespace SnapchatForWooCommerce\Tests\Integration\Tracking\ConversionEvent;
 
 use WP_UnitTestCase;
+use WC_Product_Simple;
 use SnapchatForWooCommerce\Tracking\ConversionEvent\AddToCartEvent;
 
 /**
  * @covers \SnapchatForWooCommerce\Tracking\ConversionEvent\AddToCartEvent
  */
 final class AddToCartEventTest extends WP_UnitTestCase {
-
-	/**
-	 * Sample product ID.
-	 *
-	 * @var int
-	 */
-	protected $product_id = 101;
 
 	/**
 	 * Sample quantity.
@@ -52,7 +46,12 @@ final class AddToCartEventTest extends WP_UnitTestCase {
 	 * Test that build_payload() returns expected structure and values.
 	 */
 	public function test_build_payload_returns_expected_data(): void {
-		$event   = new AddToCartEvent( $this->product_id, $this->quantity );
+		$product = new WC_Product_Simple();
+		$product->set_name( 'Product One' );
+		$product->set_regular_price( 20 );
+		$product->save();
+
+		$event   = new AddToCartEvent( $product->get_id(), $this->quantity );
 		$payload = $event->build_payload( array( 'event_id' => 'abc_123' ) );
 
 		$this->assertIsArray( $payload );
@@ -73,7 +72,7 @@ final class AddToCartEventTest extends WP_UnitTestCase {
 		$this->assertCount( 1, $payload['custom_data']['contents'] );
 
 		$contents = $payload['custom_data']['contents'][0];
-		$this->assertSame( (string) $this->product_id, $contents['id'] );
+		$this->assertSame( (string) $product->get_id(), $contents['id'] );
 		$this->assertSame( (string) $this->quantity, $contents['quantity'] );
 	}
 }

@@ -23,7 +23,7 @@ use WC_Product;
  *
  * @since 0.1.0
  */
-final class StartCheckoutEvent implements ConversionEventInterface {
+final class StartCheckoutEvent extends EventPayloadBase implements ConversionEventInterface {
 
 	/**
 	 * Unique identifier for this event type.
@@ -66,7 +66,7 @@ final class StartCheckoutEvent implements ConversionEventInterface {
 	 */
 	public function build_payload( array $args = array() ): array {
 		$contents = array();
-		$skus     = array();
+		$ids      = array();
 
 		foreach ( $this->cart->get_cart() as $item ) {
 			/**
@@ -86,17 +86,15 @@ final class StartCheckoutEvent implements ConversionEventInterface {
 				'item_price' => (string) $product->get_price(),
 			);
 
-			$skus[] = (string) $product->get_sku();
+			$ids[] = (string) $product->get_id();
 		}
 
+		$base    = parent::build_payload();
 		$default = array(
-			'event_name'       => self::ID,
-			'event_time'       => time(),
-			'event_source_url' => wc_get_raw_referer(),
-			'action_source'    => 'WEB',
-			'user_data'        => array(),
-			'custom_data'      => array(
-				'content_ids' => array_filter( $skus, fn( $sku ) => ! empty( $sku ) ),
+			'event_name'  => self::ID,
+			'user_data'   => array(),
+			'custom_data' => array(
+				'content_ids' => array_filter( $ids, fn( $id ) => ! empty( $id ) ),
 				'contents'    => $contents,
 				'currency'    => get_woocommerce_currency(),
 				'num_items'   => (string) $this->cart->get_cart_contents_count(),
@@ -104,6 +102,6 @@ final class StartCheckoutEvent implements ConversionEventInterface {
 			),
 		);
 
-		return array_merge( $default, $args );
+		return array_merge( $base, $default, $args );
 	}
 }
