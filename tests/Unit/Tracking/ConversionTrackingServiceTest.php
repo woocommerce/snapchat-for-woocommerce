@@ -57,7 +57,7 @@ final class ConversionTrackingServiceTest extends WP_UnitTestCase {
 			->method( 'track_add_to_cart' )
 			->with( 55, 2, 'abc-uuid' );
 
-		$service->handle_single_product_add_to_cart( 'key', 55, 2 );
+		$service->handle_single_product_add_to_cart( 'key', 55, 2, 0 );
 
 		unset( $_POST );
 	}

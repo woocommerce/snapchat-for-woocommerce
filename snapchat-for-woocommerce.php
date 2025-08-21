@@ -23,8 +23,6 @@ use SnapchatForWooCommerce\Utils\Storage\Options;
 use SnapchatForWooCommerce\Utils\Storage\OptionDefaults;
 use SnapchatForWooCommerce\ServiceContainer;
 use SnapchatForWooCommerce\ServiceKey;
-use SnapchatForWooCommerce\Config;
-use SnapchatForWooCommerce\Utils\Helper;
 
 defined( 'ABSPATH' ) || exit;
 

@@ -30,7 +30,7 @@ class ViewContentEventTest extends TestCase {
 		$this->assertArrayHasKey( 'custom_data', $payload );
 		$custom = $payload['custom_data'];
 
-		$this->assertEquals( array( $product->get_sku() ), $custom['content_ids'] );
+		$this->assertEquals( array( $product->get_id() ), $custom['content_ids'] );
 		$this->assertEquals( 'product', $custom['content_type'] );
 		$this->assertEquals( get_woocommerce_currency(), $custom['currency'] );
 	}

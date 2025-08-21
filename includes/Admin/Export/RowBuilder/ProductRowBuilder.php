@@ -15,6 +15,7 @@ namespace SnapchatForWooCommerce\Admin\Export\RowBuilder;
 
 use WC_Product;
 use SnapchatForWooCommerce\Admin\Export\Contract\ExportRowBuilderInterface;
+use SnapchatForWooCommerce\Admin\Export\Contract\RowBuilderAdditionalData;
 
 /**
  * Converts WooCommerce products into catalog-compatible row arrays.
@@ -29,6 +30,27 @@ use SnapchatForWooCommerce\Admin\Export\Contract\ExportRowBuilderInterface;
  * @since 0.1.0
  */
 class ProductRowBuilder implements ExportRowBuilderInterface {
+	/**
+	 * Additional data providers that can enrich the export row.
+	 *
+	 * @var RowBuilderAdditionalData[]
+	 */
+	protected $additional_data_providers = array();
+
+	/**
+	 * Constructor.
+	 *
+	 * Accepts an array of {@see RowBuilderAdditionalData} providers which will
+	 * contribute extra fields to the final row. This allows for a clean
+	 * separation between core attributes and optional enrichments.
+	 *
+	 * @since 0.1.0
+	 *
+	 * @param RowBuilderAdditionalData[] $additional_data_providers One or more providers.
+	 */
+	public function __construct( array $additional_data_providers = array() ) {
+		$this->additional_data_providers = $additional_data_providers;
+	}
 
 	/**
 	 * Builds a single exportable row from a product entity.
@@ -55,18 +77,33 @@ class ProductRowBuilder implements ExportRowBuilderInterface {
 		$image_id  = $product->get_image_id();
 		$image_url = $image_id ? wp_get_attachment_url( $image_id ) : '';
 
-		$price    = $product->get_price();
-		$currency = get_woocommerce_currency();
+		$price        = $product->get_price();
+		$is_price_set = '' !== $price;
+		$currency     = get_woocommerce_currency();
 
-		return array(
+		$row = array(
 			'id'           => (string) $product->get_id(),
 			'title'        => $product->get_name(),
 			'description'  => $product->get_description(),
 			'link'         => get_permalink( $product->get_id() ),
 			'image_link'   => $image_url,
-			'availability' => $product->is_in_stock() ? 'In stock' : 'Out of stock',
-			'price'        => $price . ' ' . $currency,
+			/**
+			 * In case the price is not set, we set the availability to 'Out of stock'
+			 * as that indicates the product is not available for purchase.
+			 *
+			 * However, if the price is explicitly set to `0`, we consider it as 'In stock'
+			 * as the product can be sold as a free product (for example, a free digital download).
+			 */
+			'availability' => $product->is_in_stock() && $is_price_set ? 'In stock' : 'Out of stock',
+			'price'        => ( $is_price_set ? $price : '0' ) . ' ' . $currency,
 			'gtin'         => $product->get_global_unique_id(),
 		);
+
+		// Merge additional data from all providers.
+		foreach ( $this->additional_data_providers as $provider ) {
+			$row = array_merge( $row, $provider->get_additional_data( $product ) );
+		}
+
+		return $row;
 	}
 }

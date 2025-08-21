@@ -124,6 +124,13 @@ class CsvExportWriter implements ExportWriterInterface {
 	 * @param string[] $row       Associative array representing a CSV row.
 	 */
 	public function append_row( string $file_path, array $row ): void {
+		$decoded_row = array_map(
+			static function ( $value ) {
+				return is_string( $value ) ? html_entity_decode( $value, ENT_QUOTES | ENT_HTML5, 'UTF-8' ) : $value;
+			},
+			$row
+		);
+
 		// Read existing content.
 		$content  = $this->fs->get_contents( $file_path );
 		$is_empty = empty( $content );
@@ -141,10 +148,10 @@ class CsvExportWriter implements ExportWriterInterface {
 		$fp = fopen( 'php://temp', 'r+' ); // phpcs:ignore WordPress.WP.AlternativeFunctions.file_system_operations_fopen
 
 		if ( $is_empty ) {
-			fputcsv( $fp, array_keys( $row ) );
+			fputcsv( $fp, array_keys( $decoded_row ) );
 		}
 
-		fputcsv( $fp, array_values( $row ) );
+		fputcsv( $fp, array_values( $decoded_row ) );
 		rewind( $fp );
 
 		$new_data = stream_get_contents( $fp );
