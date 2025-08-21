@@ -135,13 +135,13 @@ class Helper {
 	public static function get_store_name( string $suffix = '' ): string {
 		$home_url   = get_home_url();
 		$clean_url  = preg_replace( '#^https?://#', '', $home_url );
-		$store_name = $clean_url . '_woocommerce_' . time();
+		$store_name = $clean_url . '_' . time();
 
 		if ( $suffix ) {
 			$store_name .= '_' . $suffix;
 		}
 
-		return $store_name;
+		return 'WooCommerce imported catalog ' . $store_name;
 	}
 
 	/**
