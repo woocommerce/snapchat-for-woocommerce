@@ -21,6 +21,7 @@ use SnapchatForWooCommerce\Admin\Export;
 use SnapchatForWooCommerce\Admin\ProductMeta;
 use SnapchatForWooCommerce\Tracking\ConversionEventLogger;
 use SnapchatForWooCommerce\API\AdPartner\AdPartnerApi;
+use SnapchatForWooCommerce\Utils\ProductData\ProductCategoryProvider;
 use function wc_get_logger;
 
 
@@ -103,7 +104,11 @@ final class ServiceContainer {
 					new Export\BatchExportJob(
 						new Export\Service\ProductIdCacheBuilder(),
 						new Export\EntityProvider\ProductEntityProvider(),
-						new Export\RowBuilder\ProductRowBuilder(),
+						new Export\RowBuilder\ProductRowBuilder(
+							array(
+								new ProductCategoryProvider(),
+							)
+						),
 						new Export\Writer\CsvExportWriter(),
 						AdPartnerApi::get_instance(
 							self::get( ServiceKey::WCS_CLIENT )
