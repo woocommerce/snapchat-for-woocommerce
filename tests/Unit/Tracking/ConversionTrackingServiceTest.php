@@ -8,10 +8,14 @@
 namespace SnapchatForWooCommerce\Tracking;
 
 /**
- * Override check_ajax_referer() in this namespace for testing.
+ * Override check_ajax_referer() and filter_input() in this namespace for testing.
  */
 function check_ajax_referer( $action = -1, $query_arg = false, $stop = true ) {
 	return true;
+}
+
+function filter_input( $type, $var_name, $filter = FILTER_DEFAULT, $options = [] ) {
+	return $_POST[ $var_name ] ?? null;
 }
 
 namespace SnapchatForWooCommerce\Tests\Unit\Tracking;
@@ -63,15 +67,17 @@ final class ConversionTrackingServiceTest extends WP_UnitTestCase {
 	}
 
 	public function test_handle_async_add_to_cart_requires_nonce_and_delegates(): void {
-		// Prevent wp_die from exiting the test on nonce check.
-		tests_add_filter( 'wp_die_handler', '__return_false' );
-
 		$service = new ConversionTrackingService( $this->mock_tracker );
 
-		$_POST['security']   = wp_create_nonce( 'capi_nonce' );
-		$_POST['product_id'] = 777;
-		$_POST['quantity']   = 4;
-		$_POST['event_id']   = 'uuid-999';
+		// Simulate JSON payload
+		$payload = wp_json_encode( array(
+			'product_id' => 777,
+			'quantity'   => 4,
+			'event_id'   => 'uuid-999',
+		) );
+
+		$_POST['security'] = wp_create_nonce( 'capi_nonce' );
+		$_POST['payload']  = wp_slash( $payload );
 
 		$this->mock_tracker
 			->expects( $this->once() )

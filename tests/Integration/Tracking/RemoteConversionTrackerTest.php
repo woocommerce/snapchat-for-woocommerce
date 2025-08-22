@@ -103,6 +103,7 @@ class RemoteConversionTrackerTest extends WP_UnitTestCase {
 
 		$this->client->expects( $this->once() )
 			->method( 'proxy_post' )
+			->willReturn( new \WP_REST_Response( array(), 200 ) )
 			->with(
 				$this->callback( fn( $path ) => str_starts_with( $path, '/conversions/v3/pixel_456/events?access_token=token_abc' ) ),
 				$this->callback(
