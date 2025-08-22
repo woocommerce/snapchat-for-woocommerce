@@ -13,7 +13,11 @@ import {
 	onCheckoutPageVisit,
 	onPageView,
 } from './utils';
-import { singleAddToCartClick, addToCartClick, retrievedVariation } from './pixel/utils';
+import {
+	singleAddToCartClick,
+	addToCartClick,
+	retrievedVariation,
+} from './pixel/utils';
 import { sendCapiEvent } from './conversions/utils';
 import { SnapchatEvent } from './pixel/events';
 
@@ -104,4 +108,3 @@ if ( typeof jQuery === 'function' ) {
 		}
 	);
 }
-
