@@ -74,7 +74,6 @@ class ConversionTrackingService implements ServiceStatusInterface {
 		Helper::register_ajax_action( 'add_cart', array( $this, 'handle_async_add_to_cart' ) );
 		Helper::register_ajax_action( 'view_content', array( $this, 'handle_async_view_content' ) );
 		Helper::register_ajax_action( 'page_view', array( $this, 'handle_async_page_view' ) );
-		add_action( 'woocommerce_after_add_to_cart_quantity', array( $this, 'render_event_id_field' ) );
 		add_action( Helper::with_prefix( 'send_conversion_event' ), array( $this->tracker, 'send' ), 10, 2 );
 		add_action( Helper::with_prefix( 'conversion_sent' ), array( $this, 'mark_as_tracked' ), 10, 2 );
 	}
@@ -105,35 +104,6 @@ class ConversionTrackingService implements ServiceStatusInterface {
 	 */
 	public function handle_purchase( int $order_id ): void {
 		$this->tracker->track_purchase( $order_id );
-	}
-
-	/**
-	 * Outputs a hidden input field for the Event ID on single product pages.
-	 *
-	 * This is used to inject a unique UUID per Add to Cart action, enabling
-	 * deduplication between Pixel and CAPI events.
-	 *
-	 * Also injects inline JavaScript that generates a `window.crypto.randomUUID()` and
-	 * assigns it to the hidden field.
-	 *
-	 * @since 0.1.0
-	 *
-	 * @return void
-	 */
-	public function render_event_id_field(): void {
-		$attr = Helper::with_prefix( 'event_id' );
-
-		printf(
-			'<input type="hidden" name="%1$s" value="" />',
-			esc_attr( $attr ),
-		);
-
-		wp_print_inline_script_tag(
-			sprintf(
-				'document.querySelector("[name=%s]").value = window.crypto.randomUUID()',
-				esc_attr( $attr )
-			)
-		);
 	}
 
 	/**
