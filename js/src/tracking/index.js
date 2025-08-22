@@ -13,7 +13,11 @@ import {
 	onCheckoutPageVisit,
 	onPageView,
 } from './utils';
-import { singleAddToCartClick, addToCartClick } from './pixel/utils';
+import {
+	singleAddToCartClick,
+	addToCartClick,
+	retrievedVariation,
+} from './pixel/utils';
 import { sendCapiEvent } from './conversions/utils';
 import { SnapchatEvent } from './pixel/events';
 
@@ -85,3 +89,22 @@ document.addEventListener( 'wp_listen_for_consent_change', ( e ) => {
 		window.location.reload();
 	}
 } );
+
+/**
+ * Listen for WooCommerce variation selections on single product pages.
+ *
+ * The `found_variation` event is triggered by WooCommerce when a user selects
+ * a variation on the product page. This provides the full variation object,
+ * including updated price, SKU, and availability data.
+ *
+ * This implementation forwards the variation data to `retrievedVariation()`.
+ */
+if ( typeof jQuery === 'function' ) {
+	jQuery( document ).on(
+		'found_variation',
+		'form.cart',
+		function ( event, variation ) {
+			retrievedVariation( variation );
+		}
+	);
+}
