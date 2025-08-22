@@ -175,9 +175,9 @@ class ConversionTrackingService implements ServiceStatusInterface {
 		$raw_input  = filter_input( INPUT_POST, 'payload', FILTER_UNSAFE_RAW );
 		$raw_input  = wp_unslash( $raw_input );
 		$data       = json_decode( $raw_input, true );
-		$product_id = isset( $data['product_id'] ) ? absint( $data['product_id'] ) : 0;
-		$quantity   = isset( $data['quantity'] ) ? absint( $data['quantity'] ) : 0;
-		$event_id   = isset( $data['event_id'] ) ? sanitize_text_field( $data['event_id'] ) : '';
+		$product_id = absint( $data['product_id'] ?? 0 );
+		$quantity   = absint( $data['quantity'] ?? 0 );
+		$event_id   = sanitize_text_field( $data['event_id'] ?? '' );
 
 		$this->tracker->track_add_to_cart( $product_id, $quantity, $event_id );
 	}
