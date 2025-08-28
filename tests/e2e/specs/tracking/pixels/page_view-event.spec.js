@@ -29,6 +29,9 @@ test.describe( 'PAGE_VIEW event', () => {
 				const events = await page.evaluate( () => window.snaptr.queue );
 				const PAGE_VIEW = findSnaptrEvent( events, 'PAGE_VIEW' );
 				expect( PAGE_VIEW ).not.toBe( null );
+
+				const [ , , payload ] = PAGE_VIEW;
+				expect( payload.integration ).toBe( 'woocommerce-v1' );
 			} );
 		}
 

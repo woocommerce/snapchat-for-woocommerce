@@ -35,6 +35,7 @@ test.describe( 'ADD_CART event', () => {
 
 			const [ , , payload ] = ADD_CART;
 
+			expect( payload.integration ).toBe( 'woocommerce-v1' );
 			expect( payload.price ).toBe( 10 );
 			expect( payload.event_id ).toMatch( anyUuidRegex );
 			expect( payload.client_dedup_id ).toMatch( anyUuidRegex );

@@ -25,6 +25,7 @@ test.describe( 'VIEW_CONTENT event', () => {
 
 			const [ , , payload ] = VIEW_CONTENT;
 
+			expect( payload.integration ).toBe( 'woocommerce-v1' );
 			expect( payload.price ).toBe( 15 );
 			expect( payload.currency ).toBe( 'USD' );
 			expect( payload.item_ids ).toContain( 11 );
@@ -47,6 +48,7 @@ test.describe( 'VIEW_CONTENT event', () => {
 
 			const [ , , payload ] = VIEW_CONTENT;
 
+			expect( payload.integration ).toBe( 'woocommerce-v1' );
 			expect( payload.price ).toBe( 15 );
 			expect( payload.currency ).toBe( 'USD' );
 			expect( payload.item_ids ).toContain( 11 );
@@ -77,6 +79,7 @@ test.describe( 'VIEW_CONTENT event', () => {
 
 			const [ , , payload ] = VIEW_CONTENT;
 
+			expect( payload.integration ).toBe( 'woocommerce-v1' );
 			expect( payload.price ).toBe( 15 );
 			expect( payload.currency ).toBe( 'USD' );
 			expect( payload.item_ids ).toContain( 11 );
