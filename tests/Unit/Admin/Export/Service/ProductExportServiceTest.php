@@ -157,8 +157,6 @@ class ProductExportServiceTest extends WP_UnitTestCase {
 			$csv[0]
 		);
 
-		var_dump($csv);
-
 		$this->assertEquals( (string) $product->get_id(), $csv[1][0] );
 		$this->assertEquals( 'Test Product', $csv[1][1] );
 		$this->assertEquals( '', $csv[1][2] );

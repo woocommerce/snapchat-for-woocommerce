@@ -84,6 +84,7 @@ test.describe( 'PURCHASE event', () => {
 			expect( PURCHASE ).not.toBe( null );
 
 			const [ , , payload ] = PURCHASE;
+			expect( payload.integration ).toBe( 'woocommerce-v1' );
 			expect( payload.price ).toBe( '40.00' );
 			expect( payload.currency ).toBe( 'USD' );
 			expect( payload.event_id ).toMatch( orderKeyRegex );

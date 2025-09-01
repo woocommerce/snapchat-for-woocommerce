@@ -24,6 +24,7 @@ async function checkoutAssertions( page ) {
 
 	const [ , , payload ] = START_CHECKOUT;
 
+	expect( payload.integration ).toBe( 'woocommerce-v1' );
 	expect( payload.price ).toBe( '40.00' );
 	expect( payload.currency ).toBe( 'USD' );
 	expect( payload.item_ids ).toEqual( [ '10', '11' ] );
