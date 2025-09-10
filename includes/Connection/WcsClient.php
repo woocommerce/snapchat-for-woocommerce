@@ -219,8 +219,8 @@ final class WcsClient {
 		}
 
 		return new WP_Error(
-			'wcs_error',
-			__( 'WCS request failed', 'snapchat-for-woocommerce' ),
+			Helper::with_prefix( 'request_failed' ),
+			__( 'Request failed', 'snapchat-for-woocommerce' ),
 			$response
 		);
 	}
