@@ -155,7 +155,7 @@ final class UserIdentifier {
 	 *
 	 * @param array<string,mixed> $data Reference to the user_data array.
 	 */
-	private static function add_user_details( array &$data ): void {
+	public static function add_user_details( array &$data ): void {
 		$order_id = (int) get_query_var( 'order-received' );
 		$order    = wc_get_order( $order_id );
 

@@ -17,8 +17,8 @@ use SnapchatForWooCommerce\Utils\Storage\OptionDefaults;
 use SnapchatForWooCommerce\Utils\Storage\Transients;
 use SnapchatForWooCommerce\Utils\Storage\TransientDefaults;
 use SnapchatForWooCommerce\Tracking\Consent;
+use SnapchatForWooCommerce\Utils\UserIdentifier;
 use SnapchatForWooCommerce\Config;
-use WC_Product;
 
 /**
  * Fetches and injects Snapchat pixel tracking code into WooCommerce frontend pages.
@@ -242,20 +242,22 @@ final class RemotePixelTracker implements PixelTrackerInterface {
 			}
 		}
 
+		$payload = array(
+			'price'          => $total,
+			'currency'       => $currency,
+			'event_id'       => $order_key,
+			'transaction_id' => $order_key,
+			'item_ids'       => $item_ids,
+			'item_category'  => implode( ', ', array_unique( $item_categories ) ),
+			'number_items'   => $number_items,
+			'integration'    => 'woocommerce-v1',
+		);
+
+		UserIdentifier::add_user_details( $payload );
+
 		$tracking_data = sprintf(
 			'snaptr("track", "PURCHASE", %s);',
-			wp_json_encode(
-				array(
-					'price'          => $total,
-					'currency'       => $currency,
-					'event_id'       => $order_key,
-					'transaction_id' => $order_key,
-					'item_ids'       => $item_ids,
-					'item_category'  => implode( ', ', array_unique( $item_categories ) ),
-					'number_items'   => $number_items,
-					'integration'    => 'woocommerce-v1',
-				)
-			)
+			wp_json_encode( $payload )
 		);
 
 		wp_add_inline_script( Config::ASSET_HANDLE_PREFIX . 'tracking', $tracking_data );
