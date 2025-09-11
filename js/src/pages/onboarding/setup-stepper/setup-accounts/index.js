@@ -52,18 +52,18 @@ const SetupAccounts = ( props ) => {
 	return (
 		<StepContent>
 			<StepContentHeader
-				title={ __( 'Set up your accounts', 'snapchat-for-woo' ) }
+				title={ __( 'Set up your accounts', 'snapchat-for-woocommerce' ) }
 				description={ __(
 					'Connect the accounts required to use Snapchat integration.',
-					'snapchat-for-woo'
+					'snapchat-for-woocommerce'
 				) }
 			/>
 			<Section
 				className="sfw-wp-snapchat-accounts-section"
-				title={ __( 'Connect accounts', 'snapchat-for-woo' ) }
+				title={ __( 'Connect accounts', 'snapchat-for-woocommerce' ) }
 				description={ __(
 					'The following accounts are required to use the Snapchat plugin.',
-					'snapchat-for-woo'
+					'snapchat-for-woocommerce'
 				) }
 			>
 				<WPComAccountCard jetpack={ jetpack } />
@@ -76,7 +76,7 @@ const SetupAccounts = ( props ) => {
 						isPrimary
 						disabled={ isContinueButtonDisabled }
 						loading={ isSubmitting }
-						text={ __( 'Continue', 'snapchat-for-woo' ) }
+						text={ __( 'Continue', 'snapchat-for-woocommerce' ) }
 						onClick={ handleOnClick }
 					/>
 				</StepContentActions>

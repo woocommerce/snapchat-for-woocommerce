@@ -25,5 +25,5 @@ export default function getConnectedJetpackInfo( jetpack ) {
 	}
 
 	// Show a connected text instead of owner email to non jetpack owner users.
-	return __( 'Successfully connected through Jetpack', 'snapchat-for-woo' );
+	return __( 'Successfully connected through Jetpack', 'snapchat-for-woocommerce' );
 }

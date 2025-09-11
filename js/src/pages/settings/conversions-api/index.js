@@ -47,7 +47,7 @@ const ConversionsAPI = () => {
 				'success',
 				__(
 					'Conversions API Tracking status updated successfully.',
-					'snapchat-for-woo'
+					'snapchat-for-woocommerce'
 				)
 			);
 		} catch ( error ) {
@@ -66,7 +66,7 @@ const ConversionsAPI = () => {
 				'success',
 				__(
 					'Collect PII status updated successfully.',
-					'snapchat-for-woo'
+					'snapchat-for-woocommerce'
 				)
 			);
 		} catch ( error ) {
@@ -83,10 +83,10 @@ const ConversionsAPI = () => {
 	return (
 		<AccountCard
 			className="sfw-settings-track-conversions"
-			title={ __( 'Conversions API', 'snapchat-for-woo' ) }
+			title={ __( 'Conversions API', 'snapchat-for-woocommerce' ) }
 			description={ __(
 				'Send server-side conversion events to improve attribution.',
-				'snapchat-for-woo'
+				'snapchat-for-woocommerce'
 			) }
 			actions={
 				<div className="sfw-settings-track-conversions__actions">
@@ -94,7 +94,7 @@ const ConversionsAPI = () => {
 						<CheckboxControl
 							label={ __(
 								'Enable Conversions API tracking',
-								'snapchat-for-woo'
+								'snapchat-for-woocommerce'
 							) }
 							checked={ capiEnabled }
 							disabled={ isSaving }
@@ -106,14 +106,14 @@ const ConversionsAPI = () => {
 						<CheckboxControl
 							label={ __(
 								'Collect Customer PII',
-								'snapchat-for-woo'
+								'snapchat-for-woocommerce'
 							) }
 							checked={ collectPii }
 							disabled={ isSaving }
 							onChange={ handleOnChangeOfCollectPii }
 							help={ __(
 								'Share additional customer data to help ads measure results more effectively.',
-								'snapchat-for-woo'
+								'snapchat-for-woocommerce'
 							) }
 						/>
 					</p>

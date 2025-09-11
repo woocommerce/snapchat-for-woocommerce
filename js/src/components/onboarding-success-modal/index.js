@@ -40,7 +40,7 @@ const OnboardingSuccessModal = () => {
 					variant="secondary"
 					onClick={ handleCloseModal }
 				>
-					{ __( 'Close', 'snapchat-for-woo' ) }
+					{ __( 'Close', 'snapchat-for-woocommerce' ) }
 				</AppButton>,
 			] }
 		>
@@ -49,7 +49,7 @@ const OnboardingSuccessModal = () => {
 					<FlexItem>
 						<img
 							src={ wooLogoURL }
-							alt={ __( 'WooCommerce Logo', 'snapchat-for-woo' ) }
+							alt={ __( 'WooCommerce Logo', 'snapchat-for-woocommerce' ) }
 							width="187.5"
 						/>
 					</FlexItem>
@@ -57,7 +57,7 @@ const OnboardingSuccessModal = () => {
 					<FlexItem>
 						<img
 							src={ snapchatLogoURL }
-							alt={ __( 'Snapchat Logo', 'snapchat-for-woo' ) }
+							alt={ __( 'Snapchat Logo', 'snapchat-for-woocommerce' ) }
 							width="123"
 						/>
 					</FlexItem>
@@ -68,13 +68,13 @@ const OnboardingSuccessModal = () => {
 				<h2 className="sfw-onboarding-success-modal__title">
 					{ __(
 						'You’ve successfully set up Snapchat for WooCommerce! 🎉',
-						'snapchat-for-woo'
+						'snapchat-for-woocommerce'
 					) }
 				</h2>
 				<div className="sfw-onboarding-success-modal__description">
 					{ __(
 						'Your store is now connected to Snapchat. You can start running ads, track performance, and reach Snapchat users with your WooCommerce products.',
-						'snapchat-for-woo'
+						'snapchat-for-woocommerce'
 					) }
 				</div>
 			</div>

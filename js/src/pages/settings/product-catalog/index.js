@@ -95,20 +95,20 @@ const ProductCatalog = () => {
 		if ( exportInProgress ) {
 			return __(
 				'We’re generating your CSV file… This may take a few seconds.',
-				'snapchat-for-woo'
+				'snapchat-for-woocommerce'
 			);
 		}
 
 		if ( ! lastExported ) {
 			return __(
 				'Your product catalog is not synced to Snapchat yet. Generate a CSV to manually upload.',
-				'snapchat-for-woo'
+				'snapchat-for-woocommerce'
 			);
 		}
 
 		return sprintf(
 			// translators: %s: The date and time when the product catalog was last exported.
-			__( 'Last exported on %s.', 'snapchat-for-woo' ),
+			__( 'Last exported on %s.', 'snapchat-for-woocommerce' ),
 			lastExported
 		);
 	};
@@ -122,7 +122,7 @@ const ProductCatalog = () => {
 						onClick={ handleOnGenerateCsvClick }
 						loading={ exportInProgress }
 					>
-						{ __( 'Regenerate CSV', 'snapchat-for-woo' ) }
+						{ __( 'Regenerate CSV', 'snapchat-for-woocommerce' ) }
 					</AppButton>
 				</Flex>
 			);
@@ -134,7 +134,7 @@ const ProductCatalog = () => {
 				onClick={ handleOnGenerateCsvClick }
 				loading={ exportInProgress }
 			>
-				{ __( 'Generate CSV', 'snapchat-for-woo' ) }
+				{ __( 'Generate CSV', 'snapchat-for-woocommerce' ) }
 			</AppButton>
 		);
 	};
@@ -174,7 +174,7 @@ const ProductCatalog = () => {
 		<>
 			<AccountCard
 				className="sfw-product-catalog"
-				title={ __( 'Export Product Catalog', 'snapchat-for-woo' ) }
+				title={ __( 'Export Product Catalog', 'snapchat-for-woocommerce' ) }
 				description={ getDescription() }
 				indicator={ getIndicator() }
 			>
@@ -183,7 +183,7 @@ const ProductCatalog = () => {
 						<p>
 							{ __(
 								'The CSV file may have been deleted and could not be found. Click "Generate CSV" to regenerate a new one.',
-								'snapchat-for-woo'
+								'snapchat-for-woocommerce'
 							) }
 						</p>
 					</div>

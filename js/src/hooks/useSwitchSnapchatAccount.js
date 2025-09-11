@@ -37,7 +37,7 @@ const useSwitchSnapchatAccount = () => {
 			'info',
 			__(
 				'Connecting to a different Snapchat account, please wait…',
-				'snapchat-for-woo'
+				'snapchat-for-woocommerce'
 			)
 		);
 
@@ -54,7 +54,7 @@ const useSwitchSnapchatAccount = () => {
 				'error',
 				__(
 					'Unable to connect to a different Snapchat account. Please try again later.',
-					'snapchat-for-woo'
+					'snapchat-for-woocommerce'
 				)
 			);
 		} finally {

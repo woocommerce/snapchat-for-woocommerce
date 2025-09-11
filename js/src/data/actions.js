@@ -117,7 +117,7 @@ export async function updateSettings( updatedSettings ) {
 			error,
 			__(
 				'There was an error updating the settings.',
-				'snapchat-for-woo'
+				'snapchat-for-woocommerce'
 			)
 		);
 		throw error;
@@ -142,7 +142,7 @@ export async function fetchSnapchatAccount() {
 			error,
 			__(
 				'There was an error loading Snapchat account info.',
-				'snapchat-for-woo'
+				'snapchat-for-woocommerce'
 			)
 		);
 	}
@@ -166,7 +166,7 @@ export async function fetchSetup() {
 			error,
 			__(
 				'There was an error loading Snapchat setup.',
-				'snapchat-for-woo'
+				'snapchat-for-woocommerce'
 			)
 		);
 	}
@@ -196,7 +196,7 @@ export async function disconnectSnapchatAccount(
 			error,
 			__(
 				'Unable to disconnect your Snapchat account.',
-				'snapchat-for-woo'
+				'snapchat-for-woocommerce'
 			)
 		);
 		throw error;

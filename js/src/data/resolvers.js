@@ -38,7 +38,7 @@ export function getJetpackAccount() {
 				error,
 				__(
 					'There was an error loading Jetpack account info.',
-					'snapchat-for-woo'
+					'snapchat-for-woocommerce'
 				)
 			);
 		}
@@ -71,7 +71,7 @@ export function getSnapchatAccountDetails() {
 				error,
 				__(
 					'There was an error loading Snapchat account details info.',
-					'snapchat-for-woo'
+					'snapchat-for-woocommerce'
 				)
 			);
 		}
@@ -104,7 +104,7 @@ export function getSettings() {
 				error,
 				__(
 					'There was an error fetching settings.',
-					'snapchat-for-woo'
+					'snapchat-for-woocommerce'
 				)
 			);
 		}

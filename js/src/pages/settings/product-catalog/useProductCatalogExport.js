@@ -52,7 +52,7 @@ const useProductCatalogExport = (
 					'error',
 					__(
 						'No products found. Please create products to generate the CSV.',
-						'snapchat-for-woo'
+						'snapchat-for-woocommerce'
 					)
 				);
 				return;
@@ -60,7 +60,7 @@ const useProductCatalogExport = (
 
 			createNotice(
 				'error',
-				__( 'An error occurred', 'snapchat-for-woo' )
+				__( 'An error occurred', 'snapchat-for-woocommerce' )
 			);
 			onGenerateCsvError();
 		} catch ( error ) {
@@ -68,7 +68,7 @@ const useProductCatalogExport = (
 				'error',
 				sprintf(
 					// translators: %s: The error message returned from the CSV generation process.
-					__( 'CSV generation failed: %s', 'snapchat-for-woo' ),
+					__( 'CSV generation failed: %s', 'snapchat-for-woocommerce' ),
 					error.message
 				)
 			);

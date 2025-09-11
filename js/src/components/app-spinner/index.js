@@ -17,7 +17,7 @@ const AppSpinner = () => {
 		<div
 			className="sfw-app-spinner"
 			role="status"
-			aria-label={ __( 'Loading…', 'snapchat-for-woo' ) }
+			aria-label={ __( 'Loading…', 'snapchat-for-woocommerce' ) }
 		>
 			<Spinner />
 		</div>

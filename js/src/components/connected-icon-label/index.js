@@ -23,7 +23,7 @@ const ConnectedIconLabel = ( props ) => {
 			<FlexItem>
 				<GridiconCheckmarkCircle />
 			</FlexItem>
-			<FlexItem>{ __( 'Connected', 'snapchat-for-woo' ) }</FlexItem>
+			<FlexItem>{ __( 'Connected', 'snapchat-for-woocommerce' ) }</FlexItem>
 		</Flex>
 	);
 };
