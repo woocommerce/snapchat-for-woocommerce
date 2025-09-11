@@ -303,6 +303,7 @@ class RemoteConversionTracker implements ConversionTrackerInterface {
 
 			if ( is_wp_error( $response ) ) {
 				$body       = json_decode( wp_remote_retrieve_body( $response->get_error_data() ), true );
+				$body       = Helper::deep_replace_double_quotes( $body );
 				$error_data = $response->get_error_data();
 				$status     = $error_data['response']['code'];
 				$message    = $response->get_error_message();

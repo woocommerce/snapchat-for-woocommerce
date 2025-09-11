@@ -122,7 +122,7 @@ final class UserIdentifier {
 	 * @return void
 	 */
 	private static function add_ip_address( array &$data ): void {
-		$ip   = '';
+		$ip = '';
 
 		if ( isset( $_SERVER['HTTP_CF_CONNECTING_IP'] ) ) {
 			$ip = sanitize_text_field( wp_unslash( $_SERVER['HTTP_CF_CONNECTING_IP'] ) );
@@ -210,7 +210,7 @@ final class UserIdentifier {
 				$normalized = substr( $normalized, 0, 5 );
 			} elseif ( 'GB' === $country ) {
 				// UK: area + district + sector (strip unit part)
-				// Example: SW1A1AA → sw1a1
+				// Example: SW1A1AA → sw1a1.
 				if ( preg_match( '/^([a-z]{1,2}\d[a-z\d]?\d?)/i', $normalized, $matches ) ) {
 					$normalized = strtolower( $matches[1] );
 				}
@@ -220,7 +220,7 @@ final class UserIdentifier {
 		}
 
 		if ( $country ) {
-			$normalized = strtolower( $country );
+			$normalized      = strtolower( $country );
 			$data['country'] = hash( 'sha256', $normalized );
 		}
 	}

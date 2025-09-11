@@ -66,7 +66,7 @@ const ConversionsAPI = () => {
 				'success',
 				__(
 					'Collect PII status updated successfully.',
-					'snapchat-for-woocommerce'
+					'snapchat-for-woo'
 				)
 			);
 		} catch ( error ) {
@@ -106,12 +106,15 @@ const ConversionsAPI = () => {
 						<CheckboxControl
 							label={ __(
 								'Collect Customer PII',
-								'snapchat-for-woocommerce'
+								'snapchat-for-woo'
 							) }
 							checked={ collectPii }
 							disabled={ isSaving }
 							onChange={ handleOnChangeOfCollectPii }
-							help={ __( 'Share additional customer data to help ads measure results more effectively.', 'snapchat-for-woocommerce' ) }
+							help={ __(
+								'Share additional customer data to help ads measure results more effectively.',
+								'snapchat-for-woo'
+							) }
 						/>
 					</p>
 				</div>
