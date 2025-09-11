@@ -188,7 +188,7 @@ class Helper {
 	 * @param array $data Response array that is recursively processed.
 	 * @return array Sanitized array with double quotes replaced by single quotes.
 	 */
-	public static function deep_replace_double_quotes( $data ): array {
+	public static function deep_replace_double_quotes( $data ) {
 		if ( is_array( $data ) ) {
 			foreach ( $data as $key => $value ) {
 				$data[ $key ] = self::deep_replace_double_quotes( $value );
@@ -206,9 +206,11 @@ class Helper {
 		}
 
 		if ( is_string( $data ) ) {
+			// Replace all double quotes with single quotes.
 			return str_replace( '"', "'", $data );
 		}
 
+		// Return scalars (int, float, bool, null) as-is.
 		return $data;
 	}
 }
