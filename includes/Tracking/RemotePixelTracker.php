@@ -16,6 +16,7 @@ use SnapchatForWooCommerce\Utils\Storage\Options;
 use SnapchatForWooCommerce\Utils\Storage\OptionDefaults;
 use SnapchatForWooCommerce\Utils\Storage\Transients;
 use SnapchatForWooCommerce\Utils\Storage\TransientDefaults;
+use SnapchatForWooCommerce\Utils\Storage;
 use SnapchatForWooCommerce\Tracking\Consent;
 use SnapchatForWooCommerce\Utils\UserIdentifier;
 use SnapchatForWooCommerce\Config;
@@ -253,7 +254,9 @@ final class RemotePixelTracker implements PixelTrackerInterface {
 			'integration'    => 'woocommerce-v1',
 		);
 
-		UserIdentifier::add_user_details( $payload );
+		if ( Storage\Helper::is_collect_pii_enabled() ) {
+			UserIdentifier::add_user_details( $payload );
+		}
 
 		$tracking_data = sprintf(
 			'snaptr("track", "PURCHASE", %s);',

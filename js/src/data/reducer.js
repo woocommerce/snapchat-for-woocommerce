@@ -115,12 +115,6 @@ const reducer = ( state, action ) => {
 			return setIn( state, 'snapchat', snapchatAccountDetails );
 		}
 
-		case TYPES.RECEIVE_TRACK_CONVERSIONS_STATUS: {
-			const { status } = action;
-
-			return setIn( state, 'trackConversions', status );
-		}
-
 		case TYPES.DISCONNECT_ACCOUNTS_SNAPCHAT: {
 			return setIn( state, 'accounts.snapchat', null );
 		}

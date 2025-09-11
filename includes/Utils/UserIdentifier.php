@@ -23,6 +23,8 @@
 
 namespace SnapchatForWooCommerce\Utils;
 
+use SnapchatForWooCommerce\Utils\Storage;
+
 /**
  * Builds the user_data structure for CAPI event payloads.
  *
@@ -51,7 +53,7 @@ final class UserIdentifier {
 		self::add_sc_cookie( $data );
 		self::add_click_id( $data );
 
-		if ( is_order_received_page() ) {
+		if ( is_order_received_page() && Storage\Helper::is_collect_pii_enabled() ) {
 			// ⚠️ Values are only extracted on the WooCommerce order-received page.
 			self::add_user_details( $data );
 		}

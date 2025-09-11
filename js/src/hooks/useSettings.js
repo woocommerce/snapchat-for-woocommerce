@@ -27,7 +27,8 @@ const useSettings = () => {
 		const settings = selector[ selectorName ]();
 
 		return {
-			isCapiEnabled: settings.trackConversions,
+			capiEnabled: settings.capiEnabled,
+			collectPii: settings.collectPii,
 			shouldTriggerExport: settings.triggerExport,
 			lastExportTimeStamp: settings.lastExportTimeStamp,
 			exportFileUrl: settings.exportFileUrl,
