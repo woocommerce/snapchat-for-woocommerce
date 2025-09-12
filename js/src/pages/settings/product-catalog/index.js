@@ -174,7 +174,10 @@ const ProductCatalog = () => {
 		<>
 			<AccountCard
 				className="sfw-product-catalog"
-				title={ __( 'Export Product Catalog', 'snapchat-for-woocommerce' ) }
+				title={ __(
+					'Export Product Catalog',
+					'snapchat-for-woocommerce'
+				) }
 				description={ getDescription() }
 				indicator={ getIndicator() }
 			>

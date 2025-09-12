@@ -49,7 +49,10 @@ const OnboardingSuccessModal = () => {
 					<FlexItem>
 						<img
 							src={ wooLogoURL }
-							alt={ __( 'WooCommerce Logo', 'snapchat-for-woocommerce' ) }
+							alt={ __(
+								'WooCommerce Logo',
+								'snapchat-for-woocommerce'
+							) }
 							width="187.5"
 						/>
 					</FlexItem>
@@ -57,7 +60,10 @@ const OnboardingSuccessModal = () => {
 					<FlexItem>
 						<img
 							src={ snapchatLogoURL }
-							alt={ __( 'Snapchat Logo', 'snapchat-for-woocommerce' ) }
+							alt={ __(
+								'Snapchat Logo',
+								'snapchat-for-woocommerce'
+							) }
 							width="123"
 						/>
 					</FlexItem>

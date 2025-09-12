@@ -15,7 +15,10 @@ const SetupTopBar = () => {
 
 	return (
 		<TopBar
-			title={ __( 'Get started with Snapchat', 'snapchat-for-woocommerce' ) }
+			title={ __(
+				'Get started with Snapchat',
+				'snapchat-for-woocommerce'
+			) }
 			helpButton={ <HelpIconButton eventContext="setup-snapchat" /> }
 			backHref={ adminUrl }
 		/>

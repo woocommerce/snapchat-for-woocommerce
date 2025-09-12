@@ -52,7 +52,10 @@ const SetupAccounts = ( props ) => {
 	return (
 		<StepContent>
 			<StepContentHeader
-				title={ __( 'Set up your accounts', 'snapchat-for-woocommerce' ) }
+				title={ __(
+					'Set up your accounts',
+					'snapchat-for-woocommerce'
+				) }
 				description={ __(
 					'Connect the accounts required to use Snapchat integration.',
 					'snapchat-for-woocommerce'

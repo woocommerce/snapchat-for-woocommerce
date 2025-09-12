@@ -68,7 +68,10 @@ const useProductCatalogExport = (
 				'error',
 				sprintf(
 					// translators: %s: The error message returned from the CSV generation process.
-					__( 'CSV generation failed: %s', 'snapchat-for-woocommerce' ),
+					__(
+						'CSV generation failed: %s',
+						'snapchat-for-woocommerce'
+					),
 					error.message
 				)
 			);

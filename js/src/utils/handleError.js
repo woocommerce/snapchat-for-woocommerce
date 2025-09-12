@@ -41,7 +41,9 @@ export function resolveErrorMessage( error, leadingMessage, fallbackMessage ) {
 	}
 
 	if ( messages.length === 0 ) {
-		messages.push( __( 'Unknown error occurred.', 'snapchat-for-woocommerce' ) );
+		messages.push(
+			__( 'Unknown error occurred.', 'snapchat-for-woocommerce' )
+		);
 	}
 
 	return messages.join(

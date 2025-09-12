@@ -17,7 +17,10 @@ import { ALL_ACCOUNTS, SNAPCHAT_ACCOUNT } from './constants';
 const textDict = {
 	[ ALL_ACCOUNTS ]: {
 		title: __( 'Disconnect all accounts', 'snapchat-for-woocommerce' ),
-		confirmButton: __( 'Disconnect all accounts', 'snapchat-for-woocommerce' ),
+		confirmButton: __(
+			'Disconnect all accounts',
+			'snapchat-for-woocommerce'
+		),
 		confirmation: __(
 			'Yes, I want to disconnect all my accounts.',
 			'snapchat-for-woocommerce'
@@ -36,7 +39,10 @@ const textDict = {
 	},
 	[ SNAPCHAT_ACCOUNT ]: {
 		title: __( 'Disconnect Snapchat account', 'snapchat-for-woocommerce' ),
-		confirmButton: __( 'Disconnect Snapchat Account', 'snapchat-for-woocommerce' ),
+		confirmButton: __(
+			'Disconnect Snapchat Account',
+			'snapchat-for-woocommerce'
+		),
 		confirmation: __(
 			'Yes, I want to disconnect my Snapchat account.',
 			'snapchat-for-woocommerce'

@@ -28,14 +28,15 @@ const AccountDetails = () => {
 
 			{ adsId && adsName && (
 				<p>
-					{ __( 'Ads Account:', 'snapchat-for-woocommerce' ) } { adsName } (
-					{ adsId })
+					{ __( 'Ads Account:', 'snapchat-for-woocommerce' ) }{ ' ' }
+					{ adsName } ({ adsId })
 				</p>
 			) }
 
 			{ pixelId && (
 				<p>
-					{ __( 'Pixel ID:', 'snapchat-for-woocommerce' ) } { pixelId }
+					{ __( 'Pixel ID:', 'snapchat-for-woocommerce' ) }{ ' ' }
+					{ pixelId }
 				</p>
 			) }
 		</div>
