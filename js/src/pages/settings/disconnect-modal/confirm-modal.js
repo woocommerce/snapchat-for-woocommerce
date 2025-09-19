@@ -127,6 +127,7 @@ export default function ConfirmModal( {
 					loading={ isDisconnecting }
 					disabled={ ! isAgreed }
 					onClick={ handleConfirmClick }
+					eventName="sfw_disconnect_snapchat_confirm_button_click"
 				>
 					{ confirmButton }
 				</AppButton>,

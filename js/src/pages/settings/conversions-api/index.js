@@ -13,6 +13,7 @@ import useSettings from '~/hooks/useSettings';
 import useDispatchCoreNotices from '~/hooks/useDispatchCoreNotices';
 import AccountCard from '~/components/account-card';
 import SpinnerCard from '~/components/spinner-card';
+import { recordSfwEvent } from '~/utils/tracks';
 import './index.scss';
 
 /**
@@ -31,10 +32,16 @@ const ConversionsAPI = () => {
 	const { updateSettings } = useAppDispatch();
 
 	const toggleTrackConversions = useCallback( async () => {
+		recordSfwEvent( 'sfw_conversion_tracking_toggle', {
+			status: ! capiEnabled ? 'off' : 'on',
+		} );
 		await updateSettings( { capiEnabled: ! capiEnabled } );
 	}, [ updateSettings, capiEnabled ] );
 
 	const toggleCollectPii = useCallback( async () => {
+		recordSfwEvent( 'sfw_collect_pii_toggle', {
+			status: ! capiEnabled ? 'off' : 'on',
+		} );
 		await updateSettings( { collectPii: ! collectPii } );
 	}, [ updateSettings, collectPii ] );
 

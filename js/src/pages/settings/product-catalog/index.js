@@ -121,6 +121,7 @@ const ProductCatalog = () => {
 						variant="secondary"
 						onClick={ handleOnGenerateCsvClick }
 						loading={ exportInProgress }
+						eventName="sfw_regenerate_csv_button_click"
 					>
 						{ __( 'Regenerate CSV', 'snapchat-for-woocommerce' ) }
 					</AppButton>
@@ -133,6 +134,7 @@ const ProductCatalog = () => {
 				variant="secondary"
 				onClick={ handleOnGenerateCsvClick }
 				loading={ exportInProgress }
+				eventName="sfw_generate_csv_button_click"
 			>
 				{ __( 'Generate CSV', 'snapchat-for-woocommerce' ) }
 			</AppButton>

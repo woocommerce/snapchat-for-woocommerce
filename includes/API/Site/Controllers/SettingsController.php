@@ -121,6 +121,8 @@ class SettingsController extends RESTBaseController {
 				'trigger_export'        => ! file_exists( $csv_path ) && Helper::has_products() && (int) $timestamp <= ( time() - DAY_IN_SECONDS ),
 				'last_export_timestamp' => Helper::get_formatted_timestamp( $timestamp ),
 				'export_file_url'       => file_exists( $csv_path ) ? Options::get( OptionDefaults::EXPORT_FILE_URL ) : '',
+				'plugin_version'        => SNAPCHAT_FOR_WOOCOMMERCE_VERSION,
+				'ad_account_id'         => Options::get( OptionDefaults::AD_ACCOUNT_ID ),
 			)
 		);
 	}

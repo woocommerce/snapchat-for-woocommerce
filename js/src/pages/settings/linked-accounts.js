@@ -57,6 +57,7 @@ export default function LinkedAccounts() {
 							isDestructive
 							isLink
 							onClick={ openDisconnectAdsAccountModal }
+							eventName="sfw_disconnect_snapchat_button_click"
 						>
 							{ __(
 								'Disconnect Snapchat account',

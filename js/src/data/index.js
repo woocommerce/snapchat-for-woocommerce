@@ -37,6 +37,8 @@ const store = createReduxStore( STORE_KEY, {
 			triggerExport: false,
 			lastExportTimeStamp: '',
 			exportFileUrl: '',
+			version: '',
+			adAccountId: '',
 		},
 	},
 } );

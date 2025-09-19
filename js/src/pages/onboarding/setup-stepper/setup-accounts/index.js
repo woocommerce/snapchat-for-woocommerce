@@ -81,6 +81,7 @@ const SetupAccounts = ( props ) => {
 						loading={ isSubmitting }
 						text={ __( 'Continue', 'snapchat-for-woocommerce' ) }
 						onClick={ handleOnClick }
+						eventName="sfw_onboarding_completed"
 					/>
 				</StepContentActions>
 			</StepContentFooter>

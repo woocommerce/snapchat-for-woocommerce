@@ -82,6 +82,9 @@ class Assets {
 				'exportFileUrl'      => file_exists( $csv_path ) ? Options::get( OptionDefaults::EXPORT_FILE_URL ) : '',
 				'lastTimestamp'      => Helper::get_formatted_timestamp( Options::get( OptionDefaults::LAST_EXPORT_TIMESTAMP ) ),
 				'slug'               => 'sfw',
+				'trackingSlug'       => 'snapwoo_',
+				'pluginVersion'      => SNAPCHAT_FOR_WOOCOMMERCE_VERSION,
+				'adAccountId'        => Options::get( OptionDefaults::AD_ACCOUNT_ID ),
 			)
 		);
 	}
