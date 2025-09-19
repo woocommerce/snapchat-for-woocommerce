@@ -16,39 +16,45 @@ import { ALL_ACCOUNTS, SNAPCHAT_ACCOUNT } from './constants';
 
 const textDict = {
 	[ ALL_ACCOUNTS ]: {
-		title: __( 'Disconnect all accounts', 'snapchat-for-woo' ),
-		confirmButton: __( 'Disconnect all accounts', 'snapchat-for-woo' ),
+		title: __( 'Disconnect all accounts', 'snapchat-for-woocommerce' ),
+		confirmButton: __(
+			'Disconnect all accounts',
+			'snapchat-for-woocommerce'
+		),
 		confirmation: __(
 			'Yes, I want to disconnect all my accounts.',
-			'snapchat-for-woo'
+			'snapchat-for-woocommerce'
 		),
 		contents: [
 			__(
 				'I understand that I am disconnecting any WordPress.com account and Snapchat account connected to this extension.',
-				'snapchat-for-woo'
+				'snapchat-for-woocommerce'
 			),
-			__( 'Lorem ipsum', 'snapchat-for-woo' ),
+			__( 'Lorem ipsum', 'snapchat-for-woocommerce' ),
 			__(
 				'Dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.',
-				'snapchat-for-woo'
+				'snapchat-for-woocommerce'
 			),
 		],
 	},
 	[ SNAPCHAT_ACCOUNT ]: {
-		title: __( 'Disconnect Snapchat account', 'snapchat-for-woo' ),
-		confirmButton: __( 'Disconnect Snapchat Account', 'snapchat-for-woo' ),
+		title: __( 'Disconnect Snapchat account', 'snapchat-for-woocommerce' ),
+		confirmButton: __(
+			'Disconnect Snapchat Account',
+			'snapchat-for-woocommerce'
+		),
 		confirmation: __(
 			'Yes, I want to disconnect my Snapchat account.',
-			'snapchat-for-woo'
+			'snapchat-for-woocommerce'
 		),
 		contents: [
 			__(
 				'I understand that I am disconnecting my Snapchat account from this WooCommerce extension.',
-				'snapchat-for-woo'
+				'snapchat-for-woocommerce'
 			),
 			__(
 				'Some configurations for Snapchat created through WooCommerce may be lost. This cannot be undone.',
-				'snapchat-for-woo'
+				'snapchat-for-woocommerce'
 			),
 		],
 	},
@@ -112,7 +118,7 @@ export default function ConfirmModal( {
 					disabled={ isDisconnecting }
 					onClick={ handleRequestClose }
 				>
-					{ __( 'Never mind', 'snapchat-for-woo' ) }
+					{ __( 'Never mind', 'snapchat-for-woocommerce' ) }
 				</AppButton>,
 				<AppButton
 					key="2"

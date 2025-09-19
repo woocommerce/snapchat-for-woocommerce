@@ -27,7 +27,7 @@ export const APPEARANCE = {
 const snapchatLogo = (
 	<img
 		src={ snapchatLogoURL }
-		alt={ __( 'Snapchat Logo', 'snapchat-for-woo' ) }
+		alt={ __( 'Snapchat Logo', 'snapchat-for-woocommerce' ) }
 		width="40"
 		height="40"
 	/>
@@ -36,7 +36,7 @@ const snapchatLogo = (
 const wpLogo = (
 	<img
 		src={ wpLogoURL }
-		alt={ __( 'WordPress.com Logo', 'snapchat-for-woo' ) }
+		alt={ __( 'WordPress.com Logo', 'snapchat-for-woocommerce' ) }
 		width="40"
 		height="40"
 	/>
@@ -50,7 +50,7 @@ const appearanceDict = {
 	},
 	[ APPEARANCE.SNAPCHAT ]: {
 		icon: snapchatLogo,
-		title: __( 'Snapchat', 'snapchat-for-woo' ),
+		title: __( 'Snapchat', 'snapchat-for-woocommerce' ),
 	},
 };
 

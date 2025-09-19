@@ -302,15 +302,18 @@ class RemoteConversionTracker implements ConversionTrackerInterface {
 			$event = $event_payload['event_name'] ?? '';
 
 			if ( is_wp_error( $response ) ) {
+				$body       = json_decode( wp_remote_retrieve_body( $response->get_error_data() ), true );
+				$body       = Helper::deep_replace_double_quotes( $body );
 				$error_data = $response->get_error_data();
 				$status     = $error_data['response']['code'];
-				$message    = $error_data['response']['message'];
+				$message    = $response->get_error_message();
 
 				$info = array(
-					'context' => 'tracking',
-					'payload' => $payload,
-					'args'    => $args,
-					'error'   => $message,
+					'context'    => 'tracking',
+					'payload'    => $body,
+					'args'       => $args,
+					'error'      => $message,
+					'error_data' => $body,
 				);
 			} else {
 				$status = $response->get_status();

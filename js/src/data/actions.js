@@ -67,7 +67,7 @@ export function receiveSetup( setup ) {
 /**
  * Creates an action to receive the settings data from the API.
  *
- * @param {Object} settings - Settings object, e.g., { trackConversions: boolean, triggerExport: boolean }.
+ * @param {Object} settings - Settings object, e.g., { capiEnabled: boolean, triggerExport: boolean }.
  * @return {Object} Action object.
  */
 export function receiveSettings( settings ) {
@@ -91,38 +91,9 @@ export function receiveSnapchatAccountDetails( snapchatAccountDetails ) {
 }
 
 /**
- * Update the conversions tracking status.
- *
- * @param {boolean} status The status of the conversions tracking.
- * @return {Object} Action object to update the conversions tracking status.
- */
-export async function updateTrackConversionsStatus( status ) {
-	try {
-		await apiFetch( {
-			path: `${ API_NAMESPACE }/snapchat/settings`,
-			method: 'POST',
-			data: {
-				capi_enabled: status,
-			},
-		} );
-
-		return receiveTrackConversionsStatus( status );
-	} catch ( error ) {
-		handleApiError(
-			error,
-			__(
-				'There was an error updating the conversions tracking status.',
-				'snapchat-for-woo'
-			)
-		);
-		throw error;
-	}
-}
-
-/**
  * Updates one or more settings on the server.
  *
- * @param {Object} updatedSettings - Partial settings to update, e.g. { trackConversions: true }.
+ * @param {Object} updatedSettings - Partial settings to update, e.g. { capiEnabled: true }.
  * @return {Function} Action object to update settings locally.
  */
 export async function updateSettings( updatedSettings ) {
@@ -132,19 +103,21 @@ export async function updateSettings( updatedSettings ) {
 			method: 'POST',
 			data: {
 				// Convert settings keys to match REST keys
-				capi_enabled: updatedSettings.trackConversions,
+				capi_enabled: updatedSettings.capiEnabled,
+				collect_pii: updatedSettings.collectPii,
 			},
 		} );
 
 		return receiveSettings( {
-			trackConversions: Boolean( response.capi_enabled ),
+			capiEnabled: Boolean( response.capi_enabled ),
+			collectPii: Boolean( response.collect_pii ),
 		} );
 	} catch ( error ) {
 		handleApiError(
 			error,
 			__(
 				'There was an error updating the settings.',
-				'snapchat-for-woo'
+				'snapchat-for-woocommerce'
 			)
 		);
 		throw error;
@@ -169,7 +142,7 @@ export async function fetchSnapchatAccount() {
 			error,
 			__(
 				'There was an error loading Snapchat account info.',
-				'snapchat-for-woo'
+				'snapchat-for-woocommerce'
 			)
 		);
 	}
@@ -193,7 +166,7 @@ export async function fetchSetup() {
 			error,
 			__(
 				'There was an error loading Snapchat setup.',
-				'snapchat-for-woo'
+				'snapchat-for-woocommerce'
 			)
 		);
 	}
@@ -223,7 +196,7 @@ export async function disconnectSnapchatAccount(
 			error,
 			__(
 				'Unable to disconnect your Snapchat account.',
-				'snapchat-for-woo'
+				'snapchat-for-woocommerce'
 			)
 		);
 		throw error;

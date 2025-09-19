@@ -128,6 +128,13 @@ final class OptionDefaults {
 	public const CONVERSION_ACCESS_TOKEN = 'conversion_access_token';
 
 	/**
+	 * Option key that toggles whether Personally Identifiable Information (PII) is collected.
+	 *
+	 * @since 0.1.0
+	 */
+	public const COLLECT_PII = 'collect_pii';
+
+	/**
 	 * Option key for the Ad Partner's Catalog ID.
 	 *
 	 * @since 0.1.0
@@ -218,6 +225,7 @@ final class OptionDefaults {
 			self::PIXEL_ID                => '',
 			self::CONVERSIONS_ENABLED     => 'no',
 			self::CONVERSION_ACCESS_TOKEN => '',
+			self::COLLECT_PII             => 'yes',
 			self::CATALOG_ID              => '',
 			self::PRODUCT_FEED_ID         => '',
 			self::FEED_STATUS             => 'empty',

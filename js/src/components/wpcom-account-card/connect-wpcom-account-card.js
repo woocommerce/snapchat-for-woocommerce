@@ -45,7 +45,7 @@ const ConnectWPComAccountCard = () => {
 				'error',
 				__(
 					'Unable to connect your WordPress.com account. Please try again later.',
-					'snapchat-for-woo'
+					'snapchat-for-woocommerce'
 				)
 			);
 		}
@@ -56,7 +56,7 @@ const ConnectWPComAccountCard = () => {
 			appearance={ APPEARANCE.WPCOM }
 			description={ __(
 				'Required to connect with Snapchat',
-				'snapchat-for-woo'
+				'snapchat-for-woocommerce'
 			) }
 			indicator={
 				<AppButton
@@ -66,7 +66,7 @@ const ConnectWPComAccountCard = () => {
 					eventProps={ { context: nextPageName } }
 					onClick={ handleConnectClick }
 				>
-					{ __( 'Connect', 'snapchat-for-woo' ) }
+					{ __( 'Connect', 'snapchat-for-woocommerce' ) }
 				</AppButton>
 			}
 		/>

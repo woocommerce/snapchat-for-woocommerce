@@ -21,21 +21,22 @@ const AccountDetails = () => {
 		<div className="sfw-snapchat-account-details">
 			{ organizationName && (
 				<p>
-					{ __( 'Organization:', 'snapchat-for-woo' ) }{ ' ' }
+					{ __( 'Organization:', 'snapchat-for-woocommerce' ) }{ ' ' }
 					{ organizationName }
 				</p>
 			) }
 
 			{ adsId && adsName && (
 				<p>
-					{ __( 'Ads Account:', 'snapchat-for-woo' ) } { adsName } (
-					{ adsId })
+					{ __( 'Ads Account:', 'snapchat-for-woocommerce' ) }{ ' ' }
+					{ adsName } ({ adsId })
 				</p>
 			) }
 
 			{ pixelId && (
 				<p>
-					{ __( 'Pixel ID:', 'snapchat-for-woo' ) } { pixelId }
+					{ __( 'Pixel ID:', 'snapchat-for-woocommerce' ) }{ ' ' }
+					{ pixelId }
 				</p>
 			) }
 		</div>

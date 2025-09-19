@@ -25,16 +25,20 @@ import './index.scss';
  * @return {JSX.Element} The rendered ConversionsAPI settings card.
  */
 const ConversionsAPI = () => {
-	const { isCapiEnabled, hasFinishedResolution } = useSettings();
+	const { capiEnabled, collectPii, hasFinishedResolution } = useSettings();
 	const [ isSaving, setIsSaving ] = useState( false );
 	const { createNotice } = useDispatchCoreNotices();
 	const { updateSettings } = useAppDispatch();
 
 	const toggleTrackConversions = useCallback( async () => {
-		await updateSettings( { trackConversions: ! isCapiEnabled } );
-	}, [ updateSettings, isCapiEnabled ] );
+		await updateSettings( { capiEnabled: ! capiEnabled } );
+	}, [ updateSettings, capiEnabled ] );
 
-	const handleOnChange = async () => {
+	const toggleCollectPii = useCallback( async () => {
+		await updateSettings( { collectPii: ! collectPii } );
+	}, [ updateSettings, collectPii ] );
+
+	const handleOnChangeOfConversionTracking = async () => {
 		try {
 			setIsSaving( true );
 			await toggleTrackConversions();
@@ -43,7 +47,26 @@ const ConversionsAPI = () => {
 				'success',
 				__(
 					'Conversions API Tracking status updated successfully.',
-					'snapchat-for-woo'
+					'snapchat-for-woocommerce'
+				)
+			);
+		} catch ( error ) {
+			// Silently fail because the error is handled within `updateSettings` action.
+		} finally {
+			setIsSaving( false );
+		}
+	};
+
+	const handleOnChangeOfCollectPii = async () => {
+		try {
+			setIsSaving( true );
+			await toggleCollectPii();
+
+			createNotice(
+				'success',
+				__(
+					'Collect PII status updated successfully.',
+					'snapchat-for-woocommerce'
 				)
 			);
 		} catch ( error ) {
@@ -60,22 +83,40 @@ const ConversionsAPI = () => {
 	return (
 		<AccountCard
 			className="sfw-settings-track-conversions"
-			title={ __( 'Conversions API', 'snapchat-for-woo' ) }
+			title={ __( 'Conversions API', 'snapchat-for-woocommerce' ) }
 			description={ __(
 				'Send server-side conversion events to improve attribution.',
-				'snapchat-for-woo'
+				'snapchat-for-woocommerce'
 			) }
 			actions={
 				<div className="sfw-settings-track-conversions__actions">
-					<CheckboxControl
-						label={ __(
-							'Enable Conversions API tracking',
-							'snapchat-for-woo'
-						) }
-						checked={ isCapiEnabled }
-						disabled={ isSaving }
-						onChange={ handleOnChange }
-					/>
+					<p>
+						<CheckboxControl
+							label={ __(
+								'Enable Conversions API tracking',
+								'snapchat-for-woocommerce'
+							) }
+							checked={ capiEnabled }
+							disabled={ isSaving }
+							onChange={ handleOnChangeOfConversionTracking }
+						/>
+					</p>
+
+					<p>
+						<CheckboxControl
+							label={ __(
+								'Collect Customer PII',
+								'snapchat-for-woocommerce'
+							) }
+							checked={ collectPii }
+							disabled={ isSaving }
+							onChange={ handleOnChangeOfCollectPii }
+							help={ __(
+								'Share additional customer data to help ads measure results more effectively.',
+								'snapchat-for-woocommerce'
+							) }
+						/>
+					</p>
 				</div>
 			}
 		/>

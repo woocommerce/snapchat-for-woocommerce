@@ -32,7 +32,7 @@ export const pagePaths = new Set();
 
 const woocommerceTranslation =
 	getSetting( 'admin' )?.woocommerceTranslation ||
-	__( 'WooCommerce', 'snapchat-for-woo' );
+	__( 'WooCommerce', 'snapchat-for-woocommerce' );
 
 // Refer to https://github.com/woocommerce/woocommerce/blob/9.7.1/plugins/woocommerce/client/admin/client/layout/controller.js#L82
 const PAGES_FILTER = 'woocommerce_admin_pages_list';
@@ -45,8 +45,8 @@ const registerPluginAdminPages = () => {
 	addFilter( PAGES_FILTER, namespace, ( pages ) => {
 		const initialBreadcrumbs = [
 			[ '', woocommerceTranslation ],
-			[ '/marketing', __( 'Marketing', 'snapchat-for-woo' ) ],
-			__( 'Snapchat for WooCommerce', 'snapchat-for-woo' ),
+			[ '/marketing', __( 'Marketing', 'snapchat-for-woocommerce' ) ],
+			__( 'Snapchat for WooCommerce', 'snapchat-for-woocommerce' ),
 		];
 
 		const pluginAdminPages = [
@@ -59,7 +59,7 @@ const registerPluginAdminPages = () => {
 			{
 				breadcrumbs: [
 					...initialBreadcrumbs,
-					__( 'Setup Snapchat', 'snapchat-for-woo' ),
+					__( 'Setup Snapchat', 'snapchat-for-woocommerce' ),
 				],
 				container: Onboarding,
 				path: '/snapchat/setup',
@@ -67,7 +67,7 @@ const registerPluginAdminPages = () => {
 			{
 				breadcrumbs: [
 					...initialBreadcrumbs,
-					__( 'Settings', 'snapchat-for-woo' ),
+					__( 'Settings', 'snapchat-for-woocommerce' ),
 				],
 				container: Settings,
 				path: '/snapchat/settings',

@@ -31,9 +31,9 @@ const store = createReduxStore( STORE_KEY, {
 			snapchat: null,
 		},
 		snapchat: null,
-		trackConversions: null,
 		settings: {
-			trackConversions: false,
+			capiEnabled: false,
+			collectPii: true,
 			triggerExport: false,
 			lastExportTimeStamp: '',
 			exportFileUrl: '',

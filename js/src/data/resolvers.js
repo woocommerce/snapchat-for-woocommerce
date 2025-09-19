@@ -38,7 +38,7 @@ export function getJetpackAccount() {
 				error,
 				__(
 					'There was an error loading Jetpack account info.',
-					'snapchat-for-woo'
+					'snapchat-for-woocommerce'
 				)
 			);
 		}
@@ -71,7 +71,7 @@ export function getSnapchatAccountDetails() {
 				error,
 				__(
 					'There was an error loading Snapchat account details info.',
-					'snapchat-for-woo'
+					'snapchat-for-woocommerce'
 				)
 			);
 		}
@@ -92,7 +92,8 @@ export function getSettings() {
 
 			dispatch(
 				receiveSettings( {
-					trackConversions: Boolean( response.capi_enabled ),
+					capiEnabled: Boolean( response.capi_enabled ),
+					collectPii: Boolean( response.collect_pii ),
 					triggerExport: Boolean( response.trigger_export ),
 					lastExportTimeStamp: response.last_export_timestamp,
 					exportFileUrl: response.export_file_url,
@@ -103,7 +104,7 @@ export function getSettings() {
 				error,
 				__(
 					'There was an error fetching settings.',
-					'snapchat-for-woo'
+					'snapchat-for-woocommerce'
 				)
 			);
 		}

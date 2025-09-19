@@ -58,7 +58,7 @@ const ConnectSnapchatAccountCard = ( {
 				'error',
 				__(
 					'Unable to connect your Snapchat account. Please try again later.',
-					'snapchat-for-woo'
+					'snapchat-for-woocommerce'
 				)
 			);
 		}
@@ -69,7 +69,7 @@ const ConnectSnapchatAccountCard = ( {
 			return (
 				<AppButton
 					loading
-					text={ __( 'Connecting…', 'snapchat-for-woo' ) }
+					text={ __( 'Connecting…', 'snapchat-for-woocommerce' ) }
 				/>
 			);
 		}
@@ -83,7 +83,7 @@ const ConnectSnapchatAccountCard = ( {
 				eventProps={ { context: nextPageName } }
 				onClick={ handleConnectClick }
 			>
-				{ __( 'Connect', 'snapchat-for-woo' ) }
+				{ __( 'Connect', 'snapchat-for-woocommerce' ) }
 			</AppButton>
 		);
 	};
@@ -94,7 +94,7 @@ const ConnectSnapchatAccountCard = ( {
 			disabled={ disabled }
 			description={ __(
 				'Connect your Snapchat Business Account to sync your catalog and run Dynamic Ads.',
-				'snapchat-for-woo'
+				'snapchat-for-woocommerce'
 			) }
 			indicator={ getIndicator() }
 		/>
