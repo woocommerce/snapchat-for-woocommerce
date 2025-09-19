@@ -25,7 +25,7 @@ import useSwitchSnapchatAccount from '~/hooks/useSwitchSnapchatAccount';
 const SwitchAccountButton = ( {
 	text = __(
 		'Or, connect to a different Snapchat account',
-		'snapchat-for-woo'
+		'snapchat-for-woocommerce'
 	),
 	...restProps
 } ) => {

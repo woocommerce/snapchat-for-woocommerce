@@ -77,14 +77,23 @@ class SettingsController extends RESTBaseController {
 	 * @return WP_REST_Response
 	 */
 	public function set_settings( $request ) {
-		$capi_token = null;
+		$capi_token  = null;
+		$collect_pii = null;
 
 		if ( isset( $request['capi_enabled'] ) ) {
 			$capi_token = rest_sanitize_boolean( $request['capi_enabled'] );
 		}
 
+		if ( isset( $request['collect_pii'] ) ) {
+			$collect_pii = rest_sanitize_boolean( $request['collect_pii'] );
+		}
+
 		if ( ! is_null( $capi_token ) ) {
 			Options::set( OptionDefaults::CONVERSIONS_ENABLED, $capi_token ? 'yes' : 'no' );
+		}
+
+		if ( ! is_null( $collect_pii ) ) {
+			Options::set( OptionDefaults::COLLECT_PII, $collect_pii ? 'yes' : 'no' );
 		}
 
 		return rest_ensure_response(
@@ -108,6 +117,7 @@ class SettingsController extends RESTBaseController {
 		return rest_ensure_response(
 			array(
 				'capi_enabled'          => 'yes' === Options::get( OptionDefaults::CONVERSIONS_ENABLED ),
+				'collect_pii'           => 'yes' === Options::get( OptionDefaults::COLLECT_PII ),
 				'trigger_export'        => ! file_exists( $csv_path ) && Helper::has_products() && (int) $timestamp <= ( time() - DAY_IN_SECONDS ),
 				'last_export_timestamp' => Helper::get_formatted_timestamp( $timestamp ),
 				'export_file_url'       => file_exists( $csv_path ) ? Options::get( OptionDefaults::EXPORT_FILE_URL ) : '',

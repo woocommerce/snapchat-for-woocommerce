@@ -60,7 +60,7 @@ export default function LinkedAccounts() {
 						>
 							{ __(
 								'Disconnect Snapchat account',
-								'snapchat-for-woo'
+								'snapchat-for-woocommerce'
 							) }
 						</AppButton>
 					</Section.Card.Footer>

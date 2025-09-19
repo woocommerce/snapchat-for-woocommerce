@@ -104,7 +104,7 @@ const shouldReturnResponseBody = ( options ) => {
  * 		>
  * 			{ __(
  * 				'Switch to my new URL',
- * 				'snapchat-for-woo'
+ * 				'snapchat-for-woocommerce'
  * 			) }
  * 		</AppButton>
  * )

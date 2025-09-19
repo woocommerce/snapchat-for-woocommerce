@@ -175,4 +175,42 @@ class Helper {
 		// 32-bit PHP: fallback to seconds to avoid integer overflow.
 		return time();
 	}
+
+	/**
+	 * Recursively replaces double quotes with single quotes in strings within an array or object.
+	 *
+	 * Sometimes Reddit API responses contain JSON strings that contain encoded double quotes,
+	 * that breaks WooCommerce logger, resulting to uglified output instead of pretty print.
+	 * This function helps sanitize such data before logging.
+	 *
+	 * @since 0.1.0
+	 *
+	 * @param array $data Response array that is recursively processed.
+	 * @return array Sanitized array with double quotes replaced by single quotes.
+	 */
+	public static function deep_replace_double_quotes( $data ) {
+		if ( is_array( $data ) ) {
+			foreach ( $data as $key => $value ) {
+				$data[ $key ] = self::deep_replace_double_quotes( $value );
+			}
+
+			return $data;
+		}
+
+		if ( is_object( $data ) ) {
+			foreach ( $data as $key => $value ) {
+				$data->$key = self::deep_replace_double_quotes( $value );
+			}
+
+			return $data;
+		}
+
+		if ( is_string( $data ) ) {
+			// Replace all double quotes with single quotes.
+			return str_replace( '"', "'", $data );
+		}
+
+		// Return scalars (int, float, bool, null) as-is.
+		return $data;
+	}
 }

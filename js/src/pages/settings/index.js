@@ -37,25 +37,30 @@ const Settings = () => {
 		<div className="sfw-settings">
 			{ isOnboardingSuccessModalOpen && <OnboardingSuccessModal /> }
 
-			<Section title={ __( 'Product Catalog', 'snapchat-for-woo' ) }>
+			<Section
+				title={ __( 'Product Catalog', 'snapchat-for-woocommerce' ) }
+			>
 				<ProductCatalog />
 			</Section>
 
 			<Section
-				title={ __( 'Track Conversions', 'snapchat-for-woo' ) }
+				title={ __( 'Track Conversions', 'snapchat-for-woocommerce' ) }
 				description={ __(
 					'Manage how conversions are tracked on your site.',
-					'snapchat-for-woo'
+					'snapchat-for-woocommerce'
 				) }
 			>
 				<ConversionsAPI />
 			</Section>
 
 			<Section
-				title={ __( 'Manage Snapchat Connection', 'snapchat-for-woo' ) }
+				title={ __(
+					'Manage Snapchat Connection',
+					'snapchat-for-woocommerce'
+				) }
 				description={ __(
 					'See your currently connected account or disconnect.',
-					'snapchat-for-woo'
+					'snapchat-for-woocommerce'
 				) }
 			>
 				<LinkedAccounts />

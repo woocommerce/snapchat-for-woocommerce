@@ -40,7 +40,7 @@ const HelpIconButton = ( { eventContext } ) => {
 			} }
 		>
 			<GridiconHelpOutline />
-			{ __( 'Help', 'snapchat-for-woo' ) }
+			{ __( 'Help', 'snapchat-for-woocommerce' ) }
 		</AppButton>
 	);
 };
