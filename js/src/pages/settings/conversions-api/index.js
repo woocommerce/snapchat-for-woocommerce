@@ -17,11 +17,28 @@ import { recordSfwEvent } from '~/utils/tracks';
 import './index.scss';
 
 /**
+ * When Conversion tracking setting is toggled.
+ *
+ * @event sfw_conversion_tracking_toggle
+ * @property {string} status The status: on|off
+ */
+
+/**
+ * When Collect PII setting is toggled.
+ *
+ * @event sfw_collect_pii_toggle
+ * @property {string} status The status: on|off
+ */
+
+/**
  * ConversionsAPI component for managing the tracking setting.
  *
  * Renders a card UI allowing users to enable or disable server-side conversion event tracking.
  * Handles asynchronous state updates and displays success notifications upon status change.
  * Shows a loading spinner while the current tracking status is being resolved.
+ *
+ * @fires sfw_conversion_tracking_toggle
+ * @fires sfw_collect_pii_toggle
  *
  * @return {JSX.Element} The rendered ConversionsAPI settings card.
  */
@@ -40,7 +57,7 @@ const ConversionsAPI = () => {
 
 	const toggleCollectPii = useCallback( async () => {
 		recordSfwEvent( 'sfw_collect_pii_toggle', {
-			status: ! capiEnabled ? 'off' : 'on',
+			status: ! collectPii ? 'off' : 'on',
 		} );
 		await updateSettings( { collectPii: ! collectPii } );
 	}, [ updateSettings, collectPii ] );

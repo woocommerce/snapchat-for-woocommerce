@@ -60,6 +60,15 @@ const textDict = {
 	},
 };
 
+/**
+ * When the confirm "Disconnect Snapchat account" button is clicked inside the modal.
+ *
+ * @event sfw_disconnect_snapchat_confirm_button_click
+ */
+
+/**
+ * @fires sfw_disconnect_snapchat_confirm_button_click
+ */
 export default function ConfirmModal( {
 	disconnectTarget,
 	onRequestClose,

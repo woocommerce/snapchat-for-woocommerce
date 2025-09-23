@@ -25,16 +25,15 @@ export const recordStepContinueEvent = noop;
  */
 export function addBaseEventProperties( eventProperties ) {
 	const { trackingSlug } = sfwData;
-	const { version, adAccountId } = select( STORE_KEY ).getSettings();
+	const { version, adAccountId } = select( STORE_KEY ).getGeneral();
 
 	const mixedProperties = {
 		...eventProperties,
-		[ `${ trackingSlug }version` ]: version || sfwData.pluginVersion,
+		[ `${ trackingSlug }_version` ]: version,
 	};
 
-	if ( adAccountId || sfwData.adAccountId ) {
-		mixedProperties[ `${ trackingSlug }ads_id` ] =
-			adAccountId || sfwData.adAccountId;
+	if ( adAccountId ) {
+		mixedProperties[ `${ trackingSlug }_ads_id` ] = adAccountId;
 	}
 
 	return mixedProperties;

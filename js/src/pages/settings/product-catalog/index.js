@@ -17,6 +17,18 @@ import useProductCatalogExport from './useProductCatalogExport';
 import './index.scss';
 
 /**
+ * When the `Generate CSV` button is clicked.
+ *
+ * @event sfw_generate_csv_button_click
+ */
+
+/**
+ * When the `Regenerate CSV` button is clicked.
+ *
+ * @event sfw_regenerate_csv_button_click
+ */
+
+/**
  * ProductCatalog component for managing and exporting the product catalog as a CSV file.
  *
  * This component allows users to:
@@ -26,6 +38,9 @@ import './index.scss';
  * - See contextual help and documentation links.
  *
  * State management includes tracking export progress, file URL, last export time, and heartbeat connection.
+ *
+ * @fires sfw_generate_csv_button_click
+ * @fires sfw_regenerate_csv_button_click
  *
  * @return {JSX.Element} The rendered ProductCatalog settings UI.
  */

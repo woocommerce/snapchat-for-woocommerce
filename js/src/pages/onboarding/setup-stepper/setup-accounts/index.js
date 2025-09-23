@@ -20,6 +20,16 @@ import StepContentFooter from '~/components/stepper/step-content-footer';
 import StepContentActions from '~/components/stepper/step-content-actions';
 import './index.scss';
 
+/**
+ * When the merchant is onboarded.
+ *
+ * @event sfw_onboarding_completed
+ */
+
+/**
+ * 
+ * @fires sfw_onboarding_completed
+ */
 const SetupAccounts = ( props ) => {
 	const { onContinue = noop } = props;
 	const { jetpack } = useJetpackAccount();

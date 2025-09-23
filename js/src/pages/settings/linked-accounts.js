@@ -13,6 +13,7 @@ import SpinnerCard from '~/components/spinner-card';
 import Section from '~/components/section';
 import { ConnectedSnapchatAccountCard } from '~/components/snapchat-account-card';
 import DisconnectModal, { SNAPCHAT_ACCOUNT } from './disconnect-modal';
+import { queueRecordSfwEvent } from '~/utils/tracks';
 
 /**
  * Accounts are disconnected from the Setting page
@@ -22,7 +23,14 @@ import DisconnectModal, { SNAPCHAT_ACCOUNT } from './disconnect-modal';
  */
 
 /**
+ * When the "Disconnect Snapchat account" button is clicked.
+ *
+ * @event sfw_disconnect_snapchat_button_click
+ */
+
+/**
  * @fires sfw_disconnected_accounts
+ * @fires sfw_disconnect_snapchat_button_click
  */
 export default function LinkedAccounts() {
 	const { hasFinishedResolution: hasResolvedSnapchatAccount } =
@@ -34,6 +42,10 @@ export default function LinkedAccounts() {
 	const dismissModal = () => setOpenedModal( null );
 
 	const handleDisconnected = () => {
+		queueRecordSfwEvent( 'sfw_disconnected_accounts', {
+			context: openedModal,
+		} );
+
 		// Reload WC admin page to update the `sfwData` initiated from the static script.
 		window.location.reload();
 	};
