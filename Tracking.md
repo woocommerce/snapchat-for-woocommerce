@@ -96,6 +96,41 @@ Clicking on the button to connect WordPress.com account.
 #### Emitters
 - [`ConnectWPComAccountCard`](js/src/components/wpcom-account-card/connect-wpcom-account-card.js#L27)
 
+### [`sfw_onboarding_completed`](js/src/pages/onboarding/setup-stepper/setup-accounts.js#23)
+When the merchant is onboarded.
+#### Emitters
+- [`SetupAccounts`](js/src/pages/onboarding/setup-stepper/setup-accounts.js#33)
+
+### [`sfw_conversion_tracking_toggle`](js/src/pages/settings/conversions-api/index.js#19)
+When Conversion tracking setting is toggled.
+#### Emitters
+- [`ConversionsAPI`](js/src/pages/settings/conversions-api/index.js#45)
+
+### [`sfw_collect_pii_toggle`](js/src/pages/settings/conversions-api/index.js#19)
+When Collect PII setting is toggled.
+#### Emitters
+- [`ConversionsAPI`](js/src/pages/settings/conversions-api/index.js#45)
+
+### [`sfw_disconnect_snapchat_confirm_button_click`](js/src/pages/settings/disconnect-modal/confirm-modal.js#63)
+By clicking the confirm "Disconnect Snapchat account" button inside the modal.
+#### Emitters
+- [`ConfirmModal`](js/src/pages/settings/disconnect-modal/confirm-modal.js#72)
+
+### [`sfw_disconnect_snapchat_button_click`](js/src/pages/settings/linked-accounts.js#25)
+By clicking the confirm "Disconnect Snapchat account" button in the Settings screen.
+#### Emitters
+- [`LinkedAccounts`](js/src/pages/settings/linked-accounts.js#35)
+
+## [`sfw_regenerate_csv_button_click`](js/src/pages/settings/product-catalog/index.js#25)
+By clicking the the Regenerate CSV button in the Settings screen.
+#### Emitters
+- [`ProductCatalog`](js/src/pages/settings/product-catalog/index.js#47)
+
+## [`sfw_generate_csv_button_click`](js/src/pages/settings/product-catalog/index.js#19)
+By clicking the the Generate CSV button in the Settings screen.
+#### Emitters
+- [`ProductCatalog`](js/src/pages/settings/product-catalog/index.js#47)
+
 <!---
 End of `woocommerce-grow-tracking-jsdoc`-generated content.
 -->
