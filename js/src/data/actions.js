@@ -114,8 +114,6 @@ export async function updateSettings( updatedSettings ) {
 			triggerExport: Boolean( response.trigger_export ),
 			lastExportTimeStamp: response.last_export_timestamp,
 			exportFileUrl: response.export_file_url,
-			adAccountId: response.ad_account_id,
-			version: response.plugin_version,
 		} );
 	} catch ( error ) {
 		handleApiError(
