@@ -50,14 +50,14 @@ const ConversionsAPI = () => {
 
 	const toggleTrackConversions = useCallback( async () => {
 		recordSfwEvent( 'sfw_conversion_tracking_toggle', {
-			status: ! capiEnabled ? 'off' : 'on',
+			status: ! capiEnabled ? 'on' : 'off',
 		} );
 		await updateSettings( { capiEnabled: ! capiEnabled } );
 	}, [ updateSettings, capiEnabled ] );
 
 	const toggleCollectPii = useCallback( async () => {
 		recordSfwEvent( 'sfw_collect_pii_toggle', {
-			status: ! collectPii ? 'off' : 'on',
+			status: ! collectPii ? 'on' : 'off',
 		} );
 		await updateSettings( { collectPii: ! collectPii } );
 	}, [ updateSettings, collectPii ] );
