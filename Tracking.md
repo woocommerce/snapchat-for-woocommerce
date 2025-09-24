@@ -123,11 +123,19 @@ By clicking the confirm "Disconnect Snapchat account" button in the Settings scr
 
 ## [`sfw_regenerate_csv_button_click`](js/src/pages/settings/product-catalog/index.js#25)
 By clicking the the Regenerate CSV button in the Settings screen.
+#### Properties
+| name | type | description |
+| ---- | ---- | ----------- |
+`context` | `string` | (`settings`) - indicates from which page the button was clicked.
 #### Emitters
 - [`ProductCatalog`](js/src/pages/settings/product-catalog/index.js#47)
 
 ## [`sfw_generate_csv_button_click`](js/src/pages/settings/product-catalog/index.js#19)
 By clicking the the Generate CSV button in the Settings screen.
+#### Properties
+| name | type | description |
+| ---- | ---- | ----------- |
+`context` | `string` | (`settings`) - indicates from which page the button was clicked.
 #### Emitters
 - [`ProductCatalog`](js/src/pages/settings/product-catalog/index.js#47)
 
