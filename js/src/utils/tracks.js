@@ -24,16 +24,16 @@ export const recordStepContinueEvent = noop;
  * @return {Object} Event properties with base event properties.
  */
 export function addBaseEventProperties( eventProperties ) {
-	const { trackingSlug } = sfwData;
+	const { slug } = sfwData;
 	const { version, adAccountId } = select( STORE_KEY ).getGeneral();
 
 	const mixedProperties = {
 		...eventProperties,
-		[ `${ trackingSlug }_version` ]: version,
+		[ `${ slug }_version` ]: version,
 	};
 
 	if ( adAccountId ) {
-		mixedProperties[ `${ trackingSlug }_ads_id` ] = adAccountId;
+		mixedProperties[ `${ slug }_ads_id` ] = adAccountId;
 	}
 
 	return mixedProperties;

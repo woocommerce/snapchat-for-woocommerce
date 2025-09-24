@@ -49,17 +49,22 @@ const ConversionsAPI = () => {
 	const { updateSettings } = useAppDispatch();
 
 	const toggleTrackConversions = useCallback( async () => {
+		const {
+			settings: { capiEnabled: __capiEnabled },
+		} = await updateSettings( { capiEnabled: ! capiEnabled } );
+
 		recordSfwEvent( 'sfw_conversion_tracking_toggle', {
-			status: ! capiEnabled ? 'on' : 'off',
+			status: __capiEnabled ? 'on' : 'off',
 		} );
-		await updateSettings( { capiEnabled: ! capiEnabled } );
 	}, [ updateSettings, capiEnabled ] );
 
 	const toggleCollectPii = useCallback( async () => {
+		const {
+			settings: { collectPii: __collectPii },
+		} = await updateSettings( { collectPii: ! collectPii } );
 		recordSfwEvent( 'sfw_collect_pii_toggle', {
-			status: ! collectPii ? 'on' : 'off',
+			status: __collectPii ? 'on' : 'off',
 		} );
-		await updateSettings( { collectPii: ! collectPii } );
 	}, [ updateSettings, collectPii ] );
 
 	const handleOnChangeOfConversionTracking = async () => {

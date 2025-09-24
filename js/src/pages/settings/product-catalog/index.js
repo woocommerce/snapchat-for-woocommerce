@@ -137,6 +137,9 @@ const ProductCatalog = () => {
 						onClick={ handleOnGenerateCsvClick }
 						loading={ exportInProgress }
 						eventName="sfw_regenerate_csv_button_click"
+						eventProps={ {
+							context: 'settings',
+						} }
 					>
 						{ __( 'Regenerate CSV', 'snapchat-for-woocommerce' ) }
 					</AppButton>
@@ -150,6 +153,9 @@ const ProductCatalog = () => {
 				onClick={ handleOnGenerateCsvClick }
 				loading={ exportInProgress }
 				eventName="sfw_generate_csv_button_click"
+				eventProps={ {
+					context: 'settings',
+				} }
 			>
 				{ __( 'Generate CSV', 'snapchat-for-woocommerce' ) }
 			</AppButton>

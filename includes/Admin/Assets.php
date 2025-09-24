@@ -81,7 +81,7 @@ class Assets {
 				'isExportInProgress' => ServiceContainer::get( ServiceKey::PRODUCT_EXPORT_SERVICE )->job->is_job_in_progress( ProductExportService::ACTION_HOOK ),
 				'exportFileUrl'      => file_exists( $csv_path ) ? Options::get( OptionDefaults::EXPORT_FILE_URL ) : '',
 				'lastTimestamp'      => Helper::get_formatted_timestamp( Options::get( OptionDefaults::LAST_EXPORT_TIMESTAMP ) ),
-				'trackingSlug'       => 'snapwoo',
+				'slug'               => 'snapwoo',
 				'pluginVersion'      => SNAPCHAT_FOR_WOOCOMMERCE_VERSION,
 				'adAccountId'        => Options::get( OptionDefaults::AD_ACCOUNT_ID ),
 			)
