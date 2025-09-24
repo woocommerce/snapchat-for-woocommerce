@@ -20,14 +20,14 @@ import './index.scss';
  * When Conversion tracking setting is toggled.
  *
  * @event sfw_conversion_tracking_toggle
- * @property {string} status The status: on|off
+ * @property {"on"|"off"} status The status of the setting.
  */
 
 /**
  * When Collect PII setting is toggled.
  *
  * @event sfw_collect_pii_toggle
- * @property {string} status The status: on|off
+ * @property {"on"|"off"} status The status of the setting.
  */
 
 /**

@@ -27,7 +27,6 @@ import './index.scss';
  */
 
 /**
- *
  * @fires sfw_onboarding_completed
  */
 const SetupAccounts = ( props ) => {
