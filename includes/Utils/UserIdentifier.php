@@ -119,7 +119,7 @@ final class UserIdentifier {
 	 * @since 0.1.0
 	 *
 	 * @param array<string,mixed>|null $data Optional. Reference to the user_data array.
-	 * @return void
+	 * @return ?string
 	 */
 	public static function add_ip_address( ?array &$data = null ): ?string {
 		$ip = '';

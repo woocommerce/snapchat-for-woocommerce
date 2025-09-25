@@ -112,7 +112,7 @@ const ConversionsAPI = () => {
 							disabled={ isSaving }
 							onChange={ handleOnChangeOfCollectPii }
 							help={ __(
-								'Share additional customer data to help ads measure results more effectively.',
+								'Share additional customer data (PII) with both Pixel and Conversions API events to improve ads measurement.',
 								'snapchat-for-woocommerce'
 							) }
 						/>
