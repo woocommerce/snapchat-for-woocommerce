@@ -223,7 +223,7 @@ final class OptionDefaults {
 			self::ORGANIZATION_NAME       => '',
 			self::PIXEL_ENABLED           => 'yes',
 			self::PIXEL_ID                => '',
-			self::CONVERSIONS_ENABLED     => 'no',
+			self::CONVERSIONS_ENABLED     => 'yes',
 			self::CONVERSION_ACCESS_TOKEN => '',
 			self::COLLECT_PII             => 'yes',
 			self::CATALOG_ID              => '',

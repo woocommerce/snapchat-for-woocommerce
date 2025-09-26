@@ -148,10 +148,10 @@ class CsvExportWriter implements ExportWriterInterface {
 		$fp = fopen( 'php://temp', 'r+' ); // phpcs:ignore WordPress.WP.AlternativeFunctions.file_system_operations_fopen
 
 		if ( $is_empty ) {
-			fputcsv( $fp, array_keys( $decoded_row ) );
+			fputcsv( $fp, array_keys( $decoded_row ), ',', '"', '\\' );
 		}
 
-		fputcsv( $fp, array_values( $decoded_row ) );
+		fputcsv( $fp, array_values( $decoded_row ), ',', '"', '\\' );
 		rewind( $fp );
 
 		$new_data = stream_get_contents( $fp );
