@@ -13,7 +13,22 @@ import useSettings from '~/hooks/useSettings';
 import useDispatchCoreNotices from '~/hooks/useDispatchCoreNotices';
 import AccountCard from '~/components/account-card';
 import SpinnerCard from '~/components/spinner-card';
+import { recordSfwEvent } from '~/utils/tracks';
 import './index.scss';
+
+/**
+ * When Conversion tracking setting is toggled.
+ *
+ * @event sfw_conversion_tracking_toggle
+ * @property {"on"|"off"} status The status of the setting.
+ */
+
+/**
+ * When Collect PII setting is toggled.
+ *
+ * @event sfw_collect_pii_toggle
+ * @property {"on"|"off"} status The status of the setting.
+ */
 
 /**
  * ConversionsAPI component for managing the tracking setting.
@@ -21,6 +36,9 @@ import './index.scss';
  * Renders a card UI allowing users to enable or disable server-side conversion event tracking.
  * Handles asynchronous state updates and displays success notifications upon status change.
  * Shows a loading spinner while the current tracking status is being resolved.
+ *
+ * @fires sfw_conversion_tracking_toggle
+ * @fires sfw_collect_pii_toggle
  *
  * @return {JSX.Element} The rendered ConversionsAPI settings card.
  */
@@ -31,11 +49,22 @@ const ConversionsAPI = () => {
 	const { updateSettings } = useAppDispatch();
 
 	const toggleTrackConversions = useCallback( async () => {
-		await updateSettings( { capiEnabled: ! capiEnabled } );
+		const {
+			settings: { capiEnabled: __capiEnabled },
+		} = await updateSettings( { capiEnabled: ! capiEnabled } );
+
+		recordSfwEvent( 'sfw_conversion_tracking_toggle', {
+			status: __capiEnabled ? 'on' : 'off',
+		} );
 	}, [ updateSettings, capiEnabled ] );
 
 	const toggleCollectPii = useCallback( async () => {
-		await updateSettings( { collectPii: ! collectPii } );
+		const {
+			settings: { collectPii: __collectPii },
+		} = await updateSettings( { collectPii: ! collectPii } );
+		recordSfwEvent( 'sfw_collect_pii_toggle', {
+			status: __collectPii ? 'on' : 'off',
+		} );
 	}, [ updateSettings, collectPii ] );
 
 	const handleOnChangeOfConversionTracking = async () => {

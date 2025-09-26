@@ -111,6 +111,9 @@ export async function updateSettings( updatedSettings ) {
 		return receiveSettings( {
 			capiEnabled: Boolean( response.capi_enabled ),
 			collectPii: Boolean( response.collect_pii ),
+			triggerExport: Boolean( response.trigger_export ),
+			lastExportTimeStamp: response.last_export_timestamp,
+			exportFileUrl: response.export_file_url,
 		} );
 	} catch ( error ) {
 		handleApiError(
