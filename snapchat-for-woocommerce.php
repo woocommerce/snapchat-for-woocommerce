@@ -26,6 +26,10 @@ use SnapchatForWooCommerce\ServiceKey;
 
 defined( 'ABSPATH' ) || exit;
 
+if ( ! defined( 'SNAPCHAT_FOR_WOOCOMMERCE_VERSION' ) ) {
+	define( 'SNAPCHAT_FOR_WOOCOMMERCE_VERSION', '0.1.0' );
+}
+
 if ( ! defined( 'SNAPCHAT_FOR_WOOCOMMERCE_FILE' ) ) {
 	define( 'SNAPCHAT_FOR_WOOCOMMERCE_FILE', __FILE__ );
 }

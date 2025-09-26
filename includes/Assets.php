@@ -16,6 +16,8 @@ use SnapchatForWooCommerce\Utils\AssetLoader;
 use SnapchatForWooCommerce\Utils\Helper;
 use SnapchatForWooCommerce\Tracking\PixelTrackingService;
 use SnapchatForWooCommerce\Tracking\ConversionTrackingService;
+use SnapchatForWooCommerce\Utils\Storage\Options;
+use SnapchatForWooCommerce\Utils\Storage\OptionDefaults;
 
 /**
  * Manages frontend asset loading for plugin features.

@@ -20,7 +20,8 @@ const store = createReduxStore( STORE_KEY, {
 	reducer,
 	initialState: {
 		general: {
-			version: '0.1',
+			version: sfwData.pluginVersion,
+			adAccountId: sfwData.adAccountId,
 		},
 		setup: {
 			status: sfwData.status,
