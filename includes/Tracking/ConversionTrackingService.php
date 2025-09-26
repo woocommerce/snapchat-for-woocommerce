@@ -172,9 +172,8 @@ class ConversionTrackingService implements ServiceStatusInterface {
 	public function handle_async_add_to_cart(): void {
 		check_ajax_referer( 'capi_nonce', 'security' );
 
-		$raw_input  = filter_input( INPUT_POST, 'payload', FILTER_UNSAFE_RAW );
-		$raw_input  = wp_unslash( $raw_input );
-		$data       = json_decode( $raw_input, true );
+		$payload    = wp_unslash( $_POST['payload'] ?? '{}' );
+		$data       = json_decode( $payload, true );
 		$product_id = absint( $data['product_id'] ?? 0 );
 		$quantity   = absint( $data['quantity'] ?? 0 );
 		$event_id   = sanitize_text_field( $data['event_id'] ?? '' );
@@ -196,9 +195,8 @@ class ConversionTrackingService implements ServiceStatusInterface {
 	public function handle_async_view_content(): void {
 		check_ajax_referer( 'capi_nonce', 'security' );
 
-		$raw_input  = filter_input( INPUT_POST, 'payload', FILTER_UNSAFE_RAW );
-		$raw_input  = wp_unslash( $raw_input );
-		$data       = json_decode( $raw_input, true );
+		$payload    = wp_unslash( $_POST['payload'] ?? '{}' );
+		$data       = json_decode( $payload, true );
 		$product_id = isset( $data['item_ids'][0] ) ? absint( $data['item_ids'][0] ) : 0;
 		$event_id   = isset( $data['event_id'] ) ? sanitize_text_field( $data['event_id'] ) : '';
 
@@ -218,9 +216,8 @@ class ConversionTrackingService implements ServiceStatusInterface {
 	public function handle_async_start_checkout(): void {
 		check_ajax_referer( 'capi_nonce', 'security' );
 
-		$raw_input = filter_input( INPUT_POST, 'payload', FILTER_UNSAFE_RAW );
-		$raw_input = wp_unslash( $raw_input );
-		$data      = json_decode( $raw_input, true );
+		$payload    = wp_unslash( $_POST['payload'] ?? '{}' );
+		$data      = json_decode( $payload, true );
 		$event_id  = isset( $data['event_id'] ) ? sanitize_text_field( $data['event_id'] ) : '';
 		$cart      = WC() ? WC()->cart : null;
 
@@ -245,9 +242,8 @@ class ConversionTrackingService implements ServiceStatusInterface {
 	public function handle_async_page_view(): void {
 		check_ajax_referer( 'capi_nonce', 'security' );
 
-		$raw_input = filter_input( INPUT_POST, 'payload', FILTER_UNSAFE_RAW );
-		$raw_input = wp_unslash( $raw_input );
-		$data      = json_decode( $raw_input, true );
+		$payload    = wp_unslash( $_POST['payload'] ?? '{}' );
+		$data      = json_decode( $payload, true );
 		$event_id  = isset( $data['event_id'] ) ? sanitize_text_field( $data['event_id'] ) : '';
 
 		$this->tracker->track_page_view( $event_id );
