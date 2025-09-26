@@ -53,7 +53,7 @@ class ConversionEventLogger {
 	 * @since 0.1.0
 	 *
 	 * @param string $event_name  Event identifier (e.g. 'PURCHASE', 'ADD_CART').
-	 * @param ?int    $status_code HTTP status code returned from the API.
+	 * @param ?int   $status_code HTTP status code returned from the API.
 	 * @param array  $context     Optional structured context.
 	 * @return void
 	 */

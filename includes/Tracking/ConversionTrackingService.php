@@ -216,10 +216,10 @@ class ConversionTrackingService implements ServiceStatusInterface {
 	public function handle_async_start_checkout(): void {
 		check_ajax_referer( 'capi_nonce', 'security' );
 
-		$payload    = wp_unslash( $_POST['payload'] ?? '{}' );
-		$data      = json_decode( $payload, true );
-		$event_id  = isset( $data['event_id'] ) ? sanitize_text_field( $data['event_id'] ) : '';
-		$cart      = WC() ? WC()->cart : null;
+		$payload  = wp_unslash( $_POST['payload'] ?? '{}' );
+		$data     = json_decode( $payload, true );
+		$event_id = isset( $data['event_id'] ) ? sanitize_text_field( $data['event_id'] ) : '';
+		$cart     = WC() ? WC()->cart : null;
 
 		$this->tracker->track_start_checkout( $cart, $event_id );
 	}
@@ -242,9 +242,9 @@ class ConversionTrackingService implements ServiceStatusInterface {
 	public function handle_async_page_view(): void {
 		check_ajax_referer( 'capi_nonce', 'security' );
 
-		$payload    = wp_unslash( $_POST['payload'] ?? '{}' );
-		$data      = json_decode( $payload, true );
-		$event_id  = isset( $data['event_id'] ) ? sanitize_text_field( $data['event_id'] ) : '';
+		$payload  = wp_unslash( $_POST['payload'] ?? '{}' );
+		$data     = json_decode( $payload, true );
+		$event_id = isset( $data['event_id'] ) ? sanitize_text_field( $data['event_id'] ) : '';
 
 		$this->tracker->track_page_view( $event_id );
 	}
