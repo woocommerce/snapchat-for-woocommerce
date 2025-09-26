@@ -53,11 +53,11 @@ class ConversionEventLogger {
 	 * @since 0.1.0
 	 *
 	 * @param string $event_name  Event identifier (e.g. 'PURCHASE', 'ADD_CART').
-	 * @param int    $status_code HTTP status code returned from the API.
+	 * @param ?int   $status_code HTTP status code returned from the API.
 	 * @param array  $context     Optional structured context.
 	 * @return void
 	 */
-	public function log_event( string $event_name, int $status_code, array $context = array() ): void {
+	public function log_event( string $event_name, ?int $status_code, array $context = array() ): void {
 		$is_success = $status_code >= 200 && $status_code < 300;
 
 		$message = sprintf(

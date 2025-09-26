@@ -252,6 +252,7 @@ final class RemotePixelTracker implements PixelTrackerInterface {
 			'item_category'  => implode( ', ', array_unique( $item_categories ) ),
 			'number_items'   => $number_items,
 			'integration'    => 'woocommerce-v1',
+			'ip_address'     => UserIdentifier::add_ip_address(),
 		);
 
 		if ( Storage\Helper::is_collect_pii_enabled() ) {

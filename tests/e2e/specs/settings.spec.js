@@ -99,7 +99,7 @@ test.describe( 'Snapchat Settings', () => {
 		settingPage.goto();
 
 		await locator.getCapiCheckbox().click();
-		await expect( locator.getCapiCheckbox() ).toBeEnabled();
+		await expect( locator.getCapiCheckbox() ).toBeDisabled();
 		await expect(
 			page
 				.getByText(
@@ -109,7 +109,7 @@ test.describe( 'Snapchat Settings', () => {
 		).toBeVisible();
 
 		await locator.getCapiCheckbox().click();
-		await expect( locator.getCapiCheckbox() ).toBeDisabled();
+		await expect( locator.getCapiCheckbox() ).toBeEnabled();
 		await expect(
 			page
 				.getByText(

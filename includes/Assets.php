@@ -16,8 +16,7 @@ use SnapchatForWooCommerce\Utils\AssetLoader;
 use SnapchatForWooCommerce\Utils\Helper;
 use SnapchatForWooCommerce\Tracking\PixelTrackingService;
 use SnapchatForWooCommerce\Tracking\ConversionTrackingService;
-use SnapchatForWooCommerce\Utils\Storage\Options;
-use SnapchatForWooCommerce\Utils\Storage\OptionDefaults;
+use SnapchatForWooCommerce\Utils\UserIdentifier;
 
 /**
  * Manages frontend asset loading for plugin features.
@@ -106,6 +105,7 @@ class Assets {
 					'is_conversion_enabled' => ConversionTrackingService::is_enabled(),
 					'capi_nonce'            => wp_create_nonce( 'capi_nonce' ),
 					'prefix'                => Helper::with_prefix( '' ),
+					'user_ip'               => UserIdentifier::add_ip_address(),
 				)
 			)
 		);

@@ -118,10 +118,10 @@ final class UserIdentifier {
 	 *
 	 * @since 0.1.0
 	 *
-	 * @param array<string,mixed> $data Reference to the user_data array.
-	 * @return void
+	 * @param array<string,mixed>|null $data Optional. Reference to the user_data array.
+	 * @return ?string
 	 */
-	private static function add_ip_address( array &$data ): void {
+	public static function add_ip_address( ?array &$data = null ): ?string {
 		$ip = '';
 
 		if ( isset( $_SERVER['HTTP_CF_CONNECTING_IP'] ) ) {
@@ -135,8 +135,15 @@ final class UserIdentifier {
 		}
 
 		if ( $ip ) {
-			$data['client_ip_address'] = $ip;
+			if ( is_array( $data ) ) {
+				$data['client_ip_address'] = $ip;
+				return null;
+			}
+
+			return $ip;
 		}
+
+		return null;
 	}
 
 	/**
