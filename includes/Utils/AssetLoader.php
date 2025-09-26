@@ -38,7 +38,8 @@ class AssetLoader {
 		$script_asset_path = $script_path . '.asset.php';
 
 		if ( file_exists( $script_asset_path ) ) {
-			$asset_data = require $script_asset_path;
+			// phpcs:ignore Squiz.Commenting.InlineComment.InvalidEndChar
+			$asset_data = require $script_asset_path; // nosemgrep
 		} else {
 			$asset_data = array(
 				'dependencies' => array(),
@@ -69,7 +70,8 @@ class AssetLoader {
 		$style_asset_path = $style_path . '.asset.php';
 
 		if ( file_exists( $style_asset_path ) ) {
-			$asset_data = require $style_asset_path;
+			// phpcs:ignore Squiz.Commenting.InlineComment.InvalidEndChar
+			$asset_data = require $style_asset_path; // nosemgrep
 		} else {
 			$asset_data = array(
 				'dependencies' => array(),
