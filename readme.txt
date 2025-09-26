@@ -18,13 +18,6 @@ Key features include product catalog export for Snapchat's Dynamic Ads, Conversi
 
 Whether you're looking to increase brand awareness, drive sales, or re-engage existing customers, Snapchat for WooCommerce provides the tools you need to create effective advertising campaigns that convert visitors into customers.
 
-== Instructions to build the plugin
-
-- Requires node v20 and NPM v10.
-- Requires PHP composer v2.
-- Run `npm ci && npm run build` in the plugin's root.
-- Use the generated `snapchat-for-woocommerce.zip` file.
-
 == FAQ ==
 
 = Does the plugin use any external services? =
