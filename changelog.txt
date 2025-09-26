@@ -1,0 +1,4 @@
+***Snapchat for WooCommerce Changelog ***
+
+2025-09-26 - version 0.1.0
+* Initial release
