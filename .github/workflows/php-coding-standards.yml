@@ -54,7 +54,7 @@ jobs:
       - name: Install PHP Compatibility dev-develop globally
         run: |
           composer global config --no-plugins allow-plugins.dealerdirect/phpcodesniffer-composer-installer true
-          composer global require --dev phpcompatibility/php-compatibility:dev-develop
+          composer global require --dev phpcompatibility/php-compatibility:dev-develop#8daeec54772a592ad369be23ae02ed593c71e7f1
 
       - name: Run PHPCompatibility on all files
         run: ~/.composer/vendor/bin/phpcs . --standard=.php-compat.xml.dist -q --report=checkstyle | cs2pr
