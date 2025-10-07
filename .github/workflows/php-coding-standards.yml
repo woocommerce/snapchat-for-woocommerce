@@ -52,7 +52,9 @@ jobs:
         run: composer install --no-dev --prefer-dist --optimize-autoloader
 
       - name: Install PHP Compatibility dev-develop globally
-        run: composer global require --dev phpcompatibility/php-compatibility:dev-develop
+        run: |
+          composer global config --no-plugins allow-plugins.dealerdirect/phpcodesniffer-composer-installer true
+          composer global require --dev phpcompatibility/php-compatibility:dev-develop
 
       - name: Run PHPCompatibility on all files
         run: ~/.composer/vendor/bin/phpcs . --standard=.php-compat.xml.dist --runtime-set testVersion 5.6-8.3 -q --report=checkstyle | cs2pr
