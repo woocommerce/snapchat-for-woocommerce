@@ -73,22 +73,4 @@
         <exclude name="PHPCompatibility.FunctionUse.NewFunctions.spl_autoload_functionsFound"/>
     </rule>
 
-    <!--
-    The ParagonieSodiumCompat ruleset includes the ParagonieRandomCompat ruleset.
-
-    RandomCompat is contained in /wp-includes/random_compat/ since WP 4.4.0 and removed in WP 6.3.0
-    SodiumCompat is contained in /wp-includes/sodium_compat/ since WP 5.2.0
-    -->
-    <rule ref="PHPCompatibilityParagonieSodiumCompat"/>
-
-    <!-- Whitelist the WP Core mysql_to_rfc3339() function. -->
-    <rule ref="PHPCompatibility.Extensions.RemovedExtensions">
-        <properties>
-            <!-- Contained in /wp-includes/functions.php. -->
-            <property name="functionWhitelist" type="array">
-                <element value="mysql_to_rfc3339"/>
-            </property>
-        </properties>
-    </rule>
-
 </ruleset>
