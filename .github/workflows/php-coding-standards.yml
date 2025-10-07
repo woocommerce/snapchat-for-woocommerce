@@ -47,6 +47,7 @@ jobs:
         uses: woocommerce/grow/prepare-php@da5279aa4d76745ef32970e49b5ef7903a3b457a # v2.2.2
         with:
           tools: cs2pr
+          install-deps: no
 
       - name: Install composer production dependencies
         run: composer install --no-dev --prefer-dist --optimize-autoloader
