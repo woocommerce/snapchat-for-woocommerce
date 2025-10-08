@@ -4,8 +4,8 @@
     <description>WordPress specific ruleset which checks for PHP cross version compatibility.</description>
 	<!-- Once PHPCompatibility/PHPCompatibilityWP supports the targeted versions of PHP, this config file can be updated accordingly. -->
 
-	<!-- Test PHP 7.4 upwards -->
-	<config name="testVersion" value="7.4-"/>
+	<!-- Test PHP 7.4 thru 8.4 -->
+	<config name="testVersion" value="7.4-8.4"/>
 	<file>.</file>
 	<arg name="extensions" value="php,inc" />
 
