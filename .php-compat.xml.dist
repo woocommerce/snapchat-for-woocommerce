@@ -2,23 +2,12 @@
 <ruleset xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" name="PHPCompatibilityWP" xsi:noNamespaceSchemaLocation="https://schema.phpcodesniffer.com/phpcs.xsd">
 
     <description>WordPress specific ruleset which checks for PHP cross version compatibility.</description>
+	<!-- Once PHPCompatibility/PHPCompatibilityWP supports the targeted versions of PHP, this config file can be updated accordingly. -->
 
 	<!-- Test PHP 7.4 upwards -->
 	<config name="testVersion" value="7.4-"/>
 	<file>.</file>
 	<arg name="extensions" value="php,inc" />
-
-    <!--
-    The WordPress minimum PHP requirement was 5.2.4 up to WP 5.1.
-    As of WP 5.2, the new minimum PHP requirement is PHP 5.6.20.
-    As of WP 6.3, the new minimum PHP requirement is PHP 7.0.0.
-    As of WP 6.6, the new minimum PHP requirement is PHP 7.2.24.
-    Add the following in your project PHP_CodeSniffer ruleset to enforce this:
-    <config name="testVersion" value="7.2-"/>
-
-    This directive is not included in this ruleset as individual projects may use
-    a different (higher) minimum PHP version.
-    -->
 
     <rule ref="PHPCompatibility">
         <!--

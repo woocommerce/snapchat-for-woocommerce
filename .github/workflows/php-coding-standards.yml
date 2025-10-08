@@ -55,15 +55,24 @@ jobs:
           node-version-file: ".nvmrc"
           ignore-scripts: "no"
 
+      # The use of WP-Scripts results in PHP files being generated during the npm build step.
+      # In order to ensure PHP Compatibility, the build step must be run in order to ensure all
+      # files in the production release of the plugin are compatible with the target PHP versions.
       - name: Build production bundle
         run: |
           echo "::group::Build log"
           npm run build
           echo "::endgroup::"
 
+      # The PHP Compatibility sniffs need to include the vendor directory to ensure all files
+      # in the production release of the plugin are compatible with the target PHP versions.
       - name: Install composer production dependencies
         run: composer install --no-dev --prefer-dist --optimize-autoloader
 
+      # Installed globally to ensure dev dependencies are not included in compatibility sniffs.
+      # At the time of writing no production version of PHPCompatibility/PHP-Compatibility supports
+      # PHP 8.4 so a dev version is used in order to ensure the sniffs that have been created are
+      # included in the checks.
       - name: Install PHP Compatibility dev-develop globally
         run: |
           composer global config --no-plugins allow-plugins.dealerdirect/phpcodesniffer-composer-installer true
