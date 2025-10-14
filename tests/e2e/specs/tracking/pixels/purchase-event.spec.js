@@ -89,7 +89,7 @@ test.describe( 'PURCHASE event', () => {
 			expect( payload.currency ).toBe( 'USD' );
 			expect( payload.event_id ).toMatch( orderKeyRegex );
 			expect( payload.transaction_id ).toMatch( orderKeyRegex );
-			expect( payload.item_ids ).toEqual( [ '10', '11' ] );
+			expect( payload.item_ids ).toEqual( [ '12', '13' ] );
 			expect( payload.number_items ).toBe( 3 );
 			expect( payload ).toHaveProperty( 'item_category' );
 		} );

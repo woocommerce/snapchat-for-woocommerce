@@ -28,7 +28,7 @@ test.describe( 'VIEW_CONTENT event', () => {
 			expect( payload.integration ).toBe( 'woocommerce-v1' );
 			expect( payload.price ).toBe( 15 );
 			expect( payload.currency ).toBe( 'USD' );
-			expect( payload.item_ids ).toContain( 11 );
+			expect( payload.item_ids ).toContain( 13 );
 		} );
 
 		test( `[${ theme } theme] Backward navigation sends event `, async ( {
@@ -51,7 +51,7 @@ test.describe( 'VIEW_CONTENT event', () => {
 			expect( payload.integration ).toBe( 'woocommerce-v1' );
 			expect( payload.price ).toBe( 15 );
 			expect( payload.currency ).toBe( 'USD' );
-			expect( payload.item_ids ).toContain( 11 );
+			expect( payload.item_ids ).toContain( 13 );
 		} );
 
 		test( `[${ theme } theme] Navigate to Single Product Page event sends event `, async ( {
@@ -82,7 +82,7 @@ test.describe( 'VIEW_CONTENT event', () => {
 			expect( payload.integration ).toBe( 'woocommerce-v1' );
 			expect( payload.price ).toBe( 15 );
 			expect( payload.currency ).toBe( 'USD' );
-			expect( payload.item_ids ).toContain( 11 );
+			expect( payload.item_ids ).toContain( 13 );
 		} );
 
 		test( `[${ theme } theme] No event is sent on reload`, async ( {

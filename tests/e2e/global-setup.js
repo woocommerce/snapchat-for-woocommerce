@@ -102,13 +102,36 @@ module.exports = async ( config ) => {
 	for ( let i = 0; i < customerRetries; i++ ) {
 		try {
 			console.log( 'Trying to log-in as customer...' );
-			await customerPage.goto( `/wp-admin` );
-			await customerPage.fill( 'input[name="log"]', customer.username );
-			await customerPage.fill( 'input[name="pwd"]', customer.password );
-			await customerPage.locator( '#wp-submit' ).click();
+			await customerPage.goto( `/my-account/` );
+			await customerPage.waitForLoadState( 'domcontentloaded' );
+			
+			// Check if already logged in by looking for logout link
+			const logoutLink = await customerPage.locator( '.woocommerce-MyAccount-navigation-link--customer-logout' );
+			const logoutExists = await logoutLink.count();
+			
+			if ( logoutExists > 0 ) {
+				console.log( 'Customer is already logged in!' );
+				await customerPage
+					.context()
+					.storageState( { path: process.env.CUSTOMERSTATE } );
+				customerLoggedIn = true;
+				break;
+			}
+			
+			// Check if login form exists
+			const loginForm = await customerPage.locator( 'form.woocommerce-form-login' );
+			const formExists = await loginForm.count();
+			
+			if ( formExists === 0 ) {
+				throw new Error( 'Login form not found on page' );
+			}
+			
+			await customerPage.fill( 'input[name="username"]', customer.username );
+			await customerPage.fill( 'input[name="password"]', customer.password );
+			await customerPage.locator( 'button[name="login"]' ).click();
 			await customerPage.waitForLoadState( 'networkidle' );
 
-			await customerPage.goto( `/my-account` );
+			await customerPage.goto( `/my-account/` );
 			await expect(
 				customerPage.locator(
 					'.woocommerce-MyAccount-navigation-link--customer-logout'

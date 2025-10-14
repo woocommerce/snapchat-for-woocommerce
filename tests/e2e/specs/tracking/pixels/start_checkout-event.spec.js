@@ -27,7 +27,7 @@ async function checkoutAssertions( page ) {
 	expect( payload.integration ).toBe( 'woocommerce-v1' );
 	expect( payload.price ).toBe( '40.00' );
 	expect( payload.currency ).toBe( 'USD' );
-	expect( payload.item_ids ).toEqual( [ '10', '11' ] );
+	expect( payload.item_ids ).toEqual( [ '12', '13' ] );
 }
 
 test.beforeAll( 'Setup contexts', async ( { browser } ) => {
