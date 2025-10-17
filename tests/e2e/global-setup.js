@@ -104,9 +104,13 @@ module.exports = async ( config ) => {
 			console.log( 'Trying to log-in as customer...' );
 			await customerPage.goto( `/wp-admin` );
 			await customerPage.waitForLoadState( 'networkidle' );
-			await customerPage.locator( 'input[name="log"]' ).fill( customer.username );
+			await customerPage
+				.locator( 'input[name="log"]' )
+				.fill( customer.username );
 			await customerPage.waitForTimeout( 200 );
-			await customerPage.locator( 'input[name="pwd"]' ).fill( customer.password );
+			await customerPage
+				.locator( 'input[name="pwd"]' )
+				.fill( customer.password );
 			await customerPage.waitForTimeout( 200 );
 			await customerPage.locator( '#wp-submit' ).click();
 			await customerPage.goto( `/my-account` );
