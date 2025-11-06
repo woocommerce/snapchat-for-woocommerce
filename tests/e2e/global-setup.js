@@ -103,11 +103,16 @@ module.exports = async ( config ) => {
 		try {
 			console.log( 'Trying to log-in as customer...' );
 			await customerPage.goto( `/wp-admin` );
-			await customerPage.fill( 'input[name="log"]', customer.username );
-			await customerPage.fill( 'input[name="pwd"]', customer.password );
-			await customerPage.locator( '#wp-submit' ).click();
 			await customerPage.waitForLoadState( 'networkidle' );
-
+			await customerPage
+				.locator( 'input[name="log"]' )
+				.fill( customer.username );
+			await customerPage.waitForTimeout( 200 );
+			await customerPage
+				.locator( 'input[name="pwd"]' )
+				.fill( customer.password );
+			await customerPage.waitForTimeout( 200 );
+			await customerPage.locator( '#wp-submit' ).click();
 			await customerPage.goto( `/my-account` );
 			await expect(
 				customerPage.locator(
