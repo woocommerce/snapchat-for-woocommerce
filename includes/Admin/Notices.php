@@ -42,7 +42,8 @@ class Notices {
 	 * @return void
 	 */
 	public function maybe_display_notice_about_legacy_snapchat_plugin(): void {
-		if ( ! Helper::is_legacy_snapchat_plugin_active() ) {
+		// Bail if the legacy Snapchat plugin is not active.
+		if ( ! ( is_plugin_active( 'snap-pixel-for-woocommerce/snapchat-pixel-for-woocommerce.php' ) || class_exists( 'snap_pixel' ) ) ) {
 			return;
 		}
 
