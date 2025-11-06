@@ -243,16 +243,18 @@ final class RemotePixelTracker implements PixelTrackerInterface {
 			}
 		}
 
-		$payload = array(
-			'price'          => $total,
-			'currency'       => $currency,
-			'event_id'       => $order_key,
-			'transaction_id' => $order_key,
-			'item_ids'       => $item_ids,
-			'item_category'  => implode( ', ', array_unique( $item_categories ) ),
-			'number_items'   => $number_items,
-			'integration'    => 'woocommerce-v1',
-			'ip_address'     => UserIdentifier::add_ip_address(),
+		$event_id = EventIdRegistry::get_purchase_id();
+		$payload  = array(
+			'price'           => $total,
+			'currency'        => $currency,
+			'event_id'        => $event_id,
+			'client_dedup_id' => $event_id,
+			'transaction_id'  => $order_key,
+			'item_ids'        => $item_ids,
+			'item_category'   => implode( ', ', array_unique( $item_categories ) ),
+			'number_items'    => $number_items,
+			'integration'     => 'woocommerce-v1',
+			'ip_address'      => UserIdentifier::add_ip_address(),
 		);
 
 		if ( Storage\Helper::is_collect_pii_enabled() ) {
