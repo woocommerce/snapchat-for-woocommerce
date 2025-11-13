@@ -59,8 +59,8 @@ class CsvExportWriterTest extends WP_UnitTestCase {
 		$this->writer->append_row( $file, $data );
 
 		$handle = fopen( $file, 'r' );
-		$header = fgetcsv( $handle );
-		$row    = fgetcsv( $handle );
+		$header = fgetcsv( $handle, null, ',', '"', '\\' );
+		$row    = fgetcsv( $handle, null, ',', '"', '\\' );
 		fclose( $handle );
 
 		$this->assertSame( array_keys( $data ), $header );

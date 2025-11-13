@@ -150,7 +150,12 @@ class ProductExportServiceTest extends WP_UnitTestCase {
 
 		$this->assertFileExists( $file_path );
 
-		$csv = array_map( 'str_getcsv', file( $file_path ) );
+		$csv = array_map(
+			static function( $line ) {
+				return str_getcsv( $line, ',', '"', '\\' );
+			},
+			file( $file_path )
+		);
 
 		$this->assertEquals(
 			array( 'id', 'title', 'description', 'link', 'image_link', 'availability', 'price', 'gtin' ),
