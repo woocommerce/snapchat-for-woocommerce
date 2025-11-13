@@ -121,6 +121,7 @@ final class ServiceContainer {
 					new Admin\Menu(),
 					new Admin\Onboarding(),
 					new ProductMeta\ProductMetaFields(),
+					new Admin\Notices(),
 				);
 
 			default:
