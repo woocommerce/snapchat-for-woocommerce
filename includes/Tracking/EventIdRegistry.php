@@ -22,18 +22,17 @@ namespace SnapchatForWooCommerce\Tracking;
 final class EventIdRegistry {
 
 	/**
-	 * Returns a order key for the given purchase.
-	 *
-	 * Uses the WooCommerce order ID as the key.
+	 * Returns a unique event ID for the purchase event.
 	 *
 	 * @since 0.1.0
 	 *
-	 * @param int $order_id The Order ID.
-	 *
-	 * @return string Order key.
+	 * @return string Unique event ID.
 	 */
-	public static function get_purchase_id( $order_id ): string {
-		$order = wc_get_order( $order_id );
-		return $order instanceof \WC_Order ? (string) $order->get_order_key() : '';
+	public static function get_purchase_id(): string {
+		static $purchase_event_id = null;
+		if ( null === $purchase_event_id ) {
+			$purchase_event_id = wp_generate_uuid4();
+		}
+		return $purchase_event_id;
 	}
 }

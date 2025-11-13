@@ -21,7 +21,8 @@ import { customer as c } from '../../../config';
 let admin = null;
 let customer = null;
 let orderUrl = '';
-const orderKeyRegex = /^wc_order_([a-zA-Z0-9]+)$/i;
+const uuid4Regex =
+	/^[0-9a-f]{8}-[0-9a-f]{4}-4[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i;
 
 test.beforeAll( 'Setup contexts', async ( { browser } ) => {
 	admin = await browser.newPage( { storageState: process.env.ADMINSTATE } );
@@ -87,8 +88,8 @@ test.describe( 'PURCHASE event', () => {
 			expect( payload.integration ).toBe( 'woocommerce-v1' );
 			expect( payload.price ).toBe( '40.00' );
 			expect( payload.currency ).toBe( 'USD' );
-			expect( payload.event_id ).toMatch( orderKeyRegex );
-			expect( payload.transaction_id ).toMatch( orderKeyRegex );
+			expect( payload.event_id ).toMatch( uuid4Regex );
+			expect( payload.transaction_id ).toBeGreaterThan( 0 );
 			expect( payload.item_ids ).toEqual( [ '10', '11' ] );
 			expect( payload.number_items ).toBe( 3 );
 			expect( payload ).toHaveProperty( 'item_category' );
