@@ -31,24 +31,22 @@ const LegacyPluginActiveNotice = () => {
 			onDismiss={ () => setIsDismissed( true ) }
 			className="sfw-legacy-plugin-active-notice"
 		>
-			<p>
-				{ createInterpolateElement(
-					__(
-						"You currently have two Snapchat plugins installed. Having both plugins active can cause reporting issues. Please uninstall the 'Snapchat Pixel for WooCommerce' (Legacy Plugin) by following the steps <link>here</link>.",
-						'snapchat-for-woocommerce'
+			{ createInterpolateElement(
+				__(
+					"You currently have two Snapchat plugins installed. Having both plugins active can cause reporting issues. Please uninstall the 'Snapchat Pixel for WooCommerce' (Legacy Plugin) by following the steps <link>here</link>.",
+					'snapchat-for-woocommerce'
+				),
+				{
+					link: (
+						// eslint-disable-next-line jsx-a11y/anchor-has-content
+						<a
+							target="_blank"
+							rel="external noreferrer noopener"
+							href="https://woocommerce.com/document/snapchat-for-woocommerce/#section-4"
+						/>
 					),
-					{
-						link: (
-							// eslint-disable-next-line jsx-a11y/anchor-has-content
-							<a
-								target="_blank"
-								rel="external noreferrer noopener"
-								href="https://woocommerce.com/document/snapchat-for-woocommerce/#section-4"
-							/>
-						),
-					}
-				) }
-			</p>
+				}
+			) }
 		</Notice>
 	);
 };
