@@ -213,4 +213,15 @@ class Helper {
 		// Return scalars (int, float, bool, null) as-is.
 		return $data;
 	}
+
+	/**
+	 * Checks if the legacy Snapchat plugin is active.
+	 *
+	 * @since x.x.x
+	 *
+	 * @return bool True if the legacy Snapchat plugin is active, false otherwise.
+	 */
+	public static function is_legacy_snapchat_plugin_active() {
+		return is_plugin_active( 'snap-pixel-for-woocommerce/snapchat-pixel-for-woocommerce.php' ) || class_exists( 'snap_pixel' );
+	}
 }
