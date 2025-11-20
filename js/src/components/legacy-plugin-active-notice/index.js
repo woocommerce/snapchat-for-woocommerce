@@ -2,9 +2,8 @@
  * External dependencies
  */
 import { __ } from '@wordpress/i18n';
-import { useState } from '@wordpress/element';
+import { useState, createInterpolateElement } from '@wordpress/element';
 import { Notice } from '@wordpress/components';
-import { createInterpolateElement } from '@wordpress/element';
 
 /**
  * Internal dependencies
@@ -35,7 +34,7 @@ const LegacyPluginActiveNotice = () => {
 			<p>
 				{ createInterpolateElement(
 					__(
-						'You currently have two Snapchat plugins installed. Having both plugins active can cause reporting issues. Please uninstall the \'Snapchat Pixel for WooCommerce\' (Legacy Plugin) by following the steps <link>here</link>.',
+						"You currently have two Snapchat plugins installed. Having both plugins active can cause reporting issues. Please uninstall the 'Snapchat Pixel for WooCommerce' (Legacy Plugin) by following the steps <link>here</link>.",
 						'snapchat-for-woocommerce'
 					),
 					{
