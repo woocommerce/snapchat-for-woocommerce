@@ -77,10 +77,6 @@
 			max-width: wpVariables.$grid-unit-60;
 		}
 	}
-
-	.components-notice:not(.app-notice) {
-		margin-bottom: wpVariables.$grid-unit-15;
-	}
 }
 
 // compatibility-code "WC >= 7.3" -- adding margin in the first question label.

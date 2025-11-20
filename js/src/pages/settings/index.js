@@ -17,6 +17,7 @@ import useSnapchatAccount from '~/hooks/useSnapchatAccount';
 import OnboardingSuccessModal from '~/components/onboarding-success-modal';
 import { getOnboardingUrl } from '~/utils/urls';
 import './index.scss';
+import LegacyPluginActiveNotice from '~/components/legacy-plugin-active-notice';
 
 const Settings = () => {
 	// Make the component highlight SFW entry in the WC legacy menu.
@@ -37,6 +38,7 @@ const Settings = () => {
 		<div className="sfw-settings">
 			{ isOnboardingSuccessModalOpen && <OnboardingSuccessModal /> }
 
+			<LegacyPluginActiveNotice />
 			<Section
 				title={ __( 'Product Catalog', 'snapchat-for-woocommerce' ) }
 			>
