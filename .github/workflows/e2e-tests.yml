@@ -6,6 +6,8 @@ on:
       - trunk
       - develop
   pull_request:
+    # We include `labeled` so adding the label re-triggers the workflow.
+    types: [opened, synchronize, reopened, labeled]
 
 concurrency:
   group: ${{ github.workflow }}-${{ github.ref }}
@@ -20,6 +22,7 @@ jobs:
     runs-on: ubuntu-latest
     env:
       FORCE_COLOR: 2
+
     steps:
       - name: Checkout
         uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
@@ -55,17 +58,77 @@ jobs:
       - name: Install Playwright Browsers
         run: npx playwright install chromium
 
+      - name: Set WordPress RC version
+        if: "${{ contains(github.event.pull_request.labels.*.name, 'needs: WP RC test') }}"
+        run: ./tests/e2e/bin/set-core-version.js WordPress/WordPress#master
+
       - name: Setup WP environment
         run: npm run env:start
 
       - name: Check if the site is running
         run: curl -I http://localhost:8889
 
-      - name: Check WooCommerce /my-account page
-        run: curl -I http://localhost:8889/my-account
-
       - name: Run E2E tests
+        id: e2e_tests
         run: npm run test:e2e
+
+      # Update label on SUCCESS (PRs only)
+      - name: Update Success Label
+        if: |
+          github.event_name == 'pull_request' &&
+          always() &&
+          steps.e2e_tests.conclusion == 'success'
+        uses: actions/github-script@ed597411d8f924073f98dfc5c65a23a2325f34cd # v8.0.0
+        continue-on-error: true
+        with:
+          script: |
+            github.rest.issues.removeLabel({
+              issue_number: context.issue.number,
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              name: ['needs: e2e testing']
+            })
+            github.rest.issues.removeLabel({
+              issue_number: context.issue.number,
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              name: ['status: e2e tests failing']
+            })
+            github.rest.issues.addLabels({
+              issue_number: context.issue.number,
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              labels: ['status: e2e tests passing']
+            })
+
+      # Update label on FAILURE (PRs only)
+      - name: Update Failure Label
+        if: |
+          github.event_name == 'pull_request' &&
+          always() &&
+          steps.e2e_tests.conclusion == 'failure'
+        uses: actions/github-script@ed597411d8f924073f98dfc5c65a23a2325f34cd # v8.0.0
+        continue-on-error: true
+        with:
+          script: |
+            github.rest.issues.removeLabel({
+              issue_number: context.issue.number,
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              name: ['needs: e2e testing']
+            })
+            github.rest.issues.removeLabel({
+              issue_number: context.issue.number,
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              name: ['status: e2e tests passing']
+            })
+            github.rest.issues.addLabels({
+              issue_number: context.issue.number,
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              labels: ['status: e2e tests failing']
+            })
 
       - uses: actions/upload-artifact@4cec3d8aa04e39d1a68397de0c4cd6fb9dce8ec1 # v4.6.1
         if: always()
