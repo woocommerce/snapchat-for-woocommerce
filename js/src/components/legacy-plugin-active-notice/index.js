@@ -9,6 +9,7 @@ import { Notice } from '@wordpress/components';
  * Internal dependencies
  */
 import { sfwData } from '~/constants';
+import AppDocumentationLink from '../app-documentation-link';
 import './index.scss';
 
 /**
@@ -38,10 +39,9 @@ const LegacyPluginActiveNotice = () => {
 				),
 				{
 					link: (
-						// eslint-disable-next-line jsx-a11y/anchor-has-content
-						<a
-							target="_blank"
-							rel="external noreferrer noopener"
+						<AppDocumentationLink
+							context="legacy-plugin-active-notice"
+							linkId="legacy-plugin-active-notice"
 							href="https://woocommerce.com/document/snapchat-for-woocommerce/#section-4"
 						/>
 					),

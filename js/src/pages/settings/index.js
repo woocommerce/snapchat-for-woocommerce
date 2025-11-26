@@ -16,8 +16,8 @@ import ConversionsAPI from './conversions-api';
 import useSnapchatAccount from '~/hooks/useSnapchatAccount';
 import OnboardingSuccessModal from '~/components/onboarding-success-modal';
 import { getOnboardingUrl } from '~/utils/urls';
-import './index.scss';
 import LegacyPluginActiveNotice from '~/components/legacy-plugin-active-notice';
+import './index.scss';
 
 const Settings = () => {
 	// Make the component highlight SFW entry in the WC legacy menu.
