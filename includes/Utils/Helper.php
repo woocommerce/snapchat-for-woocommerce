@@ -217,8 +217,6 @@ class Helper {
 	/**
 	 * Checks if the legacy Snapchat plugin is active.
 	 *
-	 * @since x.x.x
-	 *
 	 * @return bool True if the legacy Snapchat plugin is active, false otherwise.
 	 */
 	public static function is_legacy_snapchat_plugin_active() {

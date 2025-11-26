@@ -2,7 +2,7 @@
  * External dependencies
  */
 import { __ } from '@wordpress/i18n';
-import { useState, createInterpolateElement } from '@wordpress/element';
+import { createInterpolateElement } from '@wordpress/element';
 import { Notice } from '@wordpress/components';
 
 /**
@@ -15,20 +15,20 @@ import AppDocumentationLink from '../app-documentation-link';
  * React component that displays a warning notice with link to docs on how to uninstall the legacy plugin
  * if the legacy plugin is active.
  *
+ * @fires sfw_documentation_link_click with `{ context: "legacy-plugin-active-notice", link_id: "legacy-plugin-active-notice", href: "https://woocommerce.com/document/snapchat-for-woocommerce/#section-4" }`
+ *
  * @return {JSX.Element|null} A warning notice with a link to docs on how to uninstall the legacy plugin, or null if the legacy plugin is not active.
  */
 const LegacyPluginActiveNotice = () => {
-	const [ isDismissed, setIsDismissed ] = useState( false );
 	const { isLegacyPluginActive } = sfwData;
-	if ( ! isLegacyPluginActive || isDismissed ) {
+	if ( ! isLegacyPluginActive ) {
 		return null;
 	}
 
 	return (
 		<Notice
 			status="warning"
-			isDismissible={ true }
-			onDismiss={ () => setIsDismissed( true ) }
+			isDismissible={ false }
 		>
 			{ createInterpolateElement(
 				__(
