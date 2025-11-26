@@ -10,7 +10,6 @@ import { Notice } from '@wordpress/components';
  */
 import { sfwData } from '~/constants';
 import AppDocumentationLink from '../app-documentation-link';
-import './index.scss';
 
 /**
  * React component that displays a warning notice with link to docs on how to uninstall the legacy plugin
@@ -30,7 +29,6 @@ const LegacyPluginActiveNotice = () => {
 			status="warning"
 			isDismissible={ true }
 			onDismiss={ () => setIsDismissed( true ) }
-			className="sfw-legacy-plugin-active-notice"
 		>
 			{ createInterpolateElement(
 				__(
