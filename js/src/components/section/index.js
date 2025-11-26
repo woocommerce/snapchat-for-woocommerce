@@ -48,7 +48,7 @@ const Section = ( {
 					{ title && <h1>{ title }</h1> }
 					{ description }
 				</header>
-			)}
+			) }
 			<Flex
 				className="sfw-section__body"
 				direction="column"
