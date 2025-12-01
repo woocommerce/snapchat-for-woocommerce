@@ -16,6 +16,8 @@ import ConversionsAPI from './conversions-api';
 import useSnapchatAccount from '~/hooks/useSnapchatAccount';
 import OnboardingSuccessModal from '~/components/onboarding-success-modal';
 import { getOnboardingUrl } from '~/utils/urls';
+import LegacyPluginActiveNotice from '~/components/legacy-plugin-active-notice';
+import { sfwData } from '~/constants';
 import './index.scss';
 
 const Settings = () => {
@@ -36,6 +38,12 @@ const Settings = () => {
 	return (
 		<div className="sfw-settings">
 			{ isOnboardingSuccessModalOpen && <OnboardingSuccessModal /> }
+
+			{ sfwData.isLegacyPluginActive && (
+				<Section>
+					<LegacyPluginActiveNotice />
+				</Section>
+			) }
 
 			<Section
 				title={ __( 'Product Catalog', 'snapchat-for-woocommerce' ) }
