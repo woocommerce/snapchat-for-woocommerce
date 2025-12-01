@@ -74,16 +74,17 @@ class Assets {
 			'index',
 			'AdminData',
 			array(
-				'setupComplete'      => boolval( Options::get( OptionDefaults::ONBOARDING_STATUS ) === 'connected' ),
-				'status'             => Options::get( OptionDefaults::ONBOARDING_STATUS ),
-				'step'               => Options::get( OptionDefaults::ONBOARDING_STEP ),
-				'exportNonce'        => wp_create_nonce( 'export-nonce' ),
-				'isExportInProgress' => ServiceContainer::get( ServiceKey::PRODUCT_EXPORT_SERVICE )->job->is_job_in_progress( ProductExportService::ACTION_HOOK ),
-				'exportFileUrl'      => file_exists( $csv_path ) ? Options::get( OptionDefaults::EXPORT_FILE_URL ) : '',
-				'lastTimestamp'      => Helper::get_formatted_timestamp( Options::get( OptionDefaults::LAST_EXPORT_TIMESTAMP ) ),
-				'slug'               => 'snapwoo',
-				'pluginVersion'      => SNAPCHAT_FOR_WOOCOMMERCE_VERSION,
-				'adAccountId'        => Options::get( OptionDefaults::AD_ACCOUNT_ID ),
+				'setupComplete'        => boolval( Options::get( OptionDefaults::ONBOARDING_STATUS ) === 'connected' ),
+				'status'               => Options::get( OptionDefaults::ONBOARDING_STATUS ),
+				'step'                 => Options::get( OptionDefaults::ONBOARDING_STEP ),
+				'exportNonce'          => wp_create_nonce( 'export-nonce' ),
+				'isExportInProgress'   => ServiceContainer::get( ServiceKey::PRODUCT_EXPORT_SERVICE )->job->is_job_in_progress( ProductExportService::ACTION_HOOK ),
+				'exportFileUrl'        => file_exists( $csv_path ) ? Options::get( OptionDefaults::EXPORT_FILE_URL ) : '',
+				'lastTimestamp'        => Helper::get_formatted_timestamp( Options::get( OptionDefaults::LAST_EXPORT_TIMESTAMP ) ),
+				'slug'                 => 'snapwoo',
+				'pluginVersion'        => SNAPCHAT_FOR_WOOCOMMERCE_VERSION,
+				'adAccountId'          => Options::get( OptionDefaults::AD_ACCOUNT_ID ),
+				'isLegacyPluginActive' => Helper::is_legacy_snapchat_plugin_active(),
 			)
 		);
 	}

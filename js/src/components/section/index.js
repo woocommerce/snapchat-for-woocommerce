@@ -42,11 +42,13 @@ const Section = ( {
 
 	return (
 		<section className={ sectionClassName }>
-			<header className="sfw-section__header">
-				{ topContent && <p>{ topContent }</p> }
-				{ title && <h1>{ title }</h1> }
-				{ description }
-			</header>
+			{ ( topContent || title || description ) && (
+				<header className="sfw-section__header">
+					{ topContent && <p>{ topContent }</p> }
+					{ title && <h1>{ title }</h1> }
+					{ description }
+				</header>
+			) }
 			<Flex
 				className="sfw-section__body"
 				direction="column"
