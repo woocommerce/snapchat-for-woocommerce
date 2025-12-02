@@ -1,4 +1,10 @@
 ***Snapchat for WooCommerce Changelog ***
 
+2025-12-02 - version 1.0.1
+* Add - Display an admin notice prompting users to uninstall the legacy Snapchat Pixel plugin if it is installed and active.
+* Fix - Improve tracking by deduplicating events sent from Pixel and Conversion API.
+* Tweak - WooCommerce 10.3 compatibility.
+* Tweak - WordPress 6.9 compatibility.
+
 2025-09-26 - version 1.0.0
 * Initial release
