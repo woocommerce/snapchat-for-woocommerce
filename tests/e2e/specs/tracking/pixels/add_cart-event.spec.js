@@ -7,6 +7,7 @@ const { test, expect } = require( '@playwright/test' );
  * Internal dependencies
  */
 import { findSnaptrEvent, getThemes, switchTheme } from '../../../utils';
+import { integration } from '../../../config';
 
 const anyUuidRegex =
 	/^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
@@ -35,7 +36,7 @@ test.describe( 'ADD_CART event', () => {
 
 			const [ , , payload ] = ADD_CART;
 
-			expect( payload.integration ).toBe( 'woocommerce-v1' );
+			expect( payload.integration ).toBe( integration );
 			expect( payload.price ).toBe( 10 );
 			expect( payload.event_id ).toMatch( anyUuidRegex );
 			expect( payload.client_dedup_id ).toMatch( anyUuidRegex );

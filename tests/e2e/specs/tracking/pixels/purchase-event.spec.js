@@ -16,7 +16,7 @@ import {
 	singleAddToCart,
 	clearCart,
 } from '../../../utils';
-import { customer as c } from '../../../config';
+import { customer as c, integration } from '../../../config';
 
 let admin = null;
 let customer = null;
@@ -85,7 +85,7 @@ test.describe( 'PURCHASE event', () => {
 			expect( PURCHASE ).not.toBe( null );
 
 			const [ , , payload ] = PURCHASE;
-			expect( payload.integration ).toBe( 'woocommerce-v1' );
+			expect( payload.integration ).toBe( integration );
 			expect( payload.price ).toBe( '40.00' );
 			expect( payload.currency ).toBe( 'USD' );
 			expect( payload.event_id ).toMatch( uuid4Regex );

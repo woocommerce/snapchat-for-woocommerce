@@ -1,3 +1,5 @@
+import { version } from '../../../package.json';
+
 const admin = {
 	username: 'admin',
 	password: 'password',
@@ -26,4 +28,5 @@ const customer = {
 module.exports = {
 	admin,
 	customer,
+	integration: `woocommerce-v${ version?.replaceAll( '.', '-' ) }`,
 };
