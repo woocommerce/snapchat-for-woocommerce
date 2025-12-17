@@ -1,11 +1,14 @@
+/**
+ * Internal dependencies
+ */
 import { version } from '../../../package.json';
 
-const admin = {
+export const admin = {
 	username: 'admin',
 	password: 'password',
 };
 
-const customer = {
+export const customer = {
 	username: 'customer',
 	password: 'password',
 	billing: {
@@ -25,8 +28,4 @@ const customer = {
 	},
 };
 
-module.exports = {
-	admin,
-	customer,
-	integration: `woocommerce-v${ version?.replaceAll( '.', '-' ) }`,
-};
+export const integration = `woocommerce-v${ version?.replaceAll( '.', '-' ) }`;
