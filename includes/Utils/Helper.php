@@ -222,4 +222,13 @@ class Helper {
 	public static function is_legacy_snapchat_plugin_active() {
 		return is_plugin_active( 'snap-pixel-for-woocommerce/snapchat-pixel-for-woocommerce.php' ) || class_exists( 'snap_pixel' );
 	}
+
+	/**
+	 * Returns the integration identifier to send in Pixel and CAPI event payload.
+	 *
+	 * @return string The integration identifier (eg: `woocommerce-v1-0-0`).
+	 */
+	public static function get_integration_identifier(): string {
+		return 'woocommerce-v' . str_replace( '.', '-', SNAPCHAT_FOR_WOOCOMMERCE_VERSION );
+	}
 }
