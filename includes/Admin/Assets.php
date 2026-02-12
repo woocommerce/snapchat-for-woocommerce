@@ -59,10 +59,10 @@ class Assets {
 	public function enqueue_assets(): void {
 		// phpcs:ignore WordPress.Security.NonceVerification.Recommended
 		$page = sanitize_text_field( wp_unslash( $_GET['page'] ?? '' ) );
-		// phpcs:ignore WordPress.Security.NonceVerification.Recommended
-		$path = sanitize_text_field( wp_unslash( $_GET['path'] ?? '' ) );
 
-		if ( ! ( 'wc-admin' === $page && str_contains( $path, '/snapchat' ) ) ) {
+		// Load assets on any WC Admin page to support SPA navigation.
+		// The React router will handle showing the correct components based on the actual route.
+		if ( 'wc-admin' !== $page ) {
 			return;
 		}
 
