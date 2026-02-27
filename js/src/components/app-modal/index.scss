@@ -19,6 +19,10 @@
 		@include wpMixins.break-mobile {
 			flex-direction: row;
 			justify-content: flex-end;
+
+			[dir="rtl"] & {
+				justify-content: flex-start;
+			}
 		}
 
 		button {
