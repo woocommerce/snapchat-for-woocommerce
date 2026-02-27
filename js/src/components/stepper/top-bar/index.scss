@@ -1,13 +1,13 @@
 .sfw-stepper-top-bar {
-	display: flex;
 	align-items: center;
-	min-height: wpVariables.$grid-unit-40 * 2;
 	background-color: wpColors.$white;
 	box-shadow: 0 -1px 0 0 wpColors.$gray-400 inset;
+	display: flex;
+	min-block-size: wpVariables.$grid-unit-40 * 2;
 
 	.components-button {
-		height: auto;
 		align-self: stretch;
+		block-size: auto;
 	}
 
 	&__back-button {

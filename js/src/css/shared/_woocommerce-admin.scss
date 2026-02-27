@@ -4,7 +4,7 @@
 @use "@wordpress/base-styles/variables" as wpVariables;
 
 #wpbody {
-	margin-top: 60px !important;
+	margin-block-start: 60px !important;
 }
 
 // Used in ~/hooks/useLayout.js
@@ -14,7 +14,7 @@
 	// Ref: https://github.com/woocommerce/woocommerce-admin/blob/95c487247416ab34eb8e492b984e2b068618e0d3/client/header/index.js#L92-L118.
 
 	.woocommerce-layout {
-		padding-top: 0;
+		padding-block-start: 0;
 
 		.woocommerce-layout__header {
 			display: none;
@@ -42,12 +42,12 @@
 	// and there would be a visible small grey gap.
 	&.is-wp-toolbar-disabled {
 		@media (min-width: #{ (wpBreakpoints.$break-small) }) and (max-width: #{ (wpBreakpoints.$break-medium) }) {
-			margin-top: -46px;
+			margin-block-start: -46px;
 		}
 	}
 
 	.woocommerce-layout {
-		padding-top: 0;
+		padding-block-start: 0;
 
 		.woocommerce-layout__primary {
 			margin: 0;
@@ -65,25 +65,25 @@
 .sfw-admin-page {
 	.woocommerce-stepper__steps {
 		align-items: center;
-		justify-content: center;
-		height: wpVariables.$grid-unit-40 * 2;
 		background-color: wpColors.$white;
+		block-size: wpVariables.$grid-unit-40 * 2;
 		box-shadow: inset 0 -1px 0 wpColors.$gray-400;
-		margin-bottom: 0;
+		justify-content: center;
+		margin-block-end: 0;
 
 		.woocommerce-stepper__step-divider {
-			margin-top: 0;
 			align-self: auto;
-			max-width: wpVariables.$grid-unit-60;
+			margin-block-start: 0;
+			max-inline-size: wpVariables.$grid-unit-60;
 		}
 	}
 
 	.components-notice:not(.app-notice) {
-		margin-bottom: wpVariables.$grid-unit-15;
+		margin-block-end: wpVariables.$grid-unit-15;
 	}
 }
 
 // compatibility-code "WC >= 7.3" -- adding margin in the first question label.
 .wp-admin .woocommerce-customer-effort-score__intro {
-	margin-bottom: 1em;
+	margin-block-end: 1em;
 }

@@ -7,14 +7,14 @@
 	overflow: hidden;
 
 	@include wpMixins.break-large {
-		width: variables.$sfw-width-large;
+		inline-size: variables.$sfw-width-large;
 	}
 
 	.sfw-app-modal__footer {
 		display: flex;
 		flex-direction: column-reverse;
 		gap: calc(var(--main-gap) / 2);
-		margin-top: var(--large-gap);
+		margin-block-start: var(--large-gap);
 
 		@include wpMixins.break-mobile {
 			flex-direction: row;
