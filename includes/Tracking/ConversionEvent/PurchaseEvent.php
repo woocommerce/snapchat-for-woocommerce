@@ -12,7 +12,6 @@
 namespace SnapchatForWooCommerce\Tracking\ConversionEvent;
 
 use WC_Order;
-use SnapchatForWooCommerce\Tracking\EventIdRegistry;
 
 /**
  * Constructs a Conversion request payload for the PURCHASE event type.
@@ -96,7 +95,7 @@ final class PurchaseEvent extends EventPayloadBase implements ConversionEventInt
 		$default = array(
 			'event_name'       => self::ID,
 			'event_source_url' => $this->order->get_checkout_order_received_url(),
-			'event_id'         => EventIdRegistry::get_purchase_id(),
+			'event_id'         => (string) $this->order->get_id(),
 			'user_data'        => array(),
 			'custom_data'      => array(
 				'content_ids' => array_filter( $ids, fn( $id ) => ! empty( $id ) ),
