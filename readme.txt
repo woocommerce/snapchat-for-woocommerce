@@ -1,7 +1,7 @@
 === Snapchat for WooCommerce ===
 Contributors: automattic, woocommerce
 Tags: woocommerce, snapchat, product feed, ads
-Tested up to: 6.9
+Tested up to: 7.0
 Stable tag: 1.0.2
 License: GPLv3
 License URI: https://www.gnu.org/licenses/gpl-3.0.html
