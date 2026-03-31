@@ -12,7 +12,7 @@ The best place to get support is the [WordPress.org Snapchat for WooCommerce for
 
 ## Requirements
 
--   WordPress 6.7+
+-   WordPress 6.8+
 -   WooCommerce 10.2+
 -   PHP 7.4+
 
