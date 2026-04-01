@@ -56,6 +56,10 @@ const textDict = {
 				'Some configurations for Snapchat created through WooCommerce may be lost. This cannot be undone.',
 				'snapchat-for-woocommerce'
 			),
+			__(
+				'Your catalog will remain in your Snapchat Business Account and can still be used to run Ads.',
+				'snapchat-for-woocommerce'
+			),
 		],
 	},
 };

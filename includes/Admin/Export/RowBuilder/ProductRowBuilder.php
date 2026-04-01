@@ -84,7 +84,7 @@ class ProductRowBuilder implements ExportRowBuilderInterface {
 		$row = array(
 			'id'           => (string) $product->get_id(),
 			'title'        => $product->get_name(),
-			'description'  => $product->get_description(),
+			'description'  => wp_strip_all_tags( $product->get_description() ),
 			'link'         => get_permalink( $product->get_id() ),
 			'image_link'   => $image_url,
 			/**

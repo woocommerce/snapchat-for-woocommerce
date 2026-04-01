@@ -1,14 +1,14 @@
 .sfw-loading-label {
-	display: inline-flex;
 	align-items: center;
-	gap: wpVariables.$grid-unit-10;
-	height: $button-size;
+	block-size: $button-size;
 	color: var(--wp-admin-theme-color);
+	display: inline-flex;
+	gap: wpVariables.$grid-unit-10;
 
 	.woocommerce-spinner {
-		width: $icon-size;
-		height: $icon-size;
-		min-width: $icon-size;
+		block-size: $icon-size;
+		inline-size: $icon-size;
+		min-inline-size: $icon-size;
 
 		&__circle {
 			stroke: currentcolor;
