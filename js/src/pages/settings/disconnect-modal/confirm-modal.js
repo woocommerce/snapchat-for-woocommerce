@@ -38,10 +38,7 @@ const textDict = {
 		],
 	},
 	[ SNAPCHAT_ACCOUNT ]: {
-		title: __(
-			'Disconnect Snapchat account?',
-			'snapchat-for-woocommerce'
-		),
+		title: __( 'Disconnect Snapchat account?', 'snapchat-for-woocommerce' ),
 		confirmButton: __(
 			'Disconnect Snapchat account',
 			'snapchat-for-woocommerce'
