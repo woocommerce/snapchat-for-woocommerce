@@ -38,9 +38,12 @@ const textDict = {
 		],
 	},
 	[ SNAPCHAT_ACCOUNT ]: {
-		title: __( 'Disconnect Snapchat account', 'snapchat-for-woocommerce' ),
+		title: __(
+			'Disconnect Snapchat account?',
+			'snapchat-for-woocommerce'
+		),
 		confirmButton: __(
-			'Disconnect Snapchat Account',
+			'Disconnect Snapchat account',
 			'snapchat-for-woocommerce'
 		),
 		confirmation: __(
@@ -49,15 +52,11 @@ const textDict = {
 		),
 		contents: [
 			__(
-				'I understand that I am disconnecting my Snapchat account from this WooCommerce extension.',
+				'Your Snapchat account will be disconnected from your WooCommerce store. Some Snapchat settings created in WooCommerce may be lost and can’t be restored.',
 				'snapchat-for-woocommerce'
 			),
 			__(
-				'Some configurations for Snapchat created through WooCommerce may be lost. This cannot be undone.',
-				'snapchat-for-woocommerce'
-			),
-			__(
-				'Your catalog will remain in your Snapchat Business Account and can still be used to run Ads.',
+				'Your catalog will remain in your Snapchat Business Account.',
 				'snapchat-for-woocommerce'
 			),
 		],
@@ -131,7 +130,7 @@ export default function ConfirmModal( {
 					disabled={ isDisconnecting }
 					onClick={ handleRequestClose }
 				>
-					{ __( 'Never mind', 'snapchat-for-woocommerce' ) }
+					{ __( 'Cancel', 'snapchat-for-woocommerce' ) }
 				</AppButton>,
 				<AppButton
 					key="2"
