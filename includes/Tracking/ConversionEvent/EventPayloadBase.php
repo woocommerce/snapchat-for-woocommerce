@@ -27,13 +27,6 @@ use SnapchatForWooCommerce\Utils\Helper;
  */
 class EventPayloadBase {
 	/**
-	 * Identifier of this integration as recognized by the Ad Partner.
-	 *
-	 * @since 0.1.0
-	 */
-	public const INTEGRATION = 'woocommerce-v1';
-
-	/**
 	 * Source describing where the event was observed.
 	 * Common values include: WEB, APP, OFFLINE.
 	 *
@@ -51,7 +44,7 @@ class EventPayloadBase {
 	 *
 	 * The returned array includes:
 	 * - `event_time`       — Epoch timestamp (ms preferred) of when the event occurred.
-	 * - `integration`      — Identifier string for this integration (`woocommerce-v1`).
+	 * - `integration`      — Identifier string for this integration (eg: `woocommerce-v1-0-0`).
 	 * - `event_source_url` — The URL where the event originated (from {@see wc_get_raw_referer()}).
 	 * - `action_source`    — The source channel describing where the event was observed.
 	 *
@@ -62,7 +55,7 @@ class EventPayloadBase {
 	public function build_payload(): array {
 		return array(
 			'event_time'       => Helper::get_event_time(),
-			'integration'      => self::INTEGRATION,
+			'integration'      => Helper::get_integration_identifier(),
 			'event_source_url' => (string) wc_get_raw_referer(),
 			'action_source'    => self::ACTION_SOURCE,
 		);

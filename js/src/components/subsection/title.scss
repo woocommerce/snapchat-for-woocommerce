@@ -5,6 +5,6 @@
 	font-weight: 600;
 	line-height: variables.$sfw-line-height-medium;
 	letter-spacing: 0;
-	text-align: left;
-	margin-bottom: wpVariables.$grid-unit;
+	margin-block-end: wpVariables.$grid-unit;
+	text-align: start;
 }

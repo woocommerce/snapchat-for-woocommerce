@@ -1,6 +1,7 @@
 .sfw-product-catalog {
 	.sfw-product-catalog__help {
-		padding: 0 var(--large-gap) var(--large-gap);
+		padding-block: 0 var(--large-gap);
+		padding-inline: var(--large-gap);
 
 		p {
 			color: wpColors.$gray-700;

@@ -29,8 +29,8 @@
 
 	&__icon {
 		grid-area: 1/1/span 2;
-		margin-right: wpVariables.$grid-unit-20;
 		line-height: 0;
+		margin-inline-end: wpVariables.$grid-unit-20;
 	}
 
 	&__subject {
@@ -39,22 +39,22 @@
 
 	&__indicator {
 		grid-area: 1/3/span 2;
-		margin-left: wpVariables.$grid-unit-20;
+		margin-inline-start: wpVariables.$grid-unit-20;
 
 		&--align-to-detail {
 			grid-area: 2/3;
-			margin-top: wpVariables.$grid-unit-15;
+			margin-block-start: wpVariables.$grid-unit-15;
 		}
 	}
 
 	&__detail {
 		grid-area: 2/2;
-		margin-top: wpVariables.$grid-unit-15;
+		margin-block-start: wpVariables.$grid-unit-15;
 	}
 
 	&__actions {
 		grid-area: 3/2/auto/span 2;
-		margin-top: wpVariables.$grid-unit-15;
+		margin-block-start: wpVariables.$grid-unit-15;
 	}
 
 	&__title {
@@ -63,12 +63,12 @@
 	}
 
 	&__description {
+		align-items: flex-start;
+		color: wpColors.$gray-900;
 		display: flex;
 		flex-direction: column;
-		align-items: flex-start;
 		gap: 1em;
-		margin-top: wpVariables.$grid-unit-05;
-		color: wpColors.$gray-900;
+		margin-block-start: wpVariables.$grid-unit-05;
 
 		> p {
 			margin: 0;
@@ -76,10 +76,10 @@
 	}
 
 	&__helper {
-		margin-top: wpVariables.$grid-unit-05;
-		font-style: italic;
-		font-size: wpVariables.$helptext-font-size;
 		color: wpColors.$gray-700;
+		font-size: wpVariables.$helptext-font-size;
+		font-style: italic;
+		margin-block-start: wpVariables.$grid-unit-05;
 	}
 
 	.components-card__footer {
@@ -103,7 +103,8 @@
 		background-color: #edfaef;
 		border: 0;
 		font-size: wpVariables.$helptext-font-size;
-		margin: 0 var(--large-gap) var(--main-gap);
+		margin-block: 0 var(--main-gap);
+		margin-inline: var(--large-gap);
 		padding: wpVariables.$grid-unit-20;
 	}
 

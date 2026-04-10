@@ -7,6 +7,7 @@ const { test, expect } = require( '@playwright/test' );
  * Internal dependencies
  */
 import { findSnaptrEvent, getThemes, switchTheme } from '../../../utils';
+import { integration } from '../../../config';
 
 test.describe( 'PAGE_VIEW event', () => {
 	test.use( { storageState: process.env.ADMINSTATE } );
@@ -31,7 +32,7 @@ test.describe( 'PAGE_VIEW event', () => {
 				expect( PAGE_VIEW ).not.toBe( null );
 
 				const [ , , payload ] = PAGE_VIEW;
-				expect( payload.integration ).toBe( 'woocommerce-v1' );
+				expect( payload.integration ).toBe( integration );
 			} );
 		}
 

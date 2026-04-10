@@ -20,6 +20,7 @@ use SnapchatForWooCommerce\Utils\Storage;
 use SnapchatForWooCommerce\Tracking\Consent;
 use SnapchatForWooCommerce\Utils\UserIdentifier;
 use SnapchatForWooCommerce\Config;
+use SnapchatForWooCommerce\Utils\Helper;
 
 /**
  * Fetches and injects Snapchat pixel tracking code into WooCommerce frontend pages.
@@ -252,7 +253,7 @@ final class RemotePixelTracker implements PixelTrackerInterface {
 			'item_ids'        => $item_ids,
 			'item_category'   => implode( ', ', array_unique( $item_categories ) ),
 			'number_items'    => $number_items,
-			'integration'     => 'woocommerce-v1',
+			'integration'     => Helper::get_integration_identifier(),
 			'ip_address'      => UserIdentifier::add_ip_address(),
 		);
 

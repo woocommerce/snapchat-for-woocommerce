@@ -7,6 +7,7 @@ const { test, expect } = require( '@playwright/test' );
  * Internal dependencies
  */
 import { findSnaptrEvent, getThemes, switchTheme } from '../../../utils';
+import { integration } from '../../../config';
 
 test.describe( 'VIEW_CONTENT event', () => {
 	test.use( { storageState: process.env.ADMINSTATE } );
@@ -25,7 +26,7 @@ test.describe( 'VIEW_CONTENT event', () => {
 
 			const [ , , payload ] = VIEW_CONTENT;
 
-			expect( payload.integration ).toBe( 'woocommerce-v1' );
+			expect( payload.integration ).toBe( integration );
 			expect( payload.price ).toBe( 15 );
 			expect( payload.currency ).toBe( 'USD' );
 			expect( payload.item_ids ).toContain( 11 );
@@ -48,7 +49,7 @@ test.describe( 'VIEW_CONTENT event', () => {
 
 			const [ , , payload ] = VIEW_CONTENT;
 
-			expect( payload.integration ).toBe( 'woocommerce-v1' );
+			expect( payload.integration ).toBe( integration );
 			expect( payload.price ).toBe( 15 );
 			expect( payload.currency ).toBe( 'USD' );
 			expect( payload.item_ids ).toContain( 11 );
@@ -79,7 +80,7 @@ test.describe( 'VIEW_CONTENT event', () => {
 
 			const [ , , payload ] = VIEW_CONTENT;
 
-			expect( payload.integration ).toBe( 'woocommerce-v1' );
+			expect( payload.integration ).toBe( integration );
 			expect( payload.price ).toBe( 15 );
 			expect( payload.currency ).toBe( 'USD' );
 			expect( payload.item_ids ).toContain( 11 );

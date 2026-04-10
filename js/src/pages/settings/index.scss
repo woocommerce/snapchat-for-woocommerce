@@ -1,21 +1,20 @@
 .sfw-settings {
 	.sfw-section {
-		max-width: 1032px;
-		margin-left: auto;
-		margin-right: auto;
+		margin-inline: auto;
+		max-inline-size: 1032px;
 
 		&:first-child {
-			margin-top: var(--large-gap);
+			margin-block-start: var(--large-gap);
 		}
 
 		header {
-			max-width: 328px;
-			padding-top: var(--large-gap);
+			max-inline-size: 328px;
+			padding-block-start: var(--large-gap);
 		}
 	}
 
 	.sfw-subsection-helper-text {
-		margin-top: wpVariables.$grid-unit-10;
 		color: wpColors.$gray-600;
+		margin-block-start: wpVariables.$grid-unit-10;
 	}
 }

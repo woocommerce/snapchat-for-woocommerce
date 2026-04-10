@@ -1,29 +1,29 @@
 .sfw-app-tab-nav__tabs {
-	display: flex;
-	flex-wrap: wrap;
 	align-items: stretch;
 	box-shadow: inset 0 -1px 0 wpColors.$gray-400;
-	margin-bottom: var(--main-gap);
+	display: flex;
+	flex-wrap: wrap;
+	margin-block-end: var(--main-gap);
 
 	&-item {
 		background: transparent;
+		block-size: wpVariables.$grid-unit-60;
 		border: none;
-		box-shadow: inset 0 -1px 0 wpColors.$gray-400;
 		border-radius: 0;
-		cursor: pointer;
-		height: wpVariables.$grid-unit-60;
-		padding: calc(wpVariables.$grid-unit-15 / 4) wpVariables.$grid-unit-20; // Use padding to offset the is-active border, this benefits Windows High Contrast mode
-		margin-left: 0;
-		font-weight: 500;
+		box-shadow: inset 0 -1px 0 wpColors.$gray-400;
 		box-sizing: border-box;
+		cursor: pointer;
+		font-weight: 500;
+		margin-inline-start: 0;
+		padding: calc(wpVariables.$grid-unit-15 / 4) wpVariables.$grid-unit-20; // Use padding to offset the is-active border, this benefits Windows High Contrast mode
 
 		// This pseudo-element "duplicates" the tab label and sets the text to bold.
 		// This ensures that the tab doesn't change width when selected.
 		// See: https://github.com/WordPress/gutenberg/pull/9793
 		&::after {
+			block-size: 0;
 			content: attr(data-label);
 			display: block;
-			height: 0;
 			overflow: hidden;
 			speak: none;
 			visibility: hidden;
@@ -40,10 +40,10 @@
 
 			// This border appears in Windows High Contrast mode instead of the box-shadow.
 			&::before {
+				border-block-end: $border-width-tab solid transparent;
 				content: "";
-				position: absolute;
 				inset: 0 0 1px;
-				border-bottom: $border-width-tab solid transparent;
+				position: absolute;
 			}
 		}
 

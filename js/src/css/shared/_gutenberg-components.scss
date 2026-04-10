@@ -42,7 +42,7 @@
 	// Fix the obvious styles conflicts caused by WooCommerce Payments since approximately version 2.2.0.
 	// Ref: https://github.com/Automattic/woocommerce-payments/blob/2.2.0/client/payment-details/summary/style.scss#L3-L9
 	.components-card {
-		margin-bottom: 0;
+		margin-block-end: 0;
 
 		&__header {
 			font-size: inherit;
@@ -51,6 +51,6 @@
 
 	// Adjust InputControl suffix's empty right margin.
 	.components-input-control__suffix {
-		margin-right: wpVariables.$grid-unit;
+		margin-inline-end: wpVariables.$grid-unit;
 	}
 }
