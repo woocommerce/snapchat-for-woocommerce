@@ -83,6 +83,7 @@ class SnapchatBusinessExtensionControllerTest extends WP_UnitTestCase {
 		Options::delete( OptionDefaults::ORGANIZATION_NAME );
 		Options::delete( OptionDefaults::AD_ACCOUNT_ID );
 		Options::delete( OptionDefaults::PIXEL_ID );
+		Options::delete( OptionDefaults::CATALOG_ID );
 		Transients::delete( TransientDefaults::PIXEL_SCRIPT );
 		Options::delete( OptionDefaults::ONBOARDING_STATUS );
 
@@ -112,8 +113,9 @@ class SnapchatBusinessExtensionControllerTest extends WP_UnitTestCase {
 		$mock_ad_partner_api = $this->createMock( AdPartnerApi::class );
 		$mock_catalog        = $this->createMock( CatalogApi::class );
 
-		// Mock `create()` to return a mock response with `get_data()`.
-		$mock_catalog->method( 'create' )->willReturn(
+		// `find_or_create()` returns a response shaped like `create()` so
+		// existing assertions keep working after the SNAPWOO-75 fix.
+		$mock_catalog->method( 'find_or_create' )->willReturn(
 			new \WP_REST_Response(
 				array(
 					'catalogs' => array(
@@ -196,5 +198,62 @@ class SnapchatBusinessExtensionControllerTest extends WP_UnitTestCase {
 		$this->assertSame( $this->options['pixel_id'], Options::get( OptionDefaults::PIXEL_ID ) );
 		$this->assertSame( '', Transients::get( TransientDefaults::PIXEL_SCRIPT ) );
 		$this->assertSame( 'connected', Options::get( OptionDefaults::ONBOARDING_STATUS ) );
+	}
+
+	/**
+	 * Test: when a CATALOG_ID is already stored (reconnect scenario), the controller
+	 * reuses it via `find_or_create()` and does NOT call `create()`.
+	 *
+	 * Verifies the fix for SNAPWOO-75: disconnecting and reconnecting must not
+	 * create a duplicate remote catalog on Snapchat's side.
+	 *
+	 * Invokes `set_config()` directly rather than round-tripping through the REST
+	 * server so the `never()` expectation can attach to the specific CatalogApi
+	 * mock wired into the controller under test.
+	 */
+	public function test_set_config_reuses_existing_catalog_id(): void {
+		Options::set( OptionDefaults::CATALOG_ID, 'existing-id' );
+
+		$this->jetpack_client
+			->method( 'remote_request' )
+			->willReturn( array(
+				'response' => array( 'code' => 200, 'message' => 'OK' ),
+				'headers'  => array(),
+				'body'     => file_get_contents( $this->mock_fixture ),
+			) );
+
+		$mock_catalog = $this->createMock( CatalogApi::class );
+		$mock_catalog->method( 'find_or_create' )->willReturn(
+			new \WP_REST_Response(
+				array(
+					'catalogs' => array(
+						array(
+							'catalog' => array( 'id' => 'existing-id' ),
+						),
+					),
+				)
+			)
+		);
+		$mock_catalog->expects( $this->never() )->method( 'create' );
+
+		$wcs = new WcsClient(
+			new JetpackAuthenticator(),
+			$this->jetpack_client
+		);
+		$mock_ad_partner_api          = $this->createMock( AdPartnerApi::class );
+		$mock_ad_partner_api->catalog = $mock_catalog;
+
+		$controller = new SnapchatBusinessExtensionController( $wcs, $mock_ad_partner_api );
+
+		$request = new WP_REST_Request( 'POST', '/wc/sfw/snapchat/config' );
+		$request['id']             = 'hello';
+		$request['products_token'] = 'abc123';
+
+		$response = $controller->set_config( $request );
+
+		$this->assertInstanceOf( WP_REST_Response::class, $response );
+		$data = $response->get_data();
+		$this->assertSame( 'existing-id', $data['catalog_id'] );
+		$this->assertSame( 'existing-id', Options::get( OptionDefaults::CATALOG_ID ) );
 	}
 }
