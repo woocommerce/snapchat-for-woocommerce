@@ -224,7 +224,7 @@ class SnapchatBusinessExtensionController extends RESTBaseController {
 
 		Options::set( OptionDefaults::ONBOARDING_STATUS, 'connected' );
 
-		$response = $this->ad_partner_api->catalog->create();
+		$response = $this->ad_partner_api->catalog->find_or_create();
 
 		if ( is_wp_error( $response ) ) {
 			return new WP_REST_Response(
