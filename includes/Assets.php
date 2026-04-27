@@ -106,6 +106,7 @@ class Assets {
 					'capi_nonce'            => wp_create_nonce( 'capi_nonce' ),
 					'prefix'                => Helper::with_prefix( '' ),
 					'user_ip'               => UserIdentifier::add_ip_address(),
+					'integration'           => Helper::get_integration_identifier(),
 				)
 			)
 		);

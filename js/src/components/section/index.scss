@@ -1,7 +1,7 @@
 .sfw-section {
 	display: flex;
 	flex-direction: column;
-	margin-bottom: wpVariables.$grid-unit-30;
+	margin-block-end: wpVariables.$grid-unit-30;
 
 	&--is-disabled,
 	&--is-disabled-left &__header {
@@ -14,24 +14,25 @@
 	}
 
 	&__header {
-		padding-bottom: wpVariables.$grid-unit-10;
+		padding-block-end: wpVariables.$grid-unit-10;
 
 		@include wpMixins.break-small {
-			width: 33%;
-			padding-top: var(--main-gap);
+			inline-size: 33%;
+			padding-block-start: var(--main-gap);
 		}
 
 		h1 {
 			font-size: wpVariables.$editor-font-size;
 			font-style: normal;
 			font-weight: 600;
-			margin-bottom: wpVariables.$grid-unit;
+			margin-block-end: wpVariables.$grid-unit;
 			padding: 0;
 		}
 
 		p {
-			margin: 0 0 wpVariables.$grid-unit;
 			line-height: variables.$sfw-line-height-smaller;
+			margin: 0;
+			margin-block-end: wpVariables.$grid-unit;
 		}
 	}
 
