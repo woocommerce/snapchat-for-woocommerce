@@ -1,4 +1,4 @@
-name: 'Prepare New Release'
+name: '[DEPRECATED] Prepare New Release'
 run-name:  Prepare New Release `${{ github.event.inputs.type }}/${{ github.event.inputs.version }}` from by @${{ github.actor }}
 
 # **What it does**: Does release preparation: creates the release branch and the PR with a checklist.
