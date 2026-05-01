@@ -122,7 +122,7 @@ export default class ElementLocators {
 	getSnapchatDisconnectModal() {
 		return this.page.locator( '.sfw-disconnect-accounts-modal', {
 			hasText:
-				'I understand that I am disconnecting my Snapchat account from this WooCommerce extension.',
+				'Your Snapchat account will be disconnected from your WooCommerce store.',
 		} );
 	}
 
@@ -144,7 +144,7 @@ export default class ElementLocators {
 	 */
 	getSnapchatFinalDisconnectButton() {
 		return this.getSnapchatDisconnectModal().getByRole( 'button', {
-			name: 'Disconnect Snapchat Account',
+			name: 'Disconnect Snapchat account',
 		} );
 	}
 
