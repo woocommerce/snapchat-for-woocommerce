@@ -16,6 +16,9 @@
 	"bugs": {
 		"url": "https://github.com/woocommerce/snapchat-for-woocommerce/issues"
 	},
+	"config": {
+		"wp_org_slug": "snapchat-for-woocommerce"
+	},
 	"dependencies": {
 		"@woocommerce/components": "^12.3.0",
 		"@woocommerce/navigation": "^8.2.0",
