@@ -2,7 +2,7 @@
 	"name": "snapchat-for-woocommerce",
 	"title": "Snapchat for WooCommerce",
 	"description": "Snapchat for WooCommerce",
-	"version": "0.1.0",
+	"version": "1.0.3",
 	"author": "The WordPress Contributors",
 	"license": "GPL-3.0+",
 	"keywords": [
@@ -15,6 +15,9 @@
 	},
 	"bugs": {
 		"url": "https://github.com/woocommerce/snapchat-for-woocommerce/issues"
+	},
+	"config": {
+		"wp_org_slug": "snapchat-for-woocommerce"
 	},
 	"dependencies": {
 		"@woocommerce/components": "^12.3.0",

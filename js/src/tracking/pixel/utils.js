@@ -20,7 +20,7 @@ export const sendPixelEvent = ( eventName, eventParams ) => {
 
 	window.snaptr( 'track', eventName, {
 		...eventParams,
-		integration: 'woocommerce-v1',
+		integration: TRACKING_DATA_VAR.integration,
 		ip_address: TRACKING_DATA_VAR.user_ip,
 	} );
 };
