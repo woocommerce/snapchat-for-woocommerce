@@ -2,7 +2,7 @@
  * External dependencies
  */
 import { __ } from '@wordpress/i18n';
-import { CheckboxControl } from '@wordpress/components';
+import { CheckboxControl, Flex, FlexBlock } from '@wordpress/components';
 import { useState, useCallback } from '@wordpress/element';
 
 /**
@@ -118,8 +118,11 @@ const ConversionsAPI = () => {
 				'snapchat-for-woocommerce'
 			) }
 			actions={
-				<div className="sfw-settings-track-conversions__actions">
-					<p>
+				<Flex
+					direction="column"
+					className="sfw-settings-track-conversions__actions"
+				>
+					<FlexBlock>
 						<CheckboxControl
 							label={ __(
 								'Enable Conversions API tracking',
@@ -129,9 +132,9 @@ const ConversionsAPI = () => {
 							disabled={ isSaving }
 							onChange={ handleOnChangeOfConversionTracking }
 						/>
-					</p>
+					</FlexBlock>
 
-					<p>
+					<FlexBlock>
 						<CheckboxControl
 							label={ __(
 								'Collect Customer PII',
@@ -145,8 +148,8 @@ const ConversionsAPI = () => {
 								'snapchat-for-woocommerce'
 							) }
 						/>
-					</p>
-				</div>
+					</FlexBlock>
+				</Flex>
 			}
 		/>
 	);
