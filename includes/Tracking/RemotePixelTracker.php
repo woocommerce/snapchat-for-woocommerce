@@ -17,7 +17,6 @@ use SnapchatForWooCommerce\Utils\Storage\OptionDefaults;
 use SnapchatForWooCommerce\Utils\Storage\Transients;
 use SnapchatForWooCommerce\Utils\Storage\TransientDefaults;
 use SnapchatForWooCommerce\Utils\Storage;
-use SnapchatForWooCommerce\Tracking\Consent;
 use SnapchatForWooCommerce\Utils\UserIdentifier;
 use SnapchatForWooCommerce\Config;
 use SnapchatForWooCommerce\Utils\Helper;
@@ -243,13 +242,12 @@ final class RemotePixelTracker implements PixelTrackerInterface {
 			}
 		}
 
-		$event_id = EventIdRegistry::get_purchase_id();
-		$payload  = array(
+		$payload = array(
 			'price'           => $total,
 			'currency'        => $currency,
-			'event_id'        => $event_id,
-			'client_dedup_id' => $event_id,
-			'transaction_id'  => $order_id,
+			'event_id'        => (string) $order_id,
+			'client_dedup_id' => (string) $order_id,
+			'transaction_id'  => (string) $order_id,
 			'item_ids'        => $item_ids,
 			'item_category'   => implode( ', ', array_unique( $item_categories ) ),
 			'number_items'    => $number_items,
