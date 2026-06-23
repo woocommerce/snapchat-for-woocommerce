@@ -123,6 +123,8 @@ class JetpackAccountController extends RESTBaseController {
 				);
 			}
 
+			$this->log_wp_tos_accepted();
+
 			$next     = $request->get_param( 'next_page_name' );
 			$path     = self::NEXT_PATH_MAPPING[ $next ];
 			$redirect = admin_url( "admin.php?page=wc-admin&path={$path}" );
