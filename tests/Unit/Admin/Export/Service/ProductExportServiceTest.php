@@ -148,8 +148,6 @@ class ProductExportServiceTest extends WP_UnitTestCase {
 		$this->assertNotEmpty( $file_path );
 		$this->assertFileExists( $file_path );
 
-		$this->assertFileExists( $file_path );
-
 		$csv = array_map(
 			static function( $line ) {
 				return str_getcsv( $line, ',', '"', '\\' );

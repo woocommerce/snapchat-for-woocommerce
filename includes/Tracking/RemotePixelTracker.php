@@ -19,7 +19,6 @@ use SnapchatForWooCommerce\Utils\Storage\TransientDefaults;
 use SnapchatForWooCommerce\Utils\Storage;
 use SnapchatForWooCommerce\Tracking\Consent;
 use SnapchatForWooCommerce\Utils\UserIdentifier;
-use SnapchatForWooCommerce\Config;
 use SnapchatForWooCommerce\Utils\Helper;
 
 /**
@@ -266,6 +265,6 @@ final class RemotePixelTracker implements PixelTrackerInterface {
 			wp_json_encode( $payload )
 		);
 
-		wp_add_inline_script( Config::ASSET_HANDLE_PREFIX . 'tracking', $tracking_data );
+		wp_print_inline_script_tag( $tracking_data );
 	}
 }

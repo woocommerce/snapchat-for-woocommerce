@@ -14,7 +14,7 @@ namespace SnapchatForWooCommerce\Tracking;
 use SnapchatForWooCommerce\Utils\Storage\OptionDefaults;
 use SnapchatForWooCommerce\Utils\Storage\Options;
 use SnapchatForWooCommerce\Utils\Helper;
-use SnapchatForWooCommerce\Config;
+
 use WC_Product;
 
 /**
@@ -172,12 +172,9 @@ final class PixelTrackingService implements ServiceStatusInterface {
 			$this->filter_page_view_event_data( $tracking_data );
 		}
 
-		wp_add_inline_script(
-			Config::ASSET_HANDLE_PREFIX . 'tracking',
-			'
-			window.snapchatAdsTrackingData = window.snapchatAdsTrackingData || {};
-			window.snapchatAdsTrackingData = Object.assign( window.snapchatAdsTrackingData, ' . wp_json_encode( $tracking_data ) . ' );
-			'
+		wp_print_inline_script_tag(
+			'window.snapchatAdsTrackingData = window.snapchatAdsTrackingData || {};'
+			. 'window.snapchatAdsTrackingData = Object.assign( window.snapchatAdsTrackingData, ' . wp_json_encode( $tracking_data ) . ' );'
 		);
 	}
 
