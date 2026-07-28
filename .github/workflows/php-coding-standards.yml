@@ -7,12 +7,14 @@ on:
       - develop
     paths:
       - "**.php"
+      - .phpcs.xml.dist
       - composer.json # Required for phpcompat sniffs.
       - composer.lock # Required for phpcompat sniffs.
       - .github/workflows/php-coding-standards.yml
   pull_request:
     paths:
       - "**.php"
+      - .phpcs.xml.dist
       - composer.json # Required for phpcompat sniffs.
       - composer.lock # Required for phpcompat sniffs.
       - .github/workflows/php-coding-standards.yml
