@@ -36,17 +36,17 @@ jobs:
 
     steps:
       - name: Checkout code
-        uses: actions/checkout@v6
+        uses: actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803 # v6
 
       - name: Set up PHP ${{ matrix.php-version }}
-        uses: shivammathur/setup-php@v2
+        uses: shivammathur/setup-php@f3e473d116dcccaddc5834248c87452386958240 # v2
         with:
           php-version: ${{ matrix.php-version }}
           extensions: mbstring, mysqli
           tools: composer, phpunit
 
       - name: Prepare MySQL
-        uses: woocommerce/grow/prepare-mysql@actions-v3
+        uses: woocommerce/grow/prepare-mysql@e5fa5c65e5b349b11d5679ba8958efa6e461cf36 # actions-v3
 
       - name: Install svn (used for installing WP versions)
         run: sudo apt-get -y install subversion
