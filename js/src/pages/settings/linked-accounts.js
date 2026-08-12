@@ -14,6 +14,8 @@ import Section from '~/components/section';
 import { ConnectedSnapchatAccountCard } from '~/components/snapchat-account-card';
 import DisconnectModal, { SNAPCHAT_ACCOUNT } from './disconnect-modal';
 import { queueRecordSfwEvent } from '~/utils/tracks';
+import { sfwData } from '~/constants';
+import SandboxDisabledControl from '~/components/sandbox-disabled-control';
 
 /**
  * Accounts are disconnected from the Setting page
@@ -65,17 +67,25 @@ export default function LinkedAccounts() {
 			{ hasResolvedSnapchatAccount && (
 				<ConnectedSnapchatAccountCard hideAccountSwitch>
 					<Section.Card.Footer>
-						<AppButton
-							isDestructive
-							isLink
-							onClick={ openDisconnectAdsAccountModal }
-							eventName="sfw_disconnect_snapchat_button_click"
-						>
-							{ __(
-								'Disconnect Snapchat account',
+						<SandboxDisabledControl
+							message={ __(
+								'Account disconnection is disabled while sandbox mode is active.',
 								'snapchat-for-woocommerce'
 							) }
-						</AppButton>
+						>
+							<AppButton
+								isDestructive
+								isLink
+								disabled={ sfwData.sandboxMode }
+								onClick={ openDisconnectAdsAccountModal }
+								eventName="sfw_disconnect_snapchat_button_click"
+							>
+								{ __(
+									'Disconnect Snapchat account',
+									'snapchat-for-woocommerce'
+								) }
+							</AppButton>
+						</SandboxDisabledControl>
 					</Section.Card.Footer>
 				</ConnectedSnapchatAccountCard>
 			) }

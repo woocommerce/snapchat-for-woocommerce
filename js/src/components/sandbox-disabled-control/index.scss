@@ -1,0 +1,11 @@
+.sfw-sandbox-disabled-control {
+	display: inline-flex;
+	cursor: not-allowed;
+
+	> .components-button {
+		cursor: not-allowed;
+		opacity: 0.55;
+		pointer-events: none;
+		text-decoration: none;
+	}
+}

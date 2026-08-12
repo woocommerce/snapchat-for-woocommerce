@@ -2,6 +2,7 @@
  * External dependencies
  */
 import { __ } from '@wordpress/i18n';
+import { Notice } from '@wordpress/components';
 import { useEffect } from '@wordpress/element';
 import { getHistory, getQuery } from '@woocommerce/navigation';
 
@@ -38,6 +39,25 @@ const Settings = () => {
 	return (
 		<div className="sfw-settings">
 			{ isOnboardingSuccessModalOpen && <OnboardingSuccessModal /> }
+
+			{ sfwData.sandboxMode && (
+				<Notice
+					className="sfw-sandbox-mode-notice"
+					status="info"
+					isDismissible={ false }
+				>
+					<strong>
+						{ __(
+							'Snapchat sandbox mode is active.',
+							'snapchat-for-woocommerce'
+						) }
+					</strong>{ ' ' }
+					{ __(
+						'Account details are simulated, and no data is sent to WordPress.com or Snapchat.',
+						'snapchat-for-woocommerce'
+					) }
+				</Notice>
+			) }
 
 			{ sfwData.isLegacyPluginActive && (
 				<Section>

@@ -5,6 +5,7 @@ import AccountDetails from './account-details';
 import SwitchAccountButton from './switch-account-button';
 import AccountCard, { APPEARANCE } from '~/components/account-card';
 import ConnectedIconLabel from '~/components/connected-icon-label';
+import { sfwData } from '~/constants';
 
 const ConnectedSnapchatAccountCard = ( {
 	hideAccountSwitch = false,
@@ -14,7 +15,9 @@ const ConnectedSnapchatAccountCard = ( {
 		if ( hideAccountSwitch ) {
 			return null;
 		}
-		return <SwitchAccountButton isTertiary />;
+		return (
+			<SwitchAccountButton isTertiary disabled={ sfwData.sandboxMode } />
+		);
 	};
 
 	return (

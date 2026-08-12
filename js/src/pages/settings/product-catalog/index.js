@@ -14,6 +14,7 @@ import AccountCard from '~/components/account-card';
 import useSettings from '~/hooks/useSettings';
 import useExportPoller from './useExportPoller';
 import useProductCatalogExport from './useProductCatalogExport';
+import SandboxDisabledControl from '~/components/sandbox-disabled-control';
 import './index.scss';
 
 /**
@@ -129,36 +130,50 @@ const ProductCatalog = () => {
 	};
 
 	const getIndicator = () => {
+		const sandboxMessage = __(
+			'CSV generation is disabled while sandbox mode is active.',
+			'snapchat-for-woocommerce'
+		);
+
 		if ( hasExport ) {
 			return (
 				<Flex spacing={ 4 } wrap="wrap">
-					<AppButton
-						variant="secondary"
-						onClick={ handleOnGenerateCsvClick }
-						loading={ exportInProgress }
-						eventName="sfw_regenerate_csv_button_click"
-						eventProps={ {
-							context: 'settings',
-						} }
-					>
-						{ __( 'Regenerate CSV', 'snapchat-for-woocommerce' ) }
-					</AppButton>
+					<SandboxDisabledControl message={ sandboxMessage }>
+						<AppButton
+							variant="secondary"
+							disabled={ sfwData.sandboxMode }
+							onClick={ handleOnGenerateCsvClick }
+							loading={ exportInProgress }
+							eventName="sfw_regenerate_csv_button_click"
+							eventProps={ {
+								context: 'settings',
+							} }
+						>
+							{ __(
+								'Regenerate CSV',
+								'snapchat-for-woocommerce'
+							) }
+						</AppButton>
+					</SandboxDisabledControl>
 				</Flex>
 			);
 		}
 
 		return (
-			<AppButton
-				variant="secondary"
-				onClick={ handleOnGenerateCsvClick }
-				loading={ exportInProgress }
-				eventName="sfw_generate_csv_button_click"
-				eventProps={ {
-					context: 'settings',
-				} }
-			>
-				{ __( 'Generate CSV', 'snapchat-for-woocommerce' ) }
-			</AppButton>
+			<SandboxDisabledControl message={ sandboxMessage }>
+				<AppButton
+					variant="secondary"
+					disabled={ sfwData.sandboxMode }
+					onClick={ handleOnGenerateCsvClick }
+					loading={ exportInProgress }
+					eventName="sfw_generate_csv_button_click"
+					eventProps={ {
+						context: 'settings',
+					} }
+				>
+					{ __( 'Generate CSV', 'snapchat-for-woocommerce' ) }
+				</AppButton>
+			</SandboxDisabledControl>
 		);
 	};
 
@@ -178,7 +193,11 @@ const ProductCatalog = () => {
 		 * Trigger catalog CSV generation as soon as the
 		 * merchant has successfully onboarded.
 		 */
-		if ( shouldTriggerExport && hasFinishedResolution ) {
+		if (
+			! sfwData.sandboxMode &&
+			shouldTriggerExport &&
+			hasFinishedResolution
+		) {
 			generateCsv();
 		}
 	}, [ shouldTriggerExport, hasFinishedResolution ] );

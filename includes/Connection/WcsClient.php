@@ -13,6 +13,7 @@ namespace SnapchatForWooCommerce\Connection;
 use WP_REST_Response;
 use WP_Error;
 use Jetpack_Options;
+use SnapchatForWooCommerce\SandboxMode;
 use SnapchatForWooCommerce\Utils\Helper;
 
 /**
@@ -153,6 +154,13 @@ final class WcsClient {
 	 * @return WP_REST_Response|WP_Error Parsed response or error.
 	 */
 	public function proxy_request( string $method, string $path, $body = null, $requires_auth = true ) {
+		if ( SandboxMode::is_enabled() ) {
+			return new WP_Error(
+				'snapchat_sandbox_remote_request_blocked',
+				__( 'Remote requests are disabled in sandbox mode.', 'snapchat-for-woocommerce' )
+			);
+		}
+
 		$url = sprintf(
 			'%s/%s/%s',
 			$this->get_wcs_url(),
