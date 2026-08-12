@@ -7,12 +7,17 @@
 
 namespace SnapchatForWooCommerce\Tests\Unit;
 
+use SnapchatForWooCommerce\Admin\Export\Service\ProductExportService;
+use SnapchatForWooCommerce\Admin\Export\Service\ProductIdCacheBuilder;
 use SnapchatForWooCommerce\Connection\JetpackAuthenticator;
 use SnapchatForWooCommerce\Connection\JetpackClient;
 use SnapchatForWooCommerce\Connection\WcsClient;
 use SnapchatForWooCommerce\SandboxMode;
+use SnapchatForWooCommerce\ServiceContainer;
+use SnapchatForWooCommerce\ServiceKey;
 use SnapchatForWooCommerce\Tracking\ConversionTrackingService;
 use SnapchatForWooCommerce\Tracking\PixelTrackingService;
+use SnapchatForWooCommerce\Utils\Helper;
 use SnapchatForWooCommerce\Utils\Storage\OptionDefaults;
 use SnapchatForWooCommerce\Utils\Storage\Options;
 use WP_Error;
@@ -172,5 +177,44 @@ class SandboxModeTest extends WP_UnitTestCase {
 
 		$this->assertInstanceOf( WP_Error::class, $response );
 		$this->assertSame( 'snapchat_sandbox_remote_request_blocked', $response->get_error_code() );
+		$this->assertSame( 403, $response->get_error_data()['status'] );
+	}
+
+	/**
+	 * Ensures every entry point that can generate or poll a CSV is unhooked.
+	 */
+	public function test_product_export_hooks_are_disabled(): void {
+		$service = ServiceContainer::get( ServiceKey::PRODUCT_EXPORT_SERVICE );
+		$service->register_hooks();
+		update_option( SandboxMode::OPTION_NAME, 'yes' );
+
+		$this->sandbox->disable_remote_product_hooks();
+
+		$this->assertFalse(
+			has_action(
+				'wp_ajax_' . Helper::with_prefix( 'generate_feed' ),
+				array( $service, 'trigger_export_callback' )
+			)
+		);
+		$this->assertFalse(
+			has_filter(
+				'wp_ajax_' . Helper::with_prefix( 'export_status' ),
+				array( $service, 'check_export_status' )
+			)
+		);
+		$this->assertFalse(
+			has_action(
+				Helper::with_prefix( ProductIdCacheBuilder::ACTION_HOOK ),
+				array( $service->job->cache_builder, 'handle_batch' )
+			)
+		);
+		$this->assertFalse(
+			has_action(
+				Helper::with_prefix( ProductExportService::ACTION_HOOK ),
+				array( $service, 'handle_batch' )
+			)
+		);
+
+		$service->register_hooks();
 	}
 }

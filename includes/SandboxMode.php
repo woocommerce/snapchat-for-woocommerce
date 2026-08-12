@@ -7,6 +7,8 @@
 
 namespace SnapchatForWooCommerce;
 
+use SnapchatForWooCommerce\Admin\Export\Service\ProductExportService;
+use SnapchatForWooCommerce\Admin\Export\Service\ProductIdCacheBuilder;
 use SnapchatForWooCommerce\Utils\Helper;
 use WP_Error;
 use WP_REST_Request;
@@ -244,7 +246,16 @@ final class SandboxMode {
 
 		remove_action( Helper::with_prefix( 'onboarding_complete' ), array( $service, 'start_export_after_onboarding' ) );
 		remove_action( Helper::with_prefix( 'recurring_catalog_export' ), array( $service, 'start_export' ) );
+		remove_action( Helper::with_prefix( 'export_products_cache_completed' ), array( $service, 'start_writing' ) );
+		remove_action( Helper::with_prefix( ProductExportService::ACTION_HOOK ), array( $service, 'handle_batch' ), 10 );
 		remove_action( Helper::with_prefix( 'batch_export_job_complete' ), array( $service, 'create_feed' ) );
+		remove_action( 'wp_ajax_' . Helper::with_prefix( 'generate_feed' ), array( $service, 'trigger_export_callback' ) );
+		remove_filter( 'wp_ajax_' . Helper::with_prefix( 'export_status' ), array( $service, 'check_export_status' ), 10 );
+		remove_action(
+			Helper::with_prefix( ProductIdCacheBuilder::ACTION_HOOK ),
+			array( $service->job->cache_builder, 'handle_batch' ),
+			10
+		);
 	}
 
 	/**

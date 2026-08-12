@@ -157,7 +157,8 @@ final class WcsClient {
 		if ( SandboxMode::is_enabled() ) {
 			return new WP_Error(
 				'snapchat_sandbox_remote_request_blocked',
-				__( 'Remote requests are disabled in sandbox mode.', 'snapchat-for-woocommerce' )
+				__( 'Remote requests are disabled in sandbox mode.', 'snapchat-for-woocommerce' ),
+				array( 'status' => 403 )
 			);
 		}
 

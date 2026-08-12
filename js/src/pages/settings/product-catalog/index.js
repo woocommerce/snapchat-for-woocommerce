@@ -54,7 +54,7 @@ const ProductCatalog = () => {
 	} = useSettings();
 	// Whether we want to connect the heartbeat immediately as soon as the Heartbeat component mounts.
 	const [ exportInProgress, setExportInProgress ] = useState(
-		sfwData.isExportInProgress === '1'
+		! sfwData.sandboxMode && sfwData.isExportInProgress === '1'
 	);
 	const [ fileUrl, setFileUrl ] = useState( sfwData.exportFileUrl || null );
 	const [ lastExported, setLastExported ] = useState(

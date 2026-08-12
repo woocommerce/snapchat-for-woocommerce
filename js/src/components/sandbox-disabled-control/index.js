@@ -25,7 +25,13 @@ const SandboxDisabledControl = ( { children, message } ) => {
 
 	return (
 		<Tooltip text={ message }>
-			<span className="sfw-sandbox-disabled-control" tabIndex="0">
+			<span
+				className="sfw-sandbox-disabled-control"
+				role="group"
+				aria-disabled="true"
+				aria-label={ message }
+				tabIndex="0"
+			>
 				{ children }
 			</span>
 		</Tooltip>
