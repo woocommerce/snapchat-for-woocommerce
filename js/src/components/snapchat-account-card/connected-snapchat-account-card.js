@@ -1,11 +1,15 @@
 /**
+ * External dependencies
+ */
+import { __ } from '@wordpress/i18n';
+
+/**
  * Internal dependencies
  */
 import AccountDetails from './account-details';
 import SwitchAccountButton from './switch-account-button';
 import AccountCard, { APPEARANCE } from '~/components/account-card';
 import ConnectedIconLabel from '~/components/connected-icon-label';
-import { sfwData } from '~/constants';
 
 const ConnectedSnapchatAccountCard = ( {
 	hideAccountSwitch = false,
@@ -16,7 +20,14 @@ const ConnectedSnapchatAccountCard = ( {
 			return null;
 		}
 		return (
-			<SwitchAccountButton isTertiary disabled={ sfwData.sandboxMode } />
+			<SwitchAccountButton
+				isTertiary
+				disabledInSandboxMode
+				disableInSandboxModeLabel={ __(
+					'Connecting a different account is disabled while sandbox mode is active.',
+					'snapchat-for-woocommerce'
+				) }
+			/>
 		);
 	};
 

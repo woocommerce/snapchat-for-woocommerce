@@ -3,7 +3,7 @@
  */
 import { __ } from '@wordpress/i18n';
 import { Notice } from '@wordpress/components';
-import { useEffect } from '@wordpress/element';
+import { createInterpolateElement, useEffect } from '@wordpress/element';
 import { getHistory, getQuery } from '@woocommerce/navigation';
 
 /**
@@ -46,15 +46,12 @@ const Settings = () => {
 					status="info"
 					isDismissible={ false }
 				>
-					<strong>
-						{ __(
-							'Snapchat sandbox mode is active.',
+					{ createInterpolateElement(
+						__(
+							'<strong>Snapchat sandbox mode is active.</strong> Account details are simulated, and no data is sent to WordPress.com or Snapchat.',
 							'snapchat-for-woocommerce'
-						) }
-					</strong>{ ' ' }
-					{ __(
-						'Account details are simulated, and no data is sent to WordPress.com or Snapchat.',
-						'snapchat-for-woocommerce'
+						),
+						{ strong: <strong /> }
 					) }
 				</Notice>
 			) }
