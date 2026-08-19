@@ -9,6 +9,7 @@
 namespace SnapchatForWooCommerce\Utils;
 
 use SnapchatForWooCommerce\Config;
+use WC_Order;
 use WC_Product;
 
 /**
@@ -52,6 +53,68 @@ class Helper {
 	 */
 	public static function is_request_async() {
 		return ( wp_doing_ajax() || wp_is_serving_rest_request() );
+	}
+
+	/**
+	 * Returns the order of the current `order-received` request, but only when the visitor is
+	 * allowed to see it.
+	 *
+	 * WooCommerce renders a generic confirmation page — without any order details — when the
+	 * request does not carry the order key, and it also keeps orders that belong to a registered
+	 * customer hidden from everybody but that customer. Tracking code must apply the same checks
+	 * before loading an order from the `order-received` endpoint, otherwise order and customer
+	 * data would be exposed to anyone able to guess an order ID.
+	 *
+	 * @see \WC_Shortcode_Checkout::order_received()
+	 * @see \Automattic\WooCommerce\Blocks\BlockTypes\OrderConfirmation\AbstractOrderConfirmationBlock::get_view_order_permissions()
+	 *
+	 * @since 1.0.4
+	 *
+	 * @return WC_Order|null The order when the request is authorized to view it, null otherwise.
+	 */
+	public static function get_verified_order_received_order(): ?WC_Order {
+		if ( ! is_order_received_page() ) {
+			return null;
+		}
+
+		$order_id = absint( get_query_var( 'order-received' ) );
+
+		if ( ! $order_id ) {
+			return null;
+		}
+
+		$order = wc_get_order( $order_id );
+
+		// Refunds and other order types are not confirmation pages, hence the `WC_Order` check.
+		if ( ! $order instanceof WC_Order || $order->get_id() !== $order_id ) {
+			return null;
+		}
+
+		// phpcs:ignore WordPress.Security.NonceVerification.Recommended -- Read-only check of the order key shared with the customer in the confirmation URL.
+		$order_key = isset( $_GET['key'] ) ? sanitize_text_field( wp_unslash( $_GET['key'] ) ) : '';
+
+		// A missing, malformed (arrays are sanitized to an empty string) or wrong key means WooCommerce did not grant access.
+		if ( '' === $order_key || ! $order->key_is_valid( $order_key ) ) {
+			return null;
+		}
+
+		/**
+		 * WooCommerce filter indicating if known (non-guest) shoppers need to be logged in
+		 * before they are given access to the order received page. It is read here so that
+		 * tracking follows whatever WooCommerce decides to render.
+		 *
+		 * @see \WC_Shortcode_Checkout::order_received()
+		 *
+		 * @param bool $verify_known_shoppers If verification is required.
+		 */
+		$verify_known_shoppers = apply_filters( 'woocommerce_order_received_verify_known_shoppers', true );
+		$order_customer_id     = $order->get_customer_id();
+
+		if ( $verify_known_shoppers && $order_customer_id && get_current_user_id() !== $order_customer_id ) {
+			return null;
+		}
+
+		return $order;
 	}
 
 	/**
