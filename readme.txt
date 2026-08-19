@@ -25,6 +25,12 @@ Yes, it uses a [Jetpack](https://jetpack.com/) account to connect and communicat
 
 == Changelog ==
 
+= 1.0.4 - 2026-08-19 =
+* Fix - [SNAPWOO-76] Snapchat for WooCommerce shows low transaction ID overlap between Pixel and CAPI purchase events.
+* Fix - <!--.
+* Fix - Corrected invalid nested HTML in Conversions API settings.
+* Fix - Update WPCS to 3.4.1 to pick up the fix for GHSA-3pwp-g2mj-5p3v.
+
 = 1.0.3 - 2026-05-14 =
 * Add - RTL Support.
 * Add - Snapchat catalog persistence message.
@@ -40,11 +46,5 @@ Yes, it uses a [Jetpack](https://jetpack.com/) account to connect and communicat
 
 = 1.0.2 - 2025-12-02 =
 * Fix - Fatal error on plugin activation.
-
-= 1.0.1 - 2025-12-02 =
-* Add - Display an admin notice prompting users to uninstall the legacy Snapchat Pixel plugin if it is installed and active.
-* Fix - Improve tracking by deduplicating events sent from Pixel and Conversion API.
-* Tweak - WooCommerce 10.3 compatibility.
-* Tweak - WordPress 6.9 compatibility.
 
 [See changelog for all versions](https://raw.githubusercontent.com/woocommerce/snapchat-for-woocommerce/trunk/changelog.txt).
