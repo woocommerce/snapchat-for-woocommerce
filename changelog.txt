@@ -1,5 +1,12 @@
 ***Snapchat for WooCommerce Changelog ***
 
+= 1.0.4 - 2026-08-19 =
+* Fix – Resolved potential transaction ID collisions in purchase event deduplication by using order ID as the event_id instead.
+* Fix - Corrected invalid nested HTML in Conversions API settings.
+* Dev - Update WPCS to 3.4.1 to fix CVE-2026-45293, an arbitrary code execution vulnerability in WordPress Coding Standards.
+* Tweak - Bump WordPress "Tested up to" version to 7.1
+* Tweak - Bump WordPress "Requires at least" version to 6.9
+
 = 1.0.3 - 2026-05-14 =
 * Add - RTL Support.
 * Add - Snapchat catalog persistence message.
