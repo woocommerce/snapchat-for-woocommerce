@@ -71,7 +71,9 @@ class ProductEntityProvider implements ExportableEntityProviderInterface {
 	/**
 	 * Resolves the given product IDs into `WC_Product` instances.
 	 *
-	 * Skips IDs that do not resolve to valid product objects.
+	 * Skips IDs that do not resolve to valid product objects. Results are ordered
+	 * to match the given `$ids` list, since `wc_get_products()` otherwise falls
+	 * back to its default ordering (by date), which can differ from batch order.
 	 *
 	 * @since 0.1.0
 	 *
@@ -82,6 +84,7 @@ class ProductEntityProvider implements ExportableEntityProviderInterface {
 		return wc_get_products(
 			array(
 				'include' => $ids,
+				'orderby' => 'include',
 				'return'  => 'objects',
 				'limit'   => count( $ids ),
 			)
