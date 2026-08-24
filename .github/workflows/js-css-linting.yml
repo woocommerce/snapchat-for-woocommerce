@@ -36,7 +36,7 @@ jobs:
           node-version-file: ".nvmrc"
 
       - name: Prepare annotation formatter
-        uses: woocommerce/grow/eslint-annotation@actions-v2
+        uses: woocommerce/grow/eslint-annotation@68794d4270fbfb19bb0bb76d6cebc8dd18f7d133 # actions-v2
 
       - name: Lint JavaScript and annotate linting errors
         run: npm run lint:js -- --quiet --format ./eslintFormatter.cjs
@@ -54,7 +54,7 @@ jobs:
           node-version-file: ".nvmrc"
 
       - name: Prepare annotation formatter
-        uses: woocommerce/grow/stylelint-annotation@actions-v2
+        uses: woocommerce/grow/stylelint-annotation@68794d4270fbfb19bb0bb76d6cebc8dd18f7d133 # actions-v2
 
       - name: Lint CSS and annotate linting errors
         run: npm run lint:css -- --custom-formatter ./stylelintFormatter.cjs
