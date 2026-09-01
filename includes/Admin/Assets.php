@@ -74,6 +74,7 @@ class Assets {
 			'index',
 			'AdminData',
 			array(
+				'sandboxMode'          => \SnapchatForWooCommerce\SandboxMode::is_enabled(),
 				'setupComplete'        => boolval( Options::get( OptionDefaults::ONBOARDING_STATUS ) === 'connected' ),
 				'status'               => Options::get( OptionDefaults::ONBOARDING_STATUS ),
 				'step'                 => Options::get( OptionDefaults::ONBOARDING_STEP ),
