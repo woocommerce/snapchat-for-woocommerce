@@ -52,7 +52,9 @@ class AssetLoader {
 			$script_url,
 			$asset_data['dependencies'],
 			$asset_data['version'],
-			true
+			array(
+				'strategy' => 'defer',
+			)
 		);
 	}
 

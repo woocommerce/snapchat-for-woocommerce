@@ -82,6 +82,8 @@ class ProductEntityProvider implements ExportableEntityProviderInterface {
 		return wc_get_products(
 			array(
 				'include' => $ids,
+				'orderby' => 'include',
+				'order'   => 'ASC',
 				'return'  => 'objects',
 				'limit'   => count( $ids ),
 			)
