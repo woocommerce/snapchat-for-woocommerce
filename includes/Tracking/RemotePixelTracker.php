@@ -191,7 +191,7 @@ final class RemotePixelTracker implements PixelTrackerInterface {
 	/**
 	 * Emits the Snapchat `PURCHASE` tracking event after a successful order.
 	 *
-	 * Hooked into `woocommerce_before_thankyou`. Avoids duplicate firing via meta key.
+	 * Hooked into `wp_footer`. Avoids duplicate firing via meta key.
 	 *
 	 * The order is only tracked when the request is allowed to see it, i.e. when it carries a
 	 * valid order key. Requests without it get WooCommerce's generic confirmation page, so no
