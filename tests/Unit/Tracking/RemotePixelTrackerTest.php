@@ -201,6 +201,37 @@ class RemotePixelTrackerTest extends WP_UnitTestCase {
 	}
 
 	/**
+	 * Test that the `woocommerce_thankyou_order_id` and `woocommerce_thankyou_order_key` filters
+	 * are honoured, mirroring how WooCommerce resolves the order for a payment gateway that
+	 * redirects with its own reference instead of the real order ID and key.
+	 */
+	public function test_purchase_event_is_tracked_when_order_id_and_key_are_remapped_by_filters() {
+		$order = WC_Helper_Order::create_order( 0 );
+
+		// Simulate a gateway redirect that carries neither the real order ID nor its key.
+		$this->simulate_order_received_request( $order, 'gateway-reference' );
+		set_query_var( 'order-received', '0' );
+
+		$remap_order_id  = function () use ( $order ) {
+			return $order->get_id();
+		};
+		$remap_order_key = function () use ( $order ) {
+			return $order->get_order_key();
+		};
+
+		add_filter( 'woocommerce_thankyou_order_id', $remap_order_id );
+		add_filter( 'woocommerce_thankyou_order_key', $remap_order_key );
+
+		$tracker = new RemotePixelTracker( $this->createMock( WcsClient::class ) );
+		$tracker->track_purchase_event();
+
+		remove_filter( 'woocommerce_thankyou_order_id', $remap_order_id );
+		remove_filter( 'woocommerce_thankyou_order_key', $remap_order_key );
+
+		$this->assertStringContainsString( 'snaptr("track", "PURCHASE"', $this->get_inline_tracking_script() );
+	}
+
+	/**
 	 * Test that an order of a registered customer is not tracked for other visitors,
 	 * even when the order key is known.
 	 */

@@ -79,6 +79,30 @@ class Helper {
 
 		$order_id = absint( get_query_var( 'order-received' ) );
 
+		// phpcs:ignore WordPress.Security.NonceVerification.Recommended -- Read-only check of the order key shared with the customer in the confirmation URL.
+		$order_key = isset( $_GET['key'] ) ? sanitize_text_field( wp_unslash( $_GET['key'] ) ) : '';
+
+		/**
+		 * WooCommerce filter used to remap the order ID read from the confirmation URL, e.g. by a
+		 * payment gateway that redirects with its own reference. Honoured here so tracking follows
+		 * whatever order WooCommerce itself resolves and grants access to.
+		 *
+		 * @see \WC_Shortcode_Checkout::order_received()
+		 *
+		 * @param int $order_id Order ID read from the `order-received` query var.
+		 */
+		$order_id = absint( apply_filters( 'woocommerce_thankyou_order_id', $order_id ) );
+
+		/**
+		 * WooCommerce filter used to remap the order key read from the confirmation URL. Honoured
+		 * for the same reason as `woocommerce_thankyou_order_id` above.
+		 *
+		 * @see \WC_Shortcode_Checkout::order_received()
+		 *
+		 * @param string $order_key Order key read from the `key` query argument.
+		 */
+		$order_key = (string) apply_filters( 'woocommerce_thankyou_order_key', $order_key );
+
 		if ( ! $order_id ) {
 			return null;
 		}
@@ -89,9 +113,6 @@ class Helper {
 		if ( ! $order instanceof WC_Order ) {
 			return null;
 		}
-
-		// phpcs:ignore WordPress.Security.NonceVerification.Recommended -- Read-only check of the order key shared with the customer in the confirmation URL.
-		$order_key = isset( $_GET['key'] ) ? sanitize_text_field( wp_unslash( $_GET['key'] ) ) : '';
 
 		// A missing, malformed (arrays are sanitized to an empty string) or wrong key means WooCommerce did not grant access.
 		if ( '' === $order_key || ! $order->key_is_valid( $order_key ) ) {
