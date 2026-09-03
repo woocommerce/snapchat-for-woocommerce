@@ -56,7 +56,7 @@ class RemotePixelTrackerTest extends WP_UnitTestCase {
 		Options::delete( OptionDefaults::AD_ACCOUNT_ID );
 		Options::delete( OptionDefaults::COLLECT_PII );
 
-		unset( $_GET['key'] );
+		unset( $_GET['key'], $_POST['check_submission'], $_POST['email'] );
 		set_query_var( 'order-received', '' );
 		remove_filter( 'woocommerce_is_order_received_page', '__return_true' );
 		wp_dequeue_script( self::TRACKING_HANDLE );
@@ -198,6 +198,50 @@ class RemotePixelTrackerTest extends WP_UnitTestCase {
 			'wrong key'     => array( 'wc_order_notavalidkey' ),
 			'malformed key' => array( array( 'wc_order_notavalidkey' ) ),
 		);
+	}
+
+	/**
+	 * Test that no event is added for an order past the email verification grace period until
+	 * the visitor verifies their billing email, mirroring WooCommerce's own guest verification
+	 * gate on the order-received page.
+	 */
+	public function test_purchase_event_is_not_tracked_when_email_verification_is_required() {
+		Options::set( OptionDefaults::COLLECT_PII, 'yes' );
+
+		$order = WC_Helper_Order::create_order( 0 );
+		$order->set_date_created( time() - HOUR_IN_SECONDS );
+		$order->save();
+
+		$this->simulate_order_received_request( $order, $order->get_order_key() );
+
+		$tracker = new RemotePixelTracker( $this->createMock( WcsClient::class ) );
+		$tracker->track_purchase_event();
+
+		$this->assertSame( '', $this->get_inline_tracking_script() );
+
+		// Blocked request must not burn the tracked flag, so a later verified visit still fires.
+		$this->assertSame( '', (string) $this->reload_order( $order )->get_meta( self::ORDER_PIXEL_TRACKED_META_KEY, true ) );
+	}
+
+	/**
+	 * Test that supplying the correct billing email via the verify-email form results in exactly
+	 * one PURCHASE event for an order past the email verification grace period.
+	 */
+	public function test_purchase_event_is_tracked_after_email_verification() {
+		$order = WC_Helper_Order::create_order( 0 );
+		$order->set_date_created( time() - HOUR_IN_SECONDS );
+		$order->save();
+
+		$this->simulate_order_received_request( $order, $order->get_order_key() );
+
+		$_POST['check_submission'] = wp_create_nonce( 'wc_verify_email' );
+		$_POST['email']            = $order->get_billing_email();
+
+		$tracker = new RemotePixelTracker( $this->createMock( WcsClient::class ) );
+		$tracker->track_purchase_event();
+
+		$this->assertStringContainsString( 'snaptr("track", "PURCHASE"', $this->get_inline_tracking_script() );
+		$this->assertSame( 1, (int) $this->reload_order( $order )->get_meta( self::ORDER_PIXEL_TRACKED_META_KEY, true ) );
 	}
 
 	/**

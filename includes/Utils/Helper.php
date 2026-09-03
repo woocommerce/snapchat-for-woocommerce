@@ -8,6 +8,7 @@
 
 namespace SnapchatForWooCommerce\Utils;
 
+use Automattic\WooCommerce\Internal\Utilities\Users as WC_Internal_Users;
 use SnapchatForWooCommerce\Config;
 use WC_Order;
 use WC_Product;
@@ -67,6 +68,7 @@ class Helper {
 	 *
 	 * @see \WC_Shortcode_Checkout::order_received()
 	 * @see \Automattic\WooCommerce\Blocks\BlockTypes\OrderConfirmation\AbstractOrderConfirmationBlock::get_view_order_permissions()
+	 * @see self::order_requires_email_verification()
 	 *
 	 * @since 1.0.4
 	 *
@@ -135,7 +137,46 @@ class Helper {
 			return null;
 		}
 
+		if ( self::order_requires_email_verification( $order_id ) ) {
+			return null;
+		}
+
 		return $order;
+	}
+
+	/**
+	 * Returns true when WooCommerce would ask the visitor to verify their email address before
+	 * showing order details, i.e. when it would render `checkout/form-verify-email.php` in place
+	 * of the order. Mirrors `WC_Shortcode_Checkout::guest_should_verify_email()`, including the
+	 * nonce-checked, POSTed email from a submitted verification form.
+	 *
+	 * `Users::should_user_verify_order_email()` already returns false once the order has no
+	 * billing email, or once the current user is logged in as its owner, so this check is safe to
+	 * run unconditionally rather than only for guest orders.
+	 *
+	 * @see \WC_Shortcode_Checkout::guest_should_verify_email()
+	 * @see \Automattic\WooCommerce\Internal\Utilities\Users::should_user_verify_order_email()
+	 *
+	 * @since 1.0.4
+	 *
+	 * @param int $order_id Order to check.
+	 * @return bool True when the visitor must verify their email before WooCommerce shows the order.
+	 */
+	private static function order_requires_email_verification( int $order_id ): bool {
+		if ( ! class_exists( WC_Internal_Users::class ) ) {
+			// Fail closed: without WooCommerce's own check available, assume verification is required.
+			return true;
+		}
+
+		// phpcs:ignore WordPress.Security.NonceVerification.Missing -- Verified below via wp_verify_nonce(), same as WC_Shortcode_Checkout::guest_should_verify_email().
+		$nonce          = isset( $_POST['check_submission'] ) ? sanitize_text_field( wp_unslash( $_POST['check_submission'] ) ) : '';
+		$supplied_email = null;
+
+		if ( $nonce && wp_verify_nonce( $nonce, 'wc_verify_email' ) && isset( $_POST['email'] ) ) {
+			$supplied_email = sanitize_email( wp_unslash( $_POST['email'] ) );
+		}
+
+		return (bool) WC_Internal_Users::should_user_verify_order_email( $order_id, $supplied_email, 'order-received' );
 	}
 
 	/**
