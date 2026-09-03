@@ -1,12 +1,13 @@
 /**
  * External dependencies
  */
-import { Button } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
 
 /**
  * Internal dependencies
  */
+import AppButton from '~/components/app-button';
+import { getOnboardingUrl } from '~/utils/urls';
 import snapchatLogoURL from '~/images/logo/snapchat.svg';
 
 /**
@@ -16,16 +17,11 @@ import snapchatLogoURL from '~/images/logo/snapchat.svg';
  * The promo only renders while onboarding is incomplete. Once the merchant has a
  * connected Snapchat account, nothing is rendered.
  *
- * Note: this runs on the classic order edit screen, outside the plugin admin
- * SPA, so the `~/data` store and `snapchatAdsAdminData` are not available here.
- * The CTA therefore uses the core Button; click tracking is wired in SNAPWOO-100.
- *
  * @param {Object}  props                    Component props.
  * @param {boolean} props.onboardingComplete Whether Snapchat onboarding is complete.
- * @param {string}  props.onboardingUrl      URL to the Snapchat onboarding/setup page.
  * @return {JSX.Element|null} The promo, or null when onboarding is complete.
  */
-const SnapchatAdsPromo = ( { onboardingComplete, onboardingUrl } ) => {
+const SnapchatAdsPromo = ( { onboardingComplete } ) => {
 	if ( onboardingComplete ) {
 		return null;
 	}
@@ -53,9 +49,10 @@ const SnapchatAdsPromo = ( { onboardingComplete, onboardingUrl } ) => {
 					'snapchat-for-woocommerce'
 				) }
 			</p>
-			<Button
+			<AppButton
 				variant="secondary"
-				href={ onboardingUrl }
+				href={ getOnboardingUrl() }
+				eventName="sfw_order_attribution_get_started_button_click"
 				text={ __( 'Get started', 'snapchat-for-woocommerce' ) }
 			/>
 		</div>

@@ -70,13 +70,25 @@ class MetaBoxAssets {
 
 		AssetLoader::enqueue_script( 'order-attribution', 'order-attribution' );
 		AssetLoader::enqueue_style( 'order-attribution', 'order-attribution' );
+
+		AssetLoader::localize_script(
+			'order-attribution',
+			'AdminData',
+			array(
+				'slug'          => 'snapwoo',
+				'pluginVersion' => SNAPCHAT_FOR_WOOCOMMERCE_VERSION,
+				'adAccountId'   => Options::get( OptionDefaults::AD_ACCOUNT_ID ),
+				'status'        => Options::get( OptionDefaults::ONBOARDING_STATUS ),
+				'step'          => Options::get( OptionDefaults::ONBOARDING_STEP ),
+			)
+		);
+
 		AssetLoader::localize_script(
 			'order-attribution',
 			'MetaBoxData',
 			array(
 				'onboardingComplete'     => $onboarding_complete,
 				'orderAttributionSource' => $this->order_attribution_data->get_order_attribution_source_for_edit_screen(),
-				'onboardingUrl'          => admin_url( 'admin.php?page=wc-admin&path=/snapchat/setup' ),
 			)
 		);
 	}
