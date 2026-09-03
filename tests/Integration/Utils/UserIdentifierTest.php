@@ -37,7 +37,7 @@ class UserIdentifierTest extends WP_UnitTestCase {
 
 		unset( $_GET['key'] );
 		set_query_var( 'order-received', '' );
-		remove_all_filters( 'woocommerce_is_order_received_page' );
+		remove_filter( 'woocommerce_is_order_received_page', '__return_true' );
 
 		parent::tear_down();
 	}

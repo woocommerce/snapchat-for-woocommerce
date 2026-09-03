@@ -58,7 +58,7 @@ class RemotePixelTrackerTest extends WP_UnitTestCase {
 
 		unset( $_GET['key'] );
 		set_query_var( 'order-received', '' );
-		remove_all_filters( 'woocommerce_is_order_received_page' );
+		remove_filter( 'woocommerce_is_order_received_page', '__return_true' );
 		wp_dequeue_script( self::TRACKING_HANDLE );
 		wp_deregister_script( self::TRACKING_HANDLE );
 
@@ -230,7 +230,7 @@ class RemotePixelTrackerTest extends WP_UnitTestCase {
 	public function test_purchase_event_is_not_tracked_outside_the_order_received_page() {
 		$order = WC_Helper_Order::create_order( 0 );
 		$this->simulate_order_received_request( $order, $order->get_order_key() );
-		remove_all_filters( 'woocommerce_is_order_received_page' );
+		remove_filter( 'woocommerce_is_order_received_page', '__return_true' );
 
 		$tracker = new RemotePixelTracker( $this->createMock( WcsClient::class ) );
 		$tracker->track_purchase_event();
