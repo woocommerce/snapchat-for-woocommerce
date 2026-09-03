@@ -97,7 +97,7 @@ class RemotePixelTrackerTest extends WP_UnitTestCase {
 	}
 
 	/**
-	 * Returns a fresh copy of the order, bypassing any runtime cache.
+	 * Re-reads the order from the data store.
 	 *
 	 * @param WC_Order $order Order to reload.
 	 * @return WC_Order
