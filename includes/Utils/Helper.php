@@ -86,7 +86,7 @@ class Helper {
 		$order = wc_get_order( $order_id );
 
 		// Refunds and other order types are not confirmation pages, hence the `WC_Order` check.
-		if ( ! $order instanceof WC_Order || $order->get_id() !== $order_id ) {
+		if ( ! $order instanceof WC_Order ) {
 			return null;
 		}
 
