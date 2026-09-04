@@ -66,6 +66,8 @@ const init = () => {
 		<Suspense fallback={ null }>
 			<SnapchatAdsPromo
 				onboardingComplete={ metaBoxData.onboardingComplete }
+				hasCampaign={ metaBoxData.hasCampaign }
+				createCampaignUrl={ metaBoxData.urls?.createCampaign }
 			/>
 		</Suspense>
 	);
