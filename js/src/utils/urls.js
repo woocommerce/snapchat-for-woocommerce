@@ -29,6 +29,20 @@ export const getOnboardingUrl = () => {
 };
 
 /**
+ * Builds the Snapchat Ads Manager create-campaign URL for an ad account.
+ *
+ * @param {string} adAccountId The Snapchat ad account ID.
+ * @return {string} The create-campaign URL, or an empty string when the ID is missing.
+ */
+export const getCreateCampaignUrl = ( adAccountId ) => {
+	if ( ! adAccountId ) {
+		return '';
+	}
+
+	return `https://ads.snapchat.com/${ adAccountId }/create-campaign`;
+};
+
+/**
  * Generates the dashboard URL with optional query parameters.
  *
  * @param {Object|null} query - Optional query parameters to append to the URL.

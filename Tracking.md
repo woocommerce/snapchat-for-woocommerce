@@ -118,6 +118,16 @@ When the merchant is onboarded.
 #### Emitters
 - [`SetupAccounts`](js/src/pages/onboarding/setup-stepper/setup-accounts/index.js#L32)
 
+### [`sfw_order_attribution_create_campaign_button_click`](js/src/meta-boxes/order-attribution/snapchat-ads-promo.js#L22)
+The "Create campaign" button in the create-campaign promo is clicked.
+#### Emitters
+- [`SnapchatAdsPromo`](js/src/meta-boxes/order-attribution/snapchat-ads-promo.js#L37)
+
+### [`sfw_order_attribution_get_started_button_click`](js/src/meta-boxes/order-attribution/snapchat-ads-promo.js#L16)
+The "Get started" button in the connect-account promo is clicked.
+#### Emitters
+- [`SnapchatAdsPromo`](js/src/meta-boxes/order-attribution/snapchat-ads-promo.js#L37)
+
 ### [`sfw_regenerate_csv_button_click`](js/src/pages/settings/product-catalog/index.js#L25)
 When the `Regenerate CSV` button is clicked.
 #### Emitters
