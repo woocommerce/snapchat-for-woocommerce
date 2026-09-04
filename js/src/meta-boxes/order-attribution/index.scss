@@ -1,35 +1,36 @@
 .sfw-order-attribution-promo {
-	margin-top: 16px;
-	padding: 16px;
+	margin-block-start: wpVariables.$grid-unit-20;
+	padding: wpVariables.$grid-unit-20;
 	background-color: colors.$sfw-color-gray-0;
 	border: 1px solid wpColors.$gray-300;
 	border-radius: 2px;
+}
 
-	&__header {
-		display: flex;
-		align-items: flex-start;
-		gap: 8px;
-		margin-bottom: 12px;
-	}
+.sfw-order-attribution-promo__header {
+	display: flex;
+	align-items: flex-start;
+	gap: wpVariables.$grid-unit-10;
+	margin-block-end: wpVariables.$grid-unit-15;
+}
 
-	&__logo {
-		flex-shrink: 0;
-		width: 24px;
-		height: 24px;
-	}
+.sfw-order-attribution-promo__logo {
+	flex-shrink: 0;
+	width: 24px;
+	height: 24px;
+}
 
-	&__title {
-		margin: 0;
-		font-size: variables.$sfw-font-base;
-		line-height: variables.$sfw-line-height-medium;
-		font-weight: 600;
-		color: wpColors.$black;
-	}
+.sfw-order-attribution-promo__title {
+	margin: 0;
+	font-size: variables.$sfw-font-base;
+	line-height: variables.$sfw-line-height-medium;
+	font-weight: 600;
+	color: wpColors.$black;
+}
 
-	&__body {
-		margin: 0 0 12px;
-		font-size: variables.$sfw-font-base;
-		line-height: variables.$sfw-line-height-medium;
-		color: wpColors.$gray-900;
-	}
+.sfw-order-attribution-promo__body {
+	margin-block: 0 wpVariables.$grid-unit-15;
+	margin-inline: 0;
+	font-size: variables.$sfw-font-base;
+	line-height: variables.$sfw-line-height-medium;
+	color: wpColors.$gray-900;
 }
