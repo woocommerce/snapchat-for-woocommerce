@@ -3,7 +3,7 @@
  * Enqueues meta box assets for the WooCommerce order edit screen.
  *
  * Loads the order-attribution bundle that renders the Snapchat connect-account
- * promo below the Order Attribution meta box, and passes the runtime data the
+ * promo within the Order Attribution meta box, and passes the runtime data the
  * script needs to decide whether to render.
  *
  * @package SnapchatForWooCommerce\Admin\MetaBox

@@ -11,18 +11,13 @@ import { getOnboardingUrl } from '~/utils/urls';
 import snapchatLogoURL from '~/images/logo/snapchat.svg';
 
 /**
- * Renders the Snapchat connect-account promo shown below the Order Attribution
- * meta box for Snapchat-attributed orders.
+ * Renders the Snapchat connect-account promo within the Order Attribution meta
+ * box, while onboarding is incomplete.
  *
- * The promo only renders while onboarding is incomplete. Once the merchant has a
- * connected Snapchat account, nothing is rendered.
- *
- * @param {Object}  props                    Component props.
- * @param {boolean} props.onboardingComplete Whether Snapchat onboarding is complete.
  * @return {JSX.Element|null} The promo, or null when onboarding is complete.
  */
-const SnapchatAdsPromo = ( { onboardingComplete } ) => {
-	if ( onboardingComplete ) {
+const SnapchatAdsPromo = () => {
+	if ( window.snapchatAdsMetaBoxData?.onboardingComplete ) {
 		return null;
 	}
 
