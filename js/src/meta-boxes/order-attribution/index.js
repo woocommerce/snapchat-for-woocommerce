@@ -37,11 +37,7 @@ const init = () => {
 
 	createRoot( mountNode ).render(
 		<Suspense fallback={ null }>
-			<SnapchatAdsPromo
-				onboardingComplete={ metaBoxData.onboardingComplete }
-				hasCampaign={ metaBoxData.hasCampaign }
-				createCampaignUrl={ metaBoxData.urls?.createCampaign }
-			/>
+			<SnapchatAdsPromo />
 		</Suspense>
 	);
 
