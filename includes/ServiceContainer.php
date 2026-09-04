@@ -122,6 +122,9 @@ final class ServiceContainer {
 					new Admin\Onboarding(),
 					new ProductMeta\ProductMetaFields(),
 					new Admin\Notices(),
+					new Admin\MetaBox\MetaBoxAssets(
+						new Admin\MetaBox\OrderAttributionData()
+					),
 				);
 
 			default:

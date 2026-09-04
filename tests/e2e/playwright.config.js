@@ -19,6 +19,9 @@ module.exports = ( async () => {
 	return defineConfig( {
 		testDir: '../../tests',
 
+		/* Exclude PHP and JS unit tests; Playwright only runs the e2e specs. */
+		testIgnore: [ '**/Unit/**', '**/js/**' ],
+
 		/* Maximum time one test can run for. */
 		timeout: 60 * 1000,
 
