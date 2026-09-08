@@ -20,6 +20,7 @@ jobs:
   E2eTests:
     name: Playwright Tests
     runs-on: ubuntu-latest
+    timeout-minutes: 15
     env:
       FORCE_COLOR: 2
 
