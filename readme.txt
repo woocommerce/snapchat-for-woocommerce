@@ -25,6 +25,14 @@ Yes, it uses a [Jetpack](https://jetpack.com/) account to connect and communicat
 
 == Changelog ==
 
+= 1.0.5 - 2026-09-08 =
+* Fix - Add backward-compatibility guardrail to AGENTS.md.
+* Fix - Bump WooCommerce "tested up to" version to 11.1.
+* Fix - ci: add job-level timeout-minutes to workflow jobs.
+* Fix - Ensure product export batches write CSV rows in the correct product order.
+* Fix - Pin GitHub Actions and their nested dependencies to immutable commit SHAs.
+* Fix - Pin GitHub Actions to full commit SHAs.
+
 = 1.0.4 - 2026-08-19 =
 * Fix – Resolved potential transaction ID collisions in purchase event deduplication by using order ID as the event_id instead.
 * Fix - Corrected invalid nested HTML in Conversions API settings.
@@ -44,8 +52,5 @@ Yes, it uses a [Jetpack](https://jetpack.com/) account to connect and communicat
 * Fix - Strip HTML from product description for the CSV export.
 * Fix - Update integration value to include current plugin version.
 * Update - Text of the "Disconnect Snapchat" modal.
-
-= 1.0.2 - 2025-12-02 =
-* Fix - Fatal error on plugin activation.
 
 [See changelog for all versions](https://raw.githubusercontent.com/woocommerce/snapchat-for-woocommerce/trunk/changelog.txt).
