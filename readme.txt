@@ -27,11 +27,8 @@ Yes, it uses a [Jetpack](https://jetpack.com/) account to connect and communicat
 
 = 1.0.5 - 2026-09-08 =
 * Fix - Add backward-compatibility guardrail to AGENTS.md.
-* Fix - Bump WooCommerce "tested up to" version to 11.1.
-* Fix - ci: add job-level timeout-minutes to workflow jobs.
 * Fix - Ensure product export batches write CSV rows in the correct product order.
-* Fix - Pin GitHub Actions and their nested dependencies to immutable commit SHAs.
-* Fix - Pin GitHub Actions to full commit SHAs.
+* Tweak - Bump WooCommerce "tested up to" version to 11.1.
 
 = 1.0.4 - 2026-08-19 =
 * Fix – Resolved potential transaction ID collisions in purchase event deduplication by using order ID as the event_id instead.
