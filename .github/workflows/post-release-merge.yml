@@ -17,12 +17,14 @@ on:
 jobs:
   MergeTrunkDevelopPR:
     runs-on: ubuntu-latest
+    timeout-minutes: 5
     steps:
-      - uses: woocommerce/grow/merge-trunk-develop-pr@e5fa5c65e5b349b11d5679ba8958efa6e461cf36 # actions-v3
+      - uses: woocommerce/grow/merge-trunk-develop-pr@b9c1e59aae9fdbe668b068ebd59c1545a88ea9fa # actions-v3.0.5
 
   delete-simulate-release-branch:
     name: Delete simulate release branch
     runs-on: ubuntu-latest
+    timeout-minutes: 5
     if: |
       github.event.pull_request.merged == false &&
       startsWith(github.event.pull_request.head.ref, 'release/') &&

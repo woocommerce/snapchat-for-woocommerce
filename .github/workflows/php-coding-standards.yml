@@ -25,12 +25,13 @@ jobs:
   phpcs:
     name: PHP coding standards
     runs-on: ubuntu-latest
+    timeout-minutes: 5
     steps:
       - name: Checkout repository
         uses: actions/checkout@fbc6f3992d24b796d5a048ff273f7fcc4a7b6c09 # v5
 
       - name: Prepare PHP
-        uses: woocommerce/grow/prepare-php@e5fa5c65e5b349b11d5679ba8958efa6e461cf36 # actions-v3
+        uses: woocommerce/grow/prepare-php@b9c1e59aae9fdbe668b068ebd59c1545a88ea9fa # actions-v3.0.5
         with:
           tools: cs2pr
 
@@ -43,18 +44,19 @@ jobs:
   phpcompat:
     name: PHP compatibility
     runs-on: ubuntu-latest
+    timeout-minutes: 10
     steps:
       - name: Checkout repository
         uses: actions/checkout@fbc6f3992d24b796d5a048ff273f7fcc4a7b6c09 # v5
 
       - name: Prepare PHP
-        uses: woocommerce/grow/prepare-php@e5fa5c65e5b349b11d5679ba8958efa6e461cf36 # actions-v3
+        uses: woocommerce/grow/prepare-php@b9c1e59aae9fdbe668b068ebd59c1545a88ea9fa # actions-v3.0.5
         with:
           tools: cs2pr
           install-deps: no
 
       - name: Prepare node
-        uses: woocommerce/grow/prepare-node@e5fa5c65e5b349b11d5679ba8958efa6e461cf36 # actions-v3
+        uses: woocommerce/grow/prepare-node@b9c1e59aae9fdbe668b068ebd59c1545a88ea9fa # actions-v3.0.5
         with:
           node-version-file: ".nvmrc"
           ignore-scripts: "no"

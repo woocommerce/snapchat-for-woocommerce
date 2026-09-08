@@ -16,6 +16,7 @@ jobs:
   BuildExtensionBundle:
     name: Build extension bundle
     runs-on: ubuntu-latest
+    timeout-minutes: 10
     env:
       FORCE_COLOR: 2
     steps:
@@ -23,12 +24,12 @@ jobs:
         uses: actions/checkout@fbc6f3992d24b796d5a048ff273f7fcc4a7b6c09 # v5
 
       - name: Prepare PHP
-        uses: woocommerce/grow/prepare-php@e5fa5c65e5b349b11d5679ba8958efa6e461cf36 # actions-v3
+        uses: woocommerce/grow/prepare-php@b9c1e59aae9fdbe668b068ebd59c1545a88ea9fa # actions-v3.0.5
         with:
           install-deps: "no"
 
       - name: Prepare node
-        uses: woocommerce/grow/prepare-node@e5fa5c65e5b349b11d5679ba8958efa6e461cf36 # actions-v3
+        uses: woocommerce/grow/prepare-node@b9c1e59aae9fdbe668b068ebd59c1545a88ea9fa # actions-v3.0.5
         with:
           node-version-file: ".nvmrc"
           ignore-scripts: "no"
@@ -41,7 +42,7 @@ jobs:
 
       - name: Publish dev build to GitHub
         if: ${{ github.event_name == 'push' && github.ref_name == 'develop' }}
-        uses: woocommerce/grow/publish-extension-dev-build@e5fa5c65e5b349b11d5679ba8958efa6e461cf36 # actions-v3
+        uses: woocommerce/grow/publish-extension-dev-build@b9c1e59aae9fdbe668b068ebd59c1545a88ea9fa # actions-v3.0.5
         with:
           extension-asset-path: snapchat-for-woocommerce.zip
 

@@ -25,12 +25,13 @@ jobs:
   PrepareRelease:
     name: Prepare Release
     runs-on: ubuntu-latest
+    timeout-minutes: 5
     steps:
       - name: Checkout repository
         uses: actions/checkout@fbc6f3992d24b796d5a048ff273f7fcc4a7b6c09 # v5
 
       - name: Create branch & PR
-        uses: woocommerce/grow/prepare-extension-release@e5fa5c65e5b349b11d5679ba8958efa6e461cf36 # actions-v3
+        uses: woocommerce/grow/prepare-extension-release@b9c1e59aae9fdbe668b068ebd59c1545a88ea9fa # actions-v3.0.5
         with:
           version: ${{ github.event.inputs.version }}
           type: ${{ github.event.inputs.type }}
