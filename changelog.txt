@@ -1,7 +1,6 @@
 ***Snapchat for WooCommerce Changelog ***
 
 = 1.0.5 - 2026-09-08 =
-* Fix - Add backward-compatibility guardrail to AGENTS.md.
 * Fix - Ensure product export batches write CSV rows in the correct product order.
 * Tweak - Bump WooCommerce "tested up to" version to 11.1.
 
