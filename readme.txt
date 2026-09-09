@@ -27,6 +27,7 @@ Yes, it uses a [Jetpack](https://jetpack.com/) account to connect and communicat
 
 = 1.0.5 - 2026-09-08 =
 * Fix - Ensure product export batches write CSV rows in the correct product order.
+* Fix - Purchase pixel no longer exposes order details and hashed billing data on unauthenticated order-received requests.
 * Tweak - Bump WooCommerce "tested up to" version to 11.1.
 
 = 1.0.4 - 2026-08-19 =
