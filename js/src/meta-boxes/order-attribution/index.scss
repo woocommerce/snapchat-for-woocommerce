@@ -4,30 +4,18 @@
 	background-color: colors.$sfw-color-gray-0;
 	border: 1px solid wpColors.$gray-300;
 	border-radius: 2px;
-}
-
-.sfw-order-attribution-promo__header {
-	margin-block-end: wpVariables.$grid-unit-15;
-}
-
-.sfw-order-attribution-promo__logo {
-	flex-shrink: 0;
-	width: 24px;
-	height: 24px;
+	font-size: variables.$sfw-font-base;
+	line-height: variables.$sfw-line-height-medium;
+	color: wpColors.$black;
 }
 
 .sfw-order-attribution-promo__title {
 	margin: 0;
 	font-size: variables.$sfw-font-base;
 	line-height: variables.$sfw-line-height-medium;
-	font-weight: 600;
-	color: wpColors.$black;
 }
 
 .sfw-order-attribution-promo__body {
-	margin-block: 0 wpVariables.$grid-unit-15;
-	margin-inline: 0;
-	font-size: variables.$sfw-font-base;
-	line-height: variables.$sfw-line-height-medium;
+	margin: 0;
 	color: wpColors.$gray-900;
 }

@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import { Flex, FlexItem } from '@wordpress/components';
+import { Flex, FlexItem, FlexBlock } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
 
 /**
@@ -14,55 +14,74 @@ import snapchatLogoURL from '~/images/logo/snapchat.svg';
 const ONBOARDING_URL = getOnboardingUrl();
 
 /**
+ * Tracking event fired when the merchant clicks the "Get started" CTA in the
+ * order attribution promo.
+ *
+ * Properties (added by `addBaseEventProperties`):
+ * - `<slug>_version`: Plugin version.
+ * - `<slug>_ads_id`: Snapchat Ads account ID, when connected.
+ */
+const GET_STARTED_EVENT_NAME = 'sfw_order_attribution_get_started_button_click';
+
+/**
  * Renders the Snapchat connect-account promo within the Order Attribution meta
  * box, while onboarding is incomplete.
  *
  * @return {JSX.Element|null} The promo, or null when onboarding is complete.
  */
 const SnapchatAdsPromo = () => {
-	if ( window.snapchatAdsMetaBoxData?.onboardingComplete ) {
+	if ( window.snapchatAdsMetaBoxData.onboardingComplete ) {
 		return null;
 	}
 
 	return (
-		<div className="sfw-order-attribution-promo">
-			<Flex
-				className="sfw-order-attribution-promo__header"
-				align="flex-start"
-				justify="flex-start"
-				gap={ 2 }
-			>
-				<FlexItem>
-					<img
-						className="sfw-order-attribution-promo__logo"
-						src={ snapchatLogoURL }
-						alt={ __( 'Snapchat', 'snapchat-for-woocommerce' ) }
-						width="24"
-						height="24"
-					/>
-				</FlexItem>
-				<FlexItem>
-					<h3 className="sfw-order-attribution-promo__title">
-						{ __(
-							'Your next customers are on Snapchat',
-							'snapchat-for-woocommerce'
-						) }
-					</h3>
-				</FlexItem>
-			</Flex>
-			<p className="sfw-order-attribution-promo__body">
-				{ __(
-					'Sync your catalog to reach Snapchatters actively discovering new brands and products.',
-					'snapchat-for-woocommerce'
-				) }
-			</p>
-			<AppButton
-				variant="secondary"
-				href={ ONBOARDING_URL }
-				eventName="sfw_order_attribution_get_started_button_click"
-				text={ __( 'Get started', 'snapchat-for-woocommerce' ) }
-			/>
-		</div>
+		<Flex
+			direction="column"
+			className="sfw-order-attribution-promo"
+			gap={ 3 }
+		>
+			<FlexBlock>
+				<Flex align="flex-start" gap={ 2 }>
+					<FlexItem>
+						<img
+							src={ snapchatLogoURL }
+							alt={ __(
+								'Snapchat logo',
+								'snapchat-for-woocommerce'
+							) }
+							width="24"
+							height="24"
+						/>
+					</FlexItem>
+					<FlexBlock>
+						<h3 className="sfw-order-attribution-promo__title">
+							{ __(
+								'Your next customers are on Snapchat',
+								'snapchat-for-woocommerce'
+							) }
+						</h3>
+					</FlexBlock>
+				</Flex>
+			</FlexBlock>
+
+			<FlexBlock>
+				<p className="sfw-order-attribution-promo__body">
+					{ __(
+						'Sync your catalog to reach Snapchatters actively discovering new brands and products.',
+						'snapchat-for-woocommerce'
+					) }
+				</p>
+			</FlexBlock>
+
+			<FlexBlock>
+				<AppButton
+					variant="secondary"
+					href={ ONBOARDING_URL }
+					eventName={ GET_STARTED_EVENT_NAME }
+					text={ __( 'Get started', 'snapchat-for-woocommerce' ) }
+				/>
+			</FlexBlock>
+		</Flex>
 	);
 };
 
