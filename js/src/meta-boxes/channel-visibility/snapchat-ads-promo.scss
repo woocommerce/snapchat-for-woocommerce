@@ -1,0 +1,32 @@
+.sfw-channel-visibility {
+	padding: wpVariables.$grid-unit-05;
+}
+
+.sfw-channel-visibility__logo {
+	display: block;
+}
+
+.sfw-channel-visibility__title {
+	font-size: variables.$sfw-font-base;
+	font-weight: 600;
+	line-height: variables.$sfw-line-height-medium;
+	letter-spacing: 0;
+	margin-block: 0;
+	margin-inline: 0;
+}
+
+.sfw-channel-visibility__content {
+	background-color: #fff;
+	border: 1px solid rgb(0 0 0 / 8%);
+	border-radius: wpVariables.$grid-unit-05;
+	padding: wpVariables.$grid-unit-20;
+}
+
+.sfw-channel-visibility__content p:last-child {
+	margin-block: 0;
+	margin-inline: 0;
+}
+
+.sfw-channel-visibility__get-started--is-dismissed {
+	margin-inline-start: auto;
+}
