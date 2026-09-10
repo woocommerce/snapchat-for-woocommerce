@@ -2,7 +2,7 @@
 /**
  * Plugin Name: Snapchat for WooCommerce
  * Description: Seamlessly integrates your WooCommerce store with Snapchat's powerful advertising platform, enabling you to reach millions of potential customers through engaging visual ads.
- * Version: 1.0.4
+ * Version: 1.0.5
  * Author: WooCommerce
  * Author URI: https://woocommerce.com/
  * Text Domain: snapchat-for-woocommerce
@@ -12,8 +12,8 @@
  * PHP tested up to: 8.4
  * Requires at least: 6.9
  * Tested up to: 7.1
- * WC requires at least: 10.6
- * WC tested up to: 10.8
+ * WC requires at least: 10.9
+ * WC tested up to: 11.1
  *
  * License: GNU General Public License v3.0
  * License URI: http://www.gnu.org/licenses/gpl-3.0.html
@@ -29,7 +29,7 @@ use SnapchatForWooCommerce\ServiceKey;
 defined( 'ABSPATH' ) || exit;
 
 if ( ! defined( 'SNAPCHAT_FOR_WOOCOMMERCE_VERSION' ) ) {
-	define( 'SNAPCHAT_FOR_WOOCOMMERCE_VERSION', '1.0.4' ); // WRCS: DEFINED_VERSION.
+	define( 'SNAPCHAT_FOR_WOOCOMMERCE_VERSION', '1.0.5' ); // WRCS: DEFINED_VERSION.
 }
 
 if ( ! defined( 'SNAPCHAT_FOR_WOOCOMMERCE_FILE' ) ) {
