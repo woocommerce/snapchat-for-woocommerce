@@ -122,6 +122,8 @@ final class ServiceContainer {
 					new Admin\Onboarding(),
 					new ProductMeta\ProductMetaFields(),
 					new Admin\Notices(),
+					new Admin\MetaBox\ChannelVisibilityMetaBox(),
+					new Admin\MetaBox\MetaBoxAssets(),
 				);
 
 			default:
