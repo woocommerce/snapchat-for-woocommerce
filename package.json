@@ -93,7 +93,7 @@
 		"postenv:start": "bash ./tests/e2e/bin/initialize.sh",
 		"test:e2e": "npx playwright test --config tests/e2e/playwright.config.js",
 		"start": "wp-scripts start --webpack-src-dir=js/src",
-		"test:unit:js": "wp-scripts test-unit-js --config jest.config.js"
+		"test:js": "wp-scripts test-unit-js"
 	},
 	"browserslist": [
 		"extends @wordpress/browserslist-config"

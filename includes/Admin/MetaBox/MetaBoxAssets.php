@@ -77,9 +77,6 @@ class MetaBoxAssets {
 			array(
 				'slug'          => 'snapwoo',
 				'pluginVersion' => SNAPCHAT_FOR_WOOCOMMERCE_VERSION,
-				'adAccountId'   => Options::get( OptionDefaults::AD_ACCOUNT_ID ),
-				'status'        => Options::get( OptionDefaults::ONBOARDING_STATUS ),
-				'step'          => Options::get( OptionDefaults::ONBOARDING_STEP ),
 			)
 		);
 

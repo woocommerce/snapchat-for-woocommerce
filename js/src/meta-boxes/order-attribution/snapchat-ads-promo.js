@@ -1,6 +1,7 @@
 /**
  * External dependencies
  */
+import { Flex, FlexItem } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
 
 /**
@@ -9,6 +10,8 @@ import { __ } from '@wordpress/i18n';
 import AppButton from '~/components/app-button';
 import { getOnboardingUrl } from '~/utils/urls';
 import snapchatLogoURL from '~/images/logo/snapchat.svg';
+
+const ONBOARDING_URL = getOnboardingUrl();
 
 /**
  * Renders the Snapchat connect-account promo within the Order Attribution meta
@@ -23,21 +26,30 @@ const SnapchatAdsPromo = () => {
 
 	return (
 		<div className="sfw-order-attribution-promo">
-			<div className="sfw-order-attribution-promo__header">
-				<img
-					className="sfw-order-attribution-promo__logo"
-					src={ snapchatLogoURL }
-					alt={ __( 'Snapchat', 'snapchat-for-woocommerce' ) }
-					width="24"
-					height="24"
-				/>
-				<h3 className="sfw-order-attribution-promo__title">
-					{ __(
-						'Your next customers are on Snapchat',
-						'snapchat-for-woocommerce'
-					) }
-				</h3>
-			</div>
+			<Flex
+				className="sfw-order-attribution-promo__header"
+				align="flex-start"
+				justify="flex-start"
+				gap={ 2 }
+			>
+				<FlexItem>
+					<img
+						className="sfw-order-attribution-promo__logo"
+						src={ snapchatLogoURL }
+						alt={ __( 'Snapchat', 'snapchat-for-woocommerce' ) }
+						width="24"
+						height="24"
+					/>
+				</FlexItem>
+				<FlexItem>
+					<h3 className="sfw-order-attribution-promo__title">
+						{ __(
+							'Your next customers are on Snapchat',
+							'snapchat-for-woocommerce'
+						) }
+					</h3>
+				</FlexItem>
+			</Flex>
 			<p className="sfw-order-attribution-promo__body">
 				{ __(
 					'Sync your catalog to reach Snapchatters actively discovering new brands and products.',
@@ -46,7 +58,7 @@ const SnapchatAdsPromo = () => {
 			</p>
 			<AppButton
 				variant="secondary"
-				href={ getOnboardingUrl() }
+				href={ ONBOARDING_URL }
 				eventName="sfw_order_attribution_get_started_button_click"
 				text={ __( 'Get started', 'snapchat-for-woocommerce' ) }
 			/>
