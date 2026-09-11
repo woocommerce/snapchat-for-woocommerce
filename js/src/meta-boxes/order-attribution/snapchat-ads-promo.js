@@ -11,21 +11,19 @@ import AppButton from '~/components/app-button';
 import { getOnboardingUrl } from '~/utils/urls';
 import snapchatLogoURL from '~/images/logo/snapchat.svg';
 
-const ONBOARDING_URL = getOnboardingUrl();
+const onboardingUrl = getOnboardingUrl();
 
 /**
- * Tracking event fired when the merchant clicks the "Get started" CTA in the
- * order attribution promo.
- *
- * Properties (added by `addBaseEventProperties`):
- * - `<slug>_version`: Plugin version.
- * - `<slug>_ads_id`: Snapchat Ads account ID, when connected.
+ * @event sfw_order_attribution_get_started_button_click
+ * @property {string} context Indicates from which page the button was clicked. Possible value: 'order-attribution-meta-box'.
+ * @property {string} url The URL the button directs to. Possible value: the onboarding URL.
  */
-const GET_STARTED_EVENT_NAME = 'sfw_order_attribution_get_started_button_click';
 
 /**
  * Renders the Snapchat connect-account promo within the Order Attribution meta
  * box, while onboarding is incomplete.
+ *
+ * @fires sfw_order_attribution_get_started_button_click When the "Get started" button is clicked.
  *
  * @return {JSX.Element|null} The promo, or null when onboarding is complete.
  */
@@ -41,7 +39,7 @@ const SnapchatAdsPromo = () => {
 			gap={ 3 }
 		>
 			<FlexBlock>
-				<Flex align="flex-start" gap={ 2 }>
+				<Flex align="center" gap={ 2 }>
 					<FlexItem>
 						<img
 							src={ snapchatLogoURL }
@@ -76,8 +74,12 @@ const SnapchatAdsPromo = () => {
 			<FlexBlock>
 				<AppButton
 					variant="secondary"
-					href={ ONBOARDING_URL }
-					eventName={ GET_STARTED_EVENT_NAME }
+					href={ onboardingUrl }
+					eventName="sfw_order_attribution_get_started_button_click"
+					eventProps={ {
+						context: 'order-attribution-meta-box',
+						url: onboardingUrl,
+					} }
 					text={ __( 'Get started', 'snapchat-for-woocommerce' ) }
 				/>
 			</FlexBlock>
