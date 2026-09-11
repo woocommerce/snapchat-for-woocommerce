@@ -86,6 +86,11 @@ const webpackConfig = {
 		...defaultConfig.entry(),
 		index: path.resolve( process.cwd(), 'js/src', 'index.js' ),
 		tracking: path.resolve( process.cwd(), 'js/src/tracking', 'index.js' ),
+		'order-attribution': path.resolve(
+			process.cwd(),
+			'js/src/meta-boxes/order-attribution',
+			'index.js'
+		),
 	} ),
 	output: {
 		...defaultConfig.output,
