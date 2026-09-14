@@ -1,6 +1,11 @@
 <?php
 /**
- * Conditional admin assets for the Channel visibility widget on the Edit Product screen.
+ * Conditional admin assets for plugin meta boxes on WooCommerce edit screens.
+ *
+ * Enqueues the channel-visibility bundle on the product edit screen and the
+ * order-attribution bundle (Snapchat connect-account promo) on the order edit
+ * screen, passing each the runtime data its script needs to decide whether to
+ * render.
  *
  * @package SnapchatForWooCommerce\Admin\MetaBox
  * @since 0.1.0
@@ -13,14 +18,34 @@ use SnapchatForWooCommerce\Utils\Storage\Options;
 use SnapchatForWooCommerce\Utils\Storage\OptionDefaults;
 
 /**
- * Enqueues the channel-visibility bundle on the product edit screen and inlines its data.
+ * Handles admin script and style enqueues for plugin meta boxes.
  *
  * @since 0.1.0
  */
 class MetaBoxAssets {
 
 	/**
-	 * Registers WordPress hooks.
+	 * Order attribution data resolver.
+	 *
+	 * @since 1.1.0
+	 *
+	 * @var OrderAttributionData
+	 */
+	protected OrderAttributionData $order_attribution_data;
+
+	/**
+	 * Constructor.
+	 *
+	 * @since 1.1.0
+	 *
+	 * @param OrderAttributionData $order_attribution_data Order attribution data resolver.
+	 */
+	public function __construct( OrderAttributionData $order_attribution_data ) {
+		$this->order_attribution_data = $order_attribution_data;
+	}
+
+	/**
+	 * Registers WordPress admin-side hooks.
 	 *
 	 * @since 0.1.0
 	 *
@@ -31,13 +56,25 @@ class MetaBoxAssets {
 	}
 
 	/**
-	 * Enqueues the channel-visibility bundle and localizes its data on the product edit screen.
+	 * Enqueues the plugin meta box assets on their respective edit screens.
 	 *
 	 * @since 0.1.0
 	 *
 	 * @return void
 	 */
 	public function enqueue_assets(): void {
+		$this->enqueue_channel_visibility_assets();
+		$this->enqueue_order_attribution_assets();
+	}
+
+	/**
+	 * Enqueues the channel-visibility bundle and localizes its data on the product edit screen.
+	 *
+	 * @since 0.1.0
+	 *
+	 * @return void
+	 */
+	protected function enqueue_channel_visibility_assets(): void {
 		$channel_visibility = ProductChannelVisibilityData::get_channel_visibility_inline_block();
 
 		if ( null === $channel_visibility ) {
@@ -64,6 +101,42 @@ class MetaBoxAssets {
 			'channel-visibility-meta-box',
 			'MetaBoxData',
 			$channel_visibility
+		);
+	}
+
+	/**
+	 * Enqueues the order-attribution meta box assets on the order edit screen.
+	 *
+	 * @since 1.1.0
+	 *
+	 * @return void
+	 */
+	protected function enqueue_order_attribution_assets(): void {
+		if ( ! $this->order_attribution_data->is_wc_order_edit_screen() ) {
+			return;
+		}
+
+		$onboarding_complete = Options::get( OptionDefaults::ONBOARDING_STATUS ) === 'connected';
+
+		AssetLoader::enqueue_script( 'order-attribution', 'order-attribution' );
+		AssetLoader::enqueue_style( 'order-attribution', 'order-attribution' );
+
+		AssetLoader::localize_script(
+			'order-attribution',
+			'AdminData',
+			array(
+				'slug'          => 'snapwoo',
+				'pluginVersion' => SNAPCHAT_FOR_WOOCOMMERCE_VERSION,
+			)
+		);
+
+		AssetLoader::localize_script(
+			'order-attribution',
+			'MetaBoxData',
+			array(
+				'onboardingComplete'     => $onboarding_complete,
+				'orderAttributionSource' => $this->order_attribution_data->get_order_attribution_source_for_edit_screen(),
+			)
 		);
 	}
 }

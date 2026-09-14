@@ -17,7 +17,7 @@ module.exports = ( async () => {
 	}
 
 	return defineConfig( {
-		testDir: '../../tests',
+		testDir: './specs',
 
 		/* Maximum time one test can run for. */
 		timeout: 60 * 1000,

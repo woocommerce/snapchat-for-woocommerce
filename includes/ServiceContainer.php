@@ -123,7 +123,9 @@ final class ServiceContainer {
 					new ProductMeta\ProductMetaFields(),
 					new Admin\Notices(),
 					new Admin\MetaBox\ChannelVisibilityMetaBox(),
-					new Admin\MetaBox\MetaBoxAssets(),
+					new Admin\MetaBox\MetaBoxAssets(
+						new Admin\MetaBox\OrderAttributionData()
+					),
 				);
 
 			default:
