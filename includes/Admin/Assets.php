@@ -13,6 +13,7 @@
 
 namespace SnapchatForWooCommerce\Admin;
 
+use SnapchatForWooCommerce\SandboxMode;
 use SnapchatForWooCommerce\Utils\AssetLoader;
 use SnapchatForWooCommerce\Utils\Storage\Options;
 use SnapchatForWooCommerce\Utils\Storage\OptionDefaults;
@@ -74,7 +75,7 @@ class Assets {
 			'index',
 			'AdminData',
 			array(
-				'sandboxMode'          => \SnapchatForWooCommerce\SandboxMode::is_enabled(),
+				'sandboxMode'          => SandboxMode::is_enabled(),
 				'setupComplete'        => boolval( Options::get( OptionDefaults::ONBOARDING_STATUS ) === 'connected' ),
 				'status'               => Options::get( OptionDefaults::ONBOARDING_STATUS ),
 				'step'                 => Options::get( OptionDefaults::ONBOARDING_STEP ),

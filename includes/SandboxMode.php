@@ -66,8 +66,8 @@ final class SandboxMode {
 	public static function is_enabled(): bool {
 		$value = get_option( self::OPTION_NAME, 'no' );
 
-		if ( true === $value || 1 === $value ) {
-			return true;
+		if ( ! is_scalar( $value ) ) {
+			return false;
 		}
 
 		return in_array( strtolower( (string) $value ), array( '1', 'yes', 'true', 'on' ), true );
