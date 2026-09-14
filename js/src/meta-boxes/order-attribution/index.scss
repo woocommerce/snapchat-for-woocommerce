@@ -1,0 +1,21 @@
+.sfw-order-attribution-promo {
+	margin-block-start: wpVariables.$grid-unit-20;
+	padding: wpVariables.$grid-unit-20;
+	background-color: colors.$sfw-color-gray-0;
+	border: 1px solid wpColors.$gray-300;
+	border-radius: 2px;
+	font-size: variables.$sfw-font-base;
+	line-height: variables.$sfw-line-height-medium;
+	color: wpColors.$black;
+}
+
+.sfw-order-attribution-promo__title {
+	margin: 0;
+	font-size: variables.$sfw-font-base;
+	line-height: variables.$sfw-line-height-medium;
+}
+
+.sfw-order-attribution-promo__body {
+	margin: 0;
+	color: wpColors.$gray-900;
+}

@@ -1,5 +1,10 @@
 ***Snapchat for WooCommerce Changelog ***
 
+= 1.0.5 - 2026-09-08 =
+* Fix - Ensure product export batches write CSV rows in the correct product order.
+* Fix - Purchase pixel no longer exposes order details and hashed billing data on unauthenticated order-received requests.
+* Tweak - Bump WooCommerce "tested up to" version to 11.1.
+
 = 1.0.4 - 2026-08-19 =
 * Fix – Resolved potential transaction ID collisions in purchase event deduplication by using order ID as the event_id instead.
 * Fix - Corrected invalid nested HTML in Conversions API settings.
