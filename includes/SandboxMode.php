@@ -10,6 +10,8 @@ namespace SnapchatForWooCommerce;
 use SnapchatForWooCommerce\Admin\Export\Service\ProductExportService;
 use SnapchatForWooCommerce\Admin\Export\Service\ProductIdCacheBuilder;
 use SnapchatForWooCommerce\Utils\Helper;
+use SnapchatForWooCommerce\Utils\Storage\OptionDefaults;
+use SnapchatForWooCommerce\Utils\Storage\Options;
 use WP_Error;
 use WP_REST_Request;
 use WP_REST_Response;
@@ -20,11 +22,16 @@ use WP_REST_Response;
 final class SandboxMode {
 	/**
 	 * The manually managed WordPress option that enables sandbox mode.
+	 *
+	 * Matches {@see Options::get_key( OptionDefaults::SANDBOX_MODE )} — kept as a
+	 * literal here so it can be read directly via WP-CLI without loading the plugin.
 	 */
 	public const OPTION_NAME = 'snapchat_sandbox_mode';
 
 	/**
 	 * Isolated storage for settings changed while sandbox mode is active.
+	 *
+	 * Matches {@see Options::get_key( OptionDefaults::SANDBOX_SETTINGS )}.
 	 */
 	public const SETTINGS_OPTION_NAME = 'snapchat_sandbox_settings';
 
@@ -64,7 +71,7 @@ final class SandboxMode {
 	 * Returns whether sandbox mode is enabled by its database option.
 	 */
 	public static function is_enabled(): bool {
-		$value = get_option( self::OPTION_NAME, 'no' );
+		$value = Options::get( OptionDefaults::SANDBOX_MODE );
 
 		if ( ! is_scalar( $value ) ) {
 			return false;
@@ -276,7 +283,7 @@ final class SandboxMode {
 	 * @return mixed
 	 */
 	private function get_sandbox_setting( string $key, $fallback ) {
-		$settings = get_option( self::SETTINGS_OPTION_NAME, array() );
+		$settings = Options::get( OptionDefaults::SANDBOX_SETTINGS );
 
 		if ( ! is_array( $settings ) ) {
 			return $fallback;
@@ -292,10 +299,10 @@ final class SandboxMode {
 	 * @param mixed  $value Setting value.
 	 */
 	private function set_sandbox_setting( string $key, $value ): void {
-		$settings = get_option( self::SETTINGS_OPTION_NAME, array() );
+		$settings = Options::get( OptionDefaults::SANDBOX_SETTINGS );
 		$settings = is_array( $settings ) ? $settings : array();
 
 		$settings[ $key ] = $value;
-		update_option( self::SETTINGS_OPTION_NAME, $settings );
+		Options::set( OptionDefaults::SANDBOX_SETTINGS, $settings );
 	}
 }
