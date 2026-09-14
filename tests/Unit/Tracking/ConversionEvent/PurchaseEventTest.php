@@ -76,7 +76,7 @@ class PurchaseEventTest extends WP_UnitTestCase {
 		$this->assertIsArray( $payload );
 		$this->assertSame( 'PURCHASE', $payload['event_name'] );
 		$this->assertSame( 'WEB', $payload['action_source'] );
-		$this->assertNotEmpty( $payload['event_id'] );
+		$this->assertSame( (string) $order->get_id(), $payload['event_id'] );
 		$this->assertSame( $order->get_checkout_order_received_url(), $payload['event_source_url'] );
 
 		$this->assertIsArray( $payload['custom_data'] );

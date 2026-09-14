@@ -17,7 +17,6 @@ use SnapchatForWooCommerce\Utils\Storage\OptionDefaults;
 use SnapchatForWooCommerce\Utils\Storage\Transients;
 use SnapchatForWooCommerce\Utils\Storage\TransientDefaults;
 use SnapchatForWooCommerce\Utils\Storage;
-use SnapchatForWooCommerce\Tracking\Consent;
 use SnapchatForWooCommerce\Utils\UserIdentifier;
 use SnapchatForWooCommerce\Config;
 use SnapchatForWooCommerce\Utils\Helper;
@@ -192,26 +191,28 @@ final class RemotePixelTracker implements PixelTrackerInterface {
 	/**
 	 * Emits the Snapchat `PURCHASE` tracking event after a successful order.
 	 *
-	 * Hooked into `woocommerce_before_thankyou`. Avoids duplicate firing via meta key.
+	 * Hooked into `wp_footer`. Avoids duplicate firing via meta key.
+	 *
+	 * The order is only tracked when the request is allowed to see it, i.e. when it carries a
+	 * valid order key. Requests without it get WooCommerce's generic confirmation page, so no
+	 * order data must be sent to Snapchat either, and the tracked flag has to stay untouched
+	 * so the event still fires once the customer opens their own confirmation URL.
 	 *
 	 * @since 0.1.0
 	 */
 	public function track_purchase_event() {
-		if ( ! is_order_received_page() ) {
-			return;
-		}
-
 		if ( ! Consent::has_marketing_consent() ) {
 			return;
 		}
 
-		$order_id = (int) get_query_var( 'order-received' );
-		$order    = wc_get_order( $order_id );
+		$order = Helper::get_verified_order_received_order();
 
-		// Make sure there is a valid order object and it is not already marked as tracked.
+		// Make sure there is an accessible order and it is not already marked as tracked.
 		if ( ! $order || 1 === (int) $order->get_meta( self::ORDER_PIXEL_TRACKED_META_KEY, true ) ) {
 			return;
 		}
+
+		$order_id = $order->get_id();
 
 		// Mark the order as tracked, to avoid double-reporting if the confirmation page is reloaded.
 		$order->update_meta_data( self::ORDER_PIXEL_TRACKED_META_KEY, 1 );
@@ -243,13 +244,12 @@ final class RemotePixelTracker implements PixelTrackerInterface {
 			}
 		}
 
-		$event_id = EventIdRegistry::get_purchase_id();
-		$payload  = array(
+		$payload = array(
 			'price'           => $total,
 			'currency'        => $currency,
-			'event_id'        => $event_id,
-			'client_dedup_id' => $event_id,
-			'transaction_id'  => $order_id,
+			'event_id'        => (string) $order_id,
+			'client_dedup_id' => (string) $order_id,
+			'transaction_id'  => (string) $order_id,
 			'item_ids'        => $item_ids,
 			'item_category'   => implode( ', ', array_unique( $item_categories ) ),
 			'number_items'    => $number_items,
@@ -258,7 +258,7 @@ final class RemotePixelTracker implements PixelTrackerInterface {
 		);
 
 		if ( Storage\Helper::is_collect_pii_enabled() ) {
-			UserIdentifier::add_user_details( $payload );
+			UserIdentifier::add_user_details( $payload, $order );
 		}
 
 		$tracking_data = sprintf(

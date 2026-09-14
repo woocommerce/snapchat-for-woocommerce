@@ -1,8 +1,8 @@
 === Snapchat for WooCommerce ===
 Contributors: automattic, woocommerce
 Tags: woocommerce, woo, snapchat, product feed, ads
-Tested up to: 7.0
-Stable tag: 1.0.3
+Tested up to: 7.1
+Stable tag: 1.0.5
 License: GPLv3
 License URI: https://www.gnu.org/licenses/gpl-3.0.html
 
@@ -25,6 +25,18 @@ Yes, it uses a [Jetpack](https://jetpack.com/) account to connect and communicat
 
 == Changelog ==
 
+= 1.0.5 - 2026-09-08 =
+* Fix - Ensure product export batches write CSV rows in the correct product order.
+* Fix - Purchase pixel no longer exposes order details and hashed billing data on unauthenticated order-received requests.
+* Tweak - Bump WooCommerce "tested up to" version to 11.1.
+
+= 1.0.4 - 2026-08-19 =
+* Fix – Resolved potential transaction ID collisions in purchase event deduplication by using order ID as the event_id instead.
+* Fix - Corrected invalid nested HTML in Conversions API settings.
+* Dev - Update WPCS to 3.4.1 to fix CVE-2026-45293, an arbitrary code execution vulnerability in WordPress Coding Standards.
+* Tweak - Bump WordPress "Tested up to" version to 7.1
+* Tweak - Bump WordPress "Requires at least" version to 6.9
+
 = 1.0.3 - 2026-05-14 =
 * Add - RTL Support.
 * Add - Snapchat catalog persistence message.
@@ -37,14 +49,5 @@ Yes, it uses a [Jetpack](https://jetpack.com/) account to connect and communicat
 * Fix - Strip HTML from product description for the CSV export.
 * Fix - Update integration value to include current plugin version.
 * Update - Text of the "Disconnect Snapchat" modal.
-
-= 1.0.2 - 2025-12-02 =
-* Fix - Fatal error on plugin activation.
-
-= 1.0.1 - 2025-12-02 =
-* Add - Display an admin notice prompting users to uninstall the legacy Snapchat Pixel plugin if it is installed and active.
-* Fix - Improve tracking by deduplicating events sent from Pixel and Conversion API.
-* Tweak - WooCommerce 10.3 compatibility.
-* Tweak - WordPress 6.9 compatibility.
 
 [See changelog for all versions](https://raw.githubusercontent.com/woocommerce/snapchat-for-woocommerce/trunk/changelog.txt).
