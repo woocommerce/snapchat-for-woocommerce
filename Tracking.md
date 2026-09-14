@@ -118,6 +118,16 @@ When the merchant is onboarded.
 #### Emitters
 - [`SetupAccounts`](js/src/pages/onboarding/setup-stepper/setup-accounts/index.js#L32)
 
+### [`sfw_order_attribution_create_campaign_button_click`](js/src/meta-boxes/order-attribution/snapchat-ads-promo.js#L22)
+
+#### Properties
+| name | type | description |
+| ---- | ---- | ----------- |
+`context` | `string` | Indicates from which page the button was clicked. Possible value: 'order-attribution-meta-box'.
+`url` | `string` | The URL the button directs to. Possible value: the create-campaign URL.
+#### Emitters
+- [`SnapchatAdsPromo`](js/src/meta-boxes/order-attribution/snapchat-ads-promo.js#L37) When the "Create campaign" button is clicked.
+
 ### [`sfw_order_attribution_get_started_button_click`](js/src/meta-boxes/order-attribution/snapchat-ads-promo.js#L16)
 
 #### Properties
@@ -126,7 +136,7 @@ When the merchant is onboarded.
 `context` | `string` | Indicates from which page the button was clicked. Possible value: 'order-attribution-meta-box'.
 `url` | `string` | The URL the button directs to. Possible value: the onboarding URL.
 #### Emitters
-- [`SnapchatAdsPromo`](js/src/meta-boxes/order-attribution/snapchat-ads-promo.js#L30) When the "Get started" button is clicked.
+- [`SnapchatAdsPromo`](js/src/meta-boxes/order-attribution/snapchat-ads-promo.js#L37) When the "Get started" button is clicked.
 
 ### [`sfw_regenerate_csv_button_click`](js/src/pages/settings/product-catalog/index.js#L25)
 When the `Regenerate CSV` button is clicked.
