@@ -14,23 +14,23 @@ import { getOnboardingUrl, getCreateCampaignUrl } from '~/utils/urls';
 const onboardingUrl = getOnboardingUrl();
 
 /**
- * The "Get started" button in the connect-account promo is clicked.
- *
  * @event sfw_order_attribution_get_started_button_click
+ * @property {string} context Indicates from which page the button was clicked. Possible value: 'order-attribution-meta-box'.
+ * @property {string} url The URL the button directs to. Possible value: the onboarding URL.
  */
 
 /**
- * The "Create campaign" button in the create-campaign promo is clicked.
- *
  * @event sfw_order_attribution_create_campaign_button_click
+ * @property {string} context Indicates from which page the button was clicked. Possible value: 'order-attribution-meta-box'.
+ * @property {string} url The URL the button directs to. Possible value: the create-campaign URL.
  */
 
 /**
  * Renders the Snapchat promo within the Order Attribution meta box for
  * Snapchat-attributed orders.
  *
- * @fires sfw_order_attribution_get_started_button_click
- * @fires sfw_order_attribution_create_campaign_button_click
+ * @fires sfw_order_attribution_get_started_button_click When the "Get started" button is clicked.
+ * @fires sfw_order_attribution_create_campaign_button_click When the "Create campaign" button is clicked.
  *
  * @return {JSX.Element|null} The promo, or null when nothing should render.
  */
@@ -59,6 +59,10 @@ const SnapchatAdsPromo = () => {
 						variant="secondary"
 						href={ onboardingUrl }
 						eventName="sfw_order_attribution_get_started_button_click"
+						eventProps={ {
+							context: 'order-attribution-meta-box',
+							url: onboardingUrl,
+						} }
 						text={ __( 'Get started', 'snapchat-for-woocommerce' ) }
 					/>
 				}
@@ -93,6 +97,10 @@ const SnapchatAdsPromo = () => {
 					icon={ external }
 					iconPosition="right"
 					eventName="sfw_order_attribution_create_campaign_button_click"
+					eventProps={ {
+						context: 'order-attribution-meta-box',
+						url: createCampaignUrl,
+					} }
 					text={ __( 'Create campaign', 'snapchat-for-woocommerce' ) }
 				/>
 			}
