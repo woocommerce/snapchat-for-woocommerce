@@ -8,7 +8,7 @@
  * - Standalone: no shared box exists, so Snapchat registers its own meta box.
  *
  * @package SnapchatForWooCommerce\Admin\MetaBox
- * @since 0.1.0
+ * @since 1.1.0
  */
 
 namespace SnapchatForWooCommerce\Admin\MetaBox;
@@ -16,28 +16,28 @@ namespace SnapchatForWooCommerce\Admin\MetaBox;
 /**
  * Handles Channel visibility meta box registration on the product edit screen.
  *
- * @since 0.1.0
+ * @since 1.1.0
  */
 class ChannelVisibilityMetaBox {
 
 	/**
 	 * Shared meta box id used to detect a box already registered by another channel plugin.
 	 *
-	 * @since 0.1.0
+	 * @since 1.1.0
 	 */
 	public const SHARED_BOX_ID = 'channel_visibility';
 
 	/**
 	 * Snapchat's own standalone meta box id, registered when no shared box exists.
 	 *
-	 * @since 0.1.0
+	 * @since 1.1.0
 	 */
 	public const BOX_ID = 'snapchat-channel-visibility';
 
 	/**
 	 * Registers WordPress hooks.
 	 *
-	 * @since 0.1.0
+	 * @since 1.1.0
 	 *
 	 * @return void
 	 */
@@ -52,7 +52,7 @@ class ChannelVisibilityMetaBox {
 	 * have already claimed the shared box. In cohabit mode the React bundle injects
 	 * Snapchat's row into the existing box; in standalone mode Snapchat owns the box.
 	 *
-	 * @since 0.1.0
+	 * @since 1.1.0
 	 *
 	 * @param string   $post_type Current post type.
 	 * @param \WP_Post $post      Current post object.
@@ -81,7 +81,7 @@ class ChannelVisibilityMetaBox {
 	/**
 	 * Renders the React mount point for the Channel visibility widget.
 	 *
-	 * @since 0.1.0
+	 * @since 1.1.0
 	 *
 	 * @return void
 	 */
@@ -92,7 +92,7 @@ class ChannelVisibilityMetaBox {
 	/**
 	 * Checks whether the shared Channel visibility box is already registered for products.
 	 *
-	 * @since 0.1.0
+	 * @since 1.1.0
 	 *
 	 * @param array $wp_meta_boxes Global meta boxes registry.
 	 * @return bool

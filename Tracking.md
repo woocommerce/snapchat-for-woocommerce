@@ -128,6 +128,34 @@ When the merchant is onboarded.
 #### Emitters
 - [`SnapchatAdsPromo`](js/src/meta-boxes/order-attribution/snapchat-ads-promo.js#L30) When the "Get started" button is clicked.
 
+### [`sfw_snapchat_ads_promo_shown`](js/src/meta-boxes/channel-visibility/snapchat-ads-promo.js#L23)
+
+#### Properties
+| name | type | description |
+| ---- | ---- | ----------- |
+`context` | `string` | Indicates from which page the promo was shown. Possible value: 'channel-visibility-meta-box'.
+#### Emitters
+- [`SnapchatAdsPromo`](js/src/meta-boxes/channel-visibility/snapchat-ads-promo.js#L34) When the promo first renders while onboarding is incomplete.
+
+### [`sfw_snapchat_ads_promo_get_started_click`](js/src/meta-boxes/channel-visibility/get-started-cta.js#L16)
+
+#### Properties
+| name | type | description |
+| ---- | ---- | ----------- |
+`context` | `string` | Indicates from which page the button was clicked. Possible value: 'channel-visibility-meta-box'.
+`url` | `string` | The URL the button directs to. Possible value: the onboarding URL.
+#### Emitters
+- [`GetStartedCTA`](js/src/meta-boxes/channel-visibility/get-started-cta.js#L28) When the "Get started" button is clicked.
+
+### [`sfw_snapchat_ads_promo_dismiss_click`](js/src/meta-boxes/channel-visibility/promo-cta.js#L21)
+
+#### Properties
+| name | type | description |
+| ---- | ---- | ----------- |
+`context` | `string` | Indicates from which page the button was clicked. Possible value: 'channel-visibility-meta-box'.
+#### Emitters
+- [`PromoCTA`](js/src/meta-boxes/channel-visibility/promo-cta.js#L32) When the "Dismiss" button is clicked.
+
 ### [`sfw_regenerate_csv_button_click`](js/src/pages/settings/product-catalog/index.js#L25)
 When the `Regenerate CSV` button is clicked.
 #### Emitters

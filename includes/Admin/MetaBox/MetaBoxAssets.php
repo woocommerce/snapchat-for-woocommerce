@@ -8,7 +8,7 @@
  * render.
  *
  * @package SnapchatForWooCommerce\Admin\MetaBox
- * @since 0.1.0
+ * @since 1.1.0
  */
 
 namespace SnapchatForWooCommerce\Admin\MetaBox;
@@ -20,7 +20,7 @@ use SnapchatForWooCommerce\Utils\Storage\OptionDefaults;
 /**
  * Handles admin script and style enqueues for plugin meta boxes.
  *
- * @since 0.1.0
+ * @since 1.1.0
  */
 class MetaBoxAssets {
 
@@ -47,7 +47,7 @@ class MetaBoxAssets {
 	/**
 	 * Registers WordPress admin-side hooks.
 	 *
-	 * @since 0.1.0
+	 * @since 1.1.0
 	 *
 	 * @return void
 	 */
@@ -58,7 +58,7 @@ class MetaBoxAssets {
 	/**
 	 * Enqueues the plugin meta box assets on their respective edit screens.
 	 *
-	 * @since 0.1.0
+	 * @since 1.1.0
 	 *
 	 * @return void
 	 */
@@ -70,7 +70,7 @@ class MetaBoxAssets {
 	/**
 	 * Enqueues the channel-visibility bundle and localizes its data on the product edit screen.
 	 *
-	 * @since 0.1.0
+	 * @since 1.1.0
 	 *
 	 * @return void
 	 */
@@ -91,9 +91,6 @@ class MetaBoxAssets {
 			array(
 				'slug'          => 'snapwoo',
 				'pluginVersion' => SNAPCHAT_FOR_WOOCOMMERCE_VERSION,
-				'adAccountId'   => Options::get( OptionDefaults::AD_ACCOUNT_ID ),
-				'status'        => Options::get( OptionDefaults::ONBOARDING_STATUS ),
-				'step'          => Options::get( OptionDefaults::ONBOARDING_STEP ),
 			)
 		);
 

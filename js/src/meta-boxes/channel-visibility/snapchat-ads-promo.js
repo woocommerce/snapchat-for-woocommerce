@@ -2,15 +2,12 @@
  * External dependencies
  */
 import { Flex, FlexBlock, FlexItem } from '@wordpress/components';
-import { useDispatch } from '@wordpress/data';
 import { useEffect, useRef } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
-import { store as preferencesStore } from '@wordpress/preferences';
 
 /**
  * Internal dependencies
  */
-import { PREFERENCES_STORE_NAMESPACE } from '~/constants';
 import usePreference from '~/hooks/usePreference';
 import snapchatLogoURL from '~/images/logo/snapchat.svg';
 import { recordSfwEvent } from '~/utils/tracks';
@@ -23,13 +20,19 @@ import PromoCTA from './promo-cta';
 import './snapchat-ads-promo.scss';
 
 /**
+ * @event sfw_snapchat_ads_promo_shown
+ * @property {string} context Indicates from which page the promo was shown. Possible value: 'channel-visibility-meta-box'.
+ */
+
+/**
  * Snapchat Ads promo shown in the Channel visibility widget when onboarding is incomplete.
+ *
+ * @fires sfw_snapchat_ads_promo_shown When the promo first renders while onboarding is incomplete.
  *
  * @return {JSX.Element|null} The promo, or null once onboarding is complete.
  */
 const SnapchatAdsPromo = () => {
 	const { onboardingComplete = false } = window.snapchatAdsMetaBoxData || {};
-	const { set } = useDispatch( preferencesStore );
 	const isDismissed = usePreference( CHANNEL_VISIBILITY_PROMO_KEY );
 	const hasTrackedRef = useRef( false );
 
@@ -45,10 +48,6 @@ const SnapchatAdsPromo = () => {
 			hasTrackedRef.current = true;
 		}
 	}, [ onboardingComplete ] );
-
-	const handleDismiss = () => {
-		set( PREFERENCES_STORE_NAMESPACE, CHANNEL_VISIBILITY_PROMO_KEY, true );
-	};
 
 	if ( onboardingComplete ) {
 		return null;
@@ -104,7 +103,7 @@ const SnapchatAdsPromo = () => {
 						</p>
 					</FlexBlock>
 					<FlexBlock>
-						<PromoCTA onDismiss={ handleDismiss } />
+						<PromoCTA />
 					</FlexBlock>
 				</Flex>
 			) }

@@ -3,7 +3,7 @@
  * Product edit screen detection and inline data for the channel-visibility meta box bundle.
  *
  * @package SnapchatForWooCommerce\Admin\MetaBox
- * @since 0.1.0
+ * @since 1.1.0
  */
 
 namespace SnapchatForWooCommerce\Admin\MetaBox;
@@ -15,14 +15,14 @@ use WP_Post;
 /**
  * Gates and builds the payload for the Edit Product channel-visibility bundle.
  *
- * @since 0.1.0
+ * @since 1.1.0
  */
 final class ProductChannelVisibilityData {
 
 	/**
 	 * Builds the `channelVisibility` payload for `window.snapchatAdsMetaBoxData`.
 	 *
-	 * @since 0.1.0
+	 * @since 1.1.0
 	 *
 	 * @return array<string,mixed>|null Null when not on a valid product edit context.
 	 */
