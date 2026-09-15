@@ -41,6 +41,7 @@ final class Plugin {
 	 * @since 0.1.0
 	 */
 	private static function register(): void {
+		( new SandboxMode() )->register_hooks();
 		add_action( 'rest_api_init', array( self::class, 'register_rest_routes' ) );
 		self::bootstrap_features();
 		self::bootstrap_admin_features();

@@ -24,6 +24,10 @@ export const recordStepContinueEvent = noop;
  * @return {Object} Event properties with base event properties.
  */
 export function addBaseEventProperties( eventProperties ) {
+	if ( sfwData.sandboxMode ) {
+		return eventProperties;
+	}
+
 	const { slug } = sfwData;
 	const { version, adAccountId } = select( STORE_KEY ).getGeneral();
 
@@ -46,6 +50,10 @@ export function addBaseEventProperties( eventProperties ) {
  * @param {Object} [eventProperties] The event properties to include in the event.
  */
 export function recordSfwEvent( eventName, eventProperties ) {
+	if ( sfwData.sandboxMode ) {
+		return;
+	}
+
 	recordEvent( eventName, addBaseEventProperties( eventProperties ) );
 }
 
@@ -58,5 +66,9 @@ export function recordSfwEvent( eventName, eventProperties ) {
  * @param {Object} [eventProperties] The event properties to include in the event.
  */
 export function queueRecordSfwEvent( eventName, eventProperties ) {
+	if ( sfwData.sandboxMode ) {
+		return;
+	}
+
 	queueRecordEvent( eventName, addBaseEventProperties( eventProperties ) );
 }

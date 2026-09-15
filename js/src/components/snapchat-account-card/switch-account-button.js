@@ -21,12 +21,14 @@ import useSwitchSnapchatAccount from '~/hooks/useSwitchSnapchatAccount';
  * @fires sfw_snapchat_account_connect_different_account_button_click
  * @param {Object} props React props
  * @param {string} [props.text="Or, connect to a different Snapchat account"] Text to display on the button
+ * @param {boolean} [props.disabled=false] Whether the button is externally disabled
  */
 const SwitchAccountButton = ( {
 	text = __(
 		'Or, connect to a different Snapchat account',
 		'snapchat-for-woocommerce'
 	),
+	disabled = false,
 	...restProps
 } ) => {
 	const [ handleSwitch, { loading } ] = useSwitchSnapchatAccount();
@@ -34,7 +36,7 @@ const SwitchAccountButton = ( {
 	return (
 		<AppButton
 			isLink
-			disabled={ loading }
+			disabled={ loading || disabled }
 			text={ text }
 			eventName="sfw_snapchat_account_connect_different_account_button_click"
 			onClick={ handleSwitch }
