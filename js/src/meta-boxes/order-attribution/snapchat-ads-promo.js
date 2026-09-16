@@ -9,6 +9,7 @@ import { external } from '@wordpress/icons';
  */
 import AppButton from '~/components/app-button';
 import PromoBanner from './promo-banner';
+import useSnapchatAccountDetails from '~/hooks/useSnapchatAccountDetails';
 import { getOnboardingUrl, getCreateCampaignUrl } from '~/utils/urls';
 
 const onboardingUrl = getOnboardingUrl();
@@ -38,6 +39,8 @@ const SnapchatAdsPromo = () => {
 	const metaBoxData = window.snapchatAdsMetaBoxData;
 	const onboardingComplete = metaBoxData?.onboardingComplete;
 	const hasCampaign = metaBoxData?.hasCampaign;
+
+	const { ad_acc_id: adAccountId } = useSnapchatAccountDetails();
 
 	if ( onboardingComplete && hasCampaign ) {
 		return null;
@@ -70,9 +73,7 @@ const SnapchatAdsPromo = () => {
 		);
 	}
 
-	const createCampaignUrl = getCreateCampaignUrl(
-		window.snapchatAdsAdminData?.adAccountId
-	);
+	const createCampaignUrl = getCreateCampaignUrl( adAccountId );
 
 	if ( ! createCampaignUrl ) {
 		return null;
