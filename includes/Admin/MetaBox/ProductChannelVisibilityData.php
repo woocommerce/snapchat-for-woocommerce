@@ -1,29 +1,30 @@
 <?php
 /**
- * Product edit screen detection and channel-visibility inline data for the meta box bundle.
+ * Product edit screen detection and inline data for the channel-visibility meta box bundle.
  *
  * @package SnapchatForWooCommerce\Admin\MetaBox
- * @since 0.1.0
+ * @since 1.1.0
  */
 
 namespace SnapchatForWooCommerce\Admin\MetaBox;
 
 use SnapchatForWooCommerce\Admin\ProductMeta\ProductMetaFields;
 use SnapchatForWooCommerce\Utils\Helper;
+use SnapchatForWooCommerce\Utils\OnboardingStatus;
 use WC_Product;
 use WP_Post;
 
 /**
- * Gate and payload for the Edit Product channel-visibility bundle.
+ * Gates and builds the payload for the Edit Product channel-visibility bundle.
  *
- * @since 0.1.0
+ * @since 1.1.0
  */
 final class ProductChannelVisibilityData {
 
 	/**
 	 * Whether to enqueue the channel-visibility bundle on this request.
 	 *
-	 * @since 0.1.0
+	 * @since 1.1.0
 	 *
 	 * @return bool
 	 */
@@ -32,9 +33,9 @@ final class ProductChannelVisibilityData {
 	}
 
 	/**
-	 * Builds the `channelVisibility` object for `snapchatAdsMetaBoxData`.
+	 * Builds the `channelVisibility` payload for `window.snapchatAdsMetaBoxData`.
 	 *
-	 * @since 0.1.0
+	 * @since 1.1.0
 	 *
 	 * @return array<string,mixed>|null Null when not on a valid product edit context.
 	 */
@@ -66,6 +67,7 @@ final class ProductChannelVisibilityData {
 		$catalog    = is_string( $raw_meta ) && '' !== $raw_meta ? $raw_meta : '1';
 
 		return array(
+			'onboardingComplete'   => OnboardingStatus::is_setup_completed(),
 			'field_name'           => $field_name,
 			'product_catalog_item' => $catalog,
 			'product_is_visible'   => $product->is_visible(),
