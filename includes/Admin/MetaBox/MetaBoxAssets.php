@@ -1,10 +1,11 @@
 <?php
 /**
- * Enqueues meta box assets for the WooCommerce order edit screen.
+ * Conditional admin assets for plugin meta boxes on WooCommerce edit screens.
  *
- * Loads the order-attribution bundle that renders the Snapchat connect-account
- * promo within the Order Attribution meta box, and passes the runtime data the
- * script needs to decide whether to render.
+ * Enqueues the channel-visibility bundle on the product edit screen and the
+ * order-attribution bundle (Snapchat connect-account promo) on the order edit
+ * screen, passing each the runtime data its script needs to decide whether to
+ * render.
  *
  * @package SnapchatForWooCommerce\Admin\MetaBox
  * @since 1.1.0
@@ -55,13 +56,59 @@ class MetaBoxAssets {
 	}
 
 	/**
-	 * Enqueues the order-attribution meta box assets on the order edit screen.
+	 * Enqueues the plugin meta box assets on their respective edit screens.
 	 *
 	 * @since 1.1.0
 	 *
 	 * @return void
 	 */
 	public function enqueue_assets(): void {
+		$this->enqueue_channel_visibility_assets();
+		$this->enqueue_order_attribution_assets();
+	}
+
+	/**
+	 * Enqueues the channel-visibility bundle and localizes its data on the product edit screen.
+	 *
+	 * @since 1.1.0
+	 *
+	 * @return void
+	 */
+	protected function enqueue_channel_visibility_assets(): void {
+		$channel_visibility = ProductChannelVisibilityData::get_channel_visibility_inline_block();
+
+		if ( null === $channel_visibility ) {
+			return;
+		}
+
+		AssetLoader::enqueue_script( 'channel-visibility-meta-box', 'channel-visibility-meta-box' );
+
+		// The main admin bundle is not loaded on the product edit screen, so the Redux
+		// store and tracking helpers read their base data from this payload.
+		AssetLoader::localize_script(
+			'channel-visibility-meta-box',
+			'AdminData',
+			array(
+				'slug'          => 'snapwoo',
+				'pluginVersion' => SNAPCHAT_FOR_WOOCOMMERCE_VERSION,
+			)
+		);
+
+		AssetLoader::localize_script(
+			'channel-visibility-meta-box',
+			'MetaBoxData',
+			$channel_visibility
+		);
+	}
+
+	/**
+	 * Enqueues the order-attribution meta box assets on the order edit screen.
+	 *
+	 * @since 1.1.0
+	 *
+	 * @return void
+	 */
+	protected function enqueue_order_attribution_assets(): void {
 		if ( ! $this->order_attribution_data->is_wc_order_edit_screen() ) {
 			return;
 		}
