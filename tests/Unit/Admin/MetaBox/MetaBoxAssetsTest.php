@@ -10,6 +10,7 @@ namespace SnapchatForWooCommerce\Tests\Unit\Admin\MetaBox;
 use WP_UnitTestCase;
 use SnapchatForWooCommerce\Admin\MetaBox\MetaBoxAssets;
 use SnapchatForWooCommerce\Admin\MetaBox\OrderAttributionData;
+use SnapchatForWooCommerce\API\AdPartner\CampaignApi;
 use SnapchatForWooCommerce\Config;
 use SnapchatForWooCommerce\Utils\Storage\Options;
 use SnapchatForWooCommerce\Utils\Storage\OptionDefaults;
@@ -57,7 +58,7 @@ final class MetaBoxAssetsTest extends WP_UnitTestCase {
 	public function test_bundle_not_enqueued_off_product_screen(): void {
 		set_current_screen( 'dashboard' );
 
-		( new MetaBoxAssets( new OrderAttributionData() ) )->enqueue_assets();
+		( new MetaBoxAssets( new OrderAttributionData(), $this->make_campaign_api_mock() ) )->enqueue_assets();
 
 		$this->assertFalse(
 			wp_script_is( Config::ASSET_HANDLE_PREFIX . self::SCRIPT_BASENAME, 'enqueued' )
@@ -71,7 +72,7 @@ final class MetaBoxAssetsTest extends WP_UnitTestCase {
 		Options::set( OptionDefaults::ONBOARDING_STATUS, 'incomplete' );
 		$this->place_product_on_edit_screen();
 
-		( new MetaBoxAssets( new OrderAttributionData() ) )->enqueue_assets();
+		( new MetaBoxAssets( new OrderAttributionData(), $this->make_campaign_api_mock() ) )->enqueue_assets();
 
 		$this->assertTrue(
 			wp_script_is( Config::ASSET_HANDLE_PREFIX . self::SCRIPT_BASENAME, 'enqueued' )
@@ -89,10 +90,23 @@ final class MetaBoxAssetsTest extends WP_UnitTestCase {
 		Options::set( OptionDefaults::ONBOARDING_STATUS, 'connected' );
 		$this->place_product_on_edit_screen();
 
-		( new MetaBoxAssets( new OrderAttributionData() ) )->enqueue_assets();
+		( new MetaBoxAssets( new OrderAttributionData(), $this->make_campaign_api_mock() ) )->enqueue_assets();
 
 		$payload = $this->decode_metabox_payload();
 		$this->assert_payload_bool( $payload['onboardingComplete'], true );
+	}
+
+	/**
+	 * Builds a stub `CampaignApi` so these tests don't hit the live Ad Partner endpoint.
+	 *
+	 * @param bool $has_campaign Value `has_active_campaigns()` should return.
+	 * @return CampaignApi&\PHPUnit\Framework\MockObject\MockObject
+	 */
+	private function make_campaign_api_mock( bool $has_campaign = false ) {
+		$campaign_api = $this->createMock( CampaignApi::class );
+		$campaign_api->method( 'has_active_campaigns' )->willReturn( $has_campaign );
+
+		return $campaign_api;
 	}
 
 	/**

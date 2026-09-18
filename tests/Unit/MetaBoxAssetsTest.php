@@ -11,6 +11,7 @@ use WP_UnitTestCase;
 use SnapchatForWooCommerce\Config;
 use SnapchatForWooCommerce\Admin\MetaBox\MetaBoxAssets;
 use SnapchatForWooCommerce\Admin\MetaBox\OrderAttributionData;
+use SnapchatForWooCommerce\API\AdPartner\CampaignApi;
 
 /**
  * @covers \SnapchatForWooCommerce\Admin\MetaBox\MetaBoxAssets
@@ -49,7 +50,10 @@ final class MetaBoxAssetsTest extends WP_UnitTestCase {
 		$data = $this->createMock( OrderAttributionData::class );
 		$data->method( 'is_wc_order_edit_screen' )->willReturn( false );
 
-		$assets = new MetaBoxAssets( $data );
+		$campaign_api = $this->createMock( CampaignApi::class );
+		$campaign_api->expects( $this->never() )->method( 'has_active_campaigns' );
+
+		$assets = new MetaBoxAssets( $data, $campaign_api );
 		$assets->enqueue_assets();
 
 		$this->assertFalse( wp_script_is( self::HANDLE, 'enqueued' ) );
@@ -60,7 +64,10 @@ final class MetaBoxAssetsTest extends WP_UnitTestCase {
 		$data->method( 'is_wc_order_edit_screen' )->willReturn( true );
 		$data->method( 'get_order_attribution_source_for_edit_screen' )->willReturn( 'snapchat' );
 
-		$assets = new MetaBoxAssets( $data );
+		$campaign_api = $this->createMock( CampaignApi::class );
+		$campaign_api->method( 'has_active_campaigns' )->willReturn( true );
+
+		$assets = new MetaBoxAssets( $data, $campaign_api );
 		$assets->enqueue_assets();
 
 		$this->assertTrue( wp_script_is( self::HANDLE, 'enqueued' ) );
@@ -72,5 +79,6 @@ final class MetaBoxAssetsTest extends WP_UnitTestCase {
 		$this->assertStringContainsString( 'orderAttributionSource', $inline );
 		$this->assertStringContainsString( 'snapchat', $inline );
 		$this->assertStringContainsString( 'snapchatAdsAdminData', $inline );
+		$this->assertStringContainsString( 'hasCampaign', $inline );
 	}
 }
