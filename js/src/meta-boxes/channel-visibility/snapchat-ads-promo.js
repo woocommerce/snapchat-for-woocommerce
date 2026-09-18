@@ -11,6 +11,7 @@ import { __ } from '@wordpress/i18n';
 import usePreference from '~/hooks/usePreference';
 import snapchatLogoURL from '~/images/logo/snapchat.svg';
 import { recordSfwEvent } from '~/utils/tracks';
+import ChannelVisibilitySettings from './channel-visibility-settings';
 import {
 	CHANNEL_VISIBILITY_CONTEXT,
 	CHANNEL_VISIBILITY_PROMO_KEY,
@@ -25,11 +26,14 @@ import './snapchat-ads-promo.scss';
  */
 
 /**
- * Snapchat Ads promo shown in the Channel visibility widget when onboarding is incomplete.
+ * Snapchat entry in the Channel visibility widget.
+ *
+ * Shows the get-started promo while onboarding is incomplete, and the
+ * per-product sync control once onboarding is complete.
  *
  * @fires sfw_snapchat_ads_promo_shown When the promo first renders while onboarding is incomplete.
  *
- * @return {JSX.Element|null} The promo, or null once onboarding is complete.
+ * @return {JSX.Element} The promo or the per-product sync control.
  */
 const SnapchatAdsPromo = () => {
 	const { onboardingComplete = false } = window.snapchatAdsMetaBoxData || {};
@@ -50,7 +54,7 @@ const SnapchatAdsPromo = () => {
 	}, [ onboardingComplete ] );
 
 	if ( onboardingComplete ) {
-		return null;
+		return <ChannelVisibilitySettings />;
 	}
 
 	return (
