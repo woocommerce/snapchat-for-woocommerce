@@ -73,6 +73,7 @@ final class Plugin {
 		ServiceContainer::get( ServiceKey::PIXEL_TRACKING )->register_hooks();
 		ServiceContainer::get( ServiceKey::CONVERSION_TRACKING )->register_hooks();
 		ServiceContainer::get( ServiceKey::PRODUCT_EXPORT_SERVICE )->register_hooks();
+		ServiceContainer::get( ServiceKey::AD_PARTNER_API )->campaign->register_hooks();
 		Marketing::register_hooks();
 		Compatibility::register_hooks();
 	}
