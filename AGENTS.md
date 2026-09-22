@@ -5,6 +5,10 @@ Guidelines for AI coding agents working in this repository (the `snapchat-for-wo
 -   **Namespace root:** `SnapchatForWooCommerce\` (`includes/`)
 -   **Text domain / slug:** `snapchat-for-woocommerce`
 
+## Docblocks
+
+-   **`@since` version placeholder.** When adding a new `@since` tag (or updating one) in a PHP or JS docblock for new/changed code, write `@since n.e.x.t` instead of guessing a version number. The release workflow (`bump-versions.yml`) replaces every `@since n.e.x.t` occurrence under `includes/` and `js/src/` with the real release version as part of the version-bump commit, so the tag is accurate once the code ships. This is a convention, not a lint-enforced rule: writing a real guessed version instead won't be blocked, it just won't be caught by the automated replacement.
+
 ## Backward Compatibility
 
 Any change to a **public or externally exposed** class, interface, function, method, hook, or REST endpoint signature is **high-risk** and **must state its backward-compatibility impact in the PR description**. An internal-looking name or location is not by itself a guarantee that a symbol is safe to change: other extensions, themes, and custom site code implement and consume some of these contracts in practice. See the exposed-surface list for what counts and the **Scope** note for what does not; when a symbol is genuinely reachable and useful to outside code, err toward treating it as exposed.
