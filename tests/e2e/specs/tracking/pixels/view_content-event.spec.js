@@ -6,7 +6,12 @@ const { test, expect } = require( '@playwright/test' );
 /**
  * Internal dependencies
  */
-import { findSnaptrEvent, getThemes, switchTheme } from '../../../utils';
+import {
+	findSnaptrEvent,
+	getProductId,
+	getThemes,
+	switchTheme,
+} from '../../../utils';
 import { integration } from '../../../config';
 
 test.describe( 'VIEW_CONTENT event', () => {
@@ -17,9 +22,11 @@ test.describe( 'VIEW_CONTENT event', () => {
 	for ( const theme in themes ) {
 		test( `[${ theme } theme] Direct access to Single Product Page sends events`, async ( {
 			page,
+			baseURL,
 		} ) => {
 			await switchTheme( page, themes[ theme ] );
 			await page.goto( '/product/product-two' );
+			const productId = await getProductId( baseURL, 'product-two' );
 			const events = await page.evaluate( () => window.snaptr.queue );
 			const VIEW_CONTENT = findSnaptrEvent( events, 'VIEW_CONTENT' );
 			expect( VIEW_CONTENT ).not.toBe( null );
@@ -29,11 +36,12 @@ test.describe( 'VIEW_CONTENT event', () => {
 			expect( payload.integration ).toBe( integration );
 			expect( payload.price ).toBe( 15 );
 			expect( payload.currency ).toBe( 'USD' );
-			expect( payload.item_ids ).toContain( 11 );
+			expect( payload.item_ids ).toContain( productId );
 		} );
 
 		test( `[${ theme } theme] Backward navigation sends event `, async ( {
 			page,
+			baseURL,
 		} ) => {
 			await switchTheme( page, themes[ theme ] );
 			await page.goto( '/product/product-two' );
@@ -43,6 +51,7 @@ test.describe( 'VIEW_CONTENT event', () => {
 				.click();
 			await page.goBack();
 
+			const productId = await getProductId( baseURL, 'product-two' );
 			const events = await page.evaluate( () => window.snaptr.queue );
 			const VIEW_CONTENT = findSnaptrEvent( events, 'VIEW_CONTENT' );
 			expect( VIEW_CONTENT ).not.toBe( null );
@@ -52,11 +61,12 @@ test.describe( 'VIEW_CONTENT event', () => {
 			expect( payload.integration ).toBe( integration );
 			expect( payload.price ).toBe( 15 );
 			expect( payload.currency ).toBe( 'USD' );
-			expect( payload.item_ids ).toContain( 11 );
+			expect( payload.item_ids ).toContain( productId );
 		} );
 
 		test( `[${ theme } theme] Navigate to Single Product Page event sends event `, async ( {
 			page,
+			baseURL,
 		} ) => {
 			await switchTheme( page, themes[ theme ] );
 			await page.goto( '/shop' );
@@ -74,6 +84,7 @@ test.describe( 'VIEW_CONTENT event', () => {
 			await expect( page.url() ).toContain( '/product/product-two' );
 			await page.waitForLoadState( 'domcontentloaded' );
 
+			const productId = await getProductId( baseURL, 'product-two' );
 			const events = await page.evaluate( () => window.snaptr.queue );
 			const VIEW_CONTENT = findSnaptrEvent( events, 'VIEW_CONTENT' );
 			expect( VIEW_CONTENT ).not.toBe( null );
@@ -83,7 +94,7 @@ test.describe( 'VIEW_CONTENT event', () => {
 			expect( payload.integration ).toBe( integration );
 			expect( payload.price ).toBe( 15 );
 			expect( payload.currency ).toBe( 'USD' );
-			expect( payload.item_ids ).toContain( 11 );
+			expect( payload.item_ids ).toContain( productId );
 		} );
 
 		test( `[${ theme } theme] No event is sent on reload`, async ( {

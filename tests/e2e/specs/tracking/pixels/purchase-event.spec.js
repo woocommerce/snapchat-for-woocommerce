@@ -11,6 +11,7 @@ const {
  */
 import {
 	findSnaptrEvent,
+	getProductId,
 	getThemes,
 	switchTheme,
 	singleAddToCart,
@@ -20,6 +21,7 @@ import { customer as c, integration } from '../../../config';
 
 let admin = null;
 let customer = null;
+let expectedItemIds = [];
 let orderUrl = '';
 test.beforeAll( 'Setup contexts', async ( { browser } ) => {
 	admin = await browser.newPage( { storageState: process.env.ADMINSTATE } );
@@ -37,13 +39,18 @@ test.describe( 'PURCHASE event', () => {
 
 	const themes = getThemes();
 
-	test.beforeEach( 'Setup Cart', async () => {
+	test.beforeEach( 'Setup Cart', async ( { baseURL } ) => {
 		await clearCart( admin );
 		await customer.goto( '/product/product-one' );
 		await singleAddToCart( customer, 1 );
 
 		await customer.goto( '/product/product-two' );
 		await singleAddToCart( customer, 2 );
+
+		expectedItemIds = [
+			String( await getProductId( baseURL, 'product-one' ) ),
+			String( await getProductId( baseURL, 'product-two' ) ),
+		];
 	} );
 
 	test.afterAll( 'Clear Cart at the end', async () => {
@@ -88,7 +95,7 @@ test.describe( 'PURCHASE event', () => {
 			expect( payload.event_id ).toMatch( /^\d+$/ );
 			expect( payload.client_dedup_id ).toBe( payload.event_id );
 			expect( payload.transaction_id ).toBe( payload.event_id );
-			expect( payload.item_ids ).toEqual( [ '10', '11' ] );
+			expect( payload.item_ids ).toEqual( expectedItemIds );
 			expect( payload.number_items ).toBe( 3 );
 			expect( payload ).toHaveProperty( 'item_category' );
 		} );
