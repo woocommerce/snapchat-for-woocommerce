@@ -58,10 +58,9 @@ jobs:
 
       - name: Copy build zip and preview changes
         run: |
-          TEMP_DIR=$(php -r 'echo sys_get_temp_dir();')
           SIMULATE=${{ github.event.inputs.simulate }}
 
-          cd "$TEMP_DIR/snapchat-for-woocommerce"
+          cd "${{ github.workspace }}/target-repo"
           cp snapchat-for-woocommerce.zip ${{ github.workspace }}
 
           # Show git diff if it's a dry run
