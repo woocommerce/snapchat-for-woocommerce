@@ -16,10 +16,10 @@ Applies to every PR opened against this repository.
 
 ### Requesting review
 
--   Keep the PR template's `Closes #` line and fill it with the relevant tracking issue so it auto-links the PR to the issue.
+-   Keep the PR template's `Closes #` line and fill it with a markdown link to the tracking issue so it auto-links the PR to the issue, e.g. `Closes [SNAPWOO-92](https://linear.app/a8c/issue/SNAPWOO-92).`
 -   All GitHub Actions checks must pass (CI green) before requesting review, so review time is not spent on issues that CI would have caught.
 -   Run E2E tests before requesting review only when a change could introduce regressions. They are not required on every PR.
--   Always include a changelog entry describing the change. Each line starts with a change-type prefix (`Break`, `Add`, `Update`, `Fix`, `Tweak`, `Dev`, `Doc`), e.g. `Fix - Correct pixel event deduplication`.
+-   Include a changelog entry describing the change when the PR targets `develop`. Leave it blank when targeting a feature branch. Each line starts with a change-type prefix (`Break`, `Add`, `Update`, `Fix`, `Tweak`, `Dev`, `Doc`), e.g. `Fix - Correct pixel event deduplication`.
 
 ### Code and comments are open source
 
