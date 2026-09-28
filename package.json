@@ -59,7 +59,7 @@
 		"@woocommerce/dependency-extraction-webpack-plugin": {
 			"@wordpress/dependency-extraction-webpack-plugin": "^6.56.0"
 		},
-		"react-router-dom": "^6.30.6",
+		"react-router-dom": "^7.18.0",
 		"d3-scale": "^4.0.2",
 		"d3-scale-chromatic": "^3.0.0",
 		"d3-color": "^3.1.0",
