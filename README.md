@@ -45,7 +45,7 @@ wp option update snapchat_sandbox_mode no
 
 ### Prerequisites
 
--   [NVM](https://github.com/nvm-sh/nvm) (recommended) or [NPM](https://www.npmjs.com/) — use `nvm use` to match the Node version in [.nvmrc](.nvmrc) (Node 20)
+-   [NVM](https://github.com/nvm-sh/nvm) (recommended) or [NPM](https://www.npmjs.com/) — use `nvm use` to match the Node version in [.nvmrc](.nvmrc) (Node 24)
 -   [Composer](https://getcomposer.org/)
 -   [wp-env](https://developer.wordpress.org/block-editor/reference-guides/packages/packages-env/) (requires [Docker](https://www.docker.com/))
 

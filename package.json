@@ -97,7 +97,7 @@
 		"extends @wordpress/browserslist-config"
 	],
 	"engines": {
-		"node": "^20",
-		"npm": "^10 || ^9"
+		"node": "^24",
+		"npm": "^11"
 	}
 }
