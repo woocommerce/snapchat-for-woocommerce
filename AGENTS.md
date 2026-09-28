@@ -5,6 +5,29 @@ Guidelines for AI coding agents working in this repository (the `snapchat-for-wo
 -   **Namespace root:** `SnapchatForWooCommerce\` (`includes/`)
 -   **Text domain / slug:** `snapchat-for-woocommerce`
 
+## PR Workflow
+
+Applies to every PR opened against this repository.
+
+### Branches
+
+-   Prefix branches by intent: `add/` for new work, `update/` for changes to existing behavior, `fix/` for bug fixes.
+-   Reserve `feature/` for major features only.
+
+### Requesting review
+
+-   Keep the PR template's `Closes #` line and fill it with a markdown link to the tracking issue so it auto-links the PR to the issue, e.g. `Closes [SNAPWOO-92](https://linear.app/a8c/issue/SNAPWOO-92).`
+-   All GitHub Actions checks must pass (CI green) before requesting review, so review time is not spent on issues that CI would have caught.
+-   Run E2E tests before requesting review only when a change could introduce regressions. They are not required on every PR.
+-   Include a changelog entry describing the change when the PR targets `develop`. Leave it blank when targeting a feature branch. Each line starts with a change-type prefix (`Break`, `Add`, `Update`, `Fix`, `Tweak`, `Dev`, `Doc`), e.g. `Fix - Correct pixel event deduplication`.
+
+### Code and comments are open source
+
+The plugin is public. A contributor without access to internal tooling must be able to read the code on its own.
+
+-   Never put ticket IDs (e.g. `SNAPWOO-202`) or internal ticket URLs in code or comments.
+-   Comments explain *why* for a human reader. Do not restate what the code already says, and do not add comments that only narrate the code for AI or code-generation tooling.
+
 ## Backward Compatibility
 
 Any change to a **public or externally exposed** class, interface, function, method, hook, or REST endpoint signature is **high-risk** and **must state its backward-compatibility impact in the PR description**. An internal-looking name or location is not by itself a guarantee that a symbol is safe to change: other extensions, themes, and custom site code implement and consume some of these contracts in practice. See the exposed-surface list for what counts and the **Scope** note for what does not; when a symbol is genuinely reachable and useful to outside code, err toward treating it as exposed.
