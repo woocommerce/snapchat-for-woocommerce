@@ -32,6 +32,12 @@ test.beforeAll( 'Setup contexts', async ( { browser } ) => {
 	admin.on( 'dialog', async ( dialog ) => {
 		await dialog.accept();
 	} );
+
+	// The pixel sends item IDs as strings for this event.
+	expectedItemIds = [
+		String( await getProductId( customer.request, 'product-one' ) ),
+		String( await getProductId( customer.request, 'product-two' ) ),
+	];
 } );
 
 test.describe( 'PURCHASE event', () => {
@@ -39,18 +45,13 @@ test.describe( 'PURCHASE event', () => {
 
 	const themes = getThemes();
 
-	test.beforeEach( 'Setup Cart', async ( { baseURL } ) => {
+	test.beforeEach( 'Setup Cart', async () => {
 		await clearCart( admin );
 		await customer.goto( '/product/product-one' );
 		await singleAddToCart( customer, 1 );
 
 		await customer.goto( '/product/product-two' );
 		await singleAddToCart( customer, 2 );
-
-		expectedItemIds = [
-			String( await getProductId( baseURL, 'product-one' ) ),
-			String( await getProductId( baseURL, 'product-two' ) ),
-		];
 	} );
 
 	test.afterAll( 'Clear Cart at the end', async () => {

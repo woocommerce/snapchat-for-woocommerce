@@ -18,15 +18,21 @@ test.describe( 'VIEW_CONTENT event', () => {
 	test.use( { storageState: process.env.ADMINSTATE } );
 
 	const themes = getThemes();
+	let productId = null;
+
+	test.beforeAll( 'Get product ID', async ( { browser } ) => {
+		const page = await browser.newPage();
+		// The pixel sends item IDs as numbers for this event.
+		productId = await getProductId( page.request, 'product-two' );
+		await page.close();
+	} );
 
 	for ( const theme in themes ) {
 		test( `[${ theme } theme] Direct access to Single Product Page sends events`, async ( {
 			page,
-			baseURL,
 		} ) => {
 			await switchTheme( page, themes[ theme ] );
 			await page.goto( '/product/product-two' );
-			const productId = await getProductId( baseURL, 'product-two' );
 			const events = await page.evaluate( () => window.snaptr.queue );
 			const VIEW_CONTENT = findSnaptrEvent( events, 'VIEW_CONTENT' );
 			expect( VIEW_CONTENT ).not.toBe( null );
@@ -41,7 +47,6 @@ test.describe( 'VIEW_CONTENT event', () => {
 
 		test( `[${ theme } theme] Backward navigation sends event `, async ( {
 			page,
-			baseURL,
 		} ) => {
 			await switchTheme( page, themes[ theme ] );
 			await page.goto( '/product/product-two' );
@@ -51,7 +56,6 @@ test.describe( 'VIEW_CONTENT event', () => {
 				.click();
 			await page.goBack();
 
-			const productId = await getProductId( baseURL, 'product-two' );
 			const events = await page.evaluate( () => window.snaptr.queue );
 			const VIEW_CONTENT = findSnaptrEvent( events, 'VIEW_CONTENT' );
 			expect( VIEW_CONTENT ).not.toBe( null );
@@ -66,7 +70,6 @@ test.describe( 'VIEW_CONTENT event', () => {
 
 		test( `[${ theme } theme] Navigate to Single Product Page event sends event `, async ( {
 			page,
-			baseURL,
 		} ) => {
 			await switchTheme( page, themes[ theme ] );
 			await page.goto( '/shop' );
@@ -84,7 +87,6 @@ test.describe( 'VIEW_CONTENT event', () => {
 			await expect( page.url() ).toContain( '/product/product-two' );
 			await page.waitForLoadState( 'domcontentloaded' );
 
-			const productId = await getProductId( baseURL, 'product-two' );
 			const events = await page.evaluate( () => window.snaptr.queue );
 			const VIEW_CONTENT = findSnaptrEvent( events, 'VIEW_CONTENT' );
 			expect( VIEW_CONTENT ).not.toBe( null );
