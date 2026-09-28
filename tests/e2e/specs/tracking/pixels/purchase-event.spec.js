@@ -11,6 +11,7 @@ const {
  */
 import {
 	findSnaptrEvent,
+	getProductId,
 	getThemes,
 	switchTheme,
 	singleAddToCart,
@@ -20,6 +21,7 @@ import { customer as c, integration } from '../../../config';
 
 let admin = null;
 let customer = null;
+let expectedItemIds = [];
 let orderUrl = '';
 test.beforeAll( 'Setup contexts', async ( { browser } ) => {
 	admin = await browser.newPage( { storageState: process.env.ADMINSTATE } );
@@ -30,6 +32,12 @@ test.beforeAll( 'Setup contexts', async ( { browser } ) => {
 	admin.on( 'dialog', async ( dialog ) => {
 		await dialog.accept();
 	} );
+
+	// The pixel sends item IDs as strings for this event.
+	expectedItemIds = [
+		String( await getProductId( customer.request, 'product-one' ) ),
+		String( await getProductId( customer.request, 'product-two' ) ),
+	];
 } );
 
 test.describe( 'PURCHASE event', () => {
@@ -88,7 +96,7 @@ test.describe( 'PURCHASE event', () => {
 			expect( payload.event_id ).toMatch( /^\d+$/ );
 			expect( payload.client_dedup_id ).toBe( payload.event_id );
 			expect( payload.transaction_id ).toBe( payload.event_id );
-			expect( payload.item_ids ).toEqual( [ '10', '11' ] );
+			expect( payload.item_ids ).toEqual( expectedItemIds );
 			expect( payload.number_items ).toBe( 3 );
 			expect( payload ).toHaveProperty( 'item_category' );
 		} );

@@ -8,6 +8,7 @@ const { test, expect } = require( '@playwright/test' );
  */
 import {
 	findSnaptrEvent,
+	getProductId,
 	getThemes,
 	switchTheme,
 	singleAddToCart,
@@ -17,6 +18,7 @@ import { integration } from '../../../config';
 
 let admin = null;
 let customer = null;
+let expectedItemIds = [];
 
 async function checkoutAssertions( page ) {
 	const events = await page.evaluate( () => window.snaptr.queue );
@@ -28,7 +30,7 @@ async function checkoutAssertions( page ) {
 	expect( payload.integration ).toBe( integration );
 	expect( payload.price ).toBe( '40.00' );
 	expect( payload.currency ).toBe( 'USD' );
-	expect( payload.item_ids ).toEqual( [ '10', '11' ] );
+	expect( payload.item_ids ).toEqual( expectedItemIds );
 }
 
 test.beforeAll( 'Setup contexts', async ( { browser } ) => {
@@ -40,6 +42,12 @@ test.beforeAll( 'Setup contexts', async ( { browser } ) => {
 	admin.on( 'dialog', async ( dialog ) => {
 		await dialog.accept();
 	} );
+
+	// The pixel sends item IDs as strings for this event.
+	expectedItemIds = [
+		String( await getProductId( customer.request, 'product-one' ) ),
+		String( await getProductId( customer.request, 'product-two' ) ),
+	];
 } );
 
 test.describe( 'START_CHECKOUT event', () => {

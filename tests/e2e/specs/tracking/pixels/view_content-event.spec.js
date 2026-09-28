@@ -6,13 +6,26 @@ const { test, expect } = require( '@playwright/test' );
 /**
  * Internal dependencies
  */
-import { findSnaptrEvent, getThemes, switchTheme } from '../../../utils';
+import {
+	findSnaptrEvent,
+	getProductId,
+	getThemes,
+	switchTheme,
+} from '../../../utils';
 import { integration } from '../../../config';
 
 test.describe( 'VIEW_CONTENT event', () => {
 	test.use( { storageState: process.env.ADMINSTATE } );
 
 	const themes = getThemes();
+	let productId = null;
+
+	test.beforeAll( 'Get product ID', async ( { browser } ) => {
+		const page = await browser.newPage();
+		// The pixel sends item IDs as numbers for this event.
+		productId = await getProductId( page.request, 'product-two' );
+		await page.close();
+	} );
 
 	for ( const theme in themes ) {
 		test( `[${ theme } theme] Direct access to Single Product Page sends events`, async ( {
@@ -29,7 +42,7 @@ test.describe( 'VIEW_CONTENT event', () => {
 			expect( payload.integration ).toBe( integration );
 			expect( payload.price ).toBe( 15 );
 			expect( payload.currency ).toBe( 'USD' );
-			expect( payload.item_ids ).toContain( 11 );
+			expect( payload.item_ids ).toContain( productId );
 		} );
 
 		test( `[${ theme } theme] Backward navigation sends event `, async ( {
@@ -52,7 +65,7 @@ test.describe( 'VIEW_CONTENT event', () => {
 			expect( payload.integration ).toBe( integration );
 			expect( payload.price ).toBe( 15 );
 			expect( payload.currency ).toBe( 'USD' );
-			expect( payload.item_ids ).toContain( 11 );
+			expect( payload.item_ids ).toContain( productId );
 		} );
 
 		test( `[${ theme } theme] Navigate to Single Product Page event sends event `, async ( {
@@ -83,7 +96,7 @@ test.describe( 'VIEW_CONTENT event', () => {
 			expect( payload.integration ).toBe( integration );
 			expect( payload.price ).toBe( 15 );
 			expect( payload.currency ).toBe( 'USD' );
-			expect( payload.item_ids ).toContain( 11 );
+			expect( payload.item_ids ).toContain( productId );
 		} );
 
 		test( `[${ theme } theme] No event is sent on reload`, async ( {
