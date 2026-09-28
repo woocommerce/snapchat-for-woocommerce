@@ -1,10 +1,8 @@
 /**
  * External dependencies
  */
-const { test, expect } = require( '@playwright/test' );
-const {
-	fillBillingCheckoutBlocks,
-} = require( '@woocommerce/e2e-utils-playwright' );
+import { test, expect } from '@playwright/test';
+import { fillBillingCheckoutBlocks } from '@woocommerce/e2e-utils-playwright';
 
 /**
  * Internal dependencies
