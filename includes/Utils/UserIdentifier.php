@@ -24,6 +24,7 @@
 namespace SnapchatForWooCommerce\Utils;
 
 use SnapchatForWooCommerce\Utils\Storage;
+use WC_Order;
 
 /**
  * Builds the user_data structure for CAPI event payloads.
@@ -53,8 +54,8 @@ final class UserIdentifier {
 		self::add_sc_cookie( $data );
 		self::add_click_id( $data );
 
-		if ( is_order_received_page() && Storage\Helper::is_collect_pii_enabled() ) {
-			// ⚠️ Values are only extracted on the WooCommerce order-received page.
+		if ( Storage\Helper::is_collect_pii_enabled() ) {
+			// ⚠️ Values are only extracted on an order-received page the visitor is allowed to see.
 			self::add_user_details( $data );
 		}
 
@@ -160,15 +161,21 @@ final class UserIdentifier {
 	 *              - GB: area + district + sector (excludes unit).
 	 * - country > ISO-2 country code (lowercase, SHA-256 hashed).
 	 *
+	 * Billing details are only ever read from an `order-received` request that WooCommerce would
+	 * grant access to, i.e. one carrying a valid order key. Without that check, hashed customer
+	 * identifiers would end up in tracking payloads for anyone guessing an order ID.
+	 *
 	 * @since 0.1.0
 	 *
-	 * @param array<string,mixed> $data Reference to the user_data array.
+	 * @param array<string,mixed> $data  Reference to the user_data array.
+	 * @param WC_Order|null       $order Optional. Order to read the billing details from. Defaults to
+	 *                                   the order of the current `order-received` request, when the
+	 *                                   request is authorized to view it.
 	 */
-	public static function add_user_details( array &$data ): void {
-		$order_id = (int) get_query_var( 'order-received' );
-		$order    = wc_get_order( $order_id );
+	public static function add_user_details( array &$data, ?WC_Order $order = null ): void {
+		$order = $order ?? Helper::get_verified_order_received_order();
 
-		if ( ! $order instanceof \WC_Order ) {
+		if ( ! $order instanceof WC_Order ) {
 			return;
 		}
 

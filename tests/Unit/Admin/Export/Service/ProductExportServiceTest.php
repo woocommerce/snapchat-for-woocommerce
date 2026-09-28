@@ -162,23 +162,37 @@ class ProductExportServiceTest extends WP_UnitTestCase {
 			$csv[0]
 		);
 
-		$this->assertEquals( (string) $product->get_id(), $csv[1][0] );
-		$this->assertEquals( 'Test Product', $csv[1][1] );
-		$this->assertEquals( '', $csv[1][2] );
-		$this->assertStringContainsString( '?product=test-product', $csv[1][3] );
-		$this->assertEquals( '', $csv[1][4] );
-		$this->assertEquals( 'In stock', $csv[1][5] );
-		$this->assertEquals( '29.99 USD', $csv[1][6] );
-		$this->assertEquals( '', $csv[1][7] );
+		// Products created within the same second are not returned in a guaranteed order,
+		// so the rows are matched by product ID instead of by position.
+		$rows = array();
 
-		$this->assertEquals( (string) $product_2->get_id(), $csv[2][0] );
-		$this->assertEquals( 'Sample Product', $csv[2][1] );
-		$this->assertEquals( '', $csv[2][2] );
-		$this->assertStringContainsString( '?product=sample-product', $csv[2][3] );
-		$this->assertEquals( '', $csv[2][4] );
-		$this->assertEquals( 'Out of stock', $csv[2][5] );
-		$this->assertEquals( '0 USD', $csv[2][6] );
-		$this->assertEquals( '', $csv[2][7] );
+		foreach ( array_slice( $csv, 1 ) as $row ) {
+			$rows[ $row[0] ] = $row;
+		}
+
+		$this->assertCount( 2, $rows );
+		$this->assertArrayHasKey( $product->get_id(), $rows );
+		$this->assertArrayHasKey( $product_2->get_id(), $rows );
+
+		$product_row = $rows[ $product->get_id() ];
+
+		$this->assertEquals( 'Test Product', $product_row[1] );
+		$this->assertEquals( '', $product_row[2] );
+		$this->assertStringContainsString( '?product=test-product', $product_row[3] );
+		$this->assertEquals( '', $product_row[4] );
+		$this->assertEquals( 'In stock', $product_row[5] );
+		$this->assertEquals( '29.99 USD', $product_row[6] );
+		$this->assertEquals( '', $product_row[7] );
+
+		$product_2_row = $rows[ $product_2->get_id() ];
+
+		$this->assertEquals( 'Sample Product', $product_2_row[1] );
+		$this->assertEquals( '', $product_2_row[2] );
+		$this->assertStringContainsString( '?product=sample-product', $product_2_row[3] );
+		$this->assertEquals( '', $product_2_row[4] );
+		$this->assertEquals( 'Out of stock', $product_2_row[5] );
+		$this->assertEquals( '0 USD', $product_2_row[6] );
+		$this->assertEquals( '', $product_2_row[7] );
 
 		if ( file_exists( $file_path ) ) {
 			unlink( $file_path );
