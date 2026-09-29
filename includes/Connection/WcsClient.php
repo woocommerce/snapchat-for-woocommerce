@@ -110,6 +110,7 @@ final class WcsClient {
 		 * @param string $url The default WCS endpoint URL.
 		 */
 		return apply_filters(
+			// phpcs:ignore WordPress.NamingConventions.PrefixAllGlobals.DynamicHooknameFound -- Prefixed via Helper::with_prefix().
 			Helper::with_prefix( 'wcs_base_url' ),
 			sprintf(
 				'https://public-api.wordpress.com/wpcom/v2/sites/%s/wc',
@@ -133,6 +134,7 @@ final class WcsClient {
 		 * @param string $service_name The default service name.
 		 */
 		return apply_filters(
+			// phpcs:ignore WordPress.NamingConventions.PrefixAllGlobals.DynamicHooknameFound -- Prefixed via Helper::with_prefix().
 			Helper::with_prefix( 'service_name' ),
 			'snapchat'
 		);

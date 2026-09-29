@@ -342,6 +342,7 @@ class RemoteConversionTracker implements ConversionTrackerInterface {
 		 * @param array $event_payload The payload that was sent to the Ad Partner.
 		 * @param array $args          Additional args.
 		 */
+		// phpcs:ignore WordPress.NamingConventions.PrefixAllGlobals.DynamicHooknameFound -- Prefixed via Helper::with_prefix().
 		do_action( Helper::with_prefix( 'conversion_sent' ), $event_payload, $args );
 	}
 }
