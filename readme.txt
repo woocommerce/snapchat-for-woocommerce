@@ -27,8 +27,6 @@ Yes, it uses a [Jetpack](https://jetpack.com/) account to connect and communicat
 
 = 1.0.6 - 2026-09-29 =
 * Add - Sandbox mode to preview settings without connecting to Snapchat.
-* Dev - Add PR workflow guidelines to AGENTS.md.
-* Dev - Upgrade to Node 24 and update dependencies.
 
 = 1.0.5 - 2026-09-08 =
 * Fix - Ensure product export batches write CSV rows in the correct product order.
