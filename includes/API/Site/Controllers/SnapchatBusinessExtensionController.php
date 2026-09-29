@@ -250,6 +250,7 @@ class SnapchatBusinessExtensionController extends RESTBaseController {
 		 *
 		 * @since 0.1.0
 		 */
+		// phpcs:ignore WordPress.NamingConventions.PrefixAllGlobals.DynamicHooknameFound -- Prefixed via Helper::with_prefix().
 		do_action( Helper::with_prefix( 'onboarding_complete' ) );
 
 		return rest_ensure_response(
@@ -415,6 +416,7 @@ class SnapchatBusinessExtensionController extends RESTBaseController {
 				 *
 				 * @since 0.1.0
 				 */
+				// phpcs:ignore WordPress.NamingConventions.PrefixAllGlobals.DynamicHooknameFound -- Prefixed via Helper::with_prefix().
 				do_action( Helper::with_prefix( 'snapchat_disconnected' ) );
 
 				return rest_ensure_response(

@@ -58,25 +58,23 @@ if ( ! defined( 'SNAPCHAT_FOR_WOOCOMMERCE_DEBUG' ) ) {
 
 require_once plugin_dir_path( __FILE__ ) . '/vendor/autoload_packages.php';
 
-$export_service = ServiceContainer::get( ServiceKey::PRODUCT_EXPORT_SERVICE );
-
 register_activation_hook(
 	__FILE__,
-	function () use ( $export_service ) {
+	function () {
 		Options::preload_defaults();
 
 		// Schedule recurring CSV export task when the plugin is activated.
 		if ( 'connected' === Options::get( OptionDefaults::ONBOARDING_STATUS ) ) {
-			$export_service->maybe_schedule_recurring_export();
+			ServiceContainer::get( ServiceKey::PRODUCT_EXPORT_SERVICE )->maybe_schedule_recurring_export();
 		}
 	}
 );
 
 register_deactivation_hook(
 	__FILE__,
-	function () use ( $export_service ) {
+	function () {
 		// Unschedule all tasks related to product catalog export.
-		$export_service->maybe_unschedule_export_jobs();
+		ServiceContainer::get( ServiceKey::PRODUCT_EXPORT_SERVICE )->maybe_unschedule_export_jobs();
 	}
 );
 
