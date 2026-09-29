@@ -64,6 +64,7 @@ class JetpackAuthenticator {
 		 *
 		 * @param string|null $token The token to use for authenticated requests. Default null (uses default auth method).
 		 */
+		// phpcs:ignore WordPress.NamingConventions.PrefixAllGlobals.DynamicHooknameFound -- Prefixed via Helper::with_prefix().
 		$token = apply_filters( Helper::with_prefix( 'jetpack_auth_token' ), null );
 
 		if ( $token ) {

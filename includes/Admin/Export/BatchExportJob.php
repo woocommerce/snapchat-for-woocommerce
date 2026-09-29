@@ -235,6 +235,7 @@ class BatchExportJob {
 		 *
 		 * @since 0.1.0
 		 */
+		// phpcs:ignore WordPress.NamingConventions.PrefixAllGlobals.DynamicHooknameFound -- Prefixed via Helper::with_prefix().
 		do_action( Helper::with_prefix( 'batch_export_job_complete' ) );
 	}
 }
