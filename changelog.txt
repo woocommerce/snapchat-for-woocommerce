@@ -1,11 +1,9 @@
 ***Snapchat for WooCommerce Changelog ***
 
 = 1.0.6 - 2026-09-29 =
-* Dev - Added sandbox mode.
-* Fix - Doc - Add PR workflow guidelines to AGENTS.md.
-* Fix - Fix hardcoded product IDs in pixel tracking E2E tests.
-* Fix - Update CI workflows for Node.js 24 compatibility.
-* Fix - Upgrade the local toolchain to Node 24 / npm 11 and update JS and PHP dependencies to resolve security advisories.
+* Add - Sandbox mode to preview settings without connecting to Snapchat.
+* Dev - Add PR workflow guidelines to AGENTS.md.
+* Dev - Upgrade to Node 24 and update dependencies.
 
 = 1.0.5 - 2026-09-08 =
 * Fix - Ensure product export batches write CSV rows in the correct product order.
