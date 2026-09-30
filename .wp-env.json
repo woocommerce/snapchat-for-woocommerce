@@ -1,6 +1,7 @@
 {
 	"phpVersion": null,
 	"core": null,
+	"port": 8888,
 	"plugins": [
 		"https://downloads.wordpress.org/plugin/woocommerce.zip",
 		".",
@@ -11,6 +12,7 @@
 	],
 	"env": {
 		"tests": {
+			"port": 8889,
 			"mappings": {
 				"wp-cli.yml": "./tests/e2e/bin/wp-cli.yml"
 			},
