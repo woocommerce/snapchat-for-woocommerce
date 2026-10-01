@@ -18,14 +18,16 @@ import {
 import GetStartedCTA from './get-started-cta';
 
 /**
- * @event sfw_snapchat_ads_promo_dismiss_click
- * @property {string} context Indicates from which page the button was clicked. Possible value: 'channel-visibility-meta-box'.
+ * Snapchat Ads promo "Dismiss" button is clicked.
+ *
+ * @event sfw_ads_promo_dismiss_click
+ * @property {string} context Context of the Snapchat Ads promo. Possible value: 'channel-visibility-meta-box'.
  */
 
 /**
  * Promo actions: the Get Started CTA paired with a dismiss control.
  *
- * @fires sfw_snapchat_ads_promo_dismiss_click When the "Dismiss" button is clicked.
+ * @fires sfw_ads_promo_dismiss_click with `{ context: 'channel-visibility-meta-box' }`.
  *
  * @return {JSX.Element} The promo actions row.
  */
@@ -44,7 +46,7 @@ const PromoCTA = () => {
 
 			<FlexBlock>
 				<AppButton
-					eventName="sfw_snapchat_ads_promo_dismiss_click"
+					eventName="sfw_ads_promo_dismiss_click"
 					eventProps={ {
 						context: CHANNEL_VISIBILITY_CONTEXT,
 					} }

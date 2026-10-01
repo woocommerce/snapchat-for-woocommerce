@@ -56,6 +56,7 @@ class SandboxModeTest extends WP_UnitTestCase {
 		delete_option( Options::get_key( OptionDefaults::ONBOARDING_STATUS ) );
 		delete_option( Options::get_key( OptionDefaults::CONVERSIONS_ENABLED ) );
 		delete_option( Options::get_key( OptionDefaults::PIXEL_ENABLED ) );
+		unset( $GLOBALS['current_screen'] );
 
 		parent::tear_down();
 	}
@@ -152,8 +153,16 @@ class SandboxModeTest extends WP_UnitTestCase {
 
 	/**
 	 * Ensures both storefront tracking services are disabled.
+	 *
+	 * Runs as a front-end request: other suites define `WP_ADMIN`, which would otherwise make
+	 * `is_admin()` true here and resolve the conversions setting from the admin settings context.
 	 */
 	public function test_tracking_is_disabled(): void {
+		if ( ! function_exists( 'set_current_screen' ) ) {
+			require_once ABSPATH . 'wp-admin/includes/screen.php';
+		}
+		set_current_screen( 'front' );
+
 		Options::set( OptionDefaults::PIXEL_ENABLED, 'yes' );
 		Options::set( OptionDefaults::CONVERSIONS_ENABLED, 'yes' );
 		update_option( SandboxMode::OPTION_NAME, 'yes' );
