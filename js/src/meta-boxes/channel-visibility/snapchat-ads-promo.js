@@ -20,14 +20,16 @@ import PromoCTA from './promo-cta';
 import './snapchat-ads-promo.scss';
 
 /**
- * @event sfw_snapchat_ads_promo_shown
- * @property {string} context Indicates from which page the promo was shown. Possible value: 'channel-visibility-meta-box'.
+ * Snapchat Ads promo is shown.
+ *
+ * @event sfw_ads_promo_shown
+ * @property {string} context Context of the Snapchat Ads promo. Possible values: 'channel-visibility-meta-box', 'order-attribution-meta-box'.
  */
 
 /**
  * Snapchat Ads promo shown in the Channel visibility widget when onboarding is incomplete.
  *
- * @fires sfw_snapchat_ads_promo_shown When the promo first renders while onboarding is incomplete.
+ * @fires sfw_ads_promo_shown with `{ context: 'channel-visibility-meta-box' }`.
  *
  * @return {JSX.Element|null} The promo, or null once onboarding is complete.
  */
@@ -42,7 +44,7 @@ const SnapchatAdsPromo = () => {
 		}
 
 		if ( ! hasTrackedRef.current ) {
-			recordSfwEvent( 'sfw_snapchat_ads_promo_shown', {
+			recordSfwEvent( 'sfw_ads_promo_shown', {
 				context: CHANNEL_VISIBILITY_CONTEXT,
 			} );
 			hasTrackedRef.current = true;
