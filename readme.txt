@@ -26,7 +26,7 @@ Yes, it uses a [Jetpack](https://jetpack.com/) account to connect and communicat
 == Changelog ==
 
 = 1.0.7 - 2026-10-08 =
-* Fix - Bump WooCommerce "tested up to" version to 11.2.
+* Tweak - Bump WooCommerce "tested up to" version to 11.2.
 
 = 1.0.6 - 2026-09-29 =
 * Add - Sandbox mode to preview settings without connecting to Snapchat.
