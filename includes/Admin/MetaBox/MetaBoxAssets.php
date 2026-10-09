@@ -126,7 +126,7 @@ class MetaBoxAssets {
 		}
 
 		$onboarding_complete = Options::get( OptionDefaults::ONBOARDING_STATUS ) === 'connected';
-		$has_campaign        = $this->campaign_api->has_campaigns( Options::get( OptionDefaults::AD_ACCOUNT_ID ) );
+		$has_campaign        = $onboarding_complete && $this->campaign_api->has_campaigns( Options::get( OptionDefaults::AD_ACCOUNT_ID ) );
 
 		AssetLoader::enqueue_script( 'order-attribution', 'order-attribution' );
 		AssetLoader::enqueue_style( 'order-attribution', 'order-attribution' );
