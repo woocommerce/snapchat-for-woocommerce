@@ -42,6 +42,13 @@ class SandboxModeTest extends WP_UnitTestCase {
 	public function set_up(): void {
 		parent::set_up();
 
+		// Run as a front-end request, so admin-only sandbox behaviour stays off.
+		if ( ! function_exists( 'set_current_screen' ) ) {
+			require_once ABSPATH . 'wp-admin/includes/screen.php';
+		}
+
+		set_current_screen( 'front' );
+
 		$this->sandbox = new SandboxMode();
 		delete_option( SandboxMode::OPTION_NAME );
 		delete_option( SandboxMode::SETTINGS_OPTION_NAME );
