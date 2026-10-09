@@ -44,14 +44,14 @@ class CampaignApi extends BaseAdPartnerApi {
 	}
 
 	/**
-	 * Clears the cached `has_active_campaigns()` result.
+	 * Clears the cached `has_campaigns()` result.
 	 *
 	 * @since 1.2.0
 	 *
 	 * @return void
 	 */
 	public function clear_cache(): void {
-		Transients::delete( TransientDefaults::CAMPAIGN_HAS_ACTIVE );
+		Transients::delete( TransientDefaults::HAS_CAMPAIGNS );
 	}
 
 	/**
@@ -62,7 +62,7 @@ class CampaignApi extends BaseAdPartnerApi {
 	 * excluded by the endpoint unless `read_deleted_entities=true` is passed,
 	 * which this call does not do.
 	 *
-	 * The result is cached in a transient (see {@see TransientDefaults::CAMPAIGN_HAS_ACTIVE}).
+	 * The result is cached in a transient (see {@see TransientDefaults::HAS_CAMPAIGNS}).
 	 * `Store::get()` treats a raw `false` read as "not cached" (indistinguishable
 	 * from `get_transient()`'s own false-on-miss/expiry), so the cached value is
 	 * stored as the string `'1'`/`'0'` rather than a native bool, with `''` as the
@@ -79,12 +79,12 @@ class CampaignApi extends BaseAdPartnerApi {
 	 * @return bool True if the ad account has at least one campaign, or if the
 	 *              live check could not be completed.
 	 */
-	public function has_active_campaigns( string $ad_account_id ): bool {
+	public function has_campaigns( string $ad_account_id ): bool {
 		if ( '' === $ad_account_id ) {
 			return true;
 		}
 
-		$cached = Transients::get( TransientDefaults::CAMPAIGN_HAS_ACTIVE );
+		$cached = Transients::get( TransientDefaults::HAS_CAMPAIGNS );
 
 		if ( '' !== $cached ) {
 			return '1' === $cached;
@@ -102,7 +102,7 @@ class CampaignApi extends BaseAdPartnerApi {
 		$campaigns     = ( isset( $data['campaigns'] ) && is_array( $data['campaigns'] ) ) ? $data['campaigns'] : array();
 		$has_campaigns = ! empty( $campaigns );
 
-		Transients::set( TransientDefaults::CAMPAIGN_HAS_ACTIVE, $has_campaigns ? '1' : '0' );
+		Transients::set( TransientDefaults::HAS_CAMPAIGNS, $has_campaigns ? '1' : '0' );
 
 		return $has_campaigns;
 	}

@@ -37,7 +37,7 @@ final class TransientDefaults {
 	 *
 	 * @since 1.2.0
 	 */
-	public const CAMPAIGN_HAS_ACTIVE = 'campaign_has_active';
+	public const HAS_CAMPAIGNS = 'has_campaigns';
 
 	/**
 	 * Returns defaults for all known Ad Partner transients.
@@ -50,8 +50,8 @@ final class TransientDefaults {
 	 */
 	public static function get_all(): array {
 		return array(
-			self::PIXEL_SCRIPT        => '',
-			self::CAMPAIGN_HAS_ACTIVE => '',
+			self::PIXEL_SCRIPT  => '',
+			self::HAS_CAMPAIGNS => '',
 		);
 	}
 
@@ -64,8 +64,8 @@ final class TransientDefaults {
 	 */
 	private static function get_ttls(): array {
 		return array(
-			self::PIXEL_SCRIPT        => MONTH_IN_SECONDS,
-			self::CAMPAIGN_HAS_ACTIVE => 15 * MINUTE_IN_SECONDS,
+			self::PIXEL_SCRIPT  => MONTH_IN_SECONDS,
+			self::HAS_CAMPAIGNS => 15 * MINUTE_IN_SECONDS,
 		);
 	}
 

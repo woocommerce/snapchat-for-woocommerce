@@ -51,7 +51,7 @@ final class MetaBoxAssetsTest extends WP_UnitTestCase {
 		$data->method( 'is_wc_order_edit_screen' )->willReturn( false );
 
 		$campaign_api = $this->createMock( CampaignApi::class );
-		$campaign_api->expects( $this->never() )->method( 'has_active_campaigns' );
+		$campaign_api->expects( $this->never() )->method( 'has_campaigns' );
 
 		$assets = new MetaBoxAssets( $data, $campaign_api );
 		$assets->enqueue_assets();
@@ -65,7 +65,7 @@ final class MetaBoxAssetsTest extends WP_UnitTestCase {
 		$data->method( 'get_order_attribution_source_for_edit_screen' )->willReturn( 'snapchat' );
 
 		$campaign_api = $this->createMock( CampaignApi::class );
-		$campaign_api->method( 'has_active_campaigns' )->willReturn( true );
+		$campaign_api->method( 'has_campaigns' )->willReturn( true );
 
 		$assets = new MetaBoxAssets( $data, $campaign_api );
 		$assets->enqueue_assets();

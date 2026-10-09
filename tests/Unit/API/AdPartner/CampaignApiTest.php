@@ -2,7 +2,7 @@
 /**
  * Unit tests for CampaignApi.
  *
- * Covers the SNAPWOO-105 behaviour: `has_active_campaigns()` checks the live
+ * Covers the SNAPWOO-105 behaviour: `has_campaigns()` checks the live
  * Ad Partner endpoint, caches the result, fails open (`true`) on error, and
  * has its cache busted by the `onboarding_complete`/`snapchat_disconnected`
  * hooks.
@@ -32,11 +32,11 @@ class CampaignApiTest extends WP_UnitTestCase {
 	public function set_up(): void {
 		parent::set_up();
 
-		Transients::delete( TransientDefaults::CAMPAIGN_HAS_ACTIVE );
+		Transients::delete( TransientDefaults::HAS_CAMPAIGNS );
 	}
 
 	public function tear_down(): void {
-		Transients::delete( TransientDefaults::CAMPAIGN_HAS_ACTIVE );
+		Transients::delete( TransientDefaults::HAS_CAMPAIGNS );
 		parent::tear_down();
 	}
 
@@ -49,7 +49,7 @@ class CampaignApiTest extends WP_UnitTestCase {
 
 		$api = new CampaignApi( $wcs );
 
-		$this->assertTrue( $api->has_active_campaigns( '' ) );
+		$this->assertTrue( $api->has_campaigns( '' ) );
 	}
 
 	/**
@@ -63,7 +63,7 @@ class CampaignApiTest extends WP_UnitTestCase {
 			->willReturn( new WP_REST_Response( array( 'campaigns' => array() ), 200 ) );
 
 		$api = new CampaignApi( $wcs );
-		$api->has_active_campaigns( 'abc-123' );
+		$api->has_campaigns( 'abc-123' );
 	}
 
 	/**
@@ -90,7 +90,7 @@ class CampaignApiTest extends WP_UnitTestCase {
 
 		$api = new CampaignApi( $wcs );
 
-		$this->assertTrue( $api->has_active_campaigns( 'abc-123' ) );
+		$this->assertTrue( $api->has_campaigns( 'abc-123' ) );
 	}
 
 	/**
@@ -104,7 +104,7 @@ class CampaignApiTest extends WP_UnitTestCase {
 
 		$api = new CampaignApi( $wcs );
 
-		$this->assertFalse( $api->has_active_campaigns( 'abc-123' ) );
+		$this->assertFalse( $api->has_campaigns( 'abc-123' ) );
 	}
 
 	/**
@@ -119,8 +119,8 @@ class CampaignApiTest extends WP_UnitTestCase {
 
 		$api = new CampaignApi( $wcs );
 
-		$this->assertTrue( $api->has_active_campaigns( 'abc-123' ) );
-		$this->assertTrue( $api->has_active_campaigns( 'abc-123' ) );
+		$this->assertTrue( $api->has_campaigns( 'abc-123' ) );
+		$this->assertTrue( $api->has_campaigns( 'abc-123' ) );
 	}
 
 	/**
@@ -135,8 +135,8 @@ class CampaignApiTest extends WP_UnitTestCase {
 
 		$api = new CampaignApi( $wcs );
 
-		$this->assertFalse( $api->has_active_campaigns( 'abc-123' ) );
-		$this->assertFalse( $api->has_active_campaigns( 'abc-123' ) );
+		$this->assertFalse( $api->has_campaigns( 'abc-123' ) );
+		$this->assertFalse( $api->has_campaigns( 'abc-123' ) );
 	}
 
 	/**
@@ -156,8 +156,8 @@ class CampaignApiTest extends WP_UnitTestCase {
 
 		$api = new CampaignApi( $wcs );
 
-		$this->assertTrue( $api->has_active_campaigns( 'abc-123' ) );
-		$this->assertTrue( $api->has_active_campaigns( 'abc-123' ) );
+		$this->assertTrue( $api->has_campaigns( 'abc-123' ) );
+		$this->assertTrue( $api->has_campaigns( 'abc-123' ) );
 	}
 
 	/**
@@ -172,29 +172,29 @@ class CampaignApiTest extends WP_UnitTestCase {
 
 		$api = new CampaignApi( $wcs );
 
-		$this->assertFalse( $api->has_active_campaigns( 'abc-123' ) );
+		$this->assertFalse( $api->has_campaigns( 'abc-123' ) );
 
 		$api->clear_cache();
 
-		$this->assertFalse( $api->has_active_campaigns( 'abc-123' ) );
+		$this->assertFalse( $api->has_campaigns( 'abc-123' ) );
 	}
 
 	/**
 	 * Test: `register_hooks()` wires `clear_cache()` to both connection-change hooks.
 	 */
 	public function test_register_hooks_busts_cache_on_onboarding_complete_and_disconnect(): void {
-		Transients::set( TransientDefaults::CAMPAIGN_HAS_ACTIVE, '1' );
+		Transients::set( TransientDefaults::HAS_CAMPAIGNS, '1' );
 
 		$wcs = $this->createMock( WcsClient::class );
 		$api = new CampaignApi( $wcs );
 		$api->register_hooks();
 
 		do_action( Helper::with_prefix( 'onboarding_complete' ) );
-		$this->assertSame( '', Transients::get( TransientDefaults::CAMPAIGN_HAS_ACTIVE ) );
+		$this->assertSame( '', Transients::get( TransientDefaults::HAS_CAMPAIGNS ) );
 
-		Transients::set( TransientDefaults::CAMPAIGN_HAS_ACTIVE, '1' );
+		Transients::set( TransientDefaults::HAS_CAMPAIGNS, '1' );
 
 		do_action( Helper::with_prefix( 'snapchat_disconnected' ) );
-		$this->assertSame( '', Transients::get( TransientDefaults::CAMPAIGN_HAS_ACTIVE ) );
+		$this->assertSame( '', Transients::get( TransientDefaults::HAS_CAMPAIGNS ) );
 	}
 }

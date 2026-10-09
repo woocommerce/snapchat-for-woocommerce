@@ -99,12 +99,12 @@ final class MetaBoxAssetsTest extends WP_UnitTestCase {
 	/**
 	 * Builds a stub `CampaignApi` so these tests don't hit the live Ad Partner endpoint.
 	 *
-	 * @param bool $has_campaign Value `has_active_campaigns()` should return.
+	 * @param bool $has_campaign Value `has_campaigns()` should return.
 	 * @return CampaignApi&\PHPUnit\Framework\MockObject\MockObject
 	 */
 	private function make_campaign_api_mock( bool $has_campaign = false ) {
 		$campaign_api = $this->createMock( CampaignApi::class );
-		$campaign_api->method( 'has_active_campaigns' )->willReturn( $has_campaign );
+		$campaign_api->method( 'has_campaigns' )->willReturn( $has_campaign );
 
 		return $campaign_api;
 	}
