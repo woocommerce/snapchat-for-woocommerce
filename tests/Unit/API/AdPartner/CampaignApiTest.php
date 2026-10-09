@@ -186,6 +186,22 @@ class CampaignApiTest extends WP_UnitTestCase {
 	}
 
 	/**
+	 * Test: a response without a `campaigns` array is not cached as "no campaigns".
+	 */
+	public function test_refresh_does_not_cache_when_campaigns_missing(): void {
+		$wcs = $this->createMock( WcsClient::class );
+		$wcs->method( 'proxy_get' )->willReturn(
+			new WP_REST_Response( array( 'request_status' => 'ERROR' ), 200 )
+		);
+
+		$api = new CampaignApi( $wcs );
+		$api->refresh_cache();
+
+		$this->assertSame( '', Transients::get( TransientDefaults::HAS_CAMPAIGNS ) );
+		$this->assertTrue( $api->has_campaigns() );
+	}
+
+	/**
 	 * Test: `register_hooks()` wires `refresh_cache()` to the Action Scheduler hook.
 	 */
 	public function test_register_hooks_wires_refresh_to_action_hook(): void {

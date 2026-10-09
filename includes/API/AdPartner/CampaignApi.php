@@ -110,8 +110,8 @@ class CampaignApi extends BaseAdPartnerApi {
 	 * Checks whether the connected ad account has any campaigns and caches the result.
 	 *
 	 * Runs via Action Scheduler. Cached as '1'/'0' because a cached false reads
-	 * as a cache miss. Failures are not cached, so the next cache miss schedules
-	 * another check.
+	 * as a cache miss. Failures and unexpected responses are not cached, so the
+	 * next cache miss schedules another check.
 	 *
 	 * @since n.e.x.t
 	 *
@@ -132,9 +132,12 @@ class CampaignApi extends BaseAdPartnerApi {
 			return;
 		}
 
-		$data      = $response->get_data();
-		$campaigns = ( isset( $data['campaigns'] ) && is_array( $data['campaigns'] ) ) ? $data['campaigns'] : array();
+		$data = $response->get_data();
 
-		Transients::set( TransientDefaults::HAS_CAMPAIGNS, empty( $campaigns ) ? '0' : '1' );
+		if ( ! isset( $data['campaigns'] ) || ! is_array( $data['campaigns'] ) ) {
+			return;
+		}
+
+		Transients::set( TransientDefaults::HAS_CAMPAIGNS, empty( $data['campaigns'] ) ? '0' : '1' );
 	}
 }
