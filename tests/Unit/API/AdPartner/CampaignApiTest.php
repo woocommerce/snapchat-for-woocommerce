@@ -2,10 +2,10 @@
 /**
  * Unit tests for CampaignApi.
  *
- * Covers the SNAPWOO-105 behaviour: `has_campaigns()` checks the live
- * Ad Partner endpoint, caches the result, fails open (`true`) on error, and
- * has its cache busted by the `onboarding_complete`/`snapchat_disconnected`
- * hooks.
+ * Covers `has_campaigns()` reading only the cache and scheduling a background
+ * check on a miss, `refresh_cache()` checking the live Ad Partner endpoint and
+ * caching the result, and the cache being busted by the
+ * `onboarding_complete`/`snapchat_disconnected` hooks.
  *
  * @package SnapchatForWooCommerce\Tests\Unit\API\AdPartner
  */
@@ -18,6 +18,8 @@ use WP_UnitTestCase;
 use SnapchatForWooCommerce\API\AdPartner\CampaignApi;
 use SnapchatForWooCommerce\Connection\WcsClient;
 use SnapchatForWooCommerce\Utils\Helper;
+use SnapchatForWooCommerce\Utils\Storage\Options;
+use SnapchatForWooCommerce\Utils\Storage\OptionDefaults;
 use SnapchatForWooCommerce\Utils\Storage\Transients;
 use SnapchatForWooCommerce\Utils\Storage\TransientDefaults;
 
@@ -27,49 +29,107 @@ use SnapchatForWooCommerce\Utils\Storage\TransientDefaults;
 class CampaignApiTest extends WP_UnitTestCase {
 
 	/**
-	 * Reset the transient the tests mutate.
+	 * Reset the transient, option, and scheduled actions the tests mutate.
 	 */
 	public function set_up(): void {
 		parent::set_up();
 
 		Transients::delete( TransientDefaults::HAS_CAMPAIGNS );
+		Options::set( OptionDefaults::AD_ACCOUNT_ID, 'abc-123' );
+		as_unschedule_all_actions( Helper::with_prefix( CampaignApi::ACTION_HOOK ) );
 	}
 
 	public function tear_down(): void {
 		Transients::delete( TransientDefaults::HAS_CAMPAIGNS );
+		Options::delete( OptionDefaults::AD_ACCOUNT_ID );
+		as_unschedule_all_actions( Helper::with_prefix( CampaignApi::ACTION_HOOK ) );
 		parent::tear_down();
 	}
 
 	/**
-	 * Test: an empty ad account ID short-circuits to `true` without hitting WCS.
+	 * Test: a cache miss returns `true`, schedules a background check, and
+	 * never calls WCS inline.
 	 */
-	public function test_returns_true_for_empty_ad_account_id_without_hitting_wcs(): void {
+	public function test_cache_miss_returns_true_and_schedules_refresh(): void {
 		$wcs = $this->createMock( WcsClient::class );
 		$wcs->expects( $this->never() )->method( 'proxy_get' );
 
 		$api = new CampaignApi( $wcs );
 
-		$this->assertTrue( $api->has_campaigns( '' ) );
+		$this->assertTrue( $api->has_campaigns() );
+		$this->assertTrue( as_has_scheduled_action( Helper::with_prefix( CampaignApi::ACTION_HOOK ) ) );
 	}
 
 	/**
-	 * Test: proxies GET to `/v1/adaccounts/{id}/campaigns` with the ID URL-encoded.
+	 * Test: repeated cache misses only schedule one pending background check.
 	 */
-	public function test_proxies_to_correct_endpoint(): void {
+	public function test_cache_miss_schedules_refresh_only_once(): void {
+		$api = new CampaignApi( $this->createMock( WcsClient::class ) );
+
+		$api->has_campaigns();
+		$api->has_campaigns();
+
+		$this->assertCount(
+			1,
+			as_get_scheduled_actions(
+				array(
+					'hook'   => Helper::with_prefix( CampaignApi::ACTION_HOOK ),
+					'status' => \ActionScheduler_Store::STATUS_PENDING,
+				),
+				'ids'
+			)
+		);
+	}
+
+	/**
+	 * Test: a cached result is returned without scheduling a background check.
+	 */
+	public function test_cache_hit_returns_cached_value_without_scheduling(): void {
+		$api = new CampaignApi( $this->createMock( WcsClient::class ) );
+
+		Transients::set( TransientDefaults::HAS_CAMPAIGNS, '0' );
+		$this->assertFalse( $api->has_campaigns() );
+
+		Transients::set( TransientDefaults::HAS_CAMPAIGNS, '1' );
+		$this->assertTrue( $api->has_campaigns() );
+
+		$this->assertFalse( as_has_scheduled_action( Helper::with_prefix( CampaignApi::ACTION_HOOK ) ) );
+	}
+
+	/**
+	 * Test: the refresh is skipped without hitting WCS when no ad account is connected.
+	 */
+	public function test_refresh_skips_when_no_ad_account(): void {
+		Options::set( OptionDefaults::AD_ACCOUNT_ID, '' );
+
+		$wcs = $this->createMock( WcsClient::class );
+		$wcs->expects( $this->never() )->method( 'proxy_get' );
+
+		( new CampaignApi( $wcs ) )->refresh_cache();
+
+		$this->assertSame( '', Transients::get( TransientDefaults::HAS_CAMPAIGNS ) );
+	}
+
+	/**
+	 * Test: the refresh proxies GET to `/v1/adaccounts/{id}/campaigns` with the
+	 * stored ad account ID URL-encoded.
+	 */
+	public function test_refresh_proxies_to_correct_endpoint(): void {
+		Options::set( OptionDefaults::AD_ACCOUNT_ID, 'abc 123' );
+
 		$wcs = $this->createMock( WcsClient::class );
 		$wcs->expects( $this->once() )
 			->method( 'proxy_get' )
-			->with( '/v1/adaccounts/abc-123/campaigns' )
+			->with( '/v1/adaccounts/abc%20123/campaigns' )
 			->willReturn( new WP_REST_Response( array( 'campaigns' => array() ), 200 ) );
 
-		$api = new CampaignApi( $wcs );
-		$api->has_campaigns( 'abc-123' );
+		( new CampaignApi( $wcs ) )->refresh_cache();
 	}
 
 	/**
-	 * Test: returns `true` when the response contains at least one campaign.
+	 * Test: the refresh caches `'1'` when the response contains at least one campaign.
 	 */
-	public function test_returns_true_when_campaigns_exist(): void {
+	public function test_refresh_caches_true_when_campaigns_exist(): void {
 		$wcs = $this->createMock( WcsClient::class );
 		$wcs->method( 'proxy_get' )->willReturn(
 			new WP_REST_Response(
@@ -77,7 +137,7 @@ class CampaignApiTest extends WP_UnitTestCase {
 					'campaigns' => array(
 						array(
 							'sub_request_status' => 'SUCCESS',
-							'campaign'            => array(
+							'campaign'           => array(
 								'id'     => 'campaign-1',
 								'status' => 'PAUSED',
 							),
@@ -89,94 +149,57 @@ class CampaignApiTest extends WP_UnitTestCase {
 		);
 
 		$api = new CampaignApi( $wcs );
+		$api->refresh_cache();
 
-		$this->assertTrue( $api->has_campaigns( 'abc-123' ) );
+		$this->assertSame( '1', Transients::get( TransientDefaults::HAS_CAMPAIGNS ) );
+		$this->assertTrue( $api->has_campaigns() );
 	}
 
 	/**
-	 * Test: returns `false` when the response has no campaigns.
+	 * Test: the refresh caches `'0'` when the response contains no campaigns.
 	 */
-	public function test_returns_false_when_no_campaigns_exist(): void {
+	public function test_refresh_caches_false_when_no_campaigns(): void {
 		$wcs = $this->createMock( WcsClient::class );
 		$wcs->method( 'proxy_get' )->willReturn(
 			new WP_REST_Response( array( 'campaigns' => array() ), 200 )
 		);
 
 		$api = new CampaignApi( $wcs );
+		$api->refresh_cache();
 
-		$this->assertFalse( $api->has_campaigns( 'abc-123' ) );
+		$this->assertSame( '0', Transients::get( TransientDefaults::HAS_CAMPAIGNS ) );
+		$this->assertFalse( $api->has_campaigns() );
 	}
 
 	/**
-	 * Test: fails open to `true` when the live call returns a WP_Error, and
-	 * does not cache the failure (so the next call retries the live check).
+	 * Test: a failed live call is not cached, so the next cache miss retries.
 	 */
-	public function test_fails_open_to_true_on_wp_error_and_does_not_cache(): void {
+	public function test_refresh_does_not_cache_wp_error(): void {
 		$wcs = $this->createMock( WcsClient::class );
-		$wcs->expects( $this->exactly( 2 ) )
-			->method( 'proxy_get' )
-			->willReturn( new WP_Error( 'http_request_failed', 'cURL error 28: Operation timed out' ) );
+		$wcs->method( 'proxy_get' )->willReturn(
+			new WP_Error( 'http_request_failed', 'cURL error 28: Operation timed out' )
+		);
 
-		$api = new CampaignApi( $wcs );
+		( new CampaignApi( $wcs ) )->refresh_cache();
 
-		$this->assertTrue( $api->has_campaigns( 'abc-123' ) );
-		$this->assertTrue( $api->has_campaigns( 'abc-123' ) );
+		$this->assertSame( '', Transients::get( TransientDefaults::HAS_CAMPAIGNS ) );
 	}
 
 	/**
-	 * Test: the live check is only performed once; the second call reuses the
-	 * cached `false` result instead of hitting WCS again.
+	 * Test: `register_hooks()` wires `refresh_cache()` to the Action Scheduler hook.
 	 */
-	public function test_caches_false_result_and_does_not_call_wcs_again(): void {
+	public function test_register_hooks_wires_refresh_to_action_hook(): void {
 		$wcs = $this->createMock( WcsClient::class );
 		$wcs->expects( $this->once() )
 			->method( 'proxy_get' )
 			->willReturn( new WP_REST_Response( array( 'campaigns' => array() ), 200 ) );
 
 		$api = new CampaignApi( $wcs );
+		$api->register_hooks();
 
-		$this->assertFalse( $api->has_campaigns( 'abc-123' ) );
-		$this->assertFalse( $api->has_campaigns( 'abc-123' ) );
-	}
+		do_action( Helper::with_prefix( CampaignApi::ACTION_HOOK ) );
 
-	/**
-	 * Test: the live check is only performed once; the second call reuses the
-	 * cached `true` result instead of hitting WCS again.
-	 */
-	public function test_caches_true_result_and_does_not_call_wcs_again(): void {
-		$wcs = $this->createMock( WcsClient::class );
-		$wcs->expects( $this->once() )
-			->method( 'proxy_get' )
-			->willReturn(
-				new WP_REST_Response(
-					array( 'campaigns' => array( array( 'campaign' => array( 'id' => 'c-1' ) ) ) ),
-					200
-				)
-			);
-
-		$api = new CampaignApi( $wcs );
-
-		$this->assertTrue( $api->has_campaigns( 'abc-123' ) );
-		$this->assertTrue( $api->has_campaigns( 'abc-123' ) );
-	}
-
-	/**
-	 * Test: `clear_cache()` removes the cached value, forcing the next call to
-	 * hit the live endpoint again.
-	 */
-	public function test_clear_cache_forces_live_recheck(): void {
-		$wcs = $this->createMock( WcsClient::class );
-		$wcs->expects( $this->exactly( 2 ) )
-			->method( 'proxy_get' )
-			->willReturn( new WP_REST_Response( array( 'campaigns' => array() ), 200 ) );
-
-		$api = new CampaignApi( $wcs );
-
-		$this->assertFalse( $api->has_campaigns( 'abc-123' ) );
-
-		$api->clear_cache();
-
-		$this->assertFalse( $api->has_campaigns( 'abc-123' ) );
+		$this->assertSame( '0', Transients::get( TransientDefaults::HAS_CAMPAIGNS ) );
 	}
 
 	/**

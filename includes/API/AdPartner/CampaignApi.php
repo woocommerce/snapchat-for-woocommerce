@@ -1,12 +1,12 @@
 <?php
 /**
- * API module for checking active Snapchat ad campaigns.
+ * API module for checking whether the connected ad account has any campaigns.
  *
- * This class provides an interface for checking, via WooCommerce Connect
- * Server (WCS), whether the connected ad account already has at least one
- * campaign. The result is cached in a transient so the live Ad Partner
- * endpoint isn't hit on every order-edit-screen render, and the cache is
- * busted on Snapchat connection changes (see {@see self::register_hooks()}).
+ * The check runs in a background Action Scheduler job and its result is
+ * cached in a transient, so the order edit screen only ever reads the cache
+ * and is never delayed by a slow or failing WooCommerce Connect Server (WCS)
+ * request. The cache is busted on Snapchat connection changes (see
+ * {@see self::register_hooks()}).
  *
  * @since n.e.x.t
  * @package SnapchatForWooCommerce\API\AdPartner
@@ -15,6 +15,9 @@
 namespace SnapchatForWooCommerce\API\AdPartner;
 
 use SnapchatForWooCommerce\API\AdPartner\BaseAdPartnerApi;
+use SnapchatForWooCommerce\Config;
+use SnapchatForWooCommerce\Utils\Storage\Options;
+use SnapchatForWooCommerce\Utils\Storage\OptionDefaults;
 use SnapchatForWooCommerce\Utils\Storage\Transients;
 use SnapchatForWooCommerce\Utils\Storage\TransientDefaults;
 use SnapchatForWooCommerce\Utils\Helper;
@@ -27,7 +30,14 @@ use SnapchatForWooCommerce\Utils\Helper;
 class CampaignApi extends BaseAdPartnerApi {
 
 	/**
-	 * Registers the WordPress hooks that bust the campaign cache.
+	 * Action Scheduler hook (without prefix) for the background campaign check.
+	 *
+	 * @since n.e.x.t
+	 */
+	public const ACTION_HOOK = 'refresh_campaign_cache';
+
+	/**
+	 * Registers the background job handler and the hooks that bust the campaign cache.
 	 *
 	 * The cache is cleared whenever the Snapchat connection changes: on
 	 * `onboarding_complete` (fired once at the end of the OAuth config-save
@@ -39,6 +49,7 @@ class CampaignApi extends BaseAdPartnerApi {
 	 * @return void
 	 */
 	public function register_hooks(): void {
+		add_action( Helper::with_prefix( self::ACTION_HOOK ), array( $this, 'refresh_cache' ) );
 		add_action( Helper::with_prefix( 'onboarding_complete' ), array( $this, 'clear_cache' ) );
 		add_action( Helper::with_prefix( 'snapchat_disconnected' ), array( $this, 'clear_cache' ) );
 	}
@@ -55,39 +66,62 @@ class CampaignApi extends BaseAdPartnerApi {
 	}
 
 	/**
-	 * Determines whether the given ad account has at least one campaign.
+	 * Whether the connected ad account has any campaign, active or paused.
 	 *
-	 * A campaign counts regardless of its `ACTIVE`/`PAUSED` status (Snap's
-	 * Campaign API only defines those two). Deleted campaigns are already
-	 * excluded by the endpoint unless `read_deleted_entities=true` is passed,
-	 * which this call does not do.
-	 *
-	 * The result is cached in a transient (see {@see TransientDefaults::HAS_CAMPAIGNS}).
-	 * `Store::get()` treats a raw `false` read as "not cached" (indistinguishable
-	 * from `get_transient()`'s own false-on-miss/expiry), so the cached value is
-	 * stored as the string `'1'`/`'0'` rather than a native bool, with `''` as the
-	 * "nothing cached yet" default.
-	 *
-	 * If the live check fails (expired token, rate limit, network error), this
-	 * fails to `true` so the create-campaign banner stays hidden rather than
-	 * risking a merchant creating a duplicate campaign. Failures are not cached.
+	 * Only reads the cache. On a cache miss, schedules a background check and
+	 * returns true, so the create-campaign banner stays hidden until the
+	 * result is known.
 	 *
 	 * @since n.e.x.t
 	 *
-	 * @param string $ad_account_id Ad account ID to check.
-	 *
 	 * @return bool True if the ad account has at least one campaign, or if the
-	 *              live check could not be completed.
+	 *              result is not known yet.
 	 */
-	public function has_campaigns( string $ad_account_id ): bool {
-		if ( '' === $ad_account_id ) {
-			return true;
-		}
-
+	public function has_campaigns(): bool {
 		$cached = Transients::get( TransientDefaults::HAS_CAMPAIGNS );
 
 		if ( '' !== $cached ) {
 			return '1' === $cached;
+		}
+
+		$this->schedule_refresh();
+
+		return true;
+	}
+
+	/**
+	 * Schedules the background campaign check, unless one is already pending.
+	 *
+	 * @since n.e.x.t
+	 *
+	 * @return void
+	 */
+	public function schedule_refresh(): void {
+		$hook = Helper::with_prefix( self::ACTION_HOOK );
+
+		if ( as_has_scheduled_action( $hook ) ) {
+			return;
+		}
+
+		as_enqueue_async_action( $hook, array(), Config::PLUGIN_SLUG );
+	}
+
+	/**
+	 * Checks whether the connected ad account has any campaigns and caches the result.
+	 *
+	 * Runs via Action Scheduler. Cached as '1'/'0' because a cached false reads
+	 * as a cache miss. Failures are not cached, so the next cache miss schedules
+	 * another check.
+	 *
+	 * @since n.e.x.t
+	 *
+	 * @return void
+	 */
+	public function refresh_cache(): void {
+		$ad_account_id = (string) Options::get( OptionDefaults::AD_ACCOUNT_ID );
+
+		if ( '' === $ad_account_id ) {
+			return;
 		}
 
 		$response = $this->wcs->proxy_get(
@@ -95,15 +129,12 @@ class CampaignApi extends BaseAdPartnerApi {
 		);
 
 		if ( is_wp_error( $response ) ) {
-			return true;
+			return;
 		}
 
-		$data          = $response->get_data();
-		$campaigns     = ( isset( $data['campaigns'] ) && is_array( $data['campaigns'] ) ) ? $data['campaigns'] : array();
-		$has_campaigns = ! empty( $campaigns );
+		$data      = $response->get_data();
+		$campaigns = ( isset( $data['campaigns'] ) && is_array( $data['campaigns'] ) ) ? $data['campaigns'] : array();
 
-		Transients::set( TransientDefaults::HAS_CAMPAIGNS, $has_campaigns ? '1' : '0' );
-
-		return $has_campaigns;
+		Transients::set( TransientDefaults::HAS_CAMPAIGNS, empty( $campaigns ) ? '0' : '1' );
 	}
 }
