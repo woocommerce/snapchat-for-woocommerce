@@ -8,6 +8,8 @@
 
 namespace SnapchatForWooCommerce\Admin\MetaBox;
 
+use SnapchatForWooCommerce\Admin\ProductMeta\ProductMetaFields;
+use SnapchatForWooCommerce\Utils\Helper;
 use SnapchatForWooCommerce\Utils\OnboardingStatus;
 use WC_Product;
 use WP_Post;
@@ -18,6 +20,17 @@ use WP_Post;
  * @since 1.1.0
  */
 final class ProductChannelVisibilityData {
+
+	/**
+	 * Whether to enqueue the channel-visibility bundle on this request.
+	 *
+	 * @since 1.1.0
+	 *
+	 * @return bool
+	 */
+	public static function should_enqueue_channel_visibility_bundle(): bool {
+		return null !== self::get_channel_visibility_inline_block();
+	}
 
 	/**
 	 * Builds the `channelVisibility` payload for `window.snapchatAdsMetaBoxData`.
@@ -49,8 +62,25 @@ final class ProductChannelVisibilityData {
 			return null;
 		}
 
+		$field_name = Helper::with_prefix( ProductMetaFields::CATALOG_ITEM );
+		$raw_meta   = get_post_meta( $post->ID, $field_name, true );
+		$catalog    = is_string( $raw_meta ) && '' !== $raw_meta ? $raw_meta : '1';
+
 		return array(
-			'onboardingComplete' => OnboardingStatus::is_setup_completed(),
+			'onboardingComplete'   => OnboardingStatus::is_setup_completed(),
+			'field_name'           => $field_name,
+			'product_catalog_item' => $catalog,
+			'product_is_visible'   => $product->is_visible(),
+			'options'              => array(
+				array(
+					'value' => '1',
+					'label' => __( 'Sync and show', 'snapchat-for-woocommerce' ),
+				),
+				array(
+					'value' => '0',
+					'label' => __( "Don't sync and show", 'snapchat-for-woocommerce' ),
+				),
+			),
 		);
 	}
 }
