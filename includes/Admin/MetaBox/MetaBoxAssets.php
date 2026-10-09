@@ -37,7 +37,7 @@ class MetaBoxAssets {
 	/**
 	 * Ad campaign lookup used to determine whether the create-campaign banner should show.
 	 *
-	 * @since 1.2.0
+	 * @since n.e.x.t
 	 *
 	 * @var CampaignApi
 	 */

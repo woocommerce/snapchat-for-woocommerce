@@ -76,7 +76,7 @@ final class ServiceKey {
 	/**
 	 * Identifier for the Ad Partner API service (catalog, feed, campaign submodules).
 	 *
-	 * @since 1.2.0
+	 * @since n.e.x.t
 	 */
 	public const AD_PARTNER_API = 'ad_partner_api';
 }

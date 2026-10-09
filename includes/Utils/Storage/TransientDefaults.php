@@ -35,7 +35,7 @@ final class TransientDefaults {
 	/**
 	 * Transient key for caching whether the connected ad account has any campaigns.
 	 *
-	 * @since 1.2.0
+	 * @since n.e.x.t
 	 */
 	public const HAS_CAMPAIGNS = 'has_campaigns';
 

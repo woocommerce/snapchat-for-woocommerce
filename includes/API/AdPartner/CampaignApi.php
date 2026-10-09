@@ -8,7 +8,7 @@
  * endpoint isn't hit on every order-edit-screen render, and the cache is
  * busted on Snapchat connection changes (see {@see self::register_hooks()}).
  *
- * @since 1.2.0
+ * @since n.e.x.t
  * @package SnapchatForWooCommerce\API\AdPartner
  */
 
@@ -22,7 +22,7 @@ use SnapchatForWooCommerce\Utils\Helper;
 /**
  * API module for checking whether the connected ad account has any campaigns.
  *
- * @since 1.2.0
+ * @since n.e.x.t
  */
 class CampaignApi extends BaseAdPartnerApi {
 
@@ -34,7 +34,7 @@ class CampaignApi extends BaseAdPartnerApi {
 	 * flow, which covers connect, reconnect, and ad-account change since they
 	 * all share that save path) and on `snapchat_disconnected`.
 	 *
-	 * @since 1.2.0
+	 * @since n.e.x.t
 	 *
 	 * @return void
 	 */
@@ -46,7 +46,7 @@ class CampaignApi extends BaseAdPartnerApi {
 	/**
 	 * Clears the cached `has_campaigns()` result.
 	 *
-	 * @since 1.2.0
+	 * @since n.e.x.t
 	 *
 	 * @return void
 	 */
@@ -72,7 +72,7 @@ class CampaignApi extends BaseAdPartnerApi {
 	 * fails to `true` so the create-campaign banner stays hidden rather than
 	 * risking a merchant creating a duplicate campaign. Failures are not cached.
 	 *
-	 * @since 1.2.0
+	 * @since n.e.x.t
 	 *
 	 * @param string $ad_account_id Ad account ID to check.
 	 *
