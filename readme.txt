@@ -2,7 +2,7 @@
 Contributors: automattic, woocommerce
 Tags: woocommerce, woo, snapchat, product feed, ads
 Tested up to: 7.1
-Stable tag: 1.0.5
+Stable tag: 1.0.6
 License: GPLv3
 License URI: https://www.gnu.org/licenses/gpl-3.0.html
 
@@ -25,6 +25,9 @@ Yes, it uses a [Jetpack](https://jetpack.com/) account to connect and communicat
 
 == Changelog ==
 
+= 1.0.6 - 2026-09-29 =
+* Add - Sandbox mode to preview settings without connecting to Snapchat.
+
 = 1.0.5 - 2026-09-08 =
 * Fix - Ensure product export batches write CSV rows in the correct product order.
 * Fix - Purchase pixel no longer exposes order details and hashed billing data on unauthenticated order-received requests.
@@ -36,18 +39,5 @@ Yes, it uses a [Jetpack](https://jetpack.com/) account to connect and communicat
 * Dev - Update WPCS to 3.4.1 to fix CVE-2026-45293, an arbitrary code execution vulnerability in WordPress Coding Standards.
 * Tweak - Bump WordPress "Tested up to" version to 7.1
 * Tweak - Bump WordPress "Requires at least" version to 6.9
-
-= 1.0.3 - 2026-05-14 =
-* Add - RTL Support.
-* Add - Snapchat catalog persistence message.
-* Dev - Bump WooCommerce "tested up to" version 10.8.
-* Dev - Bump WooCommerce minimum supported version to 10.6.
-* Dev - Bump WordPress "tested up to" version 7.0.
-* Dev - Bump WordPress minimum supported version to 6.8.
-* Fix - Ensure existing catalog ID is used on reconnect where possible.
-* Fix - Load snapchat assets on any wp-admin route.
-* Fix - Strip HTML from product description for the CSV export.
-* Fix - Update integration value to include current plugin version.
-* Update - Text of the "Disconnect Snapchat" modal.
 
 [See changelog for all versions](https://raw.githubusercontent.com/woocommerce/snapchat-for-woocommerce/trunk/changelog.txt).

@@ -201,6 +201,20 @@ final class OptionDefaults {
 	public const WCS_PRODUCTS_TOKEN = 'wcs_products_token';
 
 	/**
+	 * Option key for the manually managed flag that enables sandbox mode.
+	 *
+	 * @since 1.0.6
+	 */
+	public const SANDBOX_MODE = 'sandbox_mode';
+
+	/**
+	 * Option key for isolated settings changed while sandbox mode is active.
+	 *
+	 * @since 1.0.6
+	 */
+	public const SANDBOX_SETTINGS = 'sandbox_settings';
+
+	/**
 	 * Returns default values for all known Ad Partner options.
 	 *
 	 * Used by {@see Options} to provide fallbacks when option values
@@ -234,6 +248,8 @@ final class OptionDefaults {
 			self::EXPORT_PRODUCT_IDS      => array(),
 			self::LAST_EXPORT_TIMESTAMP   => 0,
 			self::WCS_PRODUCTS_TOKEN      => '',
+			self::SANDBOX_MODE            => 'no',
+			self::SANDBOX_SETTINGS        => array(),
 		);
 	}
 }
