@@ -89,19 +89,7 @@ final class ProductChannelVisibilityDataTest extends WP_UnitTestCase {
 		$this->assertSame( $this->field_name, $block['field_name'] );
 		$this->assertSame( '1', $block['product_catalog_item'] );
 		$this->assertTrue( $block['product_is_visible'] );
-		$this->assertSame(
-			array(
-				array(
-					'value' => '1',
-					'label' => 'Sync and show',
-				),
-				array(
-					'value' => '0',
-					'label' => "Don't sync and show",
-				),
-			),
-			$block['options']
-		);
+		$this->assertArrayNotHasKey( 'options', $block );
 
 		$this->assertTrue( ProductChannelVisibilityData::should_enqueue_channel_visibility_bundle() );
 	}

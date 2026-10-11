@@ -5,8 +5,8 @@ import {
 	Flex,
 	FlexBlock,
 	FlexItem,
+	FormToggle,
 	Notice,
-	SelectControl,
 } from '@wordpress/components';
 import { useState } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
@@ -16,34 +16,34 @@ import { __ } from '@wordpress/i18n';
  */
 import snapchatLogoURL from '~/images/logo/snapchat.svg';
 
-const {
-	channelVisibility: {
-		field_name: fieldName,
-		product_catalog_item: productCatalogItem,
-		product_is_visible: productIsVisible,
-		options: syncOptions,
-	} = {},
-} = window.snapchatAdsMetaBoxData || {};
-
 /**
  * Channel Visibility Settings component.
  *
- * Renders an uncontrolled SelectControl that participates in the WC product
- * form submission via its `name` attribute, so the choice saves with the
- * standard product save.
+ * Renders an uncontrolled toggle that participates in the WC product form
+ * submission via its `name` attribute, so the choice saves with the standard
+ * product save.
  *
  * @return {JSX.Element} The Channel Visibility Settings component.
  */
 const ChannelVisibilitySettings = () => {
+	const {
+		field_name: fieldName,
+		product_catalog_item: productCatalogItem,
+		product_is_visible: productIsVisible,
+	} = window.snapchatAdsMetaBoxData || {};
 	const catalogValue = productCatalogItem || '1';
-	const defaultValue = productIsVisible ? catalogValue : '0';
+	const defaultChecked = productIsVisible && catalogValue === '1';
 
-	const [ value, setValue ] = useState( defaultValue );
+	const [ checked, setChecked ] = useState( defaultChecked );
 
 	return (
-		<Flex direction="column" gap={ 4 } className="sfw-channel-visibility">
+		<Flex
+			className="sfw-channel-visibility sfw-channel-visibility--settings"
+			direction="column"
+			gap={ 4 }
+		>
 			<FlexBlock>
-				<Flex gap={ 2 } align="center" justify="flex-start">
+				<Flex gap={ 2 } align="center">
 					<FlexItem>
 						<Flex gap={ 2 } align="center">
 							<FlexItem>
@@ -64,26 +64,40 @@ const ChannelVisibilitySettings = () => {
 						</Flex>
 					</FlexItem>
 
-					<FlexBlock>
-						<SelectControl
+					<FlexItem>
+						{ /*
+						 * Unchecked checkboxes are not sent via POST.
+						 * This hidden input submits the value whenever
+						 * the control is on the page, mirroring the toggle state.
+						 */ }
+						<input
+							type="hidden"
+							name={ fieldName }
+							value={ checked ? '1' : '0' }
+						/>
+						<FormToggle
 							aria-label={ __(
 								'Channel visibility setting',
 								'snapchat-for-woocommerce'
 							) }
-							name={ fieldName }
-							options={ syncOptions }
-							value={ value }
-							onChange={ setValue }
+							value="1"
+							checked={ checked }
+							onChange={ ( event ) =>
+								setChecked( event.target.checked )
+							}
 							disabled={ ! productIsVisible }
-							__nextHasNoMarginBottom
 						/>
-					</FlexBlock>
+					</FlexItem>
 				</Flex>
 			</FlexBlock>
 
 			{ ! productIsVisible && (
 				<FlexBlock>
-					<Notice status="info" isDismissible={ false }>
+					<Notice
+						className="sfw-channel-visibility__notice"
+						status="info"
+						isDismissible={ false }
+					>
 						<p>
 							{ __(
 								'This product cannot be shown on any channel because it is hidden from your store catalog.',

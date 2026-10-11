@@ -1,5 +1,21 @@
+// Full-width divider separating this plugin's block from other extensions
+// rendered after it in the channel visibility meta box. The negative inline
+// margin cancels the meta box `.inside` horizontal padding.
+#snapchat-channel-visibility-row:not(:last-child)::after {
+	background-color: wpColors.$gray-200;
+	content: "";
+	display: block;
+	height: 1px;
+	margin-inline: -(wpVariables.$grid-unit-15);
+	width: calc(100% + #{wpVariables.$grid-unit-30});
+}
+
 .sfw-channel-visibility {
-	padding: wpVariables.$grid-unit-05;
+	padding-block: wpVariables.$grid-unit-20;
+
+	&.sfw-channel-visibility--dismissed {
+		padding-block: wpVariables.$grid-unit-15;
+	}
 }
 
 .sfw-channel-visibility__logo {
@@ -16,8 +32,8 @@
 }
 
 .sfw-channel-visibility__content {
-	background-color: #fff;
-	border: 1px solid rgb(0 0 0 / 8%);
+	background-color: colors.$sfw-color-gray-0;
+	border: 1px solid wpColors.$gray-300;
 	border-radius: wpVariables.$grid-unit-05;
 	padding: wpVariables.$grid-unit-20;
 }
@@ -25,6 +41,17 @@
 .sfw-channel-visibility__content p:last-child {
 	margin-block: 0;
 	margin-inline: 0;
+}
+
+.sfw-channel-visibility__notice .components-notice__content {
+
+	> *:first-child {
+		margin-top: 0;
+	}
+
+	> *:last-child {
+		margin-bottom: 0;
+	}
 }
 
 .sfw-channel-visibility__get-started--is-dismissed {

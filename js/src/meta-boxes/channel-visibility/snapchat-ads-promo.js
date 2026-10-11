@@ -4,6 +4,7 @@
 import { Flex, FlexBlock, FlexItem } from '@wordpress/components';
 import { useEffect, useRef } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
+import classnames from 'classnames';
 
 /**
  * Internal dependencies
@@ -58,7 +59,14 @@ const SnapchatAdsPromo = () => {
 	}
 
 	return (
-		<Flex className="sfw-channel-visibility" direction="column" gap={ 4 }>
+		<Flex
+			className={ classnames( 'sfw-channel-visibility', {
+				'sfw-channel-visibility--dismissed': isDismissed,
+			} ) }
+			direction="column"
+			gap={ 5 }
+			justify="center"
+		>
 			<FlexBlock>
 				<Flex gap={ 2 } align="center" justify="flex-start">
 					<FlexItem>
