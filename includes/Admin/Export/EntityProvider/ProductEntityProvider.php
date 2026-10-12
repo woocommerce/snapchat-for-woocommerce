@@ -7,7 +7,7 @@
  * `LIMIT` + `OFFSET` logic, and resolves each ID into a `WC_Product` object.
  *
  * Only products with the custom meta key defined in
- * {@see \SnapchatForWooCommerce\Admin\ProductMeta\ProductMetaFields::CATALOG_ITEM}
+ * {@see \SnapchatForWooCommerce\Admin\MetaBox\ChannelVisibilityMetaBox::CATALOG_ITEM}
  * and a value of `1`, `yes`, or `true` are included in the cached export list.
  *
  * @package SnapchatForWooCommerce\Admin\Export\EntityProvider
