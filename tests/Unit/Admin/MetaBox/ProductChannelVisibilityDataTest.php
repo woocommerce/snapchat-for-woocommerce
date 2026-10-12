@@ -10,7 +10,7 @@ namespace SnapchatForWooCommerce\Tests\Unit\Admin\MetaBox;
 use WP_UnitTestCase;
 use WC_Product_Simple;
 use SnapchatForWooCommerce\Admin\MetaBox\ProductChannelVisibilityData;
-use SnapchatForWooCommerce\Admin\ProductMeta\ProductMetaFields;
+use SnapchatForWooCommerce\Admin\MetaBox\ChannelVisibilityMetaBox;
 use SnapchatForWooCommerce\Utils\Helper;
 use SnapchatForWooCommerce\Utils\Storage\Options;
 use SnapchatForWooCommerce\Utils\Storage\OptionDefaults;
@@ -37,7 +37,7 @@ final class ProductChannelVisibilityDataTest extends WP_UnitTestCase {
 			require_once ABSPATH . 'wp-admin/includes/screen.php';
 		}
 
-		$this->field_name = Helper::with_prefix( ProductMetaFields::CATALOG_ITEM );
+		$this->field_name = Helper::with_prefix( ChannelVisibilityMetaBox::CATALOG_ITEM );
 	}
 
 	/**
