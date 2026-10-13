@@ -20,10 +20,6 @@ final class ProductChannelVisibilityDataTest extends WP_UnitTestCase {
 	public function set_up(): void {
 		parent::set_up();
 
-		if ( ! defined( 'WP_ADMIN' ) ) {
-			define( 'WP_ADMIN', true );
-		}
-
 		if ( ! function_exists( 'set_current_screen' ) ) {
 			require_once ABSPATH . 'wp-admin/includes/screen.php';
 		}
@@ -31,6 +27,7 @@ final class ProductChannelVisibilityDataTest extends WP_UnitTestCase {
 
 	public function tear_down(): void {
 		unset( $GLOBALS['post'] );
+		set_current_screen( 'front' );
 		parent::tear_down();
 	}
 
