@@ -33,6 +33,13 @@ final class TransientDefaults {
 	public const PIXEL_SCRIPT = 'ads_pixel_script';
 
 	/**
+	 * Transient key for caching whether the connected ad account has any campaigns.
+	 *
+	 * @since 1.2.0
+	 */
+	public const CAMPAIGN_HAS_ACTIVE = 'campaign_has_active';
+
+	/**
 	 * Returns defaults for all known Ad Partner transients.
 	 *
 	 * Used by {@see TransientStorage} when saving values.
@@ -43,7 +50,8 @@ final class TransientDefaults {
 	 */
 	public static function get_all(): array {
 		return array(
-			self::PIXEL_SCRIPT => '',
+			self::PIXEL_SCRIPT        => '',
+			self::CAMPAIGN_HAS_ACTIVE => '',
 		);
 	}
 
@@ -56,7 +64,8 @@ final class TransientDefaults {
 	 */
 	private static function get_ttls(): array {
 		return array(
-			self::PIXEL_SCRIPT => MONTH_IN_SECONDS,
+			self::PIXEL_SCRIPT        => MONTH_IN_SECONDS,
+			self::CAMPAIGN_HAS_ACTIVE => 15 * MINUTE_IN_SECONDS,
 		);
 	}
 
