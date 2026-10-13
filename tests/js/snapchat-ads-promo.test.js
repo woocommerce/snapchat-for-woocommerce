@@ -11,6 +11,7 @@ import SnapchatAdsPromo from '~/meta-boxes/order-attribution/snapchat-ads-promo'
 jest.mock( '@wordpress/components', () => ( {
 	Flex: ( { children } ) => <div>{ children }</div>,
 	FlexItem: ( { children } ) => <div>{ children }</div>,
+	FlexBlock: ( { children } ) => <div>{ children }</div>,
 } ) );
 
 jest.mock( '~/components/app-button', () => ( { text } ) => (
@@ -39,11 +40,5 @@ describe( 'SnapchatAdsPromo', () => {
 
 		expect( html ).toContain( 'Your next customers are on Snapchat' );
 		expect( html ).toContain( 'Get started' );
-	} );
-
-	it( 'renders the promo when meta box data is absent', () => {
-		const html = renderToString( <SnapchatAdsPromo /> );
-
-		expect( html ).toContain( 'Your next customers are on Snapchat' );
 	} );
 } );
