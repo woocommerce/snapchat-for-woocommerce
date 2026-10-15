@@ -8,7 +8,6 @@
 
 namespace SnapchatForWooCommerce\Admin\MetaBox;
 
-use SnapchatForWooCommerce\Admin\ProductMeta\ProductMetaFields;
 use SnapchatForWooCommerce\Utils\Helper;
 use SnapchatForWooCommerce\Utils\OnboardingStatus;
 use WC_Product;
@@ -62,7 +61,7 @@ final class ProductChannelVisibilityData {
 			return null;
 		}
 
-		$field_name = Helper::with_prefix( ProductMetaFields::CATALOG_ITEM );
+		$field_name = Helper::with_prefix( ChannelVisibilityMetaBox::CATALOG_ITEM );
 		$raw_meta   = get_post_meta( $post->ID, $field_name, true );
 		$catalog    = is_string( $raw_meta ) && '' !== $raw_meta ? $raw_meta : '1';
 
