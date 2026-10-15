@@ -39,7 +39,7 @@ describe( 'ChannelVisibilitySettings', () => {
 		const { container } = render( <ChannelVisibilitySettings /> );
 
 		const toggle = screen.getByRole( 'checkbox', {
-			name: 'Channel visibility setting',
+			name: 'Sync to Snapchat',
 		} );
 
 		const hiddenInput = container.querySelector(
@@ -91,17 +91,34 @@ describe( 'ChannelVisibilitySettings', () => {
 		setChannelVisibilityData( { product_is_visible: '' } );
 		const { container } = render( <ChannelVisibilitySettings /> );
 
-		const hiddenInput = container.querySelector(
-			`input[name="${ FIELD_NAME }"]`
-		);
 		const toggle = screen.getByRole( 'checkbox' );
 
 		expect( toggle ).not.toBeChecked();
 		expect( toggle ).toBeDisabled();
-		expect( hiddenInput ).toHaveValue( '0' );
 		expect(
 			within( container ).getByText( HIDDEN_NOTICE )
 		).toBeInTheDocument();
+	} );
+
+	test( 'Disables the hidden input when the product is hidden from the catalog, so saving keeps the stored opt-in', () => {
+		setChannelVisibilityData( {
+			product_is_visible: '',
+			product_catalog_item: '1',
+		} );
+		const { container } = render( <ChannelVisibilitySettings /> );
+
+		expect(
+			container.querySelector( `input[name="${ FIELD_NAME }"]` )
+		).toBeDisabled();
+	} );
+
+	test( 'Keeps the hidden input enabled when the product is visible', () => {
+		setChannelVisibilityData();
+		const { container } = render( <ChannelVisibilitySettings /> );
+
+		expect(
+			container.querySelector( `input[name="${ FIELD_NAME }"]` )
+		).toBeEnabled();
 	} );
 
 	test( 'Does not show the hidden-from-catalog notice when the product is visible', () => {

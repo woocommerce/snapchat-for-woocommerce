@@ -41,4 +41,10 @@ describe( 'SnapchatAdsPromo', () => {
 		expect( html ).toContain( 'Your next customers are on Snapchat' );
 		expect( html ).toContain( 'Get started' );
 	} );
+
+	it( 'renders the promo when meta box data is absent', () => {
+		const html = renderToString( <SnapchatAdsPromo /> );
+
+		expect( html ).toContain( 'Your next customers are on Snapchat' );
+	} );
 } );
