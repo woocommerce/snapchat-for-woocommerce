@@ -101,6 +101,6 @@ final class ChannelVisibilityMetaBoxTest extends WP_UnitTestCase {
 		$this->sut->render();
 		$output = ob_get_clean();
 
-		$this->assertSame( '<div id="snapchat-channel-visibility-box"></div>', $output );
+		$this->assertSame( '<div id="snapchat-channel-visibility-box" data-service="snapchat"></div>', $output );
 	}
 }

@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import { Flex, FlexBlock } from '@wordpress/components';
+import { Flex, FlexItem } from '@wordpress/components';
 import { useDispatch } from '@wordpress/data';
 import { __ } from '@wordpress/i18n';
 import { store as preferencesStore } from '@wordpress/preferences';
@@ -37,12 +37,12 @@ const PromoCTA = () => {
 	};
 
 	return (
-		<Flex gap={ 3 } align="flex-start">
-			<FlexBlock>
+		<Flex gap={ 3 } justify="flex-start">
+			<FlexItem>
 				<GetStartedCTA />
-			</FlexBlock>
+			</FlexItem>
 
-			<FlexBlock>
+			<FlexItem>
 				<AppButton
 					eventName="sfw_snapchat_ads_promo_dismiss_click"
 					eventProps={ {
@@ -53,7 +53,7 @@ const PromoCTA = () => {
 				>
 					{ __( 'Dismiss', 'snapchat-for-woocommerce' ) }
 				</AppButton>
-			</FlexBlock>
+			</FlexItem>
 		</Flex>
 	);
 };
