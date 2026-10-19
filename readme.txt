@@ -2,7 +2,7 @@
 Contributors: automattic, woocommerce
 Tags: woocommerce, woo, snapchat, product feed, ads
 Tested up to: 7.1
-Stable tag: 1.0.6
+Stable tag: 1.0.7
 License: GPLv3
 License URI: https://www.gnu.org/licenses/gpl-3.0.html
 
@@ -25,6 +25,9 @@ Yes, it uses a [Jetpack](https://jetpack.com/) account to connect and communicat
 
 == Changelog ==
 
+= 1.0.7 - 2026-10-08 =
+* Tweak - Bump WooCommerce "tested up to" version to 11.2.
+
 = 1.0.6 - 2026-09-29 =
 * Add - Sandbox mode to preview settings without connecting to Snapchat.
 
@@ -32,12 +35,5 @@ Yes, it uses a [Jetpack](https://jetpack.com/) account to connect and communicat
 * Fix - Ensure product export batches write CSV rows in the correct product order.
 * Fix - Purchase pixel no longer exposes order details and hashed billing data on unauthenticated order-received requests.
 * Tweak - Bump WooCommerce "tested up to" version to 11.1.
-
-= 1.0.4 - 2026-08-19 =
-* Fix – Resolved potential transaction ID collisions in purchase event deduplication by using order ID as the event_id instead.
-* Fix - Corrected invalid nested HTML in Conversions API settings.
-* Dev - Update WPCS to 3.4.1 to fix CVE-2026-45293, an arbitrary code execution vulnerability in WordPress Coding Standards.
-* Tweak - Bump WordPress "Tested up to" version to 7.1
-* Tweak - Bump WordPress "Requires at least" version to 6.9
 
 [See changelog for all versions](https://raw.githubusercontent.com/woocommerce/snapchat-for-woocommerce/trunk/changelog.txt).
