@@ -8,6 +8,7 @@ import classnames from 'classnames';
 /**
  * Internal dependencies
  */
+import { sfwData } from '~/constants';
 import { recordSfwEvent } from '~/utils/tracks';
 import './index.scss';
 
@@ -17,6 +18,9 @@ import './index.scss';
  * Set `loading` to `true` and it will render a disabled Button with a loading spinner indicator.
  *
  * Set `eventName` and upon `onClick` it will call `recordSfwEvent` with provided `eventName` and `eventProps`.
+ *
+ * Set `disabledInSandboxMode` to `true` and the button will be disabled while sandbox mode is
+ * active, with `disableInSandboxModeLabel` displayed as a tooltip explaining why.
  *
  * ## Usage
  *
@@ -28,6 +32,8 @@ import './index.scss';
  *
  * @param {*} props Props to be forwarded to {@link Button}.
  * @param {boolean} [props.loading] If true, the button will be disabled and will display a loading spinner indicator beside the button text.
+ * @param {boolean} [props.disabledInSandboxMode] If true, the button will be disabled while sandbox mode is active.
+ * @param {string} [props.disableInSandboxModeLabel] Tooltip text explaining why the button is disabled in sandbox mode.
  */
 const AppButton = ( props ) => {
 	const {
@@ -36,6 +42,8 @@ const AppButton = ( props ) => {
 		loading,
 		eventName,
 		eventProps,
+		disabledInSandboxMode,
+		disableInSandboxModeLabel,
 		text: passedInText,
 		onClick = () => {},
 		...rest
@@ -49,7 +57,10 @@ const AppButton = ( props ) => {
 		onClick( ...args );
 	};
 
-	const disabledButton = disabled || loading;
+	const isSandboxDisabled = Boolean(
+		disabledInSandboxMode && sfwData.sandboxMode
+	);
+	const disabledButton = disabled || loading || isSandboxDisabled;
 	const classes = [ 'sfw-app-button', className ];
 	let text;
 
@@ -73,6 +84,17 @@ const AppButton = ( props ) => {
 		}
 	}
 
+	// A truly disabled `Button` never renders its tooltip, so keep the button focusable
+	// and rely on `aria-disabled` to convey the state. `Button` then also stubs out the
+	// click handlers on its own, so the button stays inert.
+	const sandboxProps = isSandboxDisabled
+		? {
+				accessibleWhenDisabled: true,
+				showTooltip: true,
+				label: disableInSandboxModeLabel,
+		  }
+		: {};
+
 	return (
 		<Button
 			className={ classnames( ...classes ) }
@@ -81,6 +103,7 @@ const AppButton = ( props ) => {
 			text={ text }
 			onClick={ handleClick }
 			{ ...rest }
+			{ ...sandboxProps }
 		/>
 	);
 };

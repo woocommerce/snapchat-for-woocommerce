@@ -153,6 +153,7 @@ class ProductIdCacheBuilder implements CacheBuilderInterface {
 				 *
 				 * @hook snapchat_for_woocommerce_export_products_cache_completed
 				 */
+				// phpcs:ignore WordPress.NamingConventions.PrefixAllGlobals.DynamicHooknameFound -- Prefixed via Helper::with_prefix().
 				do_action( Helper::with_prefix( 'export_products_cache_completed' ) );
 			}
 			return;

@@ -53,7 +53,7 @@ const ProductCatalog = () => {
 	} = useSettings();
 	// Whether we want to connect the heartbeat immediately as soon as the Heartbeat component mounts.
 	const [ exportInProgress, setExportInProgress ] = useState(
-		sfwData.isExportInProgress === '1'
+		! sfwData.sandboxMode && sfwData.isExportInProgress === '1'
 	);
 	const [ fileUrl, setFileUrl ] = useState( sfwData.exportFileUrl || null );
 	const [ lastExported, setLastExported ] = useState(
@@ -129,11 +129,18 @@ const ProductCatalog = () => {
 	};
 
 	const getIndicator = () => {
+		const sandboxMessage = __(
+			'CSV generation is disabled while sandbox mode is active.',
+			'snapchat-for-woocommerce'
+		);
+
 		if ( hasExport ) {
 			return (
 				<Flex spacing={ 4 } wrap="wrap">
 					<AppButton
 						variant="secondary"
+						disabledInSandboxMode
+						disableInSandboxModeLabel={ sandboxMessage }
 						onClick={ handleOnGenerateCsvClick }
 						loading={ exportInProgress }
 						eventName="sfw_regenerate_csv_button_click"
@@ -150,6 +157,8 @@ const ProductCatalog = () => {
 		return (
 			<AppButton
 				variant="secondary"
+				disabledInSandboxMode
+				disableInSandboxModeLabel={ sandboxMessage }
 				onClick={ handleOnGenerateCsvClick }
 				loading={ exportInProgress }
 				eventName="sfw_generate_csv_button_click"
