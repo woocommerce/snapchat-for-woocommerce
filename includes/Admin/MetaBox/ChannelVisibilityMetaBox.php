@@ -45,7 +45,7 @@ class ChannelVisibilityMetaBox {
 	 * - {@see ProductChannelVisibilityData} to seed the Channel visibility toggle.
 	 * - {@see \SnapchatForWooCommerce\Admin\Export\Service\ProductIdCacheBuilder} to filter exportable product IDs.
 	 *
-	 * @since x.x.x
+	 * @since n.e.x.t
 	 */
 	public const CATALOG_ITEM = 'product_catalog_item';
 
@@ -113,7 +113,7 @@ class ChannelVisibilityMetaBox {
 	 * Only writes when the Channel visibility toggle submitted a value. The toggle is not
 	 * rendered before onboarding is complete, so a missing field leaves the stored value untouched.
 	 *
-	 * @since x.x.x
+	 * @since n.e.x.t
 	 *
 	 * @param int $post_id The ID of the product being saved.
 	 * @return void
