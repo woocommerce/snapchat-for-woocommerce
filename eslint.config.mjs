@@ -79,10 +79,10 @@ export default [
 			'import/no-named-as-default': 'off',
 			// Turn it off temporarily because it involves a lot of re-alignment. We can revisit it later.
 			'jsdoc/check-line-alignment': 'off',
-			// The flat config of @wordpress/eslint-plugin no longer lists `JSX` as a known type.
+			// The flat config of @wordpress/eslint-plugin no longer lists `JSX` or DOM types as known types.
 			'jsdoc/no-undefined-types': [
 				'error',
-				{ definedTypes: [ 'JSX' ] },
+				{ definedTypes: [ 'JSX', 'HTMLElement' ] },
 			],
 			// Keep ESLint 8's default of not reporting unused `catch` bindings.
 			'@typescript-eslint/no-unused-vars': [

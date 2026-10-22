@@ -14,6 +14,7 @@ import { recordSfwEvent } from '~/utils/tracks';
 jest.mock( '@wordpress/components', () => ( {
 	Flex: ( { children } ) => <div>{ children }</div>,
 	FlexItem: ( { children } ) => <div>{ children }</div>,
+	FlexBlock: ( { children } ) => <div>{ children }</div>,
 } ) );
 
 jest.mock( '~/components/app-button', () => ( { text, href } ) => (

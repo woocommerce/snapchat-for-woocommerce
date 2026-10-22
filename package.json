@@ -39,14 +39,21 @@
 	},
 	"devDependencies": {
 		"@playwright/test": "^1.63.0",
+		"@testing-library/dom": "^10.4.2",
+		"@testing-library/jest-dom": "^6.9.1",
+		"@testing-library/react": "^16.3.3",
 		"@woocommerce/dependency-extraction-webpack-plugin": "^5.1.0",
 		"@woocommerce/e2e-utils-playwright": "^0.5.1",
 		"@woocommerce/eslint-plugin": "^4.0.0",
+		"@wordpress/babel-preset-default": "^8.56.0",
 		"@wordpress/env": "^11.16.0",
+		"@wordpress/jest-preset-default": "^14.2.0",
 		"@wordpress/prettier-config": "^4.56.0",
 		"@wordpress/scripts": "^36.0.0",
 		"eslint": "^10.0.0",
 		"eslint-import-resolver-webpack": "^0.13.8",
+		"jest": "^30.5.2",
+		"jest-environment-jsdom": "^30.5.2",
 		"mini-css-extract-plugin": "^2.9.0",
 		"path-browserify": "^1.0.1",
 		"prettier": "npm:wp-prettier@^3.0.3",
@@ -94,7 +101,7 @@
 		"postenv:start": "bash ./tests/e2e/bin/initialize.sh",
 		"test:e2e": "npx playwright test --config tests/e2e/playwright.config.js",
 		"start": "wp-scripts start --webpack-src-dir=js/src",
-		"test:js": "wp-scripts test-unit-js"
+		"test:js": "wp-scripts test-unit-jest"
 	},
 	"browserslist": [
 		"extends @wordpress/browserslist-config"
