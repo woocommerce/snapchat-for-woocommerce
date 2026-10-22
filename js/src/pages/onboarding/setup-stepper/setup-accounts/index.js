@@ -12,6 +12,7 @@ import AppButton from '~/components/app-button';
 import AppSpinner from '~/components/app-spinner';
 import useJetpackAccount from '~/hooks/useJetpackAccount';
 import useSnapchatAccount from '~/hooks/useSnapchatAccount';
+import useSnapchatAccountDetails from '~/hooks/useSnapchatAccountDetails';
 import StepContent from '~/components/stepper/step-content';
 import WPComAccountCard from '~/components/wpcom-account-card';
 import SnapchatAccountCard from '~/components/snapchat-account-card';
@@ -24,10 +25,11 @@ import './index.scss';
  * When the merchant is onboarded.
  *
  * @event sfw_onboarding_completed
+ * @property {boolean} has_active_campaign Whether the connected Snapchat ad account already has a campaign.
  */
 
 /**
- * @fires sfw_onboarding_completed
+ * @fires sfw_onboarding_completed with `{ has_active_campaign: true }` or `{ has_active_campaign: false }`.
  */
 const SetupAccounts = ( props ) => {
 	const { onContinue = noop } = props;
@@ -36,6 +38,8 @@ const SetupAccounts = ( props ) => {
 		isConnected: isSnapchatConnected,
 		hasFinishedResolution: hasResolvedSnapchatAccount,
 	} = useSnapchatAccount();
+	const { has_active_campaign: hasActiveCampaign = false } =
+		useSnapchatAccountDetails();
 
 	/**
 	 * When jetpack is loading, or when Snapchat account is loading,
@@ -91,6 +95,9 @@ const SetupAccounts = ( props ) => {
 						text={ __( 'Continue', 'snapchat-for-woocommerce' ) }
 						onClick={ handleOnClick }
 						eventName="sfw_onboarding_completed"
+						eventProps={ {
+							has_active_campaign: hasActiveCampaign,
+						} }
 					/>
 				</StepContentActions>
 			</StepContentFooter>
