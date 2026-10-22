@@ -4,6 +4,11 @@
 import domReady from '@wordpress/dom-ready';
 import { createRoot, lazy, Suspense } from '@wordpress/element';
 
+/**
+ * Internal dependencies
+ */
+import { insertAlphabetically } from './utils';
+
 const SnapchatAdsPromo = lazy( () =>
 	import(
 		/* webpackChunkName: "channel-visibility-snapchat-ads-promo" */ './snapchat-ads-promo'
@@ -26,7 +31,8 @@ domReady( () => {
 
 		mountEl = document.createElement( 'div' );
 		mountEl.id = 'snapchat-channel-visibility-row';
-		inside.appendChild( mountEl );
+		mountEl.dataset.service = 'snapchat';
+		insertAlphabetically( inside, mountEl );
 	}
 
 	createRoot( mountEl ).render(

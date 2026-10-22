@@ -28,7 +28,9 @@ const onboardingUrl = getOnboardingUrl();
  * @return {JSX.Element|null} The promo, or null when onboarding is complete.
  */
 const SnapchatAdsPromo = () => {
-	if ( window.snapchatAdsMetaBoxData.onboardingComplete ) {
+	const { onboardingComplete = false } = window.snapchatAdsMetaBoxData || {};
+
+	if ( onboardingComplete ) {
 		return null;
 	}
 
