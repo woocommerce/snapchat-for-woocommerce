@@ -124,4 +124,108 @@ class RemoteConversionTrackerTest extends WP_UnitTestCase {
 				]
 			), array() );
 	}
+
+	/**
+	 * Test that a 2xx response fires conversion_sent and not conversion_failed.
+	 */
+	public function test_send_fires_conversion_sent_on_success(): void {
+		$this->set_credentials();
+		$this->client->method( 'proxy_post' )->willReturn( new \WP_REST_Response( array(), 200 ) );
+
+		$sent   = $this->record_action( 'conversion_sent' );
+		$failed = $this->record_action( 'conversion_failed' );
+
+		$payload = array( 'event_name' => 'PURCHASE' );
+		$args    = array( 'order_id' => wc_create_order()->get_id() );
+		$this->tracker->send( $payload, $args );
+
+		$this->assertSame( array( array( $payload, $args ) ), $sent->calls );
+		$this->assertSame( array(), $failed->calls );
+	}
+
+	/**
+	 * Test that a transport error fires conversion_failed with the error and not conversion_sent.
+	 */
+	public function test_send_fires_conversion_failed_on_transport_error(): void {
+		$this->set_credentials();
+		$error = new \WP_Error( 'http_request_failed', 'cURL error 28: Operation timed out' );
+		$this->client->method( 'proxy_post' )->willReturn( $error );
+
+		$sent   = $this->record_action( 'conversion_sent' );
+		$failed = $this->record_action( 'conversion_failed' );
+
+		$payload = array( 'event_name' => 'PURCHASE' );
+		$args    = array( 'order_id' => wc_create_order()->get_id() );
+		$this->tracker->send( $payload, $args );
+
+		$this->assertSame( array(), $sent->calls );
+		$this->assertSame( array( array( $payload, $args, $error ) ), $failed->calls );
+	}
+
+	/**
+	 * Test that a non-2xx response wrapped in a WP_Error fires conversion_failed.
+	 */
+	public function test_send_fires_conversion_failed_on_non_2xx_response(): void {
+		$this->set_credentials();
+		$this->client->method( 'proxy_post' )->willReturn( $this->http_error( 500 ) );
+
+		$sent   = $this->record_action( 'conversion_sent' );
+		$failed = $this->record_action( 'conversion_failed' );
+
+		$this->tracker->send( array( 'event_name' => 'PURCHASE' ), array( 'order_id' => wc_create_order()->get_id() ) );
+
+		$this->assertSame( array(), $sent->calls );
+		$this->assertCount( 1, $failed->calls );
+	}
+
+	/**
+	 * Sets a CAPI token and pixel ID so send() reaches the client.
+	 */
+	private function set_credentials(): void {
+		Options::set( OptionDefaults::CONVERSION_ACCESS_TOKEN, 'token_abc' );
+		Options::set( OptionDefaults::PIXEL_ID, 'pixel_456' );
+	}
+
+	/**
+	 * Builds the WP_Error WcsClient returns for a non-2xx response.
+	 *
+	 * @param int    $code HTTP status code.
+	 * @param string $body Response body.
+	 * @return \WP_Error
+	 */
+	private function http_error( int $code, string $body = '' ): \WP_Error {
+		return new \WP_Error(
+			Helper::with_prefix( 'request_failed' ),
+			'Request failed',
+			array(
+				'response' => array(
+					'code'    => $code,
+					'message' => '',
+				),
+				'body'     => $body,
+			)
+		);
+	}
+
+	/**
+	 * Records every call to a prefixed action.
+	 *
+	 * @param string $suffix Action name without the plugin prefix.
+	 * @return object Object whose `calls` property collects each call's arguments.
+	 */
+	private function record_action( string $suffix ): object {
+		$recorder        = new \stdClass();
+		$recorder->calls = array();
+
+		add_action(
+			Helper::with_prefix( $suffix ),
+			function ( ...$args ) use ( $recorder ) {
+				$recorder->calls[] = $args;
+			},
+			10,
+			3
+		);
+
+		return $recorder;
+	}
 }

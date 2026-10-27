@@ -297,37 +297,52 @@ class RemoteConversionTracker implements ConversionTrackerInterface {
 
 		/* @var WP_REST_Response|WP_Error $response The response from the WCS proxy. */
 		$response = $this->client->proxy_post( $path, $payload, false );
+		$event    = $event_payload['event_name'] ?? '';
 
-		if ( Helper::is_logging_enabled() ) {
-			$event = $event_payload['event_name'] ?? '';
+		if ( is_wp_error( $response ) ) {
+			if ( Helper::is_logging_enabled() ) {
+				$error_body = json_decode( wp_remote_retrieve_body( $response->get_error_data() ), true );
 
-			if ( is_wp_error( $response ) ) {
-				$body       = json_decode( wp_remote_retrieve_body( $response->get_error_data() ), true );
-				$body       = Helper::deep_replace_double_quotes( $body );
-				$error_data = $response->get_error_data();
-				$status     = $error_data['response']['code'];
-				$message    = $response->get_error_message();
-
-				$info = array(
-					'context'    => 'tracking',
-					'payload'    => $body,
-					'args'       => $args,
-					'error'      => $message,
-					'error_data' => $body,
-				);
-			} else {
-				$status = $response->get_status();
-				$info   = array(
-					'context' => 'tracking',
-					'payload' => $payload,
-					'args'    => $args,
+				$this->logger->log_event(
+					$event,
+					Helper::get_error_status_code( $response ),
+					array(
+						'context'    => 'tracking',
+						'payload'    => $payload,
+						'args'       => $args,
+						'error'      => $response->get_error_message(),
+						'error_data' => Helper::deep_replace_double_quotes( $error_body ),
+					)
 				);
 			}
 
+			/**
+			 * Fires after a conversion event failed to reach the Ad Partner.
+			 *
+			 * The request failed when the connection could not be made, it timed out, or the
+			 * WCS proxy or the Ad Partner rejected it with a non-2xx response.
+			 *
+			 * @since x.x.x
+			 *
+			 * @param array    $event_payload The payload that could not be sent.
+			 * @param array    $args          Additional args.
+			 * @param WP_Error $error         The error returned by the WCS proxy request.
+			 */
+			// phpcs:ignore WordPress.NamingConventions.PrefixAllGlobals.DynamicHooknameFound -- Prefixed via Helper::with_prefix().
+			do_action( Helper::with_prefix( 'conversion_failed' ), $event_payload, $args, $response );
+
+			return;
+		}
+
+		if ( Helper::is_logging_enabled() ) {
 			$this->logger->log_event(
 				$event,
-				$status,
-				$info
+				$response->get_status(),
+				array(
+					'context' => 'tracking',
+					'payload' => $payload,
+					'args'    => $args,
+				)
 			);
 		}
 
@@ -336,6 +351,8 @@ class RemoteConversionTracker implements ConversionTrackerInterface {
 		 *
 		 * This hook allows other plugins or custom code to perform actions after the conversion payload
 		 * has been dispatched, such as logging, triggering additional integrations, or updating metadata.
+		 * Since x.x.x it only fires when the Ad Partner accepted the event with a 2xx response; failed
+		 * sends fire `snapchat_for_woocommerce_conversion_failed` instead.
 		 *
 		 * @since 0.1.0
 		 *
