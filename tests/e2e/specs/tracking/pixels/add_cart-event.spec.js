@@ -89,8 +89,11 @@ test.describe( 'ADD_CART event', () => {
 
 			expect( payload.integration ).toBe( integration );
 			expect( payload.currency ).toBe( 'USD' );
+			expect( payload.price ).toBe( 10 );
 			expect( payload.number_items ).toBe( 1 );
 			expect( payload.item_ids ).toContain( productId );
+			expect( payload.event_id ).toMatch( anyUuidRegex );
+			expect( payload.client_dedup_id ).toMatch( anyUuidRegex );
 		} );
 
 		test( `[${ theme } theme] Single product page, variable product`, async ( {
@@ -120,7 +123,10 @@ test.describe( 'ADD_CART event', () => {
 
 			expect( payload.integration ).toBe( integration );
 			expect( payload.currency ).toBe( 'USD' );
+			expect( payload.price ).toBe( 12 );
 			expect( payload.item_ids ).toContain( variationId );
+			expect( payload.event_id ).toMatch( anyUuidRegex );
+			expect( payload.client_dedup_id ).toMatch( anyUuidRegex );
 		} );
 	}
 } );
