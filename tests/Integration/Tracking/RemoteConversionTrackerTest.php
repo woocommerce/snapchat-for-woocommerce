@@ -70,6 +70,61 @@ class RemoteConversionTrackerTest extends WP_UnitTestCase {
 	}
 
 	/**
+	 * Test that reloading the order confirmation page queues only one Purchase send.
+	 */
+	public function test_track_purchase_queues_once_per_order(): void {
+		$order_id = wc_create_order()->get_id();
+
+		$this->tracker->track_purchase( $order_id );
+		$this->tracker->track_purchase( $order_id );
+
+		$this->assertSame( 1, $this->count_pending_purchase_sends( $order_id ) );
+		$this->assertNotEmpty(
+			wc_get_order( $order_id )->get_meta( RemoteConversionTracker::ORDER_CONVERSION_QUEUED_META_KEY )
+		);
+	}
+
+	/**
+	 * Test that an order tracked before reservations existed queues nothing.
+	 */
+	public function test_track_purchase_skips_tracked_order(): void {
+		$order = wc_create_order();
+		$order->update_meta_data( RemoteConversionTracker::ORDER_CONVERSION_TRACKED_META_KEY, 1 );
+		$order->save_meta_data();
+
+		$this->tracker->track_purchase( $order->get_id() );
+
+		$this->assertSame( 0, $this->count_pending_purchase_sends( $order->get_id() ) );
+	}
+
+	/**
+	 * Test that an order reserved but not yet tracked queues nothing.
+	 */
+	public function test_track_purchase_skips_reserved_order(): void {
+		$order = wc_create_order();
+		$order->update_meta_data( RemoteConversionTracker::ORDER_CONVERSION_QUEUED_META_KEY, time() );
+		$order->save_meta_data();
+
+		$this->tracker->track_purchase( $order->get_id() );
+
+		$this->assertSame( 0, $this->count_pending_purchase_sends( $order->get_id() ) );
+	}
+
+	/**
+	 * Test that the reservation applies per order, not to every order.
+	 */
+	public function test_track_purchase_queues_each_order(): void {
+		$first  = wc_create_order()->get_id();
+		$second = wc_create_order()->get_id();
+
+		$this->tracker->track_purchase( $first );
+		$this->tracker->track_purchase( $second );
+
+		$this->assertSame( 1, $this->count_pending_purchase_sends( $first ) );
+		$this->assertSame( 1, $this->count_pending_purchase_sends( $second ) );
+	}
+
+	/**
 	 * Test that track_add_to_cart schedules an async action.
 	 */
 	public function test_track_add_to_cart_dispatches_async_action(): void {
@@ -176,6 +231,31 @@ class RemoteConversionTrackerTest extends WP_UnitTestCase {
 
 		$this->assertSame( array(), $sent->calls );
 		$this->assertCount( 1, $failed->calls );
+	}
+
+	/**
+	 * Counts pending send_conversion_event actions queued for an order.
+	 *
+	 * @param int $order_id WooCommerce order ID.
+	 * @return int
+	 */
+	private function count_pending_purchase_sends( int $order_id ): int {
+		$actions = as_get_scheduled_actions(
+			array(
+				'hook'     => Helper::with_prefix( 'send_conversion_event' ),
+				'group'    => Config::PLUGIN_SLUG,
+				'status'   => \ActionScheduler_Store::STATUS_PENDING,
+				'per_page' => -1,
+			),
+			'objects'
+		);
+
+		return count(
+			array_filter(
+				$actions,
+				fn( $action ) => ( $action->get_args()['args']['order_id'] ?? 0 ) === $order_id
+			)
+		);
 	}
 
 	/**

@@ -45,6 +45,16 @@ class RemoteConversionTracker implements ConversionTrackerInterface {
 	public const ORDER_CONVERSION_TRACKED_META_KEY = '_snapchat_conversion_tracked';
 
 	/**
+	 * Meta key used to mark orders whose Purchase event has been queued for sending.
+	 *
+	 * Holds the Unix timestamp of when the event was queued. It stays set after the send
+	 * completes or gives up, so reloading the order confirmation page never queues it again.
+	 *
+	 * @since x.x.x
+	 */
+	public const ORDER_CONVERSION_QUEUED_META_KEY = '_snapchat_conversion_queued';
+
+	/**
 	 * WCS client used to proxy API requests to the Ad Partner.
 	 *
 	 * @var WcsClient
@@ -93,8 +103,12 @@ class RemoteConversionTracker implements ConversionTrackerInterface {
 
 		$order = wc_get_order( $order_id );
 
-		// Make sure there is a valid order object and it is not already marked as tracked.
-		if ( ! $order || 1 === (int) $order->get_meta( self::ORDER_CONVERSION_TRACKED_META_KEY, true ) ) {
+		// Make sure there is a valid order object that is not already tracked or queued.
+		if (
+			! $order
+			|| 1 === (int) $order->get_meta( self::ORDER_CONVERSION_TRACKED_META_KEY, true )
+			|| $order->get_meta( self::ORDER_CONVERSION_QUEUED_META_KEY, true )
+		) {
 			return;
 		}
 
@@ -106,7 +120,7 @@ class RemoteConversionTracker implements ConversionTrackerInterface {
 		);
 		$args    = array( 'order_id' => $order_id );
 
-		as_enqueue_async_action(
+		$action_id = as_enqueue_async_action(
 			Helper::with_prefix( 'send_conversion_event' ),
 			array(
 				'event_payload' => $payload,
@@ -114,6 +128,16 @@ class RemoteConversionTracker implements ConversionTrackerInterface {
 			),
 			Config::PLUGIN_SLUG
 		);
+
+		if ( ! $action_id ) {
+			return;
+		}
+
+		// The tracked flag is only set once the send succeeds, so reserve the order now to stop
+		// a reload of the confirmation page from queueing a second Purchase in the meantime.
+		// Save only the meta, so a concurrent status change from a payment webhook isn't overwritten.
+		$order->update_meta_data( self::ORDER_CONVERSION_QUEUED_META_KEY, time() );
+		$order->save_meta_data();
 	}
 
 	/**
