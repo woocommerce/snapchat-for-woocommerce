@@ -126,6 +126,9 @@ class PurchaseConversionDeliveryTest extends WP_UnitTestCase {
 			'HTTP 400'         => array( $this->http_error( 400 ) ),
 			'sandbox block'    => array( new WP_Error( 'snapchat_sandbox_remote_request_blocked', 'Blocked', array( 'status' => 403 ) ) ),
 			'no Jetpack token' => array( new WP_Error( 'missing_token' ) ),
+			'bad Jetpack token' => array( new WP_Error( 'malformed_token' ) ),
+			'bad request body' => array( new WP_Error( 'invalid_body', 'Body is malformed.' ) ),
+			'blocked host'     => array( new WP_Error( 'http_request_not_executed', 'User has blocked requests through HTTP.' ) ),
 		);
 	}
 
@@ -154,6 +157,8 @@ class PurchaseConversionDeliveryTest extends WP_UnitTestCase {
 	 */
 	public function temporary_status_provider(): array {
 		return array(
+			'HTTP 408' => array( 408 ),
+			'HTTP 425' => array( 425 ),
 			'HTTP 429' => array( 429 ),
 			'HTTP 503' => array( 503 ),
 		);
@@ -290,6 +295,75 @@ class PurchaseConversionDeliveryTest extends WP_UnitTestCase {
 
 		$this->assertSame( 1, $later_calls );
 		$this->assertCount( 0, $this->pending_sends( $order_id ) );
+	}
+
+	/**
+	 * Test that firing the send hook directly after a queued run in the same request never throws.
+	 *
+	 * @dataProvider queued_run_result_provider
+	 *
+	 * @param bool $queued_run_fails Whether the earlier queued send fails.
+	 */
+	public function test_direct_send_hook_after_queued_run_never_throws( bool $queued_run_fails ): void {
+		$this->client->method( 'proxy_post' )->willReturnOnConsecutiveCalls(
+			$queued_run_fails ? $this->transport_error() : new WP_REST_Response( array(), 200 ),
+			$this->transport_error()
+		);
+		$queued_order = wc_create_order()->get_id();
+		$this->run_action( $this->queue_purchase( $queued_order ) );
+		$direct_order = wc_create_order()->get_id();
+
+		do_action( Helper::with_prefix( 'send_conversion_event' ), array( 'event_name' => 'PURCHASE' ), array( 'order_id' => $direct_order ) );
+
+		$this->assertCount( 0, $this->pending_sends( $direct_order ) );
+	}
+
+	/**
+	 * Outcomes of the queued send that runs before the direct hook call.
+	 *
+	 * @return array
+	 */
+	public function queued_run_result_provider(): array {
+		return array(
+			'after a failed queued send'     => array( true ),
+			'after a successful queued send' => array( false ),
+		);
+	}
+
+	/**
+	 * Test that a failed synchronous send never throws or schedules a retry.
+	 */
+	public function test_failed_synchronous_send_never_throws(): void {
+		$this->client->method( 'proxy_post' )->willReturn( $this->transport_error() );
+
+		$this->tracker->track_page_view( 'page-view-event' );
+
+		$this->assertCount( 0, $this->pending_sends() );
+	}
+
+	/**
+	 * Test that a non-numeric attempt from the action args is treated as the first attempt.
+	 */
+	public function test_non_numeric_attempt_counts_as_first_attempt(): void {
+		$this->client->method( 'proxy_post' )->willReturn( $this->transport_error() );
+		$order_id  = wc_create_order()->get_id();
+		$action_id = as_enqueue_async_action(
+			Helper::with_prefix( 'send_conversion_event' ),
+			array(
+				'event_payload' => array( 'event_name' => 'PURCHASE' ),
+				'args'          => array(
+					'order_id' => $order_id,
+					'attempt'  => 'abc',
+				),
+			),
+			Config::PLUGIN_SLUG
+		);
+
+		$this->run_action( $action_id );
+
+		$retries = $this->pending_sends( $order_id );
+		$this->assertCount( 1, $retries );
+		$this->assertSame( 2, reset( $retries )->get_args()['args']['attempt'] );
 	}
 
 	/**

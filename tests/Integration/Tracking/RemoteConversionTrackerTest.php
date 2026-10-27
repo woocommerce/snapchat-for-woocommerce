@@ -125,6 +125,20 @@ class RemoteConversionTrackerTest extends WP_UnitTestCase {
 	}
 
 	/**
+	 * Test that an order isn't reserved when its Purchase send couldn't be queued.
+	 */
+	public function test_track_purchase_skips_reservation_when_queueing_fails(): void {
+		$order_id = wc_create_order()->get_id();
+		add_filter( 'pre_as_enqueue_async_action', fn() => 0 );
+
+		$this->tracker->track_purchase( $order_id );
+
+		$this->assertEmpty(
+			wc_get_order( $order_id )->get_meta( RemoteConversionTracker::ORDER_CONVERSION_QUEUED_META_KEY )
+		);
+	}
+
+	/**
 	 * Test that track_add_to_cart schedules an async action.
 	 */
 	public function test_track_add_to_cart_dispatches_async_action(): void {

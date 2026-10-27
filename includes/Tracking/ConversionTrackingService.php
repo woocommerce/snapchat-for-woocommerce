@@ -56,14 +56,16 @@ class ConversionTrackingService implements ServiceStatusInterface {
 	/**
 	 * Error codes returned without an HTTP response that will not succeed on retry.
 	 *
-	 * These Jetpack connection codes mean the site's connection credentials are missing or
-	 * invalid, so the request was never sent. Sandbox mode's block carries a 403 status, so
-	 * it is already treated as a rejection.
+	 * The Jetpack connection codes mean the site's connection credentials are missing or
+	 * invalid, and `http_request_not_executed` means the site blocks external requests, so
+	 * the request was never sent. Sandbox mode's block carries a 403 status, so it is
+	 * already treated as a rejection.
 	 */
 	private const PERMANENT_ERROR_CODES = array(
 		'missing_token',
 		'malformed_token',
 		'invalid_body',
+		'http_request_not_executed',
 	);
 
 	/**
@@ -327,7 +329,7 @@ class ConversionTrackingService implements ServiceStatusInterface {
 
 		$order = wc_get_order( $args['order_id'] );
 
-		// Mark the order as tracked, to avoid double-reporting if the confirmation page is reloaded.
+		// Record delivery. Orders tracked before the queued flag existed still rely on this to skip reloads.
 		$order->update_meta_data( RemoteConversionTracker::ORDER_CONVERSION_TRACKED_META_KEY, 1 );
 		$order->save_meta_data();
 	}
