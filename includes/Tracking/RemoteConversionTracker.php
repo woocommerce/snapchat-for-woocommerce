@@ -103,7 +103,6 @@ class RemoteConversionTracker implements ConversionTrackerInterface {
 
 		$order = wc_get_order( $order_id );
 
-		// Make sure there is a valid order object that is not already tracked or queued.
 		if (
 			! $order
 			|| 1 === (int) $order->get_meta( self::ORDER_CONVERSION_TRACKED_META_KEY, true )
@@ -133,8 +132,6 @@ class RemoteConversionTracker implements ConversionTrackerInterface {
 			return;
 		}
 
-		// The tracked flag is only set once the send succeeds, so reserve the order now to stop
-		// a reload of the confirmation page from queueing a second Purchase in the meantime.
 		// Save only the meta, so a concurrent status change from a payment webhook isn't overwritten.
 		$order->update_meta_data( self::ORDER_CONVERSION_QUEUED_META_KEY, time() );
 		$order->save_meta_data();
@@ -321,25 +318,29 @@ class RemoteConversionTracker implements ConversionTrackerInterface {
 
 		/* @var WP_REST_Response|WP_Error $response The response from the WCS proxy. */
 		$response = $this->client->proxy_post( $path, $payload, false );
-		$event    = $event_payload['event_name'] ?? '';
+		$failed   = is_wp_error( $response );
 
-		if ( is_wp_error( $response ) ) {
-			if ( Helper::is_logging_enabled() ) {
-				$error_body = json_decode( wp_remote_retrieve_body( $response->get_error_data() ), true );
+		if ( Helper::is_logging_enabled() ) {
+			$context = array(
+				'context' => 'tracking',
+				'payload' => $payload,
+				'args'    => $args,
+			);
 
-				$this->logger->log_event(
-					$event,
-					Helper::get_error_status_code( $response ),
-					array(
-						'context'    => 'tracking',
-						'payload'    => $payload,
-						'args'       => $args,
-						'error'      => $response->get_error_message(),
-						'error_data' => Helper::deep_replace_double_quotes( $error_body ),
-					)
-				);
+			if ( $failed ) {
+				$error_body            = json_decode( wp_remote_retrieve_body( $response->get_error_data() ), true );
+				$context['error']      = $response->get_error_message();
+				$context['error_data'] = Helper::deep_replace_double_quotes( $error_body );
 			}
 
+			$this->logger->log_event(
+				$event_payload['event_name'] ?? '',
+				$failed ? Helper::get_error_status_code( $response ) : $response->get_status(),
+				$context
+			);
+		}
+
+		if ( $failed ) {
 			/**
 			 * Fires after a conversion event failed to reach the Ad Partner.
 			 *
@@ -356,18 +357,6 @@ class RemoteConversionTracker implements ConversionTrackerInterface {
 			do_action( Helper::with_prefix( 'conversion_failed' ), $event_payload, $args, $response );
 
 			return;
-		}
-
-		if ( Helper::is_logging_enabled() ) {
-			$this->logger->log_event(
-				$event,
-				$response->get_status(),
-				array(
-					'context' => 'tracking',
-					'payload' => $payload,
-					'args'    => $args,
-				)
-			);
 		}
 
 		/**

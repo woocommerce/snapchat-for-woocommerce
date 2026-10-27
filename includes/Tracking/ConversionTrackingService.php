@@ -35,13 +35,9 @@ use WP_Error;
 class ConversionTrackingService implements ServiceStatusInterface {
 
 	/**
-	 * Maximum number of attempts to send one Purchase event, including the first.
-	 */
-	private const MAX_PURCHASE_ATTEMPTS = 5;
-
-	/**
 	 * Seconds to wait before each retry attempt, keyed by the attempt number.
 	 *
+	 * The last key is the final attempt, so it also sets how many times a Purchase is sent.
 	 * The whole schedule ends about 14.6 hours after the first attempt, well inside the
 	 * window in which the Ad Partner accepts an event's original `event_time`.
 	 */
@@ -411,13 +407,14 @@ class ConversionTrackingService implements ServiceStatusInterface {
 			return;
 		}
 
-		if ( $attempt >= self::MAX_PURCHASE_ATTEMPTS ) {
+		$next_attempt = $attempt + 1;
+
+		if ( ! isset( self::RETRY_DELAYS[ $next_attempt ] ) ) {
 			$this->purchase_failure = "{$failure} Giving up after the last attempt.";
 			return;
 		}
 
-		$next_attempt = $attempt + 1;
-		$retry_id     = as_schedule_single_action(
+		$retry_id = as_schedule_single_action(
 			time() + self::RETRY_DELAYS[ $next_attempt ],
 			Helper::with_prefix( 'send_conversion_event' ),
 			array(

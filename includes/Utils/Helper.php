@@ -194,8 +194,10 @@ class Helper {
 			return null;
 		}
 
-		if ( isset( $data['response']['code'] ) && is_numeric( $data['response']['code'] ) ) {
-			return (int) $data['response']['code'];
+		$code = wp_remote_retrieve_response_code( $data );
+
+		if ( is_numeric( $code ) ) {
+			return (int) $code;
 		}
 
 		if ( isset( $data['status'] ) && is_numeric( $data['status'] ) ) {
