@@ -88,4 +88,39 @@ final class ConversionTrackingServiceTest extends WP_UnitTestCase {
 
 		unset( $_POST );
 	}
+
+	/**
+	 * Test that malformed data from the conversion_failed hook is ignored rather than fatal.
+	 *
+	 * @dataProvider malformed_failure_provider
+	 *
+	 * @param mixed $event_payload Payload passed through the hook.
+	 * @param mixed $args          Args passed through the hook.
+	 * @param mixed $error         Error passed through the hook.
+	 */
+	public function test_handle_failed_conversion_ignores_malformed_hook_data( $event_payload, $args, $error ): void {
+		$service = new ConversionTrackingService( $this->mock_tracker );
+		$service->start_queued_send( 1 );
+
+		$service->handle_failed_conversion( $event_payload, $args, $error );
+		$service->fail_queued_purchase();
+
+		$this->addToAssertionCount( 1 );
+	}
+
+	/**
+	 * Malformed values another callback could pass through the conversion_failed hook.
+	 *
+	 * @return array
+	 */
+	public function malformed_failure_provider(): array {
+		$error = new \WP_Error( 'http_request_failed', 'Timed out' );
+
+		return array(
+			'args not an array'     => array( array( 'event_name' => 'PURCHASE' ), 'order_id=1', $error ),
+			'non-numeric attempt'   => array( array( 'event_name' => 'PURCHASE' ), array( 'order_id' => 'x', 'attempt' => 'abc' ), $error ),
+			'error not a WP_Error'  => array( array( 'event_name' => 'PURCHASE' ), array( 'order_id' => 1 ), 'timeout' ),
+			'payload not an array'  => array( 'PURCHASE', array( 'order_id' => 1 ), $error ),
+		);
+	}
 }

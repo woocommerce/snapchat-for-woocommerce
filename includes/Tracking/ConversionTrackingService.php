@@ -12,9 +12,13 @@
 
 namespace SnapchatForWooCommerce\Tracking;
 
+use ActionScheduler;
+use RuntimeException;
+use SnapchatForWooCommerce\Config;
 use SnapchatForWooCommerce\Utils\Storage\OptionDefaults;
 use SnapchatForWooCommerce\Utils\Storage\Options;
 use SnapchatForWooCommerce\Utils\Helper;
+use WP_Error;
 
 /**
  * Service class for registering WooCommerce conversion tracking hooks.
@@ -31,11 +35,61 @@ use SnapchatForWooCommerce\Utils\Helper;
 class ConversionTrackingService implements ServiceStatusInterface {
 
 	/**
+	 * Maximum number of attempts to send one Purchase event, including the first.
+	 */
+	private const MAX_PURCHASE_ATTEMPTS = 5;
+
+	/**
+	 * Seconds to wait before each retry attempt, keyed by the attempt number.
+	 *
+	 * The whole schedule ends about 14.6 hours after the first attempt, well inside the
+	 * window in which the Ad Partner accepts an event's original `event_time`.
+	 */
+	private const RETRY_DELAYS = array(
+		2 => 5 * MINUTE_IN_SECONDS,
+		3 => 30 * MINUTE_IN_SECONDS,
+		4 => 2 * HOUR_IN_SECONDS,
+		5 => 12 * HOUR_IN_SECONDS,
+	);
+
+	/**
+	 * HTTP statuses that indicate a temporary failure worth retrying.
+	 */
+	private const RETRYABLE_STATUSES = array( 408, 425, 429 );
+
+	/**
+	 * Error codes returned without an HTTP response that will not succeed on retry.
+	 *
+	 * These Jetpack connection codes mean the site's connection credentials are missing or
+	 * invalid, so the request was never sent. Sandbox mode's block carries a 403 status, so
+	 * it is already treated as a rejection.
+	 */
+	private const PERMANENT_ERROR_CODES = array(
+		'missing_token',
+		'malformed_token',
+		'invalid_body',
+	);
+
+	/**
 	 * Instance of a class implementing conversion tracking logic.
 	 *
 	 * @var ConversionTrackerInterface
 	 */
 	protected ConversionTrackerInterface $tracker;
+
+	/**
+	 * ID of the Action Scheduler action currently executing, or null outside an action.
+	 *
+	 * @var int|null
+	 */
+	protected ?int $current_action_id = null;
+
+	/**
+	 * Description of the Purchase send that failed during the current action, if any.
+	 *
+	 * @var string|null
+	 */
+	protected ?string $purchase_failure = null;
 
 	/**
 	 * Constructor.
@@ -75,7 +129,12 @@ class ConversionTrackingService implements ServiceStatusInterface {
 		Helper::register_ajax_action( 'view_content', array( $this, 'handle_async_view_content' ) );
 		Helper::register_ajax_action( 'page_view', array( $this, 'handle_async_page_view' ) );
 		add_action( Helper::with_prefix( 'send_conversion_event' ), array( $this->tracker, 'send' ), 10, 2 );
+		add_action( Helper::with_prefix( 'send_conversion_event' ), array( $this, 'fail_queued_purchase' ), PHP_INT_MAX, 0 );
 		add_action( Helper::with_prefix( 'conversion_sent' ), array( $this, 'mark_as_tracked' ), 10, 2 );
+		add_action( Helper::with_prefix( 'conversion_failed' ), array( $this, 'handle_failed_conversion' ), 10, 3 );
+		add_action( 'action_scheduler_begin_execute', array( $this, 'start_queued_send' ), 10, 1 );
+		add_action( 'action_scheduler_after_execute', array( $this, 'end_queued_send' ), 10, 0 );
+		add_action( 'action_scheduler_failed_execution', array( $this, 'end_queued_send' ), 10, 0 );
 	}
 
 	/**
@@ -275,5 +334,154 @@ class ConversionTrackingService implements ServiceStatusInterface {
 		// Mark the order as tracked, to avoid double-reporting if the confirmation page is reloaded.
 		$order->update_meta_data( RemoteConversionTracker::ORDER_CONVERSION_TRACKED_META_KEY, 1 );
 		$order->save_meta_data();
+	}
+
+	/**
+	 * Remembers which Action Scheduler action is executing.
+	 *
+	 * Hook callback for `action_scheduler_begin_execute`. Failed Purchase sends are only
+	 * retried and reported as failed actions when they run inside Action Scheduler.
+	 *
+	 * @since x.x.x
+	 *
+	 * @param int $action_id ID of the action about to execute.
+	 * @return void
+	 */
+	public function start_queued_send( $action_id ): void {
+		$this->current_action_id = is_numeric( $action_id ) ? (int) $action_id : null;
+		$this->purchase_failure  = null;
+	}
+
+	/**
+	 * Forgets the executing action once it finishes.
+	 *
+	 * Hook callback for `action_scheduler_after_execute` and `action_scheduler_failed_execution`.
+	 * One queue run executes many actions on this same instance, so state from one action must
+	 * not carry into the next.
+	 *
+	 * @since x.x.x
+	 *
+	 * @return void
+	 */
+	public function end_queued_send(): void {
+		$this->current_action_id = null;
+		$this->purchase_failure  = null;
+	}
+
+	/**
+	 * Schedules a retry for a failed Purchase send and records the failure.
+	 *
+	 * Hook callback for `snapchat_for_woocommerce_conversion_failed`. Only Purchase sends
+	 * running inside an Action Scheduler action of `send_conversion_event` are handled. A
+	 * temporary failure is retried until the attempt limit, and the failure is recorded so
+	 * {@see self::fail_queued_purchase()} marks the action as failed.
+	 *
+	 * @since x.x.x
+	 *
+	 * @param mixed $event_payload The payload that could not be sent.
+	 * @param mixed $args          Additional args, including `order_id` and `attempt`.
+	 * @param mixed $error         The error returned by the request.
+	 * @return void
+	 */
+	public function handle_failed_conversion( $event_payload, $args, $error ): void {
+		if ( ! is_array( $event_payload ) || ! is_array( $args ) || ! is_wp_error( $error ) ) {
+			return;
+		}
+
+		$order_id = isset( $args['order_id'] ) ? absint( $args['order_id'] ) : 0;
+
+		if ( ! $order_id || ! $this->is_running_queued_send() ) {
+			return;
+		}
+
+		$attempt = isset( $args['attempt'] ) && is_numeric( $args['attempt'] ) ? max( 1, (int) $args['attempt'] ) : 1;
+		$status  = Helper::get_error_status_code( $error );
+		$reason  = null !== $status ? "HTTP {$status}" : $error->get_error_code();
+
+		$failure = sprintf(
+			'Snapchat %1$s conversion for order %2$d failed on attempt %3$d (%4$s).',
+			sanitize_text_field( (string) ( $event_payload['event_name'] ?? '' ) ),
+			$order_id,
+			$attempt,
+			$reason
+		);
+
+		if ( ! $this->is_retryable( $error, $status ) ) {
+			$this->purchase_failure = "{$failure} Not retried: the request was rejected.";
+			return;
+		}
+
+		if ( $attempt >= self::MAX_PURCHASE_ATTEMPTS ) {
+			$this->purchase_failure = "{$failure} Giving up after the last attempt.";
+			return;
+		}
+
+		$next_attempt = $attempt + 1;
+		$retry_id     = as_schedule_single_action(
+			time() + self::RETRY_DELAYS[ $next_attempt ],
+			Helper::with_prefix( 'send_conversion_event' ),
+			array(
+				'event_payload' => $event_payload,
+				'args'          => array_merge( $args, array( 'attempt' => $next_attempt ) ),
+			),
+			Config::PLUGIN_SLUG
+		);
+
+		$this->purchase_failure = $retry_id
+			? "{$failure} Retry scheduled as attempt {$next_attempt}."
+			: "{$failure} The retry could not be scheduled.";
+	}
+
+	/**
+	 * Marks the executing action as failed when its Purchase send failed.
+	 *
+	 * Hook callback for `send_conversion_event`, registered last so every other callback on
+	 * that hook still runs. Action Scheduler records a thrown exception as a failed action and
+	 * stores its message in the action's log.
+	 *
+	 * @since x.x.x
+	 *
+	 * @throws RuntimeException When the Purchase send in the current action failed.
+	 * @return void
+	 */
+	public function fail_queued_purchase(): void {
+		if ( null === $this->purchase_failure ) {
+			return;
+		}
+
+		$failure                = $this->purchase_failure;
+		$this->purchase_failure = null;
+
+		throw new RuntimeException( esc_html( $failure ) );
+	}
+
+	/**
+	 * Determines whether an Action Scheduler action of `send_conversion_event` is executing.
+	 *
+	 * @return bool
+	 */
+	protected function is_running_queued_send(): bool {
+		if ( null === $this->current_action_id || ! class_exists( ActionScheduler::class ) ) {
+			return false;
+		}
+
+		$action = ActionScheduler::store()->fetch_action( $this->current_action_id );
+
+		return Helper::with_prefix( 'send_conversion_event' ) === $action->get_hook();
+	}
+
+	/**
+	 * Determines whether a failed request is temporary and worth retrying.
+	 *
+	 * @param WP_Error $error  The error returned by the request.
+	 * @param int|null $status The HTTP status, or null when no HTTP response was received.
+	 * @return bool
+	 */
+	protected function is_retryable( WP_Error $error, ?int $status ): bool {
+		if ( null === $status ) {
+			return ! in_array( $error->get_error_code(), self::PERMANENT_ERROR_CODES, true );
+		}
+
+		return $status >= 500 || in_array( $status, self::RETRYABLE_STATUSES, true );
 	}
 }
