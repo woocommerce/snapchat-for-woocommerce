@@ -92,6 +92,7 @@ class ConversionTrackingService implements ServiceStatusInterface {
 		Helper::register_ajax_action( 'view_content', array( $this, 'handle_async_view_content' ) );
 		Helper::register_ajax_action( 'page_view', array( $this, 'handle_async_page_view' ) );
 		add_action( Helper::with_prefix( 'send_conversion_event' ), array( $this->tracker, 'send' ), 10, 2 );
+		// Runs last, so callbacks at any lower priority still run before a failed Purchase throws.
 		add_action( Helper::with_prefix( 'send_conversion_event' ), array( $this, 'fail_queued_purchase' ), PHP_INT_MAX, 0 );
 		add_action( Helper::with_prefix( 'conversion_sent' ), array( $this, 'mark_as_tracked' ), 10, 2 );
 		add_action( Helper::with_prefix( 'conversion_failed' ), array( $this, 'handle_failed_conversion' ), 10, 3 );

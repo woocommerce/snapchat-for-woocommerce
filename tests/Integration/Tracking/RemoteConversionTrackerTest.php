@@ -21,6 +21,8 @@ use SnapchatForWooCommerce\Tracking\ConversionEventLogger;
  */
 class RemoteConversionTrackerTest extends WP_UnitTestCase {
 
+	use ConversionSendTestHelpers;
+
 	/**
 	 * WCS client mock.
 	 *
@@ -78,10 +80,23 @@ class RemoteConversionTrackerTest extends WP_UnitTestCase {
 		$this->tracker->track_purchase( $order_id );
 		$this->tracker->track_purchase( $order_id );
 
-		$this->assertSame( 1, $this->count_pending_purchase_sends( $order_id ) );
+		$this->assertCount( 1, $this->pending_sends( $order_id ) );
 		$this->assertNotEmpty(
 			wc_get_order( $order_id )->get_meta( RemoteConversionTracker::ORDER_CONVERSION_QUEUED_META_KEY )
 		);
+	}
+
+	/**
+	 * Test that an expired reservation no longer blocks queueing the Purchase again.
+	 */
+	public function test_track_purchase_requeues_after_reservation_expires(): void {
+		$order = wc_create_order();
+		$order->update_meta_data( RemoteConversionTracker::ORDER_CONVERSION_QUEUED_META_KEY, time() - HOUR_IN_SECONDS );
+		$order->save_meta_data();
+
+		$this->tracker->track_purchase( $order->get_id() );
+
+		$this->assertCount( 1, $this->pending_sends( $order->get_id() ) );
 	}
 
 	/**
@@ -94,7 +109,7 @@ class RemoteConversionTrackerTest extends WP_UnitTestCase {
 
 		$this->tracker->track_purchase( $order->get_id() );
 
-		$this->assertSame( 0, $this->count_pending_purchase_sends( $order->get_id() ) );
+		$this->assertCount( 0, $this->pending_sends( $order->get_id() ) );
 	}
 
 	/**
@@ -107,8 +122,8 @@ class RemoteConversionTrackerTest extends WP_UnitTestCase {
 		$this->tracker->track_purchase( $first );
 		$this->tracker->track_purchase( $second );
 
-		$this->assertSame( 1, $this->count_pending_purchase_sends( $first ) );
-		$this->assertSame( 1, $this->count_pending_purchase_sends( $second ) );
+		$this->assertCount( 1, $this->pending_sends( $first ) );
+		$this->assertCount( 1, $this->pending_sends( $second ) );
 	}
 
 	/**
@@ -228,33 +243,8 @@ class RemoteConversionTrackerTest extends WP_UnitTestCase {
 	 */
 	public function send_error_provider(): array {
 		return array(
-			'transport error'  => array( new \WP_Error( 'http_request_failed', 'cURL error 28: Operation timed out' ) ),
+			'transport error'  => array( $this->transport_error() ),
 			'non-2xx response' => array( $this->http_error( 500 ) ),
-		);
-	}
-
-	/**
-	 * Counts pending send_conversion_event actions queued for an order.
-	 *
-	 * @param int $order_id WooCommerce order ID.
-	 * @return int
-	 */
-	private function count_pending_purchase_sends( int $order_id ): int {
-		$actions = as_get_scheduled_actions(
-			array(
-				'hook'     => Helper::with_prefix( 'send_conversion_event' ),
-				'group'    => Config::PLUGIN_SLUG,
-				'status'   => \ActionScheduler_Store::STATUS_PENDING,
-				'per_page' => -1,
-			),
-			'objects'
-		);
-
-		return count(
-			array_filter(
-				$actions,
-				fn( $action ) => ( $action->get_args()['args']['order_id'] ?? 0 ) === $order_id
-			)
 		);
 	}
 
@@ -264,26 +254,6 @@ class RemoteConversionTrackerTest extends WP_UnitTestCase {
 	private function set_credentials(): void {
 		Options::set( OptionDefaults::CONVERSION_ACCESS_TOKEN, 'token_abc' );
 		Options::set( OptionDefaults::PIXEL_ID, 'pixel_456' );
-	}
-
-	/**
-	 * Builds the WP_Error WcsClient returns for a non-2xx response.
-	 *
-	 * @param int $code HTTP status code.
-	 * @return \WP_Error
-	 */
-	private function http_error( int $code ): \WP_Error {
-		return new \WP_Error(
-			Helper::with_prefix( 'request_failed' ),
-			'Request failed',
-			array(
-				'response' => array(
-					'code'    => $code,
-					'message' => '',
-				),
-				'body'     => '',
-			)
-		);
 	}
 
 	/**

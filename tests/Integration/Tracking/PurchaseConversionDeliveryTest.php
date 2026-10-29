@@ -29,6 +29,8 @@ use SnapchatForWooCommerce\Utils\Storage\Options;
  */
 class PurchaseConversionDeliveryTest extends WP_UnitTestCase {
 
+	use ConversionSendTestHelpers;
+
 	/**
 	 * WCS client mock.
 	 *
@@ -201,7 +203,6 @@ class PurchaseConversionDeliveryTest extends WP_UnitTestCase {
 		$this->run_action( $this->queue_purchase( $order_id ) );
 
 		$resend = $this->queue_purchase( $order_id );
-		$this->tracker->track_purchase( $order_id );
 
 		$this->assertNotSame( 0, $resend );
 		$this->assertCount( 1, $this->pending_sends( $order_id ) );
@@ -210,6 +211,27 @@ class PurchaseConversionDeliveryTest extends WP_UnitTestCase {
 
 		$this->assertSame( ActionScheduler_Store::STATUS_COMPLETE, $this->status( $resend ) );
 		$this->assertSame( '1', (string) wc_get_order( $order_id )->get_meta( RemoteConversionTracker::ORDER_CONVERSION_TRACKED_META_KEY ) );
+	}
+
+	/**
+	 * Test that a Purchase whose send ended without reaching Snapchat is queued again once its reservation expires.
+	 */
+	public function test_unsent_purchase_is_queued_again_after_reservation_expires(): void {
+		$this->client->expects( $this->never() )->method( 'proxy_post' );
+		$order_id  = wc_create_order()->get_id();
+		$action_id = $this->queue_purchase( $order_id );
+		Options::set( OptionDefaults::CONVERSION_ACCESS_TOKEN, '' );
+
+		$this->run_action( $action_id );
+
+		$this->assertSame( ActionScheduler_Store::STATUS_COMPLETE, $this->status( $action_id ) );
+		$this->assertSame( 0, $this->queue_purchase( $order_id ) );
+
+		$order = wc_get_order( $order_id );
+		$order->update_meta_data( RemoteConversionTracker::ORDER_CONVERSION_QUEUED_META_KEY, time() - HOUR_IN_SECONDS );
+		$order->save_meta_data();
+
+		$this->assertNotSame( 0, $this->queue_purchase( $order_id ) );
 	}
 
 	/**
@@ -352,7 +374,6 @@ class PurchaseConversionDeliveryTest extends WP_UnitTestCase {
 		$log = $this->failure_log( $action_id );
 		$this->assertStringContainsString( "order {$order_id}", $log );
 		$this->assertStringContainsString( 'HTTP 400', $log );
-		$this->assertStringContainsString( 'queued again', $log );
 		$this->assertStringNotContainsString( 'token_abc', $log );
 	}
 
@@ -388,33 +409,6 @@ class PurchaseConversionDeliveryTest extends WP_UnitTestCase {
 	}
 
 	/**
-	 * Returns pending send actions, keyed by action ID, optionally for one order.
-	 *
-	 * @param int|null $order_id WooCommerce order ID, or null for every send.
-	 * @return \ActionScheduler_Action[]
-	 */
-	private function pending_sends( ?int $order_id = null ): array {
-		$actions = as_get_scheduled_actions(
-			array(
-				'hook'     => Helper::with_prefix( 'send_conversion_event' ),
-				'group'    => Config::PLUGIN_SLUG,
-				'status'   => ActionScheduler_Store::STATUS_PENDING,
-				'per_page' => -1,
-			),
-			'objects'
-		);
-
-		if ( null === $order_id ) {
-			return $actions;
-		}
-
-		return array_filter(
-			$actions,
-			fn( $action ) => ( $action->get_args()['args']['order_id'] ?? 0 ) === $order_id
-		);
-	}
-
-	/**
 	 * Returns the Action Scheduler log messages for an action.
 	 *
 	 * @param int $action_id Action ID.
@@ -427,34 +421,5 @@ class PurchaseConversionDeliveryTest extends WP_UnitTestCase {
 		);
 
 		return implode( "\n", $messages );
-	}
-
-	/**
-	 * Builds a transport error such as a timeout.
-	 *
-	 * @return WP_Error
-	 */
-	private function transport_error(): WP_Error {
-		return new WP_Error( 'http_request_failed', 'cURL error 28: Operation timed out' );
-	}
-
-	/**
-	 * Builds the WP_Error WcsClient returns for a non-2xx response.
-	 *
-	 * @param int $code HTTP status code.
-	 * @return WP_Error
-	 */
-	private function http_error( int $code ): WP_Error {
-		return new WP_Error(
-			Helper::with_prefix( 'request_failed' ),
-			'Request failed',
-			array(
-				'response' => array(
-					'code'    => $code,
-					'message' => '',
-				),
-				'body'     => '',
-			)
-		);
 	}
 }

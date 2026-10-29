@@ -49,10 +49,20 @@ class RemoteConversionTracker implements ConversionTrackerInterface {
 	 *
 	 * Holds the Unix timestamp of when the event was queued, so reloading the order confirmation
 	 * page doesn't queue it twice. A failed send removes it, so the next load queues it again.
+	 * It expires after {@see self::ORDER_CONVERSION_QUEUED_TTL} seconds.
 	 *
 	 * @since x.x.x
 	 */
 	public const ORDER_CONVERSION_QUEUED_META_KEY = '_snapchat_conversion_queued';
+
+	/**
+	 * Seconds after which a queued Purchase no longer blocks queueing it again.
+	 *
+	 * A send can end without reporting a failure: the action is cancelled, the process dies, the
+	 * credentials are removed, or conversions are turned off before it runs. An expiring reservation
+	 * keeps those orders from staying untracked. One hour is well past normal Action Scheduler latency.
+	 */
+	private const ORDER_CONVERSION_QUEUED_TTL = HOUR_IN_SECONDS;
 
 	/**
 	 * WCS client used to proxy API requests to the Ad Partner.
@@ -106,7 +116,7 @@ class RemoteConversionTracker implements ConversionTrackerInterface {
 		if (
 			! $order
 			|| 1 === (int) $order->get_meta( self::ORDER_CONVERSION_TRACKED_META_KEY, true )
-			|| $order->get_meta( self::ORDER_CONVERSION_QUEUED_META_KEY, true )
+			|| time() - (int) $order->get_meta( self::ORDER_CONVERSION_QUEUED_META_KEY, true ) < self::ORDER_CONVERSION_QUEUED_TTL
 		) {
 			return;
 		}
@@ -127,6 +137,15 @@ class RemoteConversionTracker implements ConversionTrackerInterface {
 		);
 		$args    = array( 'order_id' => $order_id );
 
+		/*
+		 * Reserve the order before queueing, so a send that fails before this request finishes
+		 * can't have its failure overwritten by a late reservation. Two simultaneous loads can still
+		 * both queue a send, but both carry the order ID as their event_id, so Snapchat deduplicates them.
+		 * Save only the meta, so a concurrent status change from a payment webhook isn't overwritten.
+		 */
+		$order->update_meta_data( self::ORDER_CONVERSION_QUEUED_META_KEY, time() );
+		$order->save_meta_data();
+
 		$action_id = as_enqueue_async_action(
 			Helper::with_prefix( 'send_conversion_event' ),
 			array(
@@ -137,12 +156,9 @@ class RemoteConversionTracker implements ConversionTrackerInterface {
 		);
 
 		if ( ! $action_id ) {
-			return;
+			$order->delete_meta_data( self::ORDER_CONVERSION_QUEUED_META_KEY );
+			$order->save_meta_data();
 		}
-
-		// Save only the meta, so a concurrent status change from a payment webhook isn't overwritten.
-		$order->update_meta_data( self::ORDER_CONVERSION_QUEUED_META_KEY, time() );
-		$order->save_meta_data();
 	}
 
 	/**
