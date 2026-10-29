@@ -11,6 +11,7 @@ namespace SnapchatForWooCommerce;
 
 use SnapchatForWooCommerce\Compatibility;
 use SnapchatForWooCommerce\MultichannelMarketing\Marketing;
+use SnapchatForWooCommerce\Tracking\FailedConversionCleanup;
 
 /**
  * Initializes and wires up core components of the Ad Partner for WooCommerce plugin.
@@ -73,6 +74,7 @@ final class Plugin {
 
 		ServiceContainer::get( ServiceKey::PIXEL_TRACKING )->register_hooks();
 		ServiceContainer::get( ServiceKey::CONVERSION_TRACKING )->register_hooks();
+		( new FailedConversionCleanup() )->register_hooks();
 		ServiceContainer::get( ServiceKey::PRODUCT_EXPORT_SERVICE )->register_hooks();
 		Marketing::register_hooks();
 		Compatibility::register_hooks();
