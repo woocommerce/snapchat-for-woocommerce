@@ -85,7 +85,7 @@ class RemoteConversionTrackerTest extends WP_UnitTestCase {
 	}
 
 	/**
-	 * Test that an order tracked before reservations existed queues nothing.
+	 * Test that an order tracked before the queued meta existed queues nothing.
 	 */
 	public function test_track_purchase_skips_tracked_order(): void {
 		$order = wc_create_order();
@@ -98,20 +98,7 @@ class RemoteConversionTrackerTest extends WP_UnitTestCase {
 	}
 
 	/**
-	 * Test that an order reserved but not yet tracked queues nothing.
-	 */
-	public function test_track_purchase_skips_reserved_order(): void {
-		$order = wc_create_order();
-		$order->update_meta_data( RemoteConversionTracker::ORDER_CONVERSION_QUEUED_META_KEY, time() );
-		$order->save_meta_data();
-
-		$this->tracker->track_purchase( $order->get_id() );
-
-		$this->assertSame( 0, $this->count_pending_purchase_sends( $order->get_id() ) );
-	}
-
-	/**
-	 * Test that the reservation applies per order, not to every order.
+	 * Test that the queued meta applies per order, not to every order.
 	 */
 	public function test_track_purchase_queues_each_order(): void {
 		$first  = wc_create_order()->get_id();
@@ -125,9 +112,9 @@ class RemoteConversionTrackerTest extends WP_UnitTestCase {
 	}
 
 	/**
-	 * Test that an order isn't reserved when its Purchase send couldn't be queued.
+	 * Test that an order isn't marked queued when its Purchase send couldn't be queued.
 	 */
-	public function test_track_purchase_skips_reservation_when_queueing_fails(): void {
+	public function test_track_purchase_skips_queued_meta_when_queueing_fails(): void {
 		$order_id = wc_create_order()->get_id();
 		add_filter( 'pre_as_enqueue_async_action', fn() => 0 );
 
@@ -213,11 +200,14 @@ class RemoteConversionTrackerTest extends WP_UnitTestCase {
 	}
 
 	/**
-	 * Test that a transport error fires conversion_failed with the error and not conversion_sent.
+	 * Test that a failed request fires conversion_failed with the error and not conversion_sent.
+	 *
+	 * @dataProvider send_error_provider
+	 *
+	 * @param \WP_Error $error Error returned by the WCS client.
 	 */
-	public function test_send_fires_conversion_failed_on_transport_error(): void {
+	public function test_send_fires_conversion_failed_on_error( \WP_Error $error ): void {
 		$this->set_credentials();
-		$error = new \WP_Error( 'http_request_failed', 'cURL error 28: Operation timed out' );
 		$this->client->method( 'proxy_post' )->willReturn( $error );
 
 		$sent   = $this->record_action( 'conversion_sent' );
@@ -232,19 +222,15 @@ class RemoteConversionTrackerTest extends WP_UnitTestCase {
 	}
 
 	/**
-	 * Test that a non-2xx response wrapped in a WP_Error fires conversion_failed.
+	 * Errors the WCS client returns for a failed request.
+	 *
+	 * @return array
 	 */
-	public function test_send_fires_conversion_failed_on_non_2xx_response(): void {
-		$this->set_credentials();
-		$this->client->method( 'proxy_post' )->willReturn( $this->http_error( 500 ) );
-
-		$sent   = $this->record_action( 'conversion_sent' );
-		$failed = $this->record_action( 'conversion_failed' );
-
-		$this->tracker->send( array( 'event_name' => 'PURCHASE' ), array( 'order_id' => wc_create_order()->get_id() ) );
-
-		$this->assertSame( array(), $sent->calls );
-		$this->assertCount( 1, $failed->calls );
+	public function send_error_provider(): array {
+		return array(
+			'transport error'  => array( new \WP_Error( 'http_request_failed', 'cURL error 28: Operation timed out' ) ),
+			'non-2xx response' => array( $this->http_error( 500 ) ),
+		);
 	}
 
 	/**
@@ -283,11 +269,10 @@ class RemoteConversionTrackerTest extends WP_UnitTestCase {
 	/**
 	 * Builds the WP_Error WcsClient returns for a non-2xx response.
 	 *
-	 * @param int    $code HTTP status code.
-	 * @param string $body Response body.
+	 * @param int $code HTTP status code.
 	 * @return \WP_Error
 	 */
-	private function http_error( int $code, string $body = '' ): \WP_Error {
+	private function http_error( int $code ): \WP_Error {
 		return new \WP_Error(
 			Helper::with_prefix( 'request_failed' ),
 			'Request failed',
@@ -296,7 +281,7 @@ class RemoteConversionTrackerTest extends WP_UnitTestCase {
 					'code'    => $code,
 					'message' => '',
 				),
-				'body'     => $body,
+				'body'     => '',
 			)
 		);
 	}

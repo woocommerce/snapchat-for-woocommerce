@@ -332,7 +332,7 @@ class ConversionTrackingService implements ServiceStatusInterface {
 	}
 
 	/**
-	 * Releases a failed Purchase's queued reservation and records the failure.
+	 * Clears a failed Purchase's queued meta and records the failure.
 	 *
 	 * Hook callback for `snapchat_for_woocommerce_conversion_failed`. Removing the queued
 	 * meta lets the next load of the order confirmation page queue the Purchase again. When
@@ -380,9 +380,8 @@ class ConversionTrackingService implements ServiceStatusInterface {
 	/**
 	 * Marks the executing action as failed when its Purchase send failed.
 	 *
-	 * Hook callback for `send_conversion_event`, registered last so every other callback on
-	 * that hook still runs. Action Scheduler records a thrown exception as a failed action and
-	 * stores its message in the action's log.
+	 * Action Scheduler records a thrown exception as a failed action and stores its message in
+	 * the action's log.
 	 *
 	 * @since x.x.x
 	 *

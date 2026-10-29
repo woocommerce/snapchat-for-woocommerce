@@ -117,7 +117,7 @@ class RemoteConversionTracker implements ConversionTrackerInterface {
 		 * privacy eraser can clear them, and send() reads them from there.
 		 */
 		$user_data = UserIdentifier::get_user_data();
-		unset( $user_data['client_ip_address'], $user_data['client_user_agent'] );
+		unset( $user_data[ UserIdentifier::CLIENT_IP_ADDRESS ], $user_data[ UserIdentifier::CLIENT_USER_AGENT ] );
 
 		$event   = new PurchaseEvent( $order_id );
 		$payload = $event->build_payload(
@@ -411,8 +411,8 @@ class RemoteConversionTracker implements ConversionTrackerInterface {
 
 		$client_data = array_filter(
 			array(
-				'client_ip_address' => $order->get_customer_ip_address(),
-				'client_user_agent' => $order->get_customer_user_agent(),
+				UserIdentifier::CLIENT_IP_ADDRESS => $order->get_customer_ip_address(),
+				UserIdentifier::CLIENT_USER_AGENT => $order->get_customer_user_agent(),
 			)
 		);
 

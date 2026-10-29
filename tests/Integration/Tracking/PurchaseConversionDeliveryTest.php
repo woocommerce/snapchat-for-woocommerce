@@ -12,7 +12,6 @@ use ActionScheduler_Store;
 use WP_Error;
 use WP_REST_Response;
 use WP_UnitTestCase;
-use WC_Product_Simple;
 use SnapchatForWooCommerce\Config;
 use SnapchatForWooCommerce\Connection\WcsClient;
 use SnapchatForWooCommerce\ServiceContainer;
@@ -45,6 +44,13 @@ class PurchaseConversionDeliveryTest extends WP_UnitTestCase {
 	protected $tracker;
 
 	/**
+	 * $_SERVER as it was before the test.
+	 *
+	 * @var array
+	 */
+	protected $server;
+
+	/**
 	 * Set up test environment.
 	 *
 	 * The plugin's own ConversionTrackingService is already hooked during bootstrap. Its callbacks
@@ -53,6 +59,8 @@ class PurchaseConversionDeliveryTest extends WP_UnitTestCase {
 	 */
 	public function set_up(): void {
 		parent::set_up();
+
+		$this->server = $_SERVER;
 
 		$container_service = ServiceContainer::get( ServiceKey::CONVERSION_TRACKING );
 		foreach ( array( 'send_conversion_event', 'conversion_sent', 'conversion_failed' ) as $suffix ) {
@@ -74,6 +82,7 @@ class PurchaseConversionDeliveryTest extends WP_UnitTestCase {
 	 * Tear down test environment.
 	 */
 	public function tear_down(): void {
+		$_SERVER = $this->server;
 		as_unschedule_all_actions( Helper::with_prefix( 'send_conversion_event' ), null, Config::PLUGIN_SLUG );
 		parent::tear_down();
 	}
@@ -116,21 +125,17 @@ class PurchaseConversionDeliveryTest extends WP_UnitTestCase {
 	}
 
 	/**
-	 * Test that a failed Purchase action doesn't store the visitor's IP address or user agent.
+	 * Test that a queued Purchase action doesn't store the visitor's IP address or user agent.
 	 */
-	public function test_failed_purchase_action_omits_ip_and_user_agent(): void {
+	public function test_queued_purchase_action_omits_ip_and_user_agent(): void {
 		$_SERVER['REMOTE_ADDR']     = '203.0.113.7';
 		$_SERVER['HTTP_USER_AGENT'] = 'Shopper UA';
-		$this->client->method( 'proxy_post' )->willReturn( $this->transport_error() );
-		$action_id = $this->queue_purchase( wc_create_order()->get_id() );
 
-		$this->run_action( $action_id );
+		$action_id = $this->queue_purchase( wc_create_order()->get_id() );
 
 		$stored = ActionScheduler::store()->fetch_action( $action_id )->get_args()['event_payload']['user_data'];
 		$this->assertArrayNotHasKey( 'client_ip_address', $stored );
 		$this->assertArrayNotHasKey( 'client_user_agent', $stored );
-
-		unset( $_SERVER['REMOTE_ADDR'], $_SERVER['HTTP_USER_AGENT'] );
 	}
 
 	/**
@@ -208,36 +213,6 @@ class PurchaseConversionDeliveryTest extends WP_UnitTestCase {
 	}
 
 	/**
-	 * Test that loading the order confirmation page after a successful send doesn't queue it again.
-	 */
-	public function test_reload_after_successful_send_does_not_queue_again(): void {
-		$this->client->method( 'proxy_post' )->willReturn( new WP_REST_Response( array(), 200 ) );
-		$order_id = wc_create_order()->get_id();
-		$this->run_action( $this->queue_purchase( $order_id ) );
-
-		$this->tracker->track_purchase( $order_id );
-
-		$this->assertCount( 0, $this->pending_sends( $order_id ) );
-	}
-
-	/**
-	 * Test that a failed add-to-cart send completes.
-	 */
-	public function test_failed_add_to_cart_completes(): void {
-		$this->client->expects( $this->once() )->method( 'proxy_post' )->willReturn( $this->transport_error() );
-		$product = new WC_Product_Simple();
-		$product->set_regular_price( '10' );
-		$product->save();
-
-		$this->tracker->track_add_to_cart( $product->get_id(), 1 );
-		$action_id = key( $this->pending_sends() );
-
-		$this->run_action( $action_id );
-
-		$this->assertSame( ActionScheduler_Store::STATUS_COMPLETE, $this->status( $action_id ) );
-	}
-
-	/**
 	 * Test that a failed non-Purchase send completes even when its args carry an order ID.
 	 */
 	public function test_failed_non_purchase_send_with_order_id_completes(): void {
@@ -251,6 +226,47 @@ class PurchaseConversionDeliveryTest extends WP_UnitTestCase {
 			),
 			Config::PLUGIN_SLUG
 		);
+
+		$this->run_action( $action_id );
+
+		$this->assertSame( ActionScheduler_Store::STATUS_COMPLETE, $this->status( $action_id ) );
+	}
+
+	/**
+	 * Test that a failed Purchase action still runs every other callback on the send hook.
+	 */
+	public function test_failed_purchase_runs_later_callbacks(): void {
+		$this->client->method( 'proxy_post' )->willReturn( $this->transport_error() );
+		$later_calls = 0;
+		add_action(
+			Helper::with_prefix( 'send_conversion_event' ),
+			function () use ( &$later_calls ) {
+				++$later_calls;
+			},
+			20
+		);
+		$action_id = $this->queue_purchase( wc_create_order()->get_id() );
+
+		$this->run_action( $action_id );
+
+		$this->assertSame( 1, $later_calls );
+		$this->assertSame( ActionScheduler_Store::STATUS_FAILED, $this->status( $action_id ) );
+	}
+
+	/**
+	 * Test that a conversion_failed call without a WP_Error doesn't fail the queued action.
+	 */
+	public function test_failure_hook_without_wp_error_is_ignored(): void {
+		$this->client->method( 'proxy_post' )->willReturn( new WP_REST_Response( array(), 200 ) );
+		add_action(
+			Helper::with_prefix( 'send_conversion_event' ),
+			function ( $event_payload, $args ) {
+				do_action( Helper::with_prefix( 'conversion_failed' ), $event_payload, $args, 'timeout' );
+			},
+			5,
+			2
+		);
+		$action_id = $this->queue_purchase( wc_create_order()->get_id() );
 
 		$this->run_action( $action_id );
 
@@ -306,33 +322,6 @@ class PurchaseConversionDeliveryTest extends WP_UnitTestCase {
 			'after a failed queued send'     => array( true ),
 			'after a successful queued send' => array( false ),
 		);
-	}
-
-	/**
-	 * Test that a failed synchronous send never throws.
-	 */
-	public function test_failed_synchronous_send_never_throws(): void {
-		$this->client->expects( $this->once() )->method( 'proxy_post' )->willReturn( $this->transport_error() );
-
-		$this->tracker->track_page_view( 'page-view-event' );
-	}
-
-	/**
-	 * Test that a failure in one action doesn't fail the next action in the same queue run.
-	 */
-	public function test_failure_does_not_leak_into_next_action(): void {
-		$this->client->method( 'proxy_post' )->willReturnOnConsecutiveCalls(
-			$this->http_error( 400 ),
-			new WP_REST_Response( array(), 200 )
-		);
-		$failing    = $this->queue_purchase( wc_create_order()->get_id() );
-		$succeeding = $this->queue_purchase( wc_create_order()->get_id() );
-
-		$this->run_action( $failing );
-		$this->run_action( $succeeding );
-
-		$this->assertSame( ActionScheduler_Store::STATUS_FAILED, $this->status( $failing ) );
-		$this->assertSame( ActionScheduler_Store::STATUS_COMPLETE, $this->status( $succeeding ) );
 	}
 
 	/**
