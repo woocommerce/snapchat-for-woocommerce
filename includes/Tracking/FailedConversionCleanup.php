@@ -18,9 +18,9 @@ use SnapchatForWooCommerce\Utils\Helper;
  *
  * Each send action stores the event payload as its args, including the visitor's plain-text
  * IP address and user agent. Action Scheduler's cleaner only purges complete and canceled
- * actions, so without this a failed send, and every retry of it, would keep that data
- * indefinitely. Failed rows are kept for the same period Action Scheduler keeps completed
- * ones, so merchants and support can still read why a send failed.
+ * actions, so without this every failed send would keep that data indefinitely. Failed
+ * rows are kept for the same period Action Scheduler keeps completed ones, so merchants and
+ * support can still read why a send failed.
  *
  * The cleanup only runs while failed sends exist. A failed send schedules it, and each run
  * schedules the next one until no failed sends remain.

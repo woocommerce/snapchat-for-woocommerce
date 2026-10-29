@@ -47,8 +47,8 @@ class RemoteConversionTracker implements ConversionTrackerInterface {
 	/**
 	 * Meta key used to mark orders whose Purchase event has been queued for sending.
 	 *
-	 * Holds the Unix timestamp of when the event was queued. It stays set after the send
-	 * completes or gives up, so reloading the order confirmation page never queues it again.
+	 * Holds the Unix timestamp of when the event was queued, so reloading the order confirmation
+	 * page doesn't queue it twice. A failed send removes it, so the next load queues it again.
 	 *
 	 * @since x.x.x
 	 */

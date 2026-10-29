@@ -118,7 +118,7 @@ final class ConversionTrackingServiceTest extends WP_UnitTestCase {
 
 		return array(
 			'args not an array'     => array( array( 'event_name' => 'PURCHASE' ), 'order_id=1', $error ),
-			'non-numeric attempt'   => array( array( 'event_name' => 'PURCHASE' ), array( 'order_id' => 'x', 'attempt' => 'abc' ), $error ),
+			'non-numeric order ID'  => array( array( 'event_name' => 'PURCHASE' ), array( 'order_id' => 'x' ), $error ),
 			'error not a WP_Error'  => array( array( 'event_name' => 'PURCHASE' ), array( 'order_id' => 1 ), 'timeout' ),
 			'payload not an array'  => array( 'PURCHASE', array( 'order_id' => 1 ), $error ),
 		);

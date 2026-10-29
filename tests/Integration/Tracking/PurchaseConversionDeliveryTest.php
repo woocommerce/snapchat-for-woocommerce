@@ -79,208 +79,120 @@ class PurchaseConversionDeliveryTest extends WP_UnitTestCase {
 	}
 
 	/**
-	 * Test that a timed-out Purchase ends Failed, stays untracked and schedules attempt 2.
-	 */
-	public function test_timed_out_purchase_fails_and_schedules_retry(): void {
-		$this->client->method( 'proxy_post' )->willReturn( $this->transport_error() );
-		$order_id  = wc_create_order()->get_id();
-		$action_id = $this->queue_purchase( $order_id );
-
-		$this->run_action( $action_id );
-
-		$this->assertSame( ActionScheduler_Store::STATUS_FAILED, $this->status( $action_id ) );
-		$this->assertEmpty( wc_get_order( $order_id )->get_meta( RemoteConversionTracker::ORDER_CONVERSION_TRACKED_META_KEY ) );
-
-		$retries = $this->pending_sends( $order_id );
-		$this->assertCount( 1, $retries );
-		$retry = reset( $retries );
-		$this->assertSame( 2, $retry->get_args()['args']['attempt'] );
-		$this->assertEqualsWithDelta( time() + 5 * MINUTE_IN_SECONDS, $retry->get_schedule()->get_date()->getTimestamp(), 10 );
-	}
-
-	/**
-	 * Test that a rejected Purchase ends Failed without a retry.
+	 * Test that a failed Purchase ends Failed, stays untracked and isn't resent automatically.
 	 *
-	 * @dataProvider permanent_error_provider
+	 * @dataProvider send_error_provider
 	 *
 	 * @param WP_Error $error Error returned by the WCS client.
 	 */
-	public function test_permanently_failed_purchase_is_not_retried( WP_Error $error ): void {
-		$this->client->method( 'proxy_post' )->willReturn( $error );
+	public function test_failed_purchase_fails_without_automatic_resend( WP_Error $error ): void {
+		$this->client->expects( $this->once() )->method( 'proxy_post' )->willReturn( $error );
 		$order_id  = wc_create_order()->get_id();
 		$action_id = $this->queue_purchase( $order_id );
 
 		$this->run_action( $action_id );
 
+		$order = wc_get_order( $order_id );
 		$this->assertSame( ActionScheduler_Store::STATUS_FAILED, $this->status( $action_id ) );
-		$this->assertCount( 0, $this->pending_sends( $order_id ) );
+		$this->assertEmpty( $order->get_meta( RemoteConversionTracker::ORDER_CONVERSION_TRACKED_META_KEY ) );
+		$this->assertEmpty( $order->get_meta( RemoteConversionTracker::ORDER_CONVERSION_QUEUED_META_KEY ) );
+		$this->assertCount( 0, $this->pending_sends() );
 	}
 
 	/**
-	 * Errors that must not be retried.
+	 * Errors a Purchase send can fail with.
 	 *
 	 * @return array
 	 */
-	public function permanent_error_provider(): array {
+	public function send_error_provider(): array {
 		return array(
+			'timeout'          => array( $this->transport_error() ),
 			'HTTP 400'         => array( $this->http_error( 400 ) ),
+			'HTTP 429'         => array( $this->http_error( 429 ) ),
+			'HTTP 503'         => array( $this->http_error( 503 ) ),
 			'sandbox block'    => array( new WP_Error( 'snapchat_sandbox_remote_request_blocked', 'Blocked', array( 'status' => 403 ) ) ),
 			'no Jetpack token' => array( new WP_Error( 'missing_token' ) ),
-			'bad Jetpack token' => array( new WP_Error( 'malformed_token' ) ),
-			'bad request body' => array( new WP_Error( 'invalid_body', 'Body is malformed.' ) ),
-			'blocked host'     => array( new WP_Error( 'http_request_not_executed', 'User has blocked requests through HTTP.' ) ),
 		);
 	}
 
 	/**
-	 * Test that temporary HTTP failures are retried.
-	 *
-	 * @dataProvider temporary_status_provider
-	 *
-	 * @param int $status HTTP status returned through the WCS proxy.
+	 * Test that loading the order confirmation page after a failed send queues the Purchase again.
 	 */
-	public function test_temporary_http_failure_is_retried( int $status ): void {
-		$this->client->method( 'proxy_post' )->willReturn( $this->http_error( $status ) );
-		$order_id  = wc_create_order()->get_id();
-		$action_id = $this->queue_purchase( $order_id );
-
-		$this->run_action( $action_id );
-
-		$this->assertSame( ActionScheduler_Store::STATUS_FAILED, $this->status( $action_id ) );
-		$this->assertCount( 1, $this->pending_sends( $order_id ) );
-	}
-
-	/**
-	 * Temporary HTTP statuses.
-	 *
-	 * @return array
-	 */
-	public function temporary_status_provider(): array {
-		return array(
-			'HTTP 408' => array( 408 ),
-			'HTTP 425' => array( 425 ),
-			'HTTP 429' => array( 429 ),
-			'HTTP 503' => array( 503 ),
+	public function test_reload_after_failed_send_queues_purchase_again(): void {
+		$this->client->method( 'proxy_post' )->willReturnOnConsecutiveCalls(
+			$this->transport_error(),
+			new WP_REST_Response( array(), 200 )
 		);
-	}
-
-	/**
-	 * Test the delay before each retry attempt.
-	 *
-	 * @dataProvider retry_delay_provider
-	 *
-	 * @param int $failed_attempt Attempt that fails.
-	 * @param int $delay          Expected seconds until the next attempt.
-	 */
-	public function test_retry_delay_grows_with_each_attempt( int $failed_attempt, int $delay ): void {
-		$this->client->method( 'proxy_post' )->willReturn( $this->transport_error() );
-		$order_id  = wc_create_order()->get_id();
-		$action_id = $this->queue_send( $order_id, $failed_attempt );
-
-		$this->run_action( $action_id );
-
-		$retries = $this->pending_sends( $order_id );
-		$this->assertCount( 1, $retries );
-		$retry = reset( $retries );
-		$this->assertSame( $failed_attempt + 1, $retry->get_args()['args']['attempt'] );
-		$this->assertEqualsWithDelta( time() + $delay, $retry->get_schedule()->get_date()->getTimestamp(), 10 );
-	}
-
-	/**
-	 * Failed attempts and the delay before the following one.
-	 *
-	 * @return array
-	 */
-	public function retry_delay_provider(): array {
-		return array(
-			'after attempt 1' => array( 1, 5 * MINUTE_IN_SECONDS ),
-			'after attempt 2' => array( 2, 30 * MINUTE_IN_SECONDS ),
-			'after attempt 3' => array( 3, 2 * HOUR_IN_SECONDS ),
-			'after attempt 4' => array( 4, 12 * HOUR_IN_SECONDS ),
-		);
-	}
-
-	/**
-	 * Test that the fifth failed attempt gives up and leaves the order untracked.
-	 */
-	public function test_last_attempt_gives_up(): void {
-		$this->client->method( 'proxy_post' )->willReturn( $this->transport_error() );
-		$order_id  = wc_create_order()->get_id();
-		$action_id = $this->queue_send( $order_id, 5 );
-
-		$this->run_action( $action_id );
-
-		$this->assertSame( ActionScheduler_Store::STATUS_FAILED, $this->status( $action_id ) );
-		$this->assertCount( 0, $this->pending_sends( $order_id ) );
-		$this->assertEmpty( wc_get_order( $order_id )->get_meta( RemoteConversionTracker::ORDER_CONVERSION_TRACKED_META_KEY ) );
-	}
-
-	/**
-	 * Test that a successful retry marks the order tracked and resends the original payload.
-	 */
-	public function test_successful_retry_marks_order_tracked(): void {
 		$order_id = wc_create_order()->get_id();
-		$sent     = array();
-		$this->client->method( 'proxy_post' )->willReturnCallback(
-			function ( $path, $payload ) use ( &$sent ) {
-				$sent[] = $payload['data'][0];
-				return 1 === count( $sent ) ? $this->http_error( 503 ) : new WP_REST_Response( array(), 200 );
-			}
-		);
-		$first = $this->queue_purchase( $order_id );
+		$this->run_action( $this->queue_purchase( $order_id ) );
 
-		$this->run_action( $first );
-		$retries = $this->pending_sends( $order_id );
-		$retry   = key( $retries );
-		$this->run_action( $retry );
+		$resend = $this->queue_purchase( $order_id );
+		$this->tracker->track_purchase( $order_id );
 
-		$this->assertSame( ActionScheduler_Store::STATUS_COMPLETE, $this->status( $retry ) );
+		$this->assertNotSame( 0, $resend );
+		$this->assertCount( 1, $this->pending_sends( $order_id ) );
+
+		$this->run_action( $resend );
+
+		$this->assertSame( ActionScheduler_Store::STATUS_COMPLETE, $this->status( $resend ) );
 		$this->assertSame( '1', (string) wc_get_order( $order_id )->get_meta( RemoteConversionTracker::ORDER_CONVERSION_TRACKED_META_KEY ) );
-		$this->assertCount( 2, $sent );
-		$this->assertSame( $sent[0]['event_time'], $sent[1]['event_time'] );
-		$this->assertSame( $sent[0]['event_id'], $sent[1]['event_id'] );
 	}
 
 	/**
-	 * Test that a failed follow-up schedule still leaves the action Failed.
+	 * Test that loading the order confirmation page after a successful send doesn't queue it again.
 	 */
-	public function test_unschedulable_retry_still_fails_action(): void {
-		$this->client->method( 'proxy_post' )->willReturn( $this->transport_error() );
-		$order_id  = wc_create_order()->get_id();
-		$action_id = $this->queue_purchase( $order_id );
-		add_filter( 'pre_as_schedule_single_action', fn() => 0 );
+	public function test_reload_after_successful_send_does_not_queue_again(): void {
+		$this->client->method( 'proxy_post' )->willReturn( new WP_REST_Response( array(), 200 ) );
+		$order_id = wc_create_order()->get_id();
+		$this->run_action( $this->queue_purchase( $order_id ) );
 
-		$this->run_action( $action_id );
+		$this->tracker->track_purchase( $order_id );
 
-		$this->assertSame( ActionScheduler_Store::STATUS_FAILED, $this->status( $action_id ) );
 		$this->assertCount( 0, $this->pending_sends( $order_id ) );
-		$this->assertStringContainsString( 'could not be scheduled', $this->failure_log( $action_id ) );
 	}
 
 	/**
-	 * Test that a failed add-to-cart send completes without a retry.
+	 * Test that a failed add-to-cart send completes.
 	 */
-	public function test_failed_add_to_cart_completes_without_retry(): void {
-		$this->client->method( 'proxy_post' )->willReturn( $this->transport_error() );
+	public function test_failed_add_to_cart_completes(): void {
+		$this->client->expects( $this->once() )->method( 'proxy_post' )->willReturn( $this->transport_error() );
 		$product = new WC_Product_Simple();
 		$product->set_regular_price( '10' );
 		$product->save();
 
 		$this->tracker->track_add_to_cart( $product->get_id(), 1 );
-		$actions   = $this->pending_sends();
-		$action_id = key( $actions );
+		$action_id = key( $this->pending_sends() );
 
 		$this->run_action( $action_id );
 
 		$this->assertSame( ActionScheduler_Store::STATUS_COMPLETE, $this->status( $action_id ) );
-		$this->assertCount( 0, $this->pending_sends() );
 	}
 
 	/**
-	 * Test that firing the send hook directly never throws or schedules a retry.
+	 * Test that a failed non-Purchase send completes even when its args carry an order ID.
+	 */
+	public function test_failed_non_purchase_send_with_order_id_completes(): void {
+		$this->client->expects( $this->once() )->method( 'proxy_post' )->willReturn( $this->transport_error() );
+		$order_id  = wc_create_order()->get_id();
+		$action_id = as_enqueue_async_action(
+			Helper::with_prefix( 'send_conversion_event' ),
+			array(
+				'event_payload' => array( 'event_name' => 'ADD_CART' ),
+				'args'          => array( 'order_id' => $order_id ),
+			),
+			Config::PLUGIN_SLUG
+		);
+
+		$this->run_action( $action_id );
+
+		$this->assertSame( ActionScheduler_Store::STATUS_COMPLETE, $this->status( $action_id ) );
+	}
+
+	/**
+	 * Test that firing the send hook directly never throws and still runs later callbacks.
 	 */
 	public function test_direct_send_hook_never_throws(): void {
-		$this->client->method( 'proxy_post' )->willReturn( $this->transport_error() );
+		$this->client->expects( $this->once() )->method( 'proxy_post' )->willReturn( $this->transport_error() );
 		$order_id    = wc_create_order()->get_id();
 		$later_calls = 0;
 		add_action(
@@ -294,7 +206,6 @@ class PurchaseConversionDeliveryTest extends WP_UnitTestCase {
 		do_action( Helper::with_prefix( 'send_conversion_event' ), array( 'event_name' => 'PURCHASE' ), array( 'order_id' => $order_id ) );
 
 		$this->assertSame( 1, $later_calls );
-		$this->assertCount( 0, $this->pending_sends( $order_id ) );
 	}
 
 	/**
@@ -305,17 +216,15 @@ class PurchaseConversionDeliveryTest extends WP_UnitTestCase {
 	 * @param bool $queued_run_fails Whether the earlier queued send fails.
 	 */
 	public function test_direct_send_hook_after_queued_run_never_throws( bool $queued_run_fails ): void {
-		$this->client->method( 'proxy_post' )->willReturnOnConsecutiveCalls(
+		$this->client->expects( $this->exactly( 2 ) )->method( 'proxy_post' )->willReturnOnConsecutiveCalls(
 			$queued_run_fails ? $this->transport_error() : new WP_REST_Response( array(), 200 ),
 			$this->transport_error()
 		);
-		$queued_order = wc_create_order()->get_id();
-		$this->run_action( $this->queue_purchase( $queued_order ) );
-		$direct_order = wc_create_order()->get_id();
+		$this->run_action( $this->queue_purchase( wc_create_order()->get_id() ) );
 
-		do_action( Helper::with_prefix( 'send_conversion_event' ), array( 'event_name' => 'PURCHASE' ), array( 'order_id' => $direct_order ) );
+		do_action( Helper::with_prefix( 'send_conversion_event' ), array( 'event_name' => 'PURCHASE' ), array( 'order_id' => wc_create_order()->get_id() ) );
 
-		$this->assertCount( 0, $this->pending_sends( $direct_order ) );
+		$this->addToAssertionCount( 1 );
 	}
 
 	/**
@@ -331,39 +240,12 @@ class PurchaseConversionDeliveryTest extends WP_UnitTestCase {
 	}
 
 	/**
-	 * Test that a failed synchronous send never throws or schedules a retry.
+	 * Test that a failed synchronous send never throws.
 	 */
 	public function test_failed_synchronous_send_never_throws(): void {
-		$this->client->method( 'proxy_post' )->willReturn( $this->transport_error() );
+		$this->client->expects( $this->once() )->method( 'proxy_post' )->willReturn( $this->transport_error() );
 
 		$this->tracker->track_page_view( 'page-view-event' );
-
-		$this->assertCount( 0, $this->pending_sends() );
-	}
-
-	/**
-	 * Test that a non-numeric attempt from the action args is treated as the first attempt.
-	 */
-	public function test_non_numeric_attempt_counts_as_first_attempt(): void {
-		$this->client->method( 'proxy_post' )->willReturn( $this->transport_error() );
-		$order_id  = wc_create_order()->get_id();
-		$action_id = as_enqueue_async_action(
-			Helper::with_prefix( 'send_conversion_event' ),
-			array(
-				'event_payload' => array( 'event_name' => 'PURCHASE' ),
-				'args'          => array(
-					'order_id' => $order_id,
-					'attempt'  => 'abc',
-				),
-			),
-			Config::PLUGIN_SLUG
-		);
-
-		$this->run_action( $action_id );
-
-		$retries = $this->pending_sends( $order_id );
-		$this->assertCount( 1, $retries );
-		$this->assertSame( 2, reset( $retries )->get_args()['args']['attempt'] );
 	}
 
 	/**
@@ -385,19 +267,35 @@ class PurchaseConversionDeliveryTest extends WP_UnitTestCase {
 	}
 
 	/**
-	 * Test that the failure message names the event and status without the access token.
+	 * Test that the failure message names the order and status without the access token.
+	 *
+	 * The error carries the request URL, as a real WcsClient error can, so a message built
+	 * from the error's text or data would leak the token.
 	 */
 	public function test_failure_message_omits_access_token(): void {
-		$this->client->method( 'proxy_post' )->willReturn( $this->http_error( 400 ) );
-		$action_id = $this->queue_purchase( wc_create_order()->get_id() );
+		$error = new WP_Error(
+			Helper::with_prefix( 'request_failed' ),
+			'Request to /conversions/v3/pixel_456/events?access_token=token_abc failed',
+			array(
+				'response' => array(
+					'code'    => 400,
+					'message' => '',
+				),
+				'body'     => '',
+				'url'      => 'https://example.com/conversions/v3/pixel_456/events?access_token=token_abc',
+			)
+		);
+		$this->client->method( 'proxy_post' )->willReturn( $error );
+		$order_id  = wc_create_order()->get_id();
+		$action_id = $this->queue_purchase( $order_id );
 
 		$this->run_action( $action_id );
 
 		$log = $this->failure_log( $action_id );
-		$this->assertStringContainsString( 'PURCHASE', $log );
-		$this->assertStringContainsString( '400', $log );
+		$this->assertStringContainsString( "order {$order_id}", $log );
+		$this->assertStringContainsString( 'HTTP 400', $log );
+		$this->assertStringContainsString( 'queued again', $log );
 		$this->assertStringNotContainsString( 'token_abc', $log );
-		$this->assertStringNotContainsString( 'access_token', $log );
 	}
 
 	/**
@@ -410,31 +308,6 @@ class PurchaseConversionDeliveryTest extends WP_UnitTestCase {
 		$this->tracker->track_purchase( $order_id );
 
 		return (int) key( $this->pending_sends( $order_id ) );
-	}
-
-	/**
-	 * Queues a Purchase send for a given attempt and returns its action ID.
-	 *
-	 * @param int $order_id WooCommerce order ID.
-	 * @param int $attempt  Attempt number.
-	 * @return int
-	 */
-	private function queue_send( int $order_id, int $attempt ): int {
-		return as_enqueue_async_action(
-			Helper::with_prefix( 'send_conversion_event' ),
-			array(
-				'event_payload' => array(
-					'event_name' => 'PURCHASE',
-					'event_id'   => (string) $order_id,
-					'event_time' => 1700000000000,
-				),
-				'args'          => array(
-					'order_id' => $order_id,
-					'attempt'  => $attempt,
-				),
-			),
-			Config::PLUGIN_SLUG
-		);
 	}
 
 	/**
