@@ -111,10 +111,18 @@ class RemoteConversionTracker implements ConversionTrackerInterface {
 			return;
 		}
 
+		/*
+		 * The queued action stores the payload, and a failed action is never purged, so leave out
+		 * the plain-text IP address and user agent. The order already stores both, where the
+		 * privacy eraser can clear them, and send() reads them from there.
+		 */
+		$user_data = UserIdentifier::get_user_data();
+		unset( $user_data['client_ip_address'], $user_data['client_user_agent'] );
+
 		$event   = new PurchaseEvent( $order_id );
 		$payload = $event->build_payload(
 			array(
-				'user_data' => UserIdentifier::get_user_data(),
+				'user_data' => $user_data,
 			)
 		);
 		$args    = array( 'order_id' => $order_id );
@@ -312,6 +320,8 @@ class RemoteConversionTracker implements ConversionTrackerInterface {
 			return;
 		}
 
+		$event_payload = $this->add_order_client_data( $event_payload, $args );
+
 		$query   = http_build_query( array( 'access_token' => $token ) );
 		$path    = "/conversions/v3/{$pixel_id}/events?{$query}";
 		$payload = array( 'data' => array( $event_payload ) );
@@ -374,5 +384,46 @@ class RemoteConversionTracker implements ConversionTrackerInterface {
 		 */
 		// phpcs:ignore WordPress.NamingConventions.PrefixAllGlobals.DynamicHooknameFound -- Prefixed via Helper::with_prefix().
 		do_action( Helper::with_prefix( 'conversion_sent' ), $event_payload, $args );
+	}
+
+	/**
+	 * Adds the visitor's IP address and user agent stored on the order to a Purchase payload.
+	 *
+	 * Purchase payloads are queued without them (see {@see self::track_purchase()}). Values
+	 * already in the payload win, so actions queued before that change send what they stored.
+	 *
+	 * @param array $event_payload Single event payload.
+	 * @param array $args          Additional args, including `order_id`.
+	 * @return array
+	 */
+	private function add_order_client_data( array $event_payload, array $args ): array {
+		$order_id = isset( $args['order_id'] ) ? absint( $args['order_id'] ) : 0;
+
+		if ( ! $order_id || PurchaseEvent::ID !== ( $event_payload['event_name'] ?? '' ) ) {
+			return $event_payload;
+		}
+
+		$order = wc_get_order( $order_id );
+
+		if ( ! $order ) {
+			return $event_payload;
+		}
+
+		$client_data = array_filter(
+			array(
+				'client_ip_address' => $order->get_customer_ip_address(),
+				'client_user_agent' => $order->get_customer_user_agent(),
+			)
+		);
+
+		if ( ! $client_data ) {
+			return $event_payload;
+		}
+
+		$user_data = isset( $event_payload['user_data'] ) && is_array( $event_payload['user_data'] ) ? $event_payload['user_data'] : array();
+
+		$event_payload['user_data'] = array_merge( $client_data, $user_data );
+
+		return $event_payload;
 	}
 }

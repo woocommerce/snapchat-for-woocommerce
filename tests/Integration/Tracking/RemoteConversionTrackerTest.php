@@ -205,7 +205,7 @@ class RemoteConversionTrackerTest extends WP_UnitTestCase {
 		$failed = $this->record_action( 'conversion_failed' );
 
 		$payload = array( 'event_name' => 'PURCHASE' );
-		$args    = array( 'order_id' => wc_create_order()->get_id() );
+		$args    = array( 'order_id' => $this->create_order_without_client_data() );
 		$this->tracker->send( $payload, $args );
 
 		$this->assertSame( array( array( $payload, $args ) ), $sent->calls );
@@ -224,7 +224,7 @@ class RemoteConversionTrackerTest extends WP_UnitTestCase {
 		$failed = $this->record_action( 'conversion_failed' );
 
 		$payload = array( 'event_name' => 'PURCHASE' );
-		$args    = array( 'order_id' => wc_create_order()->get_id() );
+		$args    = array( 'order_id' => $this->create_order_without_client_data() );
 		$this->tracker->send( $payload, $args );
 
 		$this->assertSame( array(), $sent->calls );
@@ -321,5 +321,19 @@ class RemoteConversionTrackerTest extends WP_UnitTestCase {
 		);
 
 		return $recorder;
+	}
+
+	/**
+	 * Creates an order with no stored IP address or user agent, so send() leaves the payload as is.
+	 *
+	 * @return int Order ID.
+	 */
+	private function create_order_without_client_data(): int {
+		$order = wc_create_order();
+		$order->set_customer_ip_address( '' );
+		$order->set_customer_user_agent( '' );
+		$order->save();
+
+		return $order->get_id();
 	}
 }

@@ -116,6 +116,75 @@ class PurchaseConversionDeliveryTest extends WP_UnitTestCase {
 	}
 
 	/**
+	 * Test that a failed Purchase action doesn't store the visitor's IP address or user agent.
+	 */
+	public function test_failed_purchase_action_omits_ip_and_user_agent(): void {
+		$_SERVER['REMOTE_ADDR']     = '203.0.113.7';
+		$_SERVER['HTTP_USER_AGENT'] = 'Shopper UA';
+		$this->client->method( 'proxy_post' )->willReturn( $this->transport_error() );
+		$action_id = $this->queue_purchase( wc_create_order()->get_id() );
+
+		$this->run_action( $action_id );
+
+		$stored = ActionScheduler::store()->fetch_action( $action_id )->get_args()['event_payload']['user_data'];
+		$this->assertArrayNotHasKey( 'client_ip_address', $stored );
+		$this->assertArrayNotHasKey( 'client_user_agent', $stored );
+
+		unset( $_SERVER['REMOTE_ADDR'], $_SERVER['HTTP_USER_AGENT'] );
+	}
+
+	/**
+	 * Test that a Purchase is sent with the IP address and user agent stored on the order.
+	 */
+	public function test_purchase_is_sent_with_order_ip_and_user_agent(): void {
+		$order = wc_create_order();
+		$order->set_customer_ip_address( '203.0.113.7' );
+		$order->set_customer_user_agent( 'Shopper UA' );
+		$order->save();
+		$this->client->expects( $this->once() )
+			->method( 'proxy_post' )
+			->with(
+				$this->anything(),
+				$this->callback(
+					fn( $payload ) => '203.0.113.7' === ( $payload['data'][0]['user_data']['client_ip_address'] ?? null )
+						&& 'Shopper UA' === ( $payload['data'][0]['user_data']['client_user_agent'] ?? null )
+				)
+			)
+			->willReturn( new WP_REST_Response( array(), 200 ) );
+
+		$this->run_action( $this->queue_purchase( $order->get_id() ) );
+	}
+
+	/**
+	 * Test that a Purchase queued with its IP address and user agent sends the stored values.
+	 */
+	public function test_purchase_queued_with_ip_keeps_stored_values(): void {
+		$order = wc_create_order();
+		$order->set_customer_ip_address( '203.0.113.7' );
+		$order->save();
+		$this->client->expects( $this->once() )
+			->method( 'proxy_post' )
+			->with(
+				$this->anything(),
+				$this->callback( fn( $payload ) => '198.51.100.1' === ( $payload['data'][0]['user_data']['client_ip_address'] ?? null ) )
+			)
+			->willReturn( new WP_REST_Response( array(), 200 ) );
+		$action_id = as_enqueue_async_action(
+			Helper::with_prefix( 'send_conversion_event' ),
+			array(
+				'event_payload' => array(
+					'event_name' => 'PURCHASE',
+					'user_data'  => array( 'client_ip_address' => '198.51.100.1' ),
+				),
+				'args'          => array( 'order_id' => $order->get_id() ),
+			),
+			Config::PLUGIN_SLUG
+		);
+
+		$this->run_action( $action_id );
+	}
+
+	/**
 	 * Test that loading the order confirmation page after a failed send queues the Purchase again.
 	 */
 	public function test_reload_after_failed_send_queues_purchase_again(): void {

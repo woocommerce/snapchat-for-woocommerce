@@ -25,7 +25,6 @@ use SnapchatForWooCommerce\Utils\Storage\Options;
 use SnapchatForWooCommerce\Utils\Storage\OptionDefaults;
 use SnapchatForWooCommerce\ServiceContainer;
 use SnapchatForWooCommerce\ServiceKey;
-use SnapchatForWooCommerce\Tracking\FailedConversionCleanup;
 
 defined( 'ABSPATH' ) || exit;
 
@@ -68,9 +67,6 @@ register_activation_hook(
 		if ( 'connected' === Options::get( OptionDefaults::ONBOARDING_STATUS ) ) {
 			ServiceContainer::get( ServiceKey::PRODUCT_EXPORT_SERVICE )->maybe_schedule_recurring_export();
 		}
-
-		// Resume purging failed conversion sends left over from before deactivation.
-		( new FailedConversionCleanup() )->maybe_schedule();
 	}
 );
 
@@ -79,8 +75,6 @@ register_deactivation_hook(
 	function () {
 		// Unschedule all tasks related to product catalog export.
 		ServiceContainer::get( ServiceKey::PRODUCT_EXPORT_SERVICE )->maybe_unschedule_export_jobs();
-
-		( new FailedConversionCleanup() )->unschedule();
 	}
 );
 
