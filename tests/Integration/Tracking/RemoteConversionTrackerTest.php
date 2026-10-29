@@ -133,11 +133,13 @@ class RemoteConversionTrackerTest extends WP_UnitTestCase {
 		$order_id = wc_create_order()->get_id();
 		add_filter( 'pre_as_enqueue_async_action', fn() => 0 );
 
+		$_SERVER['REMOTE_ADDR'] = '203.0.113.7';
+
 		$this->tracker->track_purchase( $order_id );
 
-		$this->assertEmpty(
-			wc_get_order( $order_id )->get_meta( RemoteConversionTracker::ORDER_CONVERSION_QUEUED_META_KEY )
-		);
+		$order = wc_get_order( $order_id );
+		$this->assertEmpty( $order->get_meta( RemoteConversionTracker::ORDER_CONVERSION_QUEUED_META_KEY ) );
+		$this->assertEmpty( $order->get_meta( RemoteConversionTracker::ORDER_CLIENT_IP_ADDRESS_META_KEY ) );
 	}
 
 	/**
@@ -207,7 +209,7 @@ class RemoteConversionTrackerTest extends WP_UnitTestCase {
 		$failed = $this->record_action( 'conversion_failed' );
 
 		$payload = array( 'event_name' => 'PURCHASE' );
-		$args    = array( 'order_id' => $this->create_order_without_client_data() );
+		$args    = array( 'order_id' => wc_create_order()->get_id() );
 		$this->tracker->send( $payload, $args );
 
 		$this->assertSame( array( array( $payload, $args ) ), $sent->calls );
@@ -229,7 +231,7 @@ class RemoteConversionTrackerTest extends WP_UnitTestCase {
 		$failed = $this->record_action( 'conversion_failed' );
 
 		$payload = array( 'event_name' => 'PURCHASE' );
-		$args    = array( 'order_id' => $this->create_order_without_client_data() );
+		$args    = array( 'order_id' => wc_create_order()->get_id() );
 		$this->tracker->send( $payload, $args );
 
 		$this->assertSame( array(), $sent->calls );
@@ -276,19 +278,5 @@ class RemoteConversionTrackerTest extends WP_UnitTestCase {
 		);
 
 		return $recorder;
-	}
-
-	/**
-	 * Creates an order with no stored IP address or user agent, so send() leaves the payload as is.
-	 *
-	 * @return int Order ID.
-	 */
-	private function create_order_without_client_data(): int {
-		$order = wc_create_order();
-		$order->set_customer_ip_address( '' );
-		$order->set_customer_user_agent( '' );
-		$order->save();
-
-		return $order->get_id();
 	}
 }

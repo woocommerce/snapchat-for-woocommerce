@@ -127,27 +127,36 @@ class PurchaseConversionDeliveryTest extends WP_UnitTestCase {
 	}
 
 	/**
-	 * Test that a queued Purchase action doesn't store the visitor's IP address or user agent.
+	 * Test that a queued Purchase action keeps the visitor's IP address and user agent on the order, not in its args.
 	 */
 	public function test_queued_purchase_action_omits_ip_and_user_agent(): void {
 		$_SERVER['REMOTE_ADDR']     = '203.0.113.7';
 		$_SERVER['HTTP_USER_AGENT'] = 'Shopper UA';
+		$order_id                   = wc_create_order()->get_id();
 
-		$action_id = $this->queue_purchase( wc_create_order()->get_id() );
+		$action_id = $this->queue_purchase( $order_id );
 
 		$stored = ActionScheduler::store()->fetch_action( $action_id )->get_args()['event_payload']['user_data'];
 		$this->assertArrayNotHasKey( 'client_ip_address', $stored );
 		$this->assertArrayNotHasKey( 'client_user_agent', $stored );
+		$order = wc_get_order( $order_id );
+		$this->assertSame( '203.0.113.7', $order->get_meta( RemoteConversionTracker::ORDER_CLIENT_IP_ADDRESS_META_KEY ) );
+		$this->assertSame( 'Shopper UA', $order->get_meta( RemoteConversionTracker::ORDER_CLIENT_USER_AGENT_META_KEY ) );
 	}
 
 	/**
-	 * Test that a Purchase is sent with the IP address and user agent stored on the order.
+	 * Test that a Purchase is sent with the confirmation page visitor's IP address and user agent, not the order's.
+	 *
+	 * An order created in wp-admin stores the admin's IP address and user agent, while the
+	 * customer who pays for it loads the confirmation page.
 	 */
-	public function test_purchase_is_sent_with_order_ip_and_user_agent(): void {
+	public function test_purchase_is_sent_with_confirmation_request_ip_and_user_agent(): void {
 		$order = wc_create_order();
-		$order->set_customer_ip_address( '203.0.113.7' );
-		$order->set_customer_user_agent( 'Shopper UA' );
+		$order->set_customer_ip_address( '198.51.100.1' );
+		$order->set_customer_user_agent( 'Admin UA' );
 		$order->save();
+		$_SERVER['HTTP_CF_CONNECTING_IP'] = '203.0.113.7';
+		$_SERVER['HTTP_USER_AGENT']       = 'Shopper UA';
 		$this->client->expects( $this->once() )
 			->method( 'proxy_post' )
 			->with(
@@ -160,6 +169,36 @@ class PurchaseConversionDeliveryTest extends WP_UnitTestCase {
 			->willReturn( new WP_REST_Response( array(), 200 ) );
 
 		$this->run_action( $this->queue_purchase( $order->get_id() ) );
+
+		$order = wc_get_order( $order->get_id() );
+		$this->assertEmpty( $order->get_meta( RemoteConversionTracker::ORDER_CLIENT_IP_ADDRESS_META_KEY ) );
+		$this->assertEmpty( $order->get_meta( RemoteConversionTracker::ORDER_CLIENT_USER_AGENT_META_KEY ) );
+	}
+
+	/**
+	 * Test that erasing an order's personal data removes the visitor data kept for its Purchase.
+	 */
+	public function test_order_personal_data_eraser_removes_client_data(): void {
+		$_SERVER['REMOTE_ADDR']     = '203.0.113.7';
+		$_SERVER['HTTP_USER_AGENT'] = 'Shopper UA';
+		$order_id                   = wc_create_order()->get_id();
+		$this->queue_purchase( $order_id );
+
+		\WC_Privacy_Erasers::remove_order_personal_data( wc_get_order( $order_id ) );
+
+		$order = wc_get_order( $order_id );
+		$this->assertEmpty( $order->get_meta( RemoteConversionTracker::ORDER_CLIENT_IP_ADDRESS_META_KEY ) );
+		$this->assertEmpty( $order->get_meta( RemoteConversionTracker::ORDER_CLIENT_USER_AGENT_META_KEY ) );
+	}
+
+	/**
+	 * Test that the order personal data export includes the visitor data kept for its Purchase.
+	 */
+	public function test_order_personal_data_export_includes_client_data(): void {
+		$meta = apply_filters( 'woocommerce_privacy_export_order_personal_data_meta', array() );
+
+		$this->assertArrayHasKey( RemoteConversionTracker::ORDER_CLIENT_IP_ADDRESS_META_KEY, $meta );
+		$this->assertArrayHasKey( RemoteConversionTracker::ORDER_CLIENT_USER_AGENT_META_KEY, $meta );
 	}
 
 	/**
@@ -167,8 +206,8 @@ class PurchaseConversionDeliveryTest extends WP_UnitTestCase {
 	 */
 	public function test_purchase_queued_with_ip_keeps_stored_values(): void {
 		$order = wc_create_order();
-		$order->set_customer_ip_address( '203.0.113.7' );
-		$order->save();
+		$order->update_meta_data( RemoteConversionTracker::ORDER_CLIENT_IP_ADDRESS_META_KEY, '203.0.113.7' );
+		$order->save_meta_data();
 		$this->client->expects( $this->once() )
 			->method( 'proxy_post' )
 			->with(

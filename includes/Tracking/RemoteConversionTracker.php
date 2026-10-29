@@ -65,6 +65,34 @@ class RemoteConversionTracker implements ConversionTrackerInterface {
 	private const ORDER_CONVERSION_QUEUED_TTL = HOUR_IN_SECONDS;
 
 	/**
+	 * Order meta key holding the visitor's IP address for the order's queued Purchase event.
+	 *
+	 * Read from the order confirmation request, like every other event's IP address, and kept on
+	 * the order instead of in the queued action. Removed once the Purchase is sent or the order's
+	 * personal data is erased.
+	 *
+	 * @since x.x.x
+	 */
+	public const ORDER_CLIENT_IP_ADDRESS_META_KEY = '_snapchat_client_ip_address';
+
+	/**
+	 * Order meta key holding the visitor's user agent for the order's queued Purchase event.
+	 *
+	 * Handled like {@see self::ORDER_CLIENT_IP_ADDRESS_META_KEY}.
+	 *
+	 * @since x.x.x
+	 */
+	public const ORDER_CLIENT_USER_AGENT_META_KEY = '_snapchat_client_user_agent';
+
+	/**
+	 * Order meta key for each `user_data` field kept on the order.
+	 */
+	private const ORDER_CLIENT_DATA_META_KEYS = array(
+		UserIdentifier::CLIENT_IP_ADDRESS => self::ORDER_CLIENT_IP_ADDRESS_META_KEY,
+		UserIdentifier::CLIENT_USER_AGENT => self::ORDER_CLIENT_USER_AGENT_META_KEY,
+	);
+
+	/**
 	 * WCS client used to proxy API requests to the Ad Partner.
 	 *
 	 * @var WcsClient
@@ -122,12 +150,21 @@ class RemoteConversionTracker implements ConversionTrackerInterface {
 		}
 
 		/*
-		 * The queued action stores the payload, and a failed action is never purged, so leave out
-		 * the plain-text IP address and user agent. The order already stores both, where the
-		 * privacy eraser can clear them, and send() reads them from there.
+		 * The queued action stores the payload, and a failed action is never purged, so keep the
+		 * plain-text IP address and user agent on the order instead, where the privacy eraser can
+		 * clear them. send() adds them back.
 		 */
 		$user_data = UserIdentifier::get_user_data();
-		unset( $user_data[ UserIdentifier::CLIENT_IP_ADDRESS ], $user_data[ UserIdentifier::CLIENT_USER_AGENT ] );
+
+		foreach ( self::ORDER_CLIENT_DATA_META_KEYS as $field => $meta_key ) {
+			if ( empty( $user_data[ $field ] ) ) {
+				$order->delete_meta_data( $meta_key );
+			} else {
+				$order->update_meta_data( $meta_key, $user_data[ $field ] );
+			}
+
+			unset( $user_data[ $field ] );
+		}
 
 		$event   = new PurchaseEvent( $order_id );
 		$payload = $event->build_payload(
@@ -157,6 +194,11 @@ class RemoteConversionTracker implements ConversionTrackerInterface {
 
 		if ( ! $action_id ) {
 			$order->delete_meta_data( self::ORDER_CONVERSION_QUEUED_META_KEY );
+
+			foreach ( self::ORDER_CLIENT_DATA_META_KEYS as $meta_key ) {
+				$order->delete_meta_data( $meta_key );
+			}
+
 			$order->save_meta_data();
 		}
 	}
@@ -403,7 +445,7 @@ class RemoteConversionTracker implements ConversionTrackerInterface {
 	}
 
 	/**
-	 * Adds the visitor's IP address and user agent stored on the order to a Purchase payload.
+	 * Adds the visitor's IP address and user agent kept on the order to a Purchase payload.
 	 *
 	 * Purchase payloads are queued without them (see {@see self::track_purchase()}). Values
 	 * already in the payload win, so actions queued before that change send what they stored.
@@ -425,12 +467,15 @@ class RemoteConversionTracker implements ConversionTrackerInterface {
 			return $event_payload;
 		}
 
-		$client_data = array_filter(
-			array(
-				UserIdentifier::CLIENT_IP_ADDRESS => $order->get_customer_ip_address(),
-				UserIdentifier::CLIENT_USER_AGENT => $order->get_customer_user_agent(),
-			)
-		);
+		$client_data = array();
+
+		foreach ( self::ORDER_CLIENT_DATA_META_KEYS as $field => $meta_key ) {
+			$value = $order->get_meta( $meta_key, true );
+
+			if ( is_string( $value ) && '' !== $value ) {
+				$client_data[ $field ] = $value;
+			}
+		}
 
 		if ( ! $client_data ) {
 			return $event_payload;

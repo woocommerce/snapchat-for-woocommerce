@@ -18,6 +18,7 @@ use SnapchatForWooCommerce\Tracking\ConversionEvent\PurchaseEvent;
 use SnapchatForWooCommerce\Utils\Storage\OptionDefaults;
 use SnapchatForWooCommerce\Utils\Storage\Options;
 use SnapchatForWooCommerce\Utils\Helper;
+use WC_Order;
 
 /**
  * Service class for registering WooCommerce conversion tracking hooks.
@@ -81,6 +82,10 @@ class ConversionTrackingService implements ServiceStatusInterface {
 	 * @return void
 	 */
 	public function register_hooks(): void {
+		// Registered even when conversions are off, so data kept from earlier Purchases can still be exported and erased.
+		add_filter( 'woocommerce_privacy_export_order_personal_data_meta', array( $this, 'add_client_data_to_privacy_export' ) );
+		add_action( 'woocommerce_privacy_remove_order_personal_data', array( $this, 'erase_client_data' ) );
+
 		if ( ! self::is_enabled() ) {
 			return;
 		}
@@ -297,6 +302,49 @@ class ConversionTrackingService implements ServiceStatusInterface {
 
 		// Record delivery. Orders tracked before the queued flag existed still rely on this to skip reloads.
 		$order->update_meta_data( RemoteConversionTracker::ORDER_CONVERSION_TRACKED_META_KEY, 1 );
+		$order->delete_meta_data( RemoteConversionTracker::ORDER_CLIENT_IP_ADDRESS_META_KEY );
+		$order->delete_meta_data( RemoteConversionTracker::ORDER_CLIENT_USER_AGENT_META_KEY );
+		$order->save_meta_data();
+	}
+
+	/**
+	 * Adds the visitor data kept for a queued Purchase to WooCommerce's order personal data export.
+	 *
+	 * Hook callback for `woocommerce_privacy_export_order_personal_data_meta`.
+	 *
+	 * @since x.x.x
+	 *
+	 * @param mixed $meta_to_export Order meta keys to export, mapped to their labels.
+	 * @return mixed
+	 */
+	public function add_client_data_to_privacy_export( $meta_to_export ) {
+		if ( ! is_array( $meta_to_export ) ) {
+			return $meta_to_export;
+		}
+
+		$meta_to_export[ RemoteConversionTracker::ORDER_CLIENT_IP_ADDRESS_META_KEY ] = __( 'Snapchat conversion IP address', 'snapchat-for-woocommerce' );
+		$meta_to_export[ RemoteConversionTracker::ORDER_CLIENT_USER_AGENT_META_KEY ] = __( 'Snapchat conversion user agent', 'snapchat-for-woocommerce' );
+
+		return $meta_to_export;
+	}
+
+	/**
+	 * Removes the visitor data kept for a queued Purchase when the order's personal data is erased.
+	 *
+	 * Hook callback for `woocommerce_privacy_remove_order_personal_data`.
+	 *
+	 * @since x.x.x
+	 *
+	 * @param mixed $order Order whose personal data is being erased.
+	 * @return void
+	 */
+	public function erase_client_data( $order ): void {
+		if ( ! $order instanceof WC_Order ) {
+			return;
+		}
+
+		$order->delete_meta_data( RemoteConversionTracker::ORDER_CLIENT_IP_ADDRESS_META_KEY );
+		$order->delete_meta_data( RemoteConversionTracker::ORDER_CLIENT_USER_AGENT_META_KEY );
 		$order->save_meta_data();
 	}
 
