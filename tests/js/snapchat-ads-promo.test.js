@@ -7,6 +7,9 @@ import { renderToString } from '@wordpress/element';
  * Internal dependencies
  */
 import SnapchatAdsPromo from '~/meta-boxes/order-attribution/snapchat-ads-promo';
+import useSnapchatAccountDetails from '~/hooks/useSnapchatAccountDetails';
+
+jest.mock( '~/hooks/useSnapchatAccountDetails', () => jest.fn( () => ( {} ) ) );
 
 jest.mock( '@wordpress/components', () => ( {
 	Flex: ( { children } ) => <div>{ children }</div>,
@@ -14,8 +17,8 @@ jest.mock( '@wordpress/components', () => ( {
 	FlexBlock: ( { children } ) => <div>{ children }</div>,
 } ) );
 
-jest.mock( '~/components/app-button', () => ( { text } ) => (
-	<button>{ text }</button>
+jest.mock( '~/components/app-button', () => ( { text, href } ) => (
+	<a href={ href }>{ text }</a>
 ) );
 
 jest.mock( '~/utils/urls', () => ( {
@@ -29,7 +32,8 @@ jest.mock( '~/utils/urls', () => ( {
 describe( 'SnapchatAdsPromo', () => {
 	afterEach( () => {
 		delete window.snapchatAdsMetaBoxData;
-		delete window.snapchatAdsAdminData;
+		useSnapchatAccountDetails.mockReset();
+		useSnapchatAccountDetails.mockReturnValue( {} );
 	} );
 
 	it( 'renders the get-started promo when onboarding is incomplete', () => {
@@ -58,12 +62,15 @@ describe( 'SnapchatAdsPromo', () => {
 
 	it( 'renders the create-campaign promo when onboarded without a campaign', () => {
 		window.snapchatAdsMetaBoxData = { onboardingComplete: true };
-		window.snapchatAdsAdminData = { adAccountId: 'abc123' };
+		useSnapchatAccountDetails.mockReturnValue( { ad_acc_id: 'abc123' } );
 
 		const html = renderToString( <SnapchatAdsPromo /> );
 
 		expect( html ).toContain( 'Get more sales with Snapchat Ads' );
 		expect( html ).toContain( 'Create campaign' );
+		expect( html ).toContain(
+			'href="https://ads.snapchat.com/abc123/create-campaign"'
+		);
 	} );
 
 	it( 'renders nothing when onboarded without a campaign and no ad account', () => {
