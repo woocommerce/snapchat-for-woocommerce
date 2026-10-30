@@ -1,6 +1,7 @@
 /**
  * External dependencies
  */
+import { Flex, FlexBlock, FlexItem } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
 
 /**
@@ -18,20 +19,33 @@ import snapchatLogoURL from '~/images/logo/snapchat.svg';
  * @return {JSX.Element} The promo banner.
  */
 const PromoBanner = ( { title, body, cta } ) => (
-	<div className="sfw-order-attribution-promo">
-		<div className="sfw-order-attribution-promo__header">
-			<img
-				className="sfw-order-attribution-promo__logo"
-				src={ snapchatLogoURL }
-				alt={ __( 'Snapchat', 'snapchat-for-woocommerce' ) }
-				width="24"
-				height="24"
-			/>
-			<h3 className="sfw-order-attribution-promo__title">{ title }</h3>
-		</div>
-		<p className="sfw-order-attribution-promo__body">{ body }</p>
-		{ cta }
-	</div>
+	<Flex className="sfw-order-attribution-promo" direction="column" gap={ 3 }>
+		<FlexBlock>
+			<Flex gap={ 2 } align="center">
+				<FlexItem>
+					<img
+						className="sfw-order-attribution-promo__logo"
+						src={ snapchatLogoURL }
+						alt={ __(
+							'Snapchat Logo',
+							'snapchat-for-woocommerce'
+						) }
+						width={ 24 }
+						height={ 24 }
+					/>
+				</FlexItem>
+				<FlexBlock>
+					<h3 className="sfw-order-attribution-promo__title">
+						{ title }
+					</h3>
+				</FlexBlock>
+			</Flex>
+		</FlexBlock>
+		<FlexBlock>
+			<p>{ body }</p>
+		</FlexBlock>
+		<FlexBlock>{ cta }</FlexBlock>
+	</Flex>
 );
 
 export default PromoBanner;
