@@ -12,9 +12,13 @@
 
 namespace SnapchatForWooCommerce\Tracking;
 
+use ActionScheduler;
+use RuntimeException;
+use SnapchatForWooCommerce\Tracking\ConversionEvent\PurchaseEvent;
 use SnapchatForWooCommerce\Utils\Storage\OptionDefaults;
 use SnapchatForWooCommerce\Utils\Storage\Options;
 use SnapchatForWooCommerce\Utils\Helper;
+use WC_Order;
 
 /**
  * Service class for registering WooCommerce conversion tracking hooks.
@@ -36,6 +40,20 @@ class ConversionTrackingService implements ServiceStatusInterface {
 	 * @var ConversionTrackerInterface
 	 */
 	protected ConversionTrackerInterface $tracker;
+
+	/**
+	 * ID of the Action Scheduler action currently executing, or null outside an action.
+	 *
+	 * @var int|null
+	 */
+	protected ?int $current_action_id = null;
+
+	/**
+	 * Description of the Purchase send that failed during the current action, if any.
+	 *
+	 * @var string|null
+	 */
+	protected ?string $purchase_failure = null;
 
 	/**
 	 * Constructor.
@@ -64,6 +82,10 @@ class ConversionTrackingService implements ServiceStatusInterface {
 	 * @return void
 	 */
 	public function register_hooks(): void {
+		// Registered even when conversions are off, so data kept from earlier Purchases can still be exported and erased.
+		add_filter( 'woocommerce_privacy_export_order_personal_data_meta', array( $this, 'add_client_data_to_privacy_export' ) );
+		add_action( 'woocommerce_privacy_remove_order_personal_data', array( $this, 'erase_client_data' ) );
+
 		if ( ! self::is_enabled() ) {
 			return;
 		}
@@ -75,7 +97,13 @@ class ConversionTrackingService implements ServiceStatusInterface {
 		Helper::register_ajax_action( 'view_content', array( $this, 'handle_async_view_content' ) );
 		Helper::register_ajax_action( 'page_view', array( $this, 'handle_async_page_view' ) );
 		add_action( Helper::with_prefix( 'send_conversion_event' ), array( $this->tracker, 'send' ), 10, 2 );
+		// Runs last, so callbacks at any lower priority still run before a failed Purchase throws.
+		add_action( Helper::with_prefix( 'send_conversion_event' ), array( $this, 'fail_queued_purchase' ), PHP_INT_MAX, 0 );
 		add_action( Helper::with_prefix( 'conversion_sent' ), array( $this, 'mark_as_tracked' ), 10, 2 );
+		add_action( Helper::with_prefix( 'conversion_failed' ), array( $this, 'handle_failed_conversion' ), 10, 3 );
+		add_action( 'action_scheduler_begin_execute', array( $this, 'start_queued_send' ), 10, 1 );
+		add_action( 'action_scheduler_after_execute', array( $this, 'end_queued_send' ), 10, 0 );
+		add_action( 'action_scheduler_failed_execution', array( $this, 'end_queued_send' ), 10, 0 );
 	}
 
 	/**
@@ -272,8 +300,166 @@ class ConversionTrackingService implements ServiceStatusInterface {
 
 		$order = wc_get_order( $args['order_id'] );
 
-		// Mark the order as tracked, to avoid double-reporting if the confirmation page is reloaded.
+		// Record delivery. Orders tracked before the queued flag existed still rely on this to skip reloads.
 		$order->update_meta_data( RemoteConversionTracker::ORDER_CONVERSION_TRACKED_META_KEY, 1 );
+		$order->delete_meta_data( RemoteConversionTracker::ORDER_CLIENT_IP_ADDRESS_META_KEY );
+		$order->delete_meta_data( RemoteConversionTracker::ORDER_CLIENT_USER_AGENT_META_KEY );
 		$order->save_meta_data();
+	}
+
+	/**
+	 * Adds the visitor data kept for a queued Purchase to WooCommerce's order personal data export.
+	 *
+	 * Hook callback for `woocommerce_privacy_export_order_personal_data_meta`.
+	 *
+	 * @since x.x.x
+	 *
+	 * @param mixed $meta_to_export Order meta keys to export, mapped to their labels.
+	 * @return mixed
+	 */
+	public function add_client_data_to_privacy_export( $meta_to_export ) {
+		if ( ! is_array( $meta_to_export ) ) {
+			return $meta_to_export;
+		}
+
+		$meta_to_export[ RemoteConversionTracker::ORDER_CLIENT_IP_ADDRESS_META_KEY ] = __( 'Snapchat conversion IP address', 'snapchat-for-woocommerce' );
+		$meta_to_export[ RemoteConversionTracker::ORDER_CLIENT_USER_AGENT_META_KEY ] = __( 'Snapchat conversion user agent', 'snapchat-for-woocommerce' );
+
+		return $meta_to_export;
+	}
+
+	/**
+	 * Removes the visitor data kept for a queued Purchase when the order's personal data is erased.
+	 *
+	 * Hook callback for `woocommerce_privacy_remove_order_personal_data`.
+	 *
+	 * @since x.x.x
+	 *
+	 * @param mixed $order Order whose personal data is being erased.
+	 * @return void
+	 */
+	public function erase_client_data( $order ): void {
+		if ( ! $order instanceof WC_Order ) {
+			return;
+		}
+
+		$order->delete_meta_data( RemoteConversionTracker::ORDER_CLIENT_IP_ADDRESS_META_KEY );
+		$order->delete_meta_data( RemoteConversionTracker::ORDER_CLIENT_USER_AGENT_META_KEY );
+		$order->save_meta_data();
+	}
+
+	/**
+	 * Remembers which Action Scheduler action is executing.
+	 *
+	 * Hook callback for `action_scheduler_begin_execute`. Failed Purchase sends are only
+	 * reported as failed actions when they run inside Action Scheduler.
+	 *
+	 * @since x.x.x
+	 *
+	 * @param int $action_id ID of the action about to execute.
+	 * @return void
+	 */
+	public function start_queued_send( $action_id ): void {
+		$this->current_action_id = is_numeric( $action_id ) ? (int) $action_id : null;
+		$this->purchase_failure  = null;
+	}
+
+	/**
+	 * Forgets the executing action once it finishes.
+	 *
+	 * Hook callback for `action_scheduler_after_execute` and `action_scheduler_failed_execution`.
+	 * One queue run executes many actions on this same instance, so state from one action must
+	 * not carry into the next.
+	 *
+	 * @since x.x.x
+	 *
+	 * @return void
+	 */
+	public function end_queued_send(): void {
+		$this->current_action_id = null;
+		$this->purchase_failure  = null;
+	}
+
+	/**
+	 * Clears a failed Purchase's queued meta and records the failure.
+	 *
+	 * Hook callback for `snapchat_for_woocommerce_conversion_failed`. Removing the queued
+	 * meta lets the next load of the order confirmation page queue the Purchase again. When
+	 * the send ran inside an Action Scheduler action of `send_conversion_event`, the failure
+	 * is recorded so {@see self::fail_queued_purchase()} marks the action as failed.
+	 *
+	 * @since x.x.x
+	 *
+	 * @param mixed $event_payload The payload that could not be sent.
+	 * @param mixed $args          Additional args, including `order_id`.
+	 * @param mixed $error         The error returned by the request.
+	 * @return void
+	 */
+	public function handle_failed_conversion( $event_payload, $args, $error ): void {
+		if ( ! is_array( $event_payload ) || ! is_array( $args ) || ! is_wp_error( $error ) ) {
+			return;
+		}
+
+		$order_id = isset( $args['order_id'] ) ? absint( $args['order_id'] ) : 0;
+
+		if ( ! $order_id || PurchaseEvent::ID !== ( $event_payload['event_name'] ?? '' ) ) {
+			return;
+		}
+
+		$order = wc_get_order( $order_id );
+
+		if ( $order ) {
+			$order->delete_meta_data( RemoteConversionTracker::ORDER_CONVERSION_QUEUED_META_KEY );
+			$order->save_meta_data();
+		}
+
+		if ( ! $this->is_running_queued_send() ) {
+			return;
+		}
+
+		$status = Helper::get_error_status_code( $error );
+
+		$this->purchase_failure = sprintf(
+			'Snapchat Purchase conversion for order %1$d failed (%2$s). It will be queued again the next time the order confirmation page loads.',
+			$order_id,
+			null !== $status ? "HTTP {$status}" : $error->get_error_code()
+		);
+	}
+
+	/**
+	 * Marks the executing action as failed when its Purchase send failed.
+	 *
+	 * Action Scheduler records a thrown exception as a failed action and stores its message in
+	 * the action's log.
+	 *
+	 * @since x.x.x
+	 *
+	 * @throws RuntimeException When the Purchase send in the current action failed.
+	 * @return void
+	 */
+	public function fail_queued_purchase(): void {
+		if ( null === $this->purchase_failure ) {
+			return;
+		}
+
+		$failure                = $this->purchase_failure;
+		$this->purchase_failure = null;
+
+		throw new RuntimeException( esc_html( $failure ) );
+	}
+
+	/**
+	 * Determines whether an Action Scheduler action of `send_conversion_event` is executing.
+	 *
+	 * @return bool
+	 */
+	protected function is_running_queued_send(): bool {
+		if ( null === $this->current_action_id || ! class_exists( ActionScheduler::class ) ) {
+			return false;
+		}
+
+		$action = ActionScheduler::store()->fetch_action( $this->current_action_id );
+
+		return Helper::with_prefix( 'send_conversion_event' ) === $action->get_hook();
 	}
 }

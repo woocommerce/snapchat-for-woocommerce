@@ -12,6 +12,7 @@ use Automattic\WooCommerce\Internal\Utilities\Users as WC_Internal_Users;
 use SnapchatForWooCommerce\Config;
 use WC_Order;
 use WC_Product;
+use WP_Error;
 
 /**
  * Class Helper
@@ -171,6 +172,39 @@ class Helper {
 	 */
 	public static function is_logging_enabled(): bool {
 		return defined( 'SNAPCHAT_FOR_WOOCOMMERCE_DEBUG' ) && SNAPCHAT_FOR_WOOCOMMERCE_DEBUG;
+	}
+
+	/**
+	 * Returns the HTTP status code carried by a remote request error.
+	 *
+	 * The WCS client returns three shapes of error: a transport error (connection
+	 * failure or timeout) with no HTTP response, a locally generated error with a
+	 * `status` entry in its data, and a non-2xx response with the raw HTTP response
+	 * array as its data.
+	 *
+	 * @since x.x.x
+	 *
+	 * @param WP_Error $error The error returned by the remote request.
+	 * @return int|null The HTTP status code, or null when no HTTP response was received.
+	 */
+	public static function get_error_status_code( WP_Error $error ): ?int {
+		$data = $error->get_error_data();
+
+		if ( ! is_array( $data ) ) {
+			return null;
+		}
+
+		$code = wp_remote_retrieve_response_code( $data );
+
+		if ( is_numeric( $code ) ) {
+			return (int) $code;
+		}
+
+		if ( isset( $data['status'] ) && is_numeric( $data['status'] ) ) {
+			return (int) $data['status'];
+		}
+
+		return null;
 	}
 
 	/**

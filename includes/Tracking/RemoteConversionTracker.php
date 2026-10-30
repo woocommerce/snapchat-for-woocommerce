@@ -45,6 +45,54 @@ class RemoteConversionTracker implements ConversionTrackerInterface {
 	public const ORDER_CONVERSION_TRACKED_META_KEY = '_snapchat_conversion_tracked';
 
 	/**
+	 * Meta key used to mark orders whose Purchase event has been queued for sending.
+	 *
+	 * Holds the Unix timestamp of when the event was queued, so reloading the order confirmation
+	 * page doesn't queue it twice. A failed send removes it, so the next load queues it again.
+	 * It expires after {@see self::ORDER_CONVERSION_QUEUED_TTL} seconds.
+	 *
+	 * @since x.x.x
+	 */
+	public const ORDER_CONVERSION_QUEUED_META_KEY = '_snapchat_conversion_queued';
+
+	/**
+	 * Seconds after which a queued Purchase no longer blocks queueing it again.
+	 *
+	 * A send can end without reporting a failure: the action is cancelled, the process dies, the
+	 * credentials are removed, or conversions are turned off before it runs. An expiring reservation
+	 * keeps those orders from staying untracked. One hour is well past normal Action Scheduler latency.
+	 */
+	private const ORDER_CONVERSION_QUEUED_TTL = HOUR_IN_SECONDS;
+
+	/**
+	 * Order meta key holding the visitor's IP address for the order's queued Purchase event.
+	 *
+	 * Read from the order confirmation request, like every other event's IP address, and kept on
+	 * the order instead of in the queued action. Removed once the Purchase is sent or the order's
+	 * personal data is erased.
+	 *
+	 * @since x.x.x
+	 */
+	public const ORDER_CLIENT_IP_ADDRESS_META_KEY = '_snapchat_client_ip_address';
+
+	/**
+	 * Order meta key holding the visitor's user agent for the order's queued Purchase event.
+	 *
+	 * Handled like {@see self::ORDER_CLIENT_IP_ADDRESS_META_KEY}.
+	 *
+	 * @since x.x.x
+	 */
+	public const ORDER_CLIENT_USER_AGENT_META_KEY = '_snapchat_client_user_agent';
+
+	/**
+	 * Order meta key for each `user_data` field kept on the order.
+	 */
+	private const ORDER_CLIENT_DATA_META_KEYS = array(
+		UserIdentifier::CLIENT_IP_ADDRESS => self::ORDER_CLIENT_IP_ADDRESS_META_KEY,
+		UserIdentifier::CLIENT_USER_AGENT => self::ORDER_CLIENT_USER_AGENT_META_KEY,
+	);
+
+	/**
 	 * WCS client used to proxy API requests to the Ad Partner.
 	 *
 	 * @var WcsClient
@@ -93,20 +141,49 @@ class RemoteConversionTracker implements ConversionTrackerInterface {
 
 		$order = wc_get_order( $order_id );
 
-		// Make sure there is a valid order object and it is not already marked as tracked.
-		if ( ! $order || 1 === (int) $order->get_meta( self::ORDER_CONVERSION_TRACKED_META_KEY, true ) ) {
+		if (
+			! $order
+			|| 1 === (int) $order->get_meta( self::ORDER_CONVERSION_TRACKED_META_KEY, true )
+			|| time() - (int) $order->get_meta( self::ORDER_CONVERSION_QUEUED_META_KEY, true ) < self::ORDER_CONVERSION_QUEUED_TTL
+		) {
 			return;
+		}
+
+		/*
+		 * The queued action stores the payload, and a failed action is never purged, so keep the
+		 * plain-text IP address and user agent on the order instead, where the privacy eraser can
+		 * clear them. send() adds them back.
+		 */
+		$user_data = UserIdentifier::get_user_data();
+
+		foreach ( self::ORDER_CLIENT_DATA_META_KEYS as $field => $meta_key ) {
+			if ( empty( $user_data[ $field ] ) ) {
+				$order->delete_meta_data( $meta_key );
+			} else {
+				$order->update_meta_data( $meta_key, $user_data[ $field ] );
+			}
+
+			unset( $user_data[ $field ] );
 		}
 
 		$event   = new PurchaseEvent( $order_id );
 		$payload = $event->build_payload(
 			array(
-				'user_data' => UserIdentifier::get_user_data(),
+				'user_data' => $user_data,
 			)
 		);
 		$args    = array( 'order_id' => $order_id );
 
-		as_enqueue_async_action(
+		/*
+		 * Reserve the order before queueing, so a send that fails before this request finishes
+		 * can't have its failure overwritten by a late reservation. Two simultaneous loads can still
+		 * both queue a send, but both carry the order ID as their event_id, so Snapchat deduplicates them.
+		 * Save only the meta, so a concurrent status change from a payment webhook isn't overwritten.
+		 */
+		$order->update_meta_data( self::ORDER_CONVERSION_QUEUED_META_KEY, time() );
+		$order->save_meta_data();
+
+		$action_id = as_enqueue_async_action(
 			Helper::with_prefix( 'send_conversion_event' ),
 			array(
 				'event_payload' => $payload,
@@ -114,6 +191,16 @@ class RemoteConversionTracker implements ConversionTrackerInterface {
 			),
 			Config::PLUGIN_SLUG
 		);
+
+		if ( ! $action_id ) {
+			$order->delete_meta_data( self::ORDER_CONVERSION_QUEUED_META_KEY );
+
+			foreach ( self::ORDER_CLIENT_DATA_META_KEYS as $meta_key ) {
+				$order->delete_meta_data( $meta_key );
+			}
+
+			$order->save_meta_data();
+		}
 	}
 
 	/**
@@ -291,44 +378,53 @@ class RemoteConversionTracker implements ConversionTrackerInterface {
 			return;
 		}
 
+		$event_payload = $this->add_order_client_data( $event_payload, $args );
+
 		$query   = http_build_query( array( 'access_token' => $token ) );
 		$path    = "/conversions/v3/{$pixel_id}/events?{$query}";
 		$payload = array( 'data' => array( $event_payload ) );
 
 		/* @var WP_REST_Response|WP_Error $response The response from the WCS proxy. */
 		$response = $this->client->proxy_post( $path, $payload, false );
+		$failed   = is_wp_error( $response );
 
 		if ( Helper::is_logging_enabled() ) {
-			$event = $event_payload['event_name'] ?? '';
+			$context = array(
+				'context' => 'tracking',
+				'payload' => $payload,
+				'args'    => $args,
+			);
 
-			if ( is_wp_error( $response ) ) {
-				$body       = json_decode( wp_remote_retrieve_body( $response->get_error_data() ), true );
-				$body       = Helper::deep_replace_double_quotes( $body );
-				$error_data = $response->get_error_data();
-				$status     = $error_data['response']['code'];
-				$message    = $response->get_error_message();
-
-				$info = array(
-					'context'    => 'tracking',
-					'payload'    => $body,
-					'args'       => $args,
-					'error'      => $message,
-					'error_data' => $body,
-				);
-			} else {
-				$status = $response->get_status();
-				$info   = array(
-					'context' => 'tracking',
-					'payload' => $payload,
-					'args'    => $args,
-				);
+			if ( $failed ) {
+				$error_body            = json_decode( wp_remote_retrieve_body( $response->get_error_data() ), true );
+				$context['error']      = $response->get_error_message();
+				$context['error_data'] = Helper::deep_replace_double_quotes( $error_body );
 			}
 
 			$this->logger->log_event(
-				$event,
-				$status,
-				$info
+				$event_payload['event_name'] ?? '',
+				$failed ? Helper::get_error_status_code( $response ) : $response->get_status(),
+				$context
 			);
+		}
+
+		if ( $failed ) {
+			/**
+			 * Fires after a conversion event failed to reach the Ad Partner.
+			 *
+			 * The request failed when the connection could not be made, it timed out, or the
+			 * WCS proxy or the Ad Partner rejected it with a non-2xx response.
+			 *
+			 * @since x.x.x
+			 *
+			 * @param array    $event_payload The payload that could not be sent.
+			 * @param array    $args          Additional args.
+			 * @param WP_Error $error         The error returned by the WCS proxy request.
+			 */
+			// phpcs:ignore WordPress.NamingConventions.PrefixAllGlobals.DynamicHooknameFound -- Prefixed via Helper::with_prefix().
+			do_action( Helper::with_prefix( 'conversion_failed' ), $event_payload, $args, $response );
+
+			return;
 		}
 
 		/**
@@ -336,6 +432,8 @@ class RemoteConversionTracker implements ConversionTrackerInterface {
 		 *
 		 * This hook allows other plugins or custom code to perform actions after the conversion payload
 		 * has been dispatched, such as logging, triggering additional integrations, or updating metadata.
+		 * Since x.x.x it only fires when the Ad Partner accepted the event with a 2xx response; failed
+		 * sends fire `snapchat_for_woocommerce_conversion_failed` instead.
 		 *
 		 * @since 0.1.0
 		 *
@@ -344,5 +442,49 @@ class RemoteConversionTracker implements ConversionTrackerInterface {
 		 */
 		// phpcs:ignore WordPress.NamingConventions.PrefixAllGlobals.DynamicHooknameFound -- Prefixed via Helper::with_prefix().
 		do_action( Helper::with_prefix( 'conversion_sent' ), $event_payload, $args );
+	}
+
+	/**
+	 * Adds the visitor's IP address and user agent kept on the order to a Purchase payload.
+	 *
+	 * Purchase payloads are queued without them (see {@see self::track_purchase()}). Values
+	 * already in the payload win, so actions queued before that change send what they stored.
+	 *
+	 * @param array $event_payload Single event payload.
+	 * @param array $args          Additional args, including `order_id`.
+	 * @return array
+	 */
+	private function add_order_client_data( array $event_payload, array $args ): array {
+		$order_id = isset( $args['order_id'] ) ? absint( $args['order_id'] ) : 0;
+
+		if ( ! $order_id || PurchaseEvent::ID !== ( $event_payload['event_name'] ?? '' ) ) {
+			return $event_payload;
+		}
+
+		$order = wc_get_order( $order_id );
+
+		if ( ! $order ) {
+			return $event_payload;
+		}
+
+		$client_data = array();
+
+		foreach ( self::ORDER_CLIENT_DATA_META_KEYS as $field => $meta_key ) {
+			$value = $order->get_meta( $meta_key, true );
+
+			if ( is_string( $value ) && '' !== $value ) {
+				$client_data[ $field ] = $value;
+			}
+		}
+
+		if ( ! $client_data ) {
+			return $event_payload;
+		}
+
+		$user_data = isset( $event_payload['user_data'] ) && is_array( $event_payload['user_data'] ) ? $event_payload['user_data'] : array();
+
+		$event_payload['user_data'] = array_merge( $client_data, $user_data );
+
+		return $event_payload;
 	}
 }

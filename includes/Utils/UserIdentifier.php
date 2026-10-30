@@ -37,6 +37,20 @@ use WC_Order;
 final class UserIdentifier {
 
 	/**
+	 * `user_data` key holding the visitor's raw IP address.
+	 *
+	 * @since x.x.x
+	 */
+	public const CLIENT_IP_ADDRESS = 'client_ip_address';
+
+	/**
+	 * `user_data` key holding the visitor's raw user agent.
+	 *
+	 * @since x.x.x
+	 */
+	public const CLIENT_USER_AGENT = 'client_user_agent';
+
+	/**
 	 * Generates the complete `user_data` array used in event payloads.
 	 *
 	 * Combines IP address, user agent, Snap cookies/click IDs into a
@@ -107,7 +121,7 @@ final class UserIdentifier {
 	 */
 	private static function add_user_agent( array &$data ): void {
 		if ( isset( $_SERVER['HTTP_USER_AGENT'] ) ) {
-			$data['client_user_agent'] = sanitize_text_field( wp_unslash( $_SERVER['HTTP_USER_AGENT'] ) );
+			$data[ self::CLIENT_USER_AGENT ] = sanitize_text_field( wp_unslash( $_SERVER['HTTP_USER_AGENT'] ) );
 		}
 	}
 
@@ -137,7 +151,7 @@ final class UserIdentifier {
 
 		if ( $ip ) {
 			if ( is_array( $data ) ) {
-				$data['client_ip_address'] = $ip;
+				$data[ self::CLIENT_IP_ADDRESS ] = $ip;
 				return null;
 			}
 
