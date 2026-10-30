@@ -72,4 +72,11 @@ final class ServiceKey {
 	 * @since 0.1.0
 	 */
 	public const SETTINGS_REST_CONTROLLER_SETUP = 'settings_rest_controller_setup';
+
+	/**
+	 * Identifier for the Ad Partner API service (catalog, feed, campaign submodules).
+	 *
+	 * @since 1.2.0
+	 */
+	public const AD_PARTNER_API = 'ad_partner_api';
 }
