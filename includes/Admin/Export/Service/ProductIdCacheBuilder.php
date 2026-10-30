@@ -17,7 +17,7 @@ namespace SnapchatForWooCommerce\Admin\Export\Service;
 
 use SnapchatForWooCommerce\Admin\Export\Contract\CacheBuilderInterface;
 use SnapchatForWooCommerce\Config;
-use SnapchatForWooCommerce\Admin\ProductMeta\ProductMetaFields;
+use SnapchatForWooCommerce\Admin\MetaBox\ChannelVisibilityMetaBox;
 use SnapchatForWooCommerce\Utils\Helper;
 use SnapchatForWooCommerce\Utils\Storage\Options;
 use SnapchatForWooCommerce\Utils\Storage\OptionDefaults;
@@ -134,7 +134,7 @@ class ProductIdCacheBuilder implements CacheBuilderInterface {
 			'page'          => $page,
 			'status'        => 'publish',
 			'return'        => 'ids',
-			'snap_meta_key' => Helper::with_prefix( ProductMetaFields::CATALOG_ITEM ),
+			'snap_meta_key' => Helper::with_prefix( ChannelVisibilityMetaBox::CATALOG_ITEM ),
 		);
 
 		$query   = new \WC_Product_Query( $query_args );
@@ -153,6 +153,7 @@ class ProductIdCacheBuilder implements CacheBuilderInterface {
 				 *
 				 * @hook snapchat_for_woocommerce_export_products_cache_completed
 				 */
+				// phpcs:ignore WordPress.NamingConventions.PrefixAllGlobals.DynamicHooknameFound -- Prefixed via Helper::with_prefix().
 				do_action( Helper::with_prefix( 'export_products_cache_completed' ) );
 			}
 			return;

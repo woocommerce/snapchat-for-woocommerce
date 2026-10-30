@@ -18,7 +18,6 @@ use SnapchatForWooCommerce\Connection;
 use SnapchatForWooCommerce\Tracking;
 use SnapchatForWooCommerce\Admin;
 use SnapchatForWooCommerce\Admin\Export;
-use SnapchatForWooCommerce\Admin\ProductMeta;
 use SnapchatForWooCommerce\Tracking\ConversionEventLogger;
 use SnapchatForWooCommerce\API\AdPartner\AdPartnerApi;
 use SnapchatForWooCommerce\Utils\ProductData\ProductCategoryProvider;
@@ -120,7 +119,6 @@ final class ServiceContainer {
 					new Admin\Assets(),
 					new Admin\Menu(),
 					new Admin\Onboarding(),
-					new ProductMeta\ProductMetaFields(),
 					new Admin\Notices(),
 					new Admin\MetaBox\ChannelVisibilityMetaBox(),
 					new Admin\MetaBox\MetaBoxAssets(

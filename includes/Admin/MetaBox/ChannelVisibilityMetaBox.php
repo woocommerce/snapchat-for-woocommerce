@@ -13,6 +13,8 @@
 
 namespace SnapchatForWooCommerce\Admin\MetaBox;
 
+use SnapchatForWooCommerce\Utils\Helper;
+
 /**
  * Handles Channel visibility meta box registration on the product edit screen.
  *
@@ -35,6 +37,19 @@ class ChannelVisibilityMetaBox {
 	public const BOX_ID = 'snapchat-channel-visibility';
 
 	/**
+	 * Meta key (unprefixed) that flags whether a product is synced to the Snapchat catalog.
+	 *
+	 * Stored as `'1'` (synced) or `'0'` (not synced). A missing value is treated as synced.
+	 *
+	 * Used by:
+	 * - {@see ProductChannelVisibilityData} to seed the Channel visibility toggle.
+	 * - {@see \SnapchatForWooCommerce\Admin\Export\Service\ProductIdCacheBuilder} to filter exportable product IDs.
+	 *
+	 * @since n.e.x.t
+	 */
+	public const CATALOG_ITEM = 'product_catalog_item';
+
+	/**
 	 * Registers WordPress hooks.
 	 *
 	 * @since 1.1.0
@@ -43,6 +58,7 @@ class ChannelVisibilityMetaBox {
 	 */
 	public function register_hooks(): void {
 		add_action( 'add_meta_boxes', array( $this, 'maybe_register' ), 999, 2 );
+		add_action( 'woocommerce_process_product_meta', array( $this, 'save_meta' ) );
 	}
 
 	/**
@@ -86,7 +102,35 @@ class ChannelVisibilityMetaBox {
 	 * @return void
 	 */
 	public function render(): void {
-		echo '<div id="snapchat-channel-visibility-box"></div>';
+		// `data-service` lets each extension sharing this meta box place its box alphabetically
+		// (see insertAlphabetically() in js/src/meta-boxes/channel-visibility/utils.js).
+		echo '<div id="snapchat-channel-visibility-box" data-service="snapchat"></div>';
+	}
+
+	/**
+	 * Saves the Snapchat catalog sync flag when the product is saved.
+	 *
+	 * Only writes when the Channel visibility toggle submitted a value. The toggle is not
+	 * rendered before onboarding is complete, so a missing field leaves the stored value untouched.
+	 *
+	 * @since n.e.x.t
+	 *
+	 * @param int $post_id The ID of the product being saved.
+	 * @return void
+	 */
+	public function save_meta( $post_id ): void {
+		$meta_key = Helper::with_prefix( self::CATALOG_ITEM );
+
+		// Nonce verification done in the Woo Core parent method.
+		// phpcs:ignore WordPress.Security.NonceVerification.Missing
+		if ( ! isset( $_POST[ $meta_key ] ) ) {
+			return;
+		}
+
+		// phpcs:ignore WordPress.Security.NonceVerification.Missing
+		$value = sanitize_text_field( wp_unslash( $_POST[ $meta_key ] ) );
+
+		update_post_meta( absint( $post_id ), $meta_key, '1' === $value ? '1' : '0' );
 	}
 
 	/**

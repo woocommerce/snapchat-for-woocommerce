@@ -1,4 +1,11 @@
 .sfw-settings {
+	.sfw-sandbox-mode-notice {
+		box-sizing: border-box;
+		margin-block: var(--large-gap) 0;
+		margin-inline: auto;
+		max-inline-size: 1032px;
+	}
+
 	.sfw-section {
 		margin-inline: auto;
 		max-inline-size: 1032px;

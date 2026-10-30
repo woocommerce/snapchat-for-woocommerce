@@ -18,22 +18,8 @@
 	"archive": {
 		"exclude": [
 			"!/js/build",
+			"!/vendor/*",
 			"!/languages",
-			"!/vendor/**",
-			"./js/src",
-			"./bin",
-			"tests",
-			"node_modules",
-			"snapchat-for-woocommerce.zip",
-			"phpunit.xml.dist",
-			"README.md",
-			"composer.json",
-			"composer.lock",
-			"package.json",
-			"package-lock.json",
-			"phpcs.xml.dist",
-			"phpcs-compat.xml.dist",
-			"webpack.config.js",
 			".*"
 		]
 	},

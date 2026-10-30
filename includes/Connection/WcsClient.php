@@ -13,6 +13,7 @@ namespace SnapchatForWooCommerce\Connection;
 use WP_REST_Response;
 use WP_Error;
 use Jetpack_Options;
+use SnapchatForWooCommerce\SandboxMode;
 use SnapchatForWooCommerce\Utils\Helper;
 
 /**
@@ -109,6 +110,7 @@ final class WcsClient {
 		 * @param string $url The default WCS endpoint URL.
 		 */
 		return apply_filters(
+			// phpcs:ignore WordPress.NamingConventions.PrefixAllGlobals.DynamicHooknameFound -- Prefixed via Helper::with_prefix().
 			Helper::with_prefix( 'wcs_base_url' ),
 			sprintf(
 				'https://public-api.wordpress.com/wpcom/v2/sites/%s/wc',
@@ -132,6 +134,7 @@ final class WcsClient {
 		 * @param string $service_name The default service name.
 		 */
 		return apply_filters(
+			// phpcs:ignore WordPress.NamingConventions.PrefixAllGlobals.DynamicHooknameFound -- Prefixed via Helper::with_prefix().
 			Helper::with_prefix( 'service_name' ),
 			'snapchat'
 		);
@@ -153,6 +156,14 @@ final class WcsClient {
 	 * @return WP_REST_Response|WP_Error Parsed response or error.
 	 */
 	public function proxy_request( string $method, string $path, $body = null, $requires_auth = true ) {
+		if ( SandboxMode::is_enabled() ) {
+			return new WP_Error(
+				'snapchat_sandbox_remote_request_blocked',
+				__( 'Remote requests are disabled in sandbox mode.', 'snapchat-for-woocommerce' ),
+				array( 'status' => 403 )
+			);
+		}
+
 		$url = sprintf(
 			'%s/%s/%s',
 			$this->get_wcs_url(),

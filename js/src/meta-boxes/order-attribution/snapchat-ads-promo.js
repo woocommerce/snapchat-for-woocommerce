@@ -36,9 +36,8 @@ const onboardingUrl = getOnboardingUrl();
  * @return {JSX.Element|null} The promo, or null when nothing should render.
  */
 const SnapchatAdsPromo = () => {
-	const metaBoxData = window.snapchatAdsMetaBoxData;
-	const onboardingComplete = metaBoxData?.onboardingComplete;
-	const hasCampaign = metaBoxData?.hasCampaign;
+	const { onboardingComplete = false, hasCampaign = false } =
+		window.snapchatAdsMetaBoxData || {};
 
 	const { ad_acc_id: adAccountId } = useSnapchatAccountDetails();
 

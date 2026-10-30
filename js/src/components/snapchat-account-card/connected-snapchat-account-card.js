@@ -1,4 +1,9 @@
 /**
+ * External dependencies
+ */
+import { __ } from '@wordpress/i18n';
+
+/**
  * Internal dependencies
  */
 import AccountDetails from './account-details';
@@ -14,7 +19,16 @@ const ConnectedSnapchatAccountCard = ( {
 		if ( hideAccountSwitch ) {
 			return null;
 		}
-		return <SwitchAccountButton isTertiary />;
+		return (
+			<SwitchAccountButton
+				isTertiary
+				disabledInSandboxMode
+				disableInSandboxModeLabel={ __(
+					'Connecting a different account is disabled while sandbox mode is active.',
+					'snapchat-for-woocommerce'
+				) }
+			/>
+		);
 	};
 
 	return (
