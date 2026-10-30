@@ -99,6 +99,7 @@ const trackAddToCartEvent = ( product, quantity = 1, eventId = null ) => {
 		item_ids: [ id ],
 		number_items: parseInt( quantity, 10 ),
 		price,
+		currency: TRACKING_DATA_VAR.pixel_data.currency,
 	};
 
 	if ( eventId ) {
