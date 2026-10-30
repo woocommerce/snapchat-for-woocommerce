@@ -91,14 +91,14 @@ Snapchat Ads promo "Get started" button is clicked.
 - [`GetStartedCTA`](js/src/meta-boxes/channel-visibility/get-started-cta.js#L36) with `{ context: 'channel-visibility-meta-box', href: 'admin.php?page=wc-admin&path=%2Fsnapchat%2Fstart&referrer_type=in_product_placement&referrer_id=channel-visibility-meta-box', referrer_type: 'in_product_placement', referrer_id: 'channel-visibility-meta-box' }`.
 - [`SnapchatAdsPromo`](js/src/meta-boxes/order-attribution/snapchat-ads-promo.js#L64) with `{ context: 'order-attribution-meta-box', href: 'admin.php?page=wc-admin&path=%2Fsnapchat%2Fsetup&referrer_type=in_product_placement&referrer_id=order-attribution-meta-box', referrer_type: 'in_product_placement', referrer_id: 'order-attribution-meta-box' }`.
 
-### [`sfw_ads_promo_shown`](js/src/meta-boxes/channel-visibility/snapchat-ads-promo.js#L22)
+### [`sfw_ads_promo_shown`](js/src/meta-boxes/channel-visibility/snapchat-ads-promo.js#L24)
 Snapchat Ads promo is shown.
 #### Properties
 | name | type | description |
 | ---- | ---- | ----------- |
 `context` | `string` | Context of the Snapchat Ads promo. Possible values: 'channel-visibility-meta-box', 'order-attribution-meta-box'.
 #### Emitters
-- [`SnapchatAdsPromo`](js/src/meta-boxes/channel-visibility/snapchat-ads-promo.js#L36) with `{ context: 'channel-visibility-meta-box' }`.
+- [`SnapchatAdsPromo`](js/src/meta-boxes/channel-visibility/snapchat-ads-promo.js#L41) with `{ context: 'channel-visibility-meta-box' }`.
 - [`SnapchatAdsPromo`](js/src/meta-boxes/order-attribution/snapchat-ads-promo.js#L64) with `{ context: 'order-attribution-meta-box' }`.
 
 ### [`sfw_ads_promo_shown`](js/src/meta-boxes/order-attribution/snapchat-ads-promo.js#L27)
@@ -108,7 +108,7 @@ Snapchat Ads promo is shown.
 | ---- | ---- | ----------- |
 `context` | `string` | Context of the Snapchat Ads promo. Possible values: 'channel-visibility-meta-box', 'order-attribution-meta-box'.
 #### Emitters
-- [`SnapchatAdsPromo`](js/src/meta-boxes/channel-visibility/snapchat-ads-promo.js#L36) with `{ context: 'channel-visibility-meta-box' }`.
+- [`SnapchatAdsPromo`](js/src/meta-boxes/channel-visibility/snapchat-ads-promo.js#L41) with `{ context: 'channel-visibility-meta-box' }`.
 - [`SnapchatAdsPromo`](js/src/meta-boxes/order-attribution/snapchat-ads-promo.js#L64) with `{ context: 'order-attribution-meta-box' }`.
 
 ### [`sfw_collect_pii_toggle`](js/src/pages/settings/conversions-api/index.js#L26)
