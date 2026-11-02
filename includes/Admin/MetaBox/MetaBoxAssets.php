@@ -15,8 +15,7 @@ namespace SnapchatForWooCommerce\Admin\MetaBox;
 
 use SnapchatForWooCommerce\API\AdPartner\CampaignApi;
 use SnapchatForWooCommerce\Utils\AssetLoader;
-use SnapchatForWooCommerce\Utils\Storage\Options;
-use SnapchatForWooCommerce\Utils\Storage\OptionDefaults;
+use SnapchatForWooCommerce\Utils\OnboardingStatus;
 
 /**
  * Handles admin script and style enqueues for plugin meta boxes.
@@ -125,7 +124,7 @@ class MetaBoxAssets {
 			return;
 		}
 
-		$onboarding_complete = Options::get( OptionDefaults::ONBOARDING_STATUS ) === 'connected';
+		$onboarding_complete = OnboardingStatus::is_setup_completed();
 		$has_campaign        = $onboarding_complete && $this->campaign_api->has_campaigns();
 
 		AssetLoader::enqueue_script( 'order-attribution', 'order-attribution' );
