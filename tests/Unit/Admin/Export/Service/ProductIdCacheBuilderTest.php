@@ -45,6 +45,10 @@ class ProductIdCacheBuilderTest extends WP_UnitTestCase {
 			'woocommerce_product_data_store_cpt_get_products_query',
 			array( $this->sut, 'query_products_by_meta' )
 		);
+		remove_filter(
+			'woocommerce_product_data_store_cpt_get_products_query',
+			array( $this->sut, 'query_catalog_visible_products' )
+		);
 		Options::delete( OptionDefaults::EXPORT_PRODUCT_IDS );
 		as_unschedule_all_actions( Helper::with_prefix( ProductIdCacheBuilder::ACTION_HOOK ) );
 
@@ -81,6 +85,57 @@ class ProductIdCacheBuilderTest extends WP_UnitTestCase {
 		update_post_meta( $not_synced, $meta_key, '0' );
 
 		$this->assertSame( array( $synced ), $this->build_ids() );
+	}
+
+	/**
+	 * Products shown in the shop are exported, whether or not they also appear in search.
+	 */
+	public function test_includes_products_visible_in_catalog(): void {
+		$shop_and_search = $this->create_product( array( 'catalog_visibility' => 'visible' ) );
+		$shop_only       = $this->create_product( array( 'catalog_visibility' => 'catalog' ) );
+
+		$this->assertSame( array( $shop_and_search, $shop_only ), $this->build_ids() );
+	}
+
+	/**
+	 * Products hidden from the store catalog are not exported, matching the Channel visibility notice.
+	 */
+	public function test_excludes_products_hidden_from_catalog(): void {
+		$visible = $this->create_product();
+		$this->create_product( array( 'catalog_visibility' => 'hidden' ) );
+		$this->create_product( array( 'catalog_visibility' => 'search' ) );
+
+		$this->assertSame( array( $visible ), $this->build_ids() );
+	}
+
+	/**
+	 * The catalog visibility filter adds to an existing tax query instead of replacing it.
+	 */
+	public function test_catalog_visibility_filter_keeps_existing_tax_query(): void {
+		$existing = array(
+			'taxonomy' => 'product_type',
+			'field'    => 'slug',
+			'terms'    => array( 'simple' ),
+		);
+
+		$query = $this->sut->query_catalog_visible_products(
+			array( 'tax_query' => array( $existing ) ), // phpcs:ignore WordPress.DB.SlowDBQuery.slow_db_query_tax_query
+			array( 'snap_visible' => true )
+		);
+
+		$this->assertSame( $existing, $query['tax_query'][0] );
+		$this->assertSame( 'product_visibility', $query['tax_query'][1]['taxonomy'] );
+		$this->assertSame( array( 'exclude-from-catalog' ), $query['tax_query'][1]['terms'] );
+		$this->assertSame( 'NOT IN', $query['tax_query'][1]['operator'] );
+	}
+
+	/**
+	 * The catalog visibility filter leaves other product queries alone.
+	 */
+	public function test_catalog_visibility_filter_ignores_other_queries(): void {
+		$query = array( 'post_type' => 'product' );
+
+		$this->assertSame( $query, $this->sut->query_catalog_visible_products( $query, array() ) );
 	}
 
 	/**
