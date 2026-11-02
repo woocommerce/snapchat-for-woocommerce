@@ -3,8 +3,9 @@
  * Unit tests for CampaignApi.
  *
  * Covers `has_campaigns()` reading only the cache and scheduling a background
- * check on a miss, `refresh_cache()` checking the live Ad Partner endpoint and
- * caching the result, and the cache being busted by the
+ * check on a miss or an ad account mismatch, `refresh_cache()` checking the
+ * live Ad Partner endpoint and caching the result with its ad account ID, and
+ * the cache being busted by the
  * `onboarding_complete`/`snapchat_disconnected` hooks.
  *
  * @package SnapchatForWooCommerce\Tests\Unit\API\AdPartner
@@ -87,13 +88,38 @@ class CampaignApiTest extends WP_UnitTestCase {
 	public function test_cache_hit_returns_cached_value_without_scheduling(): void {
 		$api = new CampaignApi( $this->createMock( WcsClient::class ) );
 
-		Transients::set( TransientDefaults::HAS_CAMPAIGNS, '0' );
+		Transients::set( TransientDefaults::HAS_CAMPAIGNS, $this->cached_result( 'abc-123', false ) );
 		$this->assertFalse( $api->has_campaigns() );
 
-		Transients::set( TransientDefaults::HAS_CAMPAIGNS, '1' );
+		Transients::set( TransientDefaults::HAS_CAMPAIGNS, $this->cached_result( 'abc-123', true ) );
 		$this->assertTrue( $api->has_campaigns() );
 
 		$this->assertFalse( as_has_scheduled_action( Helper::with_prefix( CampaignApi::ACTION_HOOK ) ) );
+	}
+
+	/**
+	 * Test: a cached result for a different ad account is treated as a cache
+	 * miss, so a stale result is never used after the account changes.
+	 */
+	public function test_cached_result_for_other_ad_account_is_ignored(): void {
+		$api = new CampaignApi( $this->createMock( WcsClient::class ) );
+
+		Transients::set( TransientDefaults::HAS_CAMPAIGNS, $this->cached_result( 'old-account', false ) );
+
+		$this->assertTrue( $api->has_campaigns() );
+		$this->assertTrue( as_has_scheduled_action( Helper::with_prefix( CampaignApi::ACTION_HOOK ) ) );
+	}
+
+	/**
+	 * Test: a cached value in an unexpected format is treated as a cache miss.
+	 */
+	public function test_cached_result_in_unexpected_format_is_ignored(): void {
+		$api = new CampaignApi( $this->createMock( WcsClient::class ) );
+
+		Transients::set( TransientDefaults::HAS_CAMPAIGNS, '0' );
+
+		$this->assertTrue( $api->has_campaigns() );
+		$this->assertTrue( as_has_scheduled_action( Helper::with_prefix( CampaignApi::ACTION_HOOK ) ) );
 	}
 
 	/**
@@ -127,7 +153,8 @@ class CampaignApiTest extends WP_UnitTestCase {
 	}
 
 	/**
-	 * Test: the refresh caches `'1'` when the response contains at least one campaign.
+	 * Test: the refresh caches a positive result for the checked ad account when
+	 * the response contains at least one campaign.
 	 */
 	public function test_refresh_caches_true_when_campaigns_exist(): void {
 		$wcs = $this->createMock( WcsClient::class );
@@ -151,12 +178,13 @@ class CampaignApiTest extends WP_UnitTestCase {
 		$api = new CampaignApi( $wcs );
 		$api->refresh_cache();
 
-		$this->assertSame( '1', Transients::get( TransientDefaults::HAS_CAMPAIGNS ) );
+		$this->assertSame( $this->cached_result( 'abc-123', true ), Transients::get( TransientDefaults::HAS_CAMPAIGNS ) );
 		$this->assertTrue( $api->has_campaigns() );
 	}
 
 	/**
-	 * Test: the refresh caches `'0'` when the response contains no campaigns.
+	 * Test: the refresh caches a negative result for the checked ad account when
+	 * the response contains no campaigns.
 	 */
 	public function test_refresh_caches_false_when_no_campaigns(): void {
 		$wcs = $this->createMock( WcsClient::class );
@@ -167,8 +195,29 @@ class CampaignApiTest extends WP_UnitTestCase {
 		$api = new CampaignApi( $wcs );
 		$api->refresh_cache();
 
-		$this->assertSame( '0', Transients::get( TransientDefaults::HAS_CAMPAIGNS ) );
+		$this->assertSame( $this->cached_result( 'abc-123', false ), Transients::get( TransientDefaults::HAS_CAMPAIGNS ) );
 		$this->assertFalse( $api->has_campaigns() );
+	}
+
+	/**
+	 * Test: when the ad account changes while a check is in flight, the result
+	 * stays tagged with the account that was checked and isn't used for the
+	 * new one.
+	 */
+	public function test_refresh_result_is_not_used_after_ad_account_changes_mid_check(): void {
+		$wcs = $this->createMock( WcsClient::class );
+		$wcs->method( 'proxy_get' )->willReturnCallback(
+			function () {
+				Options::set( OptionDefaults::AD_ACCOUNT_ID, 'new-account' );
+				return new WP_REST_Response( array( 'campaigns' => array() ), 200 );
+			}
+		);
+
+		$api = new CampaignApi( $wcs );
+		$api->refresh_cache();
+
+		$this->assertSame( $this->cached_result( 'abc-123', false ), Transients::get( TransientDefaults::HAS_CAMPAIGNS ) );
+		$this->assertTrue( $api->has_campaigns() );
 	}
 
 	/**
@@ -215,14 +264,14 @@ class CampaignApiTest extends WP_UnitTestCase {
 
 		do_action( Helper::with_prefix( CampaignApi::ACTION_HOOK ) );
 
-		$this->assertSame( '0', Transients::get( TransientDefaults::HAS_CAMPAIGNS ) );
+		$this->assertSame( $this->cached_result( 'abc-123', false ), Transients::get( TransientDefaults::HAS_CAMPAIGNS ) );
 	}
 
 	/**
 	 * Test: `register_hooks()` wires `clear_cache()` to both connection-change hooks.
 	 */
 	public function test_register_hooks_busts_cache_on_onboarding_complete_and_disconnect(): void {
-		Transients::set( TransientDefaults::HAS_CAMPAIGNS, '1' );
+		Transients::set( TransientDefaults::HAS_CAMPAIGNS, $this->cached_result( 'abc-123', true ) );
 
 		$wcs = $this->createMock( WcsClient::class );
 		$api = new CampaignApi( $wcs );
@@ -231,9 +280,23 @@ class CampaignApiTest extends WP_UnitTestCase {
 		do_action( Helper::with_prefix( 'onboarding_complete' ) );
 		$this->assertSame( '', Transients::get( TransientDefaults::HAS_CAMPAIGNS ) );
 
-		Transients::set( TransientDefaults::HAS_CAMPAIGNS, '1' );
+		Transients::set( TransientDefaults::HAS_CAMPAIGNS, $this->cached_result( 'abc-123', true ) );
 
 		do_action( Helper::with_prefix( 'snapchat_disconnected' ) );
 		$this->assertSame( '', Transients::get( TransientDefaults::HAS_CAMPAIGNS ) );
+	}
+
+	/**
+	 * Builds a cached campaign result in the format `refresh_cache()` stores.
+	 *
+	 * @param string $ad_account_id Ad account the result was checked for.
+	 * @param bool   $has_campaigns Whether the ad account has campaigns.
+	 * @return array
+	 */
+	private function cached_result( string $ad_account_id, bool $has_campaigns ): array {
+		return array(
+			'ad_account_id' => $ad_account_id,
+			'has_campaigns' => $has_campaigns,
+		);
 	}
 }

@@ -68,9 +68,11 @@ class CampaignApi extends BaseAdPartnerApi {
 	/**
 	 * Whether the connected ad account has any campaign, active or paused.
 	 *
-	 * Only reads the cache. On a cache miss, schedules a background check and
-	 * returns true, so the create-campaign banner stays hidden until the
-	 * result is known.
+	 * Only reads the cache. The cached result is tagged with the ad account it
+	 * was checked for, and is only used while that account is still the
+	 * connected one. On a cache miss or an account mismatch, schedules a
+	 * background check and returns true, so the create-campaign banner stays
+	 * hidden until the result is known.
 	 *
 	 * @since n.e.x.t
 	 *
@@ -80,8 +82,12 @@ class CampaignApi extends BaseAdPartnerApi {
 	public function has_campaigns(): bool {
 		$cached = Transients::get( TransientDefaults::HAS_CAMPAIGNS );
 
-		if ( '' !== $cached ) {
-			return '1' === $cached;
+		if (
+			is_array( $cached )
+			&& isset( $cached['ad_account_id'], $cached['has_campaigns'] )
+			&& (string) Options::get( OptionDefaults::AD_ACCOUNT_ID ) === $cached['ad_account_id']
+		) {
+			return (bool) $cached['has_campaigns'];
 		}
 
 		$this->schedule_refresh();
@@ -109,9 +115,10 @@ class CampaignApi extends BaseAdPartnerApi {
 	/**
 	 * Checks whether the connected ad account has any campaigns and caches the result.
 	 *
-	 * Runs via Action Scheduler. Cached as '1'/'0' because a cached false reads
-	 * as a cache miss. Failures and unexpected responses are not cached, so the
-	 * next cache miss schedules another check.
+	 * Runs via Action Scheduler. The result is cached together with the ad
+	 * account ID it was checked for, so a result for a previous account is
+	 * never used after the account changes. Failures and unexpected responses
+	 * are not cached, so the next cache miss schedules another check.
 	 *
 	 * @since n.e.x.t
 	 *
@@ -138,6 +145,12 @@ class CampaignApi extends BaseAdPartnerApi {
 			return;
 		}
 
-		Transients::set( TransientDefaults::HAS_CAMPAIGNS, empty( $data['campaigns'] ) ? '0' : '1' );
+		Transients::set(
+			TransientDefaults::HAS_CAMPAIGNS,
+			array(
+				'ad_account_id' => $ad_account_id,
+				'has_campaigns' => ! empty( $data['campaigns'] ),
+			)
+		);
 	}
 }
