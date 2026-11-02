@@ -96,6 +96,51 @@ final class ChannelVisibilityMetaBoxTest extends WP_UnitTestCase {
 	}
 
 	/**
+	 * When Reddit for WooCommerce's standalone box exists, Snapchat joins it instead of registering a second box.
+	 */
+	public function test_reddit_standalone_box_does_not_register_second_box(): void {
+		global $wp_meta_boxes;
+		$wp_meta_boxes = $this->registry_with_box( ChannelVisibilityMetaBox::REDDIT_BOX_ID );
+
+		$this->sut->maybe_register( 'product', null );
+
+		$this->assertSame(
+			array( ChannelVisibilityMetaBox::REDDIT_BOX_ID ),
+			array_keys( $wp_meta_boxes['product']['side']['default'] )
+		);
+	}
+
+	/**
+	 * A box removed with remove_meta_box() doesn't count, so Snapchat registers its own.
+	 */
+	public function test_removed_box_does_not_block_own_box(): void {
+		global $wp_meta_boxes;
+		$wp_meta_boxes = $this->registry_with_box( ChannelVisibilityMetaBox::REDDIT_BOX_ID );
+
+		$wp_meta_boxes['product']['side']['default'][ ChannelVisibilityMetaBox::REDDIT_BOX_ID ] = false;
+
+		$this->sut->maybe_register( 'product', null );
+
+		$this->assertArrayHasKey(
+			ChannelVisibilityMetaBox::BOX_ID,
+			$wp_meta_boxes['product']['side']['default']
+		);
+	}
+
+	/**
+	 * register_hooks() registers the box after Reddit for WooCommerce's priority 999.
+	 */
+	public function test_register_hooks_registers_box_after_reddit(): void {
+		$this->sut->register_hooks();
+
+		$this->assertSame(
+			ChannelVisibilityMetaBox::REGISTER_PRIORITY,
+			has_action( 'add_meta_boxes', array( $this->sut, 'maybe_register' ) )
+		);
+		$this->assertGreaterThan( 999, ChannelVisibilityMetaBox::REGISTER_PRIORITY );
+	}
+
+	/**
 	 * render() emits exactly the mount-point div.
 	 */
 	public function test_render_emits_mount_point_div(): void {
@@ -178,5 +223,28 @@ final class ChannelVisibilityMetaBoxTest extends WP_UnitTestCase {
 		$this->sut->register_hooks();
 
 		$this->assertNotFalse( has_action( 'woocommerce_process_product_meta', array( $this->sut, 'save_meta' ) ) );
+	}
+
+	/**
+	 * Builds a meta box registry containing a single product side box.
+	 *
+	 * @param string $box_id Meta box id.
+	 * @return array
+	 */
+	private function registry_with_box( string $box_id ): array {
+		return array(
+			'product' => array(
+				'side' => array(
+					'default' => array(
+						$box_id => array(
+							'id'       => $box_id,
+							'title'    => 'Channel visibility',
+							'callback' => '__return_false',
+							'args'     => null,
+						),
+					),
+				),
+			),
+		);
 	}
 }
