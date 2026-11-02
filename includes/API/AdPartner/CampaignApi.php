@@ -125,7 +125,7 @@ class CampaignApi extends BaseAdPartnerApi {
 		}
 
 		$response = $this->wcs->proxy_get(
-			'/v1/adaccounts/' . rawurlencode( $ad_account_id ) . '/campaigns'
+			'/ads/v1/adaccounts/' . rawurlencode( $ad_account_id ) . '/campaigns'
 		);
 
 		if ( is_wp_error( $response ) ) {

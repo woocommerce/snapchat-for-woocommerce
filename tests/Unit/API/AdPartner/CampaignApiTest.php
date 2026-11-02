@@ -111,7 +111,7 @@ class CampaignApiTest extends WP_UnitTestCase {
 	}
 
 	/**
-	 * Test: the refresh proxies GET to `/v1/adaccounts/{id}/campaigns` with the
+	 * Test: the refresh proxies GET to `/ads/v1/adaccounts/{id}/campaigns` with the
 	 * stored ad account ID URL-encoded.
 	 */
 	public function test_refresh_proxies_to_correct_endpoint(): void {
@@ -120,7 +120,7 @@ class CampaignApiTest extends WP_UnitTestCase {
 		$wcs = $this->createMock( WcsClient::class );
 		$wcs->expects( $this->once() )
 			->method( 'proxy_get' )
-			->with( '/v1/adaccounts/abc%20123/campaigns' )
+			->with( '/ads/v1/adaccounts/abc%20123/campaigns' )
 			->willReturn( new WP_REST_Response( array( 'campaigns' => array() ), 200 ) );
 
 		( new CampaignApi( $wcs ) )->refresh_cache();
