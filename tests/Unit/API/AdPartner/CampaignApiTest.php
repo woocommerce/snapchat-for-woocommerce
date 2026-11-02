@@ -6,7 +6,8 @@
  * check on a miss or an ad account mismatch, `refresh_cache()` checking the
  * live Ad Partner endpoint and caching the result with its ad account ID, and
  * the cache being busted by the
- * `onboarding_complete`/`snapchat_disconnected` hooks.
+ * `onboarding_complete`/`snapchat_disconnected` hooks, with queued checks
+ * cancelled on disconnect.
  *
  * @package SnapchatForWooCommerce\Tests\Unit\API\AdPartner
  */
@@ -284,6 +285,36 @@ class CampaignApiTest extends WP_UnitTestCase {
 
 		do_action( Helper::with_prefix( 'snapchat_disconnected' ) );
 		$this->assertSame( '', Transients::get( TransientDefaults::HAS_CAMPAIGNS ) );
+	}
+
+	/**
+	 * Test: disconnecting cancels a queued background check.
+	 */
+	public function test_register_hooks_unschedules_refresh_on_disconnect(): void {
+		$api = new CampaignApi( $this->createMock( WcsClient::class ) );
+		$api->register_hooks();
+
+		$api->schedule_refresh();
+		$this->assertTrue( as_has_scheduled_action( Helper::with_prefix( CampaignApi::ACTION_HOOK ) ) );
+
+		do_action( Helper::with_prefix( 'snapchat_disconnected' ) );
+
+		$this->assertFalse( as_has_scheduled_action( Helper::with_prefix( CampaignApi::ACTION_HOOK ) ) );
+	}
+
+	/**
+	 * Test: reconnecting keeps a queued background check, since it reads the
+	 * current ad account when it runs.
+	 */
+	public function test_onboarding_complete_keeps_queued_refresh(): void {
+		$api = new CampaignApi( $this->createMock( WcsClient::class ) );
+		$api->register_hooks();
+
+		$api->schedule_refresh();
+
+		do_action( Helper::with_prefix( 'onboarding_complete' ) );
+
+		$this->assertTrue( as_has_scheduled_action( Helper::with_prefix( CampaignApi::ACTION_HOOK ) ) );
 	}
 
 	/**

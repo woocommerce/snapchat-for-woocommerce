@@ -37,12 +37,14 @@ class CampaignApi extends BaseAdPartnerApi {
 	public const ACTION_HOOK = 'refresh_campaign_cache';
 
 	/**
-	 * Registers the background job handler and the hooks that bust the campaign cache.
+	 * Registers the background job handler and the connection-change hooks.
 	 *
 	 * The cache is cleared whenever the Snapchat connection changes: on
-	 * `onboarding_complete` (fired once at the end of the OAuth config-save
-	 * flow, which covers connect, reconnect, and ad-account change since they
-	 * all share that save path) and on `snapchat_disconnected`.
+	 * `onboarding_complete` (fired at the end of the OAuth config-save flow
+	 * for connect, reconnect, and ad-account change) and on
+	 * `snapchat_disconnected`. On disconnect, any queued background check is
+	 * also cancelled. The cached result is tagged with its ad account, so a
+	 * change that skips these hooks still never serves a stale result.
 	 *
 	 * @since n.e.x.t
 	 *
@@ -52,6 +54,7 @@ class CampaignApi extends BaseAdPartnerApi {
 		add_action( Helper::with_prefix( self::ACTION_HOOK ), array( $this, 'refresh_cache' ) );
 		add_action( Helper::with_prefix( 'onboarding_complete' ), array( $this, 'clear_cache' ) );
 		add_action( Helper::with_prefix( 'snapchat_disconnected' ), array( $this, 'clear_cache' ) );
+		add_action( Helper::with_prefix( 'snapchat_disconnected' ), array( $this, 'unschedule_refresh' ) );
 	}
 
 	/**
@@ -63,6 +66,17 @@ class CampaignApi extends BaseAdPartnerApi {
 	 */
 	public function clear_cache(): void {
 		Transients::delete( TransientDefaults::HAS_CAMPAIGNS );
+	}
+
+	/**
+	 * Cancels any queued background campaign check.
+	 *
+	 * @since n.e.x.t
+	 *
+	 * @return void
+	 */
+	public function unschedule_refresh(): void {
+		as_unschedule_all_actions( Helper::with_prefix( self::ACTION_HOOK ) );
 	}
 
 	/**
