@@ -24,9 +24,28 @@ The best place to get support is the [WordPress.org Snapchat for WooCommerce for
 
 ## Development
 
+### Sandbox mode
+
+Sandbox mode displays the post-onboarding settings experience with simulated
+WordPress.com and Snapchat accounts. Remote requests, storefront tracking,
+usage tracking, and remote product-feed synchronization are disabled. Changes
+to the conversion settings are stored separately from live settings.
+
+Enable it with WP-CLI:
+
+```bash
+wp option update snapchat_sandbox_mode yes
+```
+
+Disable it again with:
+
+```bash
+wp option update snapchat_sandbox_mode no
+```
+
 ### Prerequisites
 
--   [NVM](https://github.com/nvm-sh/nvm) (recommended) or [NPM](https://www.npmjs.com/) — use `nvm use` to match the Node version in [.nvmrc](.nvmrc) (Node 20)
+-   [NVM](https://github.com/nvm-sh/nvm) (recommended) or [NPM](https://www.npmjs.com/) — use `nvm use` to match the Node version in [.nvmrc](.nvmrc) (Node 24)
 -   [Composer](https://getcomposer.org/)
 -   [wp-env](https://developer.wordpress.org/block-editor/reference-guides/packages/packages-env/) (requires [Docker](https://www.docker.com/))
 

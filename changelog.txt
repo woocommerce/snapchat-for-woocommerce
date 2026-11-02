@@ -1,5 +1,11 @@
 ***Snapchat for WooCommerce Changelog ***
 
+= 1.0.7 - 2026-10-08 =
+* Tweak - Bump WooCommerce "tested up to" version to 11.2.
+
+= 1.0.6 - 2026-09-29 =
+* Add - Sandbox mode to preview settings without connecting to Snapchat.
+
 = 1.0.5 - 2026-09-08 =
 * Fix - Ensure product export batches write CSV rows in the correct product order.
 * Fix - Purchase pixel no longer exposes order details and hashed billing data on unauthenticated order-received requests.

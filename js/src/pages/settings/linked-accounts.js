@@ -68,6 +68,11 @@ export default function LinkedAccounts() {
 						<AppButton
 							isDestructive
 							isLink
+							disabledInSandboxMode
+							disableInSandboxModeLabel={ __(
+								'Account disconnection is disabled while sandbox mode is active.',
+								'snapchat-for-woocommerce'
+							) }
 							onClick={ openDisconnectAdsAccountModal }
 							eventName="sfw_disconnect_snapchat_button_click"
 						>

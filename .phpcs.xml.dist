@@ -29,6 +29,15 @@
 		</properties>
 	</rule>
 
+	<rule ref="WordPress.NamingConventions.PrefixAllGlobals">
+		<properties>
+			<property name="prefixes" type="array">
+				<element value="snapchat_for_woocommerce" />
+				<element value="SnapchatForWooCommerce" />
+			</property>
+		</properties>
+	</rule>
+
 	<rule ref="PHPCompatibilityWP" />
 
 	<arg name="extensions" value="php"/>

@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-const { test, expect } = require( '@playwright/test' );
+import { test, expect } from '@playwright/test';
 
 const PLUGINS_PAGE_URL = '/wp-admin/plugins.php';
 

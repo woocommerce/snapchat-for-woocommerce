@@ -7,6 +7,8 @@
 	<!-- Test PHP 7.4 thru 8.4 -->
 	<config name="testVersion" value="7.4-8.4"/>
 	<file>.</file>
+	<!-- npm packages can ship PHP sources (e.g. block-library), but none of it is part of the plugin. -->
+	<exclude-pattern>*/node_modules/*</exclude-pattern>
 	<arg name="extensions" value="php,inc" />
 
     <rule ref="PHPCompatibility">

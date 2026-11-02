@@ -1,7 +1,7 @@
 {
 	"extends": [
 		"stylelint-config-standard-scss",
-		"@wordpress/stylelint-config"
+		"@wordpress/stylelint-config/scss"
 	],
 	"rules": {
 		"at-rule-empty-line-before": null,

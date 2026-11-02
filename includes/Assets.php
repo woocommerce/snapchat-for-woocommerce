@@ -98,6 +98,7 @@ class Assets {
 			 * @return array Modified tracking data.
 			 */
 			apply_filters(
+				// phpcs:ignore WordPress.NamingConventions.PrefixAllGlobals.DynamicHooknameFound -- Prefixed via Helper::with_prefix().
 				Helper::with_prefix( 'filter_tracking_data' ),
 				array(
 					'ajax_url'              => admin_url( 'admin-ajax.php' ),

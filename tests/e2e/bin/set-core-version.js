@@ -5,7 +5,6 @@ const { exit } = require( 'process' );
 
 const path = `${ process.cwd() }/.wp-env.override.json`;
 
-// eslint-disable-next-line import/no-dynamic-require
 const config = fs.existsSync( path ) ? require( path ) : {};
 
 const args = process.argv.slice( 2 );
@@ -23,7 +22,6 @@ if ( args[ 0 ] === 'latest' ) {
 
 config.core = args[ 0 ];
 
-// eslint-disable-next-line no-useless-escape
 if ( ! config.core.match( /^WordPress\/WordPress\#/ ) ) {
 	config.core = `WordPress/WordPress#${ config.core }`;
 }

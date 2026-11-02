@@ -33,6 +33,11 @@ const useProductCatalogExport = (
 	const { createNotice } = useDispatchCoreNotices();
 
 	const generateCsv = useCallback( async () => {
+		// CSV generation is unavailable while sandbox mode is active.
+		if ( sfwData.sandboxMode ) {
+			return;
+		}
+
 		try {
 			const res = await window.jQuery.post( window.ajaxurl, {
 				action: EXPORT_CSV_ACTION,

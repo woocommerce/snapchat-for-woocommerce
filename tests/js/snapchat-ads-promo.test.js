@@ -11,6 +11,7 @@ import SnapchatAdsPromo from '~/meta-boxes/order-attribution/snapchat-ads-promo'
 jest.mock( '@wordpress/components', () => ( {
 	Flex: ( { children } ) => <div>{ children }</div>,
 	FlexItem: ( { children } ) => <div>{ children }</div>,
+	FlexBlock: ( { children } ) => <div>{ children }</div>,
 } ) );
 
 jest.mock( '~/components/app-button', () => ( { text } ) => (

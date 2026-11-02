@@ -93,6 +93,7 @@ class Helper {
 		 *
 		 * @param int $order_id Order ID read from the `order-received` query var.
 		 */
+		// phpcs:ignore WordPress.NamingConventions.PrefixAllGlobals.NonPrefixedHooknameFound -- WooCommerce core filter, applied intentionally to mirror core behaviour.
 		$order_id = absint( apply_filters( 'woocommerce_thankyou_order_id', $order_id ) );
 
 		/**
@@ -103,6 +104,7 @@ class Helper {
 		 *
 		 * @param string $order_key Order key read from the `key` query argument.
 		 */
+		// phpcs:ignore WordPress.NamingConventions.PrefixAllGlobals.NonPrefixedHooknameFound -- WooCommerce core filter, applied intentionally to mirror core behaviour.
 		$order_key = (string) apply_filters( 'woocommerce_thankyou_order_key', $order_key );
 
 		if ( ! $order_id ) {
@@ -130,6 +132,7 @@ class Helper {
 		 *
 		 * @param bool $verify_known_shoppers If verification is required.
 		 */
+		// phpcs:ignore WordPress.NamingConventions.PrefixAllGlobals.NonPrefixedHooknameFound -- WooCommerce core filter, applied intentionally to mirror core behaviour.
 		$verify_known_shoppers = apply_filters( 'woocommerce_order_received_verify_known_shoppers', true );
 		$order_customer_id     = $order->get_customer_id();
 

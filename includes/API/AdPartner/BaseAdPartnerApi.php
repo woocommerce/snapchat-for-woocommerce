@@ -13,7 +13,7 @@
  * @package SnapchatForWooCommerce\API\AdPartner
  */
 
-namespace SnapchatForWooCommerce\Api\AdPartner;
+namespace SnapchatForWooCommerce\API\AdPartner;
 
 use SnapchatForWooCommerce\Connection\WcsClient;
 
