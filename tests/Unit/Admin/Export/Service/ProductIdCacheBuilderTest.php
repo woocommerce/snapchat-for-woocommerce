@@ -50,6 +50,7 @@ class ProductIdCacheBuilderTest extends WP_UnitTestCase {
 			array( $this->sut, 'query_catalog_visible_products' )
 		);
 		Options::delete( OptionDefaults::EXPORT_PRODUCT_IDS );
+		delete_option( 'woocommerce_hide_out_of_stock_items' );
 		as_unschedule_all_actions( Helper::with_prefix( ProductIdCacheBuilder::ACTION_HOOK ) );
 
 		parent::tear_down();
@@ -106,6 +107,30 @@ class ProductIdCacheBuilderTest extends WP_UnitTestCase {
 		$this->create_product( array( 'catalog_visibility' => 'search' ) );
 
 		$this->assertSame( array( $visible ), $this->build_ids() );
+	}
+
+	/**
+	 * Out-of-stock products are not exported when the store hides them from the catalog.
+	 */
+	public function test_excludes_out_of_stock_products_when_store_hides_them(): void {
+		update_option( 'woocommerce_hide_out_of_stock_items', 'yes' );
+
+		$in_stock = $this->create_product();
+		$this->create_product( array( 'stock_status' => 'outofstock' ) );
+
+		$this->assertSame( array( $in_stock ), $this->build_ids() );
+	}
+
+	/**
+	 * Out-of-stock products are still exported when the store shows them in the catalog.
+	 */
+	public function test_includes_out_of_stock_products_when_store_shows_them(): void {
+		update_option( 'woocommerce_hide_out_of_stock_items', 'no' );
+
+		$in_stock     = $this->create_product();
+		$out_of_stock = $this->create_product( array( 'stock_status' => 'outofstock' ) );
+
+		$this->assertSame( array( $in_stock, $out_of_stock ), $this->build_ids() );
 	}
 
 	/**

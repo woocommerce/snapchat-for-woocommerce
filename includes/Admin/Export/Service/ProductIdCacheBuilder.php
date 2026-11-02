@@ -216,7 +216,9 @@ class ProductIdCacheBuilder implements CacheBuilderInterface {
 	 * Matches `WC_Product::is_visible()` outside a search, which the Channel visibility
 	 * meta box uses to tell merchants a product "cannot be shown on any channel": products
 	 * set to Hidden or Search results only both carry the `exclude-from-catalog` term in
-	 * the `product_visibility` taxonomy, so they're left out.
+	 * the `product_visibility` taxonomy, so they're left out. When the store hides
+	 * out-of-stock items from the catalog, products with the `outofstock` term are left
+	 * out too.
 	 *
 	 * Filtering in the query, rather than checking each product afterwards, matters because
 	 * {@see self::handle_batch()} treats an empty page as the last one: a page where every
@@ -234,12 +236,18 @@ class ProductIdCacheBuilder implements CacheBuilderInterface {
 			return $query;
 		}
 
-		// Append to any existing tax query rather than replacing it. Excluding one term is cheap.
+		$excluded_terms = array( 'exclude-from-catalog' );
+
+		if ( 'yes' === get_option( 'woocommerce_hide_out_of_stock_items' ) ) {
+			$excluded_terms[] = 'outofstock';
+		}
+
+		// Append to any existing tax query rather than replacing it. Excluding a couple of terms is cheap.
 		$query['tax_query']   = isset( $query['tax_query'] ) ? (array) $query['tax_query'] : array(); // phpcs:ignore WordPress.DB.SlowDBQuery.slow_db_query_tax_query
 		$query['tax_query'][] = array(
 			'taxonomy' => 'product_visibility',
 			'field'    => 'slug',
-			'terms'    => array( 'exclude-from-catalog' ),
+			'terms'    => $excluded_terms,
 			'operator' => 'NOT IN',
 		);
 
