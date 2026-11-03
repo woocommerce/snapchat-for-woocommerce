@@ -51,7 +51,7 @@ class RemoteConversionTracker implements ConversionTrackerInterface {
 	 * page doesn't queue it twice. A failed send removes it, so the next load queues it again.
 	 * It expires after {@see self::ORDER_CONVERSION_QUEUED_TTL} seconds.
 	 *
-	 * @since x.x.x
+	 * @since 1.0.8
 	 */
 	public const ORDER_CONVERSION_QUEUED_META_KEY = '_snapchat_conversion_queued';
 
@@ -71,7 +71,7 @@ class RemoteConversionTracker implements ConversionTrackerInterface {
 	 * the order instead of in the queued action. Removed once the Purchase is sent or the order's
 	 * personal data is erased.
 	 *
-	 * @since x.x.x
+	 * @since 1.0.8
 	 */
 	public const ORDER_CLIENT_IP_ADDRESS_META_KEY = '_snapchat_client_ip_address';
 
@@ -80,7 +80,7 @@ class RemoteConversionTracker implements ConversionTrackerInterface {
 	 *
 	 * Handled like {@see self::ORDER_CLIENT_IP_ADDRESS_META_KEY}.
 	 *
-	 * @since x.x.x
+	 * @since 1.0.8
 	 */
 	public const ORDER_CLIENT_USER_AGENT_META_KEY = '_snapchat_client_user_agent';
 
@@ -415,7 +415,7 @@ class RemoteConversionTracker implements ConversionTrackerInterface {
 			 * The request failed when the connection could not be made, it timed out, or the
 			 * WCS proxy or the Ad Partner rejected it with a non-2xx response.
 			 *
-			 * @since x.x.x
+			 * @since 1.0.8
 			 *
 			 * @param array    $event_payload The payload that could not be sent.
 			 * @param array    $args          Additional args.
@@ -432,7 +432,7 @@ class RemoteConversionTracker implements ConversionTrackerInterface {
 		 *
 		 * This hook allows other plugins or custom code to perform actions after the conversion payload
 		 * has been dispatched, such as logging, triggering additional integrations, or updating metadata.
-		 * Since x.x.x it only fires when the Ad Partner accepted the event with a 2xx response; failed
+		 * Since 1.0.8 it only fires when the Ad Partner accepted the event with a 2xx response; failed
 		 * sends fire `snapchat_for_woocommerce_conversion_failed` instead.
 		 *
 		 * @since 0.1.0

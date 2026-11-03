@@ -312,7 +312,7 @@ class ConversionTrackingService implements ServiceStatusInterface {
 	 *
 	 * Hook callback for `woocommerce_privacy_export_order_personal_data_meta`.
 	 *
-	 * @since x.x.x
+	 * @since 1.0.8
 	 *
 	 * @param mixed $meta_to_export Order meta keys to export, mapped to their labels.
 	 * @return mixed
@@ -333,7 +333,7 @@ class ConversionTrackingService implements ServiceStatusInterface {
 	 *
 	 * Hook callback for `woocommerce_privacy_remove_order_personal_data`.
 	 *
-	 * @since x.x.x
+	 * @since 1.0.8
 	 *
 	 * @param mixed $order Order whose personal data is being erased.
 	 * @return void
@@ -354,7 +354,7 @@ class ConversionTrackingService implements ServiceStatusInterface {
 	 * Hook callback for `action_scheduler_begin_execute`. Failed Purchase sends are only
 	 * reported as failed actions when they run inside Action Scheduler.
 	 *
-	 * @since x.x.x
+	 * @since 1.0.8
 	 *
 	 * @param int $action_id ID of the action about to execute.
 	 * @return void
@@ -371,7 +371,7 @@ class ConversionTrackingService implements ServiceStatusInterface {
 	 * One queue run executes many actions on this same instance, so state from one action must
 	 * not carry into the next.
 	 *
-	 * @since x.x.x
+	 * @since 1.0.8
 	 *
 	 * @return void
 	 */
@@ -388,7 +388,7 @@ class ConversionTrackingService implements ServiceStatusInterface {
 	 * the send ran inside an Action Scheduler action of `send_conversion_event`, the failure
 	 * is recorded so {@see self::fail_queued_purchase()} marks the action as failed.
 	 *
-	 * @since x.x.x
+	 * @since 1.0.8
 	 *
 	 * @param mixed $event_payload The payload that could not be sent.
 	 * @param mixed $args          Additional args, including `order_id`.
@@ -432,7 +432,7 @@ class ConversionTrackingService implements ServiceStatusInterface {
 	 * Action Scheduler records a thrown exception as a failed action and stores its message in
 	 * the action's log.
 	 *
-	 * @since x.x.x
+	 * @since 1.0.8
 	 *
 	 * @throws RuntimeException When the Purchase send in the current action failed.
 	 * @return void

@@ -39,14 +39,14 @@ final class UserIdentifier {
 	/**
 	 * `user_data` key holding the visitor's raw IP address.
 	 *
-	 * @since x.x.x
+	 * @since 1.0.8
 	 */
 	public const CLIENT_IP_ADDRESS = 'client_ip_address';
 
 	/**
 	 * `user_data` key holding the visitor's raw user agent.
 	 *
-	 * @since x.x.x
+	 * @since 1.0.8
 	 */
 	public const CLIENT_USER_AGENT = 'client_user_agent';
 

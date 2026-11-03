@@ -182,7 +182,7 @@ class Helper {
 	 * `status` entry in its data, and a non-2xx response with the raw HTTP response
 	 * array as its data.
 	 *
-	 * @since x.x.x
+	 * @since 1.0.8
 	 *
 	 * @param WP_Error $error The error returned by the remote request.
 	 * @return int|null The HTTP status code, or null when no HTTP response was received.
