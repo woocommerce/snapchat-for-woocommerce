@@ -2,7 +2,7 @@
 
 = 1.0.8 - 2026-11-03 =
 * Dev - Tested with PHP 8.5.
-* Fix - `snapchat_for_woocommerce_conversion_sent` now fires only after Snapchat accepts the event, and queued Purchase conversion payloads no longer include the visitor's IP address and user agent.
+* Fix - Retry Purchase conversions that fail to send, and stop counting them as sent until Snapchat accepts them.
 * Fix - Send the store currency with Pixel ADD_CART events.
 * Tweak - Update the WordPress.com logo on the account connection card.
 
