@@ -36,22 +36,39 @@ final class ChannelVisibilityMetaBoxTest extends WP_UnitTestCase {
 	}
 
 	/**
-	 * With no shared box present, Snapchat registers its own box on the product screen.
+	 * With no shared box present, Snapchat registers the shared box on the product screen.
 	 */
-	public function test_standalone_mode_registers_own_meta_box(): void {
+	public function test_standalone_mode_registers_shared_meta_box(): void {
 		global $wp_meta_boxes;
 		$wp_meta_boxes = array();
 
 		$this->sut->maybe_register( 'product', null );
 
 		$this->assertArrayHasKey(
-			'snapchat-channel-visibility',
+			ChannelVisibilityMetaBox::SHARED_BOX_ID,
 			$wp_meta_boxes['product']['side']['default']
 		);
 
-		$box = $wp_meta_boxes['product']['side']['default']['snapchat-channel-visibility'];
-		$this->assertSame( 'snapchat-channel-visibility', $box['id'] );
+		$box = $wp_meta_boxes['product']['side']['default'][ ChannelVisibilityMetaBox::SHARED_BOX_ID ];
+		$this->assertSame( 'channel_visibility', $box['id'] );
 		$this->assertSame( 'Channel visibility', $box['title'] );
+		$this->assertSame( array( $this->sut, 'render' ), $box['callback'] );
+	}
+
+	/**
+	 * Once Snapchat has registered the shared box, a second run leaves it as it is,
+	 * the same check any other channel plugin running later makes.
+	 */
+	public function test_standalone_box_is_detected_as_shared_box(): void {
+		global $wp_meta_boxes;
+		$wp_meta_boxes = array();
+
+		$this->sut->maybe_register( 'product', null );
+		$registered = $wp_meta_boxes;
+
+		$this->sut->maybe_register( 'product', null );
+
+		$this->assertSame( $registered, $wp_meta_boxes );
 	}
 
 	/**
@@ -88,11 +105,8 @@ final class ChannelVisibilityMetaBoxTest extends WP_UnitTestCase {
 
 		$this->sut->maybe_register( 'product', null );
 
-		foreach ( $wp_meta_boxes['product'] as $contexts ) {
-			foreach ( $contexts as $priorities ) {
-				$this->assertArrayNotHasKey( 'snapchat-channel-visibility', $priorities );
-			}
-		}
+		$this->assertSame( array( 'default' ), array_keys( $wp_meta_boxes['product']['side'] ) );
+		$this->assertSame( '__return_false', $wp_meta_boxes['product']['side']['default']['channel_visibility']['callback'] );
 	}
 
 	/**
