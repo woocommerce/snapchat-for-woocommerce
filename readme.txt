@@ -27,11 +27,9 @@ Yes, it uses a [Jetpack](https://jetpack.com/) account to connect and communicat
 
 = 1.0.8 - 2026-11-03 =
 * Dev - Tested with PHP 8.5.
-* Fix - Break - `snapchat_for_woocommerce_conversion_sent` now fires only after Snapchat accepts the event, and queued Purchase conversion payloads no longer include the visitor's IP address and user agent.
-* Fix - Correct the Ad Partner base class namespace so optimized builds can load it.
-* Fix - Doc - Add the Automattic security policy and public security contact.
+* Fix - `snapchat_for_woocommerce_conversion_sent` now fires only after Snapchat accepts the event, and queued Purchase conversion payloads no longer include the visitor's IP address and user agent.
 * Fix - Send the store currency with Pixel ADD_CART events.
-* Fix - Update the WordPress.com logo on the account connection card.
+* Tweak - Update the WordPress.com logo on the account connection card.
 
 = 1.0.7 - 2026-10-08 =
 * Tweak - Bump WooCommerce "tested up to" version to 11.2.
