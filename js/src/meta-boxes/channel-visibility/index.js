@@ -7,7 +7,7 @@ import { createRoot, lazy, Suspense } from '@wordpress/element';
 /**
  * Internal dependencies
  */
-import { getHostBoxContainer, insertAlphabetically } from './utils';
+import { insertAlphabetically } from './utils';
 
 const SnapchatAdsPromo = lazy( () =>
 	import(
@@ -23,7 +23,7 @@ domReady( () => {
 	let mountEl = document.getElementById( 'snapchat-channel-visibility-box' );
 
 	if ( ! mountEl ) {
-		const inside = getHostBoxContainer();
+		const inside = document.querySelector( '#channel_visibility .inside' );
 
 		if ( ! inside ) {
 			return;

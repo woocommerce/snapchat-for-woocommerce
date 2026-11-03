@@ -1,10 +1,7 @@
 /**
  * Internal dependencies
  */
-import {
-	getHostBoxContainer,
-	insertAlphabetically,
-} from '~/meta-boxes/channel-visibility/utils';
+import { insertAlphabetically } from '~/meta-boxes/channel-visibility/utils';
 
 const createContainer = ( html ) => {
 	const container = document.createElement( 'div' );
@@ -95,55 +92,5 @@ describe( 'insertAlphabetically', () => {
 
 		expect( insertBefore ).not.toHaveBeenCalled();
 		expect( getOrder( container ) ).toEqual( [ 'reddit', 'snapchat' ] );
-	} );
-} );
-
-describe( 'getHostBoxContainer', () => {
-	const createMetaBox = ( id ) =>
-		`<div id="${ id }" class="postbox"><div class="inside"></div></div>`;
-
-	test( 'Returns the shared box when it exists', () => {
-		const root = createContainer( createMetaBox( 'channel_visibility' ) );
-
-		expect( getHostBoxContainer( root ) ).toBe(
-			root.querySelector( '#channel_visibility .inside' )
-		);
-	} );
-
-	test( "Returns Reddit's standalone box when there is no shared box", () => {
-		const root = createContainer(
-			createMetaBox( 'reddit-channel-visibility' )
-		);
-
-		expect( getHostBoxContainer( root ) ).toBe(
-			root.querySelector( '#reddit-channel-visibility .inside' )
-		);
-	} );
-
-	test( "Prefers the shared box over Reddit's standalone box", () => {
-		const root = createContainer(
-			createMetaBox( 'reddit-channel-visibility' ) +
-				createMetaBox( 'channel_visibility' )
-		);
-
-		expect( getHostBoxContainer( root ) ).toBe(
-			root.querySelector( '#channel_visibility .inside' )
-		);
-	} );
-
-	test( 'Returns null when there is no box to join', () => {
-		const root = createContainer( createMetaBox( 'other-box' ) );
-
-		expect( getHostBoxContainer( root ) ).toBeNull();
-	} );
-
-	test( 'Looks in the document by default', () => {
-		document.body.innerHTML = createMetaBox( 'reddit-channel-visibility' );
-
-		expect( getHostBoxContainer() ).toBe(
-			document.querySelector( '#reddit-channel-visibility .inside' )
-		);
-
-		document.body.innerHTML = '';
 	} );
 } );

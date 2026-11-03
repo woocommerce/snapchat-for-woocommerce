@@ -1,32 +1,4 @@
 /**
- * Selectors for the `.inside` element of each Channel visibility box Snapchat can join,
- * in order of preference: the shared box, then Reddit for WooCommerce's standalone box.
- */
-const HOST_BOX_SELECTORS = [
-	'#channel_visibility .inside',
-	'#reddit-channel-visibility .inside',
-];
-
-/**
- * Finds the existing Channel visibility box that Snapchat should add its row to,
- * when Snapchat didn't register its own box.
- *
- * @param {HTMLElement} [root] Where to look. Defaults to `document`.
- * @return {HTMLElement|null} The box's `.inside` element, or `null` if there's none.
- */
-export const getHostBoxContainer = ( root = document ) => {
-	for ( const selector of HOST_BOX_SELECTORS ) {
-		const container = root.querySelector( selector );
-
-		if ( container ) {
-			return container;
-		}
-	}
-
-	return null;
-};
-
-/**
  * Inserts an extension box into the shared channel visibility meta box at
  * its alphabetical position among the other boxes, by `data-service`.
  *

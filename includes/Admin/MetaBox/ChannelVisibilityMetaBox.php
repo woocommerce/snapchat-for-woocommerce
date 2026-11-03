@@ -37,23 +37,6 @@ class ChannelVisibilityMetaBox {
 	public const BOX_ID = 'snapchat-channel-visibility';
 
 	/**
-	 * Reddit for WooCommerce's standalone meta box id, registered when no shared box exists.
-	 *
-	 * @since n.e.x.t
-	 */
-	public const REDDIT_BOX_ID = 'reddit-channel-visibility';
-
-	/**
-	 * Priority for registering Snapchat's own box on `add_meta_boxes`.
-	 *
-	 * Runs after the priority 999 that Reddit for WooCommerce uses for its standalone box,
-	 * so that box is always registered first, whatever order the plugins load in.
-	 *
-	 * @since n.e.x.t
-	 */
-	public const REGISTER_PRIORITY = 1000;
-
-	/**
 	 * Meta key (unprefixed) that flags whether a product is synced to the Snapchat catalog.
 	 *
 	 * Stored as `'1'` (synced) or `'0'` (not synced). A missing value is treated as synced.
@@ -74,17 +57,16 @@ class ChannelVisibilityMetaBox {
 	 * @return void
 	 */
 	public function register_hooks(): void {
-		add_action( 'add_meta_boxes', array( $this, 'maybe_register' ), self::REGISTER_PRIORITY, 2 );
+		add_action( 'add_meta_boxes', array( $this, 'maybe_register' ), 999, 2 );
 		add_action( 'woocommerce_process_product_meta', array( $this, 'save_meta' ) );
 	}
 
 	/**
-	 * Registers Snapchat's own Channel visibility meta box only when no box exists to join.
+	 * Registers Snapchat's own Channel visibility meta box only when no shared box exists.
 	 *
-	 * Runs late (see {@see self::REGISTER_PRIORITY}) so other channel plugins have already
-	 * registered either the shared box or their own standalone box. In cohabit mode the
-	 * React bundle injects Snapchat's row into the existing box; in standalone mode
-	 * Snapchat owns the box.
+	 * Runs at priority 999 so channel plugins registering at their default priority
+	 * have already claimed the shared box. In cohabit mode the React bundle injects
+	 * Snapchat's row into the existing box; in standalone mode Snapchat owns the box.
 	 *
 	 * @since 1.1.0
 	 *
@@ -152,11 +134,7 @@ class ChannelVisibilityMetaBox {
 	}
 
 	/**
-	 * Checks whether a Channel visibility box that Snapchat can join is already registered for products.
-	 *
-	 * That is either the shared box, or Reddit for WooCommerce's standalone box when no
-	 * shared box exists. Boxes removed with `remove_meta_box()` are left in the registry
-	 * as `false`, so they don't count.
+	 * Checks whether the shared Channel visibility box is already registered for products.
 	 *
 	 * @since 1.1.0
 	 *
@@ -170,10 +148,8 @@ class ChannelVisibilityMetaBox {
 
 		foreach ( $wp_meta_boxes['product'] as $contexts ) {
 			foreach ( $contexts as $priorities ) {
-				foreach ( array( self::SHARED_BOX_ID, self::REDDIT_BOX_ID ) as $box_id ) {
-					if ( ! empty( $priorities[ $box_id ] ) ) {
-						return true;
-					}
+				if ( array_key_exists( self::SHARED_BOX_ID, $priorities ) ) {
+					return true;
 				}
 			}
 		}
