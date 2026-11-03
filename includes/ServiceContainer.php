@@ -18,6 +18,7 @@ use SnapchatForWooCommerce\Connection;
 use SnapchatForWooCommerce\Tracking;
 use SnapchatForWooCommerce\Admin;
 use SnapchatForWooCommerce\Admin\Export;
+use SnapchatForWooCommerce\Campaign;
 use SnapchatForWooCommerce\Tracking\ConversionEventLogger;
 use SnapchatForWooCommerce\API\AdPartner\AdPartnerApi;
 use SnapchatForWooCommerce\Utils\ProductData\ProductCategoryProvider;
@@ -98,6 +99,14 @@ final class ServiceContainer {
 						)
 					)
 				);
+			case ServiceKey::AD_PARTNER_API:
+				return AdPartnerApi::get_instance(
+					self::get( ServiceKey::WCS_CLIENT )
+				);
+			case ServiceKey::CAMPAIGN_STATUS_SERVICE:
+				return new Campaign\CampaignStatusService(
+					self::get( ServiceKey::AD_PARTNER_API )
+				);
 			case ServiceKey::PRODUCT_EXPORT_SERVICE:
 				return new Export\Service\ProductExportService(
 					new Export\BatchExportJob(
@@ -109,9 +118,7 @@ final class ServiceContainer {
 							)
 						),
 						new Export\Writer\CsvExportWriter(),
-						AdPartnerApi::get_instance(
-							self::get( ServiceKey::WCS_CLIENT )
-						),
+						self::get( ServiceKey::AD_PARTNER_API ),
 					)
 				);
 			case ServiceKey::ADMIN_SETUP:
@@ -122,7 +129,8 @@ final class ServiceContainer {
 					new Admin\Notices(),
 					new Admin\MetaBox\ChannelVisibilityMetaBox(),
 					new Admin\MetaBox\MetaBoxAssets(
-						new Admin\MetaBox\OrderAttributionData()
+						new Admin\MetaBox\OrderAttributionData(),
+						self::get( ServiceKey::CAMPAIGN_STATUS_SERVICE )
 					),
 				);
 
