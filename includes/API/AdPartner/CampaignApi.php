@@ -21,6 +21,7 @@ use SnapchatForWooCommerce\Utils\Storage\OptionDefaults;
 use SnapchatForWooCommerce\Utils\Storage\Transients;
 use SnapchatForWooCommerce\Utils\Storage\TransientDefaults;
 use SnapchatForWooCommerce\Utils\Helper;
+use WP_Error;
 
 /**
  * API module for checking whether the connected ad account has any campaigns.
@@ -127,6 +128,20 @@ class CampaignApi extends BaseAdPartnerApi {
 	}
 
 	/**
+	 * Retrieves the campaigns for an ad account.
+	 *
+	 * @since n.e.x.t
+	 *
+	 * @param string $ad_account_id Ad account to list campaigns for.
+	 * @return \WP_REST_Response|WP_Error REST response from WCS or error if the request failed.
+	 */
+	public function get_campaigns( string $ad_account_id ) {
+		return $this->wcs->proxy_get(
+			'/ads/v1/adaccounts/' . rawurlencode( $ad_account_id ) . '/campaigns'
+		);
+	}
+
+	/**
 	 * Checks whether the connected ad account has any campaigns and caches the result.
 	 *
 	 * Runs via Action Scheduler. The result is cached together with the ad
@@ -145,9 +160,7 @@ class CampaignApi extends BaseAdPartnerApi {
 			return;
 		}
 
-		$response = $this->wcs->proxy_get(
-			'/ads/v1/adaccounts/' . rawurlencode( $ad_account_id ) . '/campaigns'
-		);
+		$response = $this->get_campaigns( $ad_account_id );
 
 		if ( is_wp_error( $response ) ) {
 			return;
