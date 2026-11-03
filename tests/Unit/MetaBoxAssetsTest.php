@@ -11,7 +11,7 @@ use WP_UnitTestCase;
 use SnapchatForWooCommerce\Config;
 use SnapchatForWooCommerce\Admin\MetaBox\MetaBoxAssets;
 use SnapchatForWooCommerce\Admin\MetaBox\OrderAttributionData;
-use SnapchatForWooCommerce\API\AdPartner\CampaignApi;
+use SnapchatForWooCommerce\Campaign\CampaignStatusService;
 use SnapchatForWooCommerce\Utils\Storage\Options;
 use SnapchatForWooCommerce\Utils\Storage\OptionDefaults;
 
@@ -52,10 +52,10 @@ final class MetaBoxAssetsTest extends WP_UnitTestCase {
 		$data = $this->createMock( OrderAttributionData::class );
 		$data->method( 'is_wc_order_edit_screen' )->willReturn( false );
 
-		$campaign_api = $this->createMock( CampaignApi::class );
-		$campaign_api->expects( $this->never() )->method( 'has_campaigns' );
+		$campaign_status = $this->createMock( CampaignStatusService::class );
+		$campaign_status->expects( $this->never() )->method( 'has_campaigns' );
 
-		$assets = new MetaBoxAssets( $data, $campaign_api );
+		$assets = new MetaBoxAssets( $data, $campaign_status );
 		$assets->enqueue_assets();
 
 		$this->assertFalse( wp_script_is( self::HANDLE, 'enqueued' ) );
@@ -67,10 +67,10 @@ final class MetaBoxAssetsTest extends WP_UnitTestCase {
 		$data = $this->createMock( OrderAttributionData::class );
 		$data->method( 'is_wc_order_edit_screen' )->willReturn( true );
 
-		$campaign_api = $this->createMock( CampaignApi::class );
-		$campaign_api->expects( $this->never() )->method( 'has_campaigns' );
+		$campaign_status = $this->createMock( CampaignStatusService::class );
+		$campaign_status->expects( $this->never() )->method( 'has_campaigns' );
 
-		$assets = new MetaBoxAssets( $data, $campaign_api );
+		$assets = new MetaBoxAssets( $data, $campaign_status );
 		$assets->enqueue_assets();
 
 		$this->assertTrue( wp_script_is( self::HANDLE, 'enqueued' ) );
@@ -83,10 +83,10 @@ final class MetaBoxAssetsTest extends WP_UnitTestCase {
 		$data->method( 'is_wc_order_edit_screen' )->willReturn( true );
 		$data->method( 'get_order_attribution_source_for_edit_screen' )->willReturn( 'snapchat' );
 
-		$campaign_api = $this->createMock( CampaignApi::class );
-		$campaign_api->expects( $this->once() )->method( 'has_campaigns' )->willReturn( true );
+		$campaign_status = $this->createMock( CampaignStatusService::class );
+		$campaign_status->expects( $this->once() )->method( 'has_campaigns' )->willReturn( true );
 
-		$assets = new MetaBoxAssets( $data, $campaign_api );
+		$assets = new MetaBoxAssets( $data, $campaign_status );
 		$assets->enqueue_assets();
 
 		$this->assertTrue( wp_script_is( self::HANDLE, 'enqueued' ) );

@@ -79,4 +79,11 @@ final class ServiceKey {
 	 * @since n.e.x.t
 	 */
 	public const AD_PARTNER_API = 'ad_partner_api';
+
+	/**
+	 * Identifier for the campaign status service (cached "has campaigns" check).
+	 *
+	 * @since n.e.x.t
+	 */
+	public const CAMPAIGN_STATUS_SERVICE = 'campaign_status_service';
 }
