@@ -134,6 +134,33 @@ class CampaignStatusServiceTest extends WP_UnitTestCase {
 	}
 
 	/**
+	 * Test: the cached result for the connected ad account is returned as-is.
+	 */
+	public function test_get_cached_has_campaigns_returns_cached_value(): void {
+		Transients::set( TransientDefaults::HAS_CAMPAIGNS, $this->cached_result( 'abc-123', true ) );
+		$this->assertTrue( $this->service->get_cached_has_campaigns() );
+
+		Transients::set( TransientDefaults::HAS_CAMPAIGNS, $this->cached_result( 'abc-123', false ) );
+		$this->assertFalse( $this->service->get_cached_has_campaigns() );
+	}
+
+	/**
+	 * Test: with no usable cached result, null is returned and no check is
+	 * scheduled.
+	 */
+	public function test_get_cached_has_campaigns_returns_null_without_scheduling(): void {
+		$this->assertNull( $this->service->get_cached_has_campaigns() );
+
+		Transients::set( TransientDefaults::HAS_CAMPAIGNS, $this->cached_result( 'old-account', false ) );
+		$this->assertNull( $this->service->get_cached_has_campaigns() );
+
+		Transients::set( TransientDefaults::HAS_CAMPAIGNS, '0' );
+		$this->assertNull( $this->service->get_cached_has_campaigns() );
+
+		$this->assertFalse( as_has_scheduled_action( Helper::with_prefix( CampaignStatusService::ACTION_HOOK ) ) );
+	}
+
+	/**
 	 * Test: the refresh is skipped without calling the API when no ad account is connected.
 	 */
 	public function test_refresh_skips_when_no_ad_account(): void {
