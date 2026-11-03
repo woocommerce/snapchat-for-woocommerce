@@ -35,6 +35,9 @@ validate_file_exits( "{$wc_dir}/woocommerce.php" );
 // Require the composer autoloader.
 require_once dirname( __DIR__ ) . '/vendor/autoload.php';
 
+// Test helpers aren't autoloaded, and PHPUnit only loads files ending in Test.php.
+require_once __DIR__ . '/Integration/Tracking/ConversionSendTestHelpers.php';
+
 // Enable this Library for avoiding errors mocking final Google API Classes.
 // @see https://github.com/googleads/google-ads-php/issues/1008
 BypassFinals::enable();
