@@ -35,6 +35,17 @@ class ChannelVisibilityMetaBox {
 	public const SHARED_BOX_ID = 'channel_visibility';
 
 	/**
+	 * Priority of the `add_meta_boxes` callback that registers the shared box.
+	 *
+	 * Late enough that channel plugins registering at the default priority have
+	 * already claimed the shared box, and one ahead of the common 999 so plugins
+	 * that only look for the shared box at 999 find it and join it.
+	 *
+	 * @since n.e.x.t
+	 */
+	public const REGISTER_PRIORITY = 998;
+
+	/**
 	 * Meta key (unprefixed) that flags whether a product is synced to the Snapchat catalog.
 	 *
 	 * Stored as `'1'` (synced) or `'0'` (not synced). A missing value is treated as synced.
@@ -55,15 +66,15 @@ class ChannelVisibilityMetaBox {
 	 * @return void
 	 */
 	public function register_hooks(): void {
-		add_action( 'add_meta_boxes', array( $this, 'maybe_register' ), 999, 2 );
+		add_action( 'add_meta_boxes', array( $this, 'maybe_register' ), self::REGISTER_PRIORITY, 2 );
 		add_action( 'woocommerce_process_product_meta', array( $this, 'save_meta' ) );
 	}
 
 	/**
 	 * Registers the shared Channel visibility meta box only when it doesn't exist yet.
 	 *
-	 * Runs at priority 999 so channel plugins registering at their default priority
-	 * have already claimed the shared box. In cohabit mode the React bundle injects
+	 * Runs at {@see self::REGISTER_PRIORITY} so channel plugins registering at their
+	 * default priority have already claimed the shared box. In cohabit mode the React bundle injects
 	 * Snapchat's row into the existing box; in standalone mode Snapchat registers the
 	 * shared box, so channel plugins that run later join it instead of adding their own.
 	 *

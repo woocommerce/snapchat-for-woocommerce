@@ -186,6 +186,16 @@ final class ChannelVisibilityMetaBoxTest extends WP_UnitTestCase {
 	}
 
 	/**
+	 * register_hooks() registers the box at 998, ahead of channel plugins that look for
+	 * the shared box at 999.
+	 */
+	public function test_register_hooks_registers_box_before_priority_999(): void {
+		$this->sut->register_hooks();
+
+		$this->assertSame( 998, has_action( 'add_meta_boxes', array( $this->sut, 'maybe_register' ) ) );
+	}
+
+	/**
 	 * register_hooks() wires save_meta() to the WooCommerce product save.
 	 */
 	public function test_register_hooks_adds_save_meta_action(): void {
