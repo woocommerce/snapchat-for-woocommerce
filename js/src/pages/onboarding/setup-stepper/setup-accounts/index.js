@@ -25,11 +25,11 @@ import './index.scss';
  * When the merchant is onboarded.
  *
  * @event sfw_onboarding_completed
- * @property {boolean} has_active_campaign Whether the connected Snapchat ad account already has a campaign.
+ * @property {boolean|null} has_active_campaign Whether the connected Snapchat ad account already has a campaign, or null if the check could not be completed.
  */
 
 /**
- * @fires sfw_onboarding_completed with `{ has_active_campaign: true }` or `{ has_active_campaign: false }`.
+ * @fires sfw_onboarding_completed with `{ has_active_campaign: true }`, `{ has_active_campaign: false }`, or `{ has_active_campaign: null }` when the campaign check could not be completed.
  */
 const SetupAccounts = ( props ) => {
 	const { onContinue = noop } = props;

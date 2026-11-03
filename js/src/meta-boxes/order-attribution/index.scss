@@ -1,21 +1,26 @@
 .sfw-order-attribution-promo {
-	margin-block-start: wpVariables.$grid-unit-20;
-	padding: wpVariables.$grid-unit-20;
 	background-color: colors.$sfw-color-gray-0;
 	border: 1px solid wpColors.$gray-300;
-	border-radius: 2px;
-	font-size: variables.$sfw-font-base;
-	line-height: variables.$sfw-line-height-medium;
-	color: wpColors.$black;
+	border-radius: wpVariables.$grid-unit-05;
+	margin-block: wpVariables.$grid-unit-20;
+	margin-inline: 0;
+	padding: wpVariables.$grid-unit-20;
+
+	p:last-child {
+		margin-block: 0;
+		margin-inline: 0;
+	}
+}
+
+.sfw-order-attribution-promo__logo {
+	display: block;
 }
 
 .sfw-order-attribution-promo__title {
-	margin: 0;
 	font-size: variables.$sfw-font-base;
+	font-weight: 600;
 	line-height: variables.$sfw-line-height-medium;
-}
-
-.sfw-order-attribution-promo__body {
-	margin: 0;
-	color: wpColors.$gray-900;
+	letter-spacing: 0;
+	margin-block: 0;
+	margin-inline: 0;
 }

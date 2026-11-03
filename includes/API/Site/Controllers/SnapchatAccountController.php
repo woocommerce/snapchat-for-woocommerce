@@ -16,7 +16,7 @@ namespace SnapchatForWooCommerce\API\Site\Controllers;
 
 use WP_REST_Response;
 use SnapchatForWooCommerce\Config;
-use SnapchatForWooCommerce\API\AdPartner\CampaignApi;
+use SnapchatForWooCommerce\Campaign\CampaignStatusService;
 use SnapchatForWooCommerce\Utils\Storage\Options;
 use SnapchatForWooCommerce\Utils\Storage\OptionDefaults;
 
@@ -28,23 +28,23 @@ use SnapchatForWooCommerce\Utils\Storage\OptionDefaults;
 class SnapchatAccountController extends RESTBaseController {
 
 	/**
-	 * Ad campaign lookup used to report whether the ad account has an active campaign.
+	 * Campaign status used to report whether the ad account has a campaign.
 	 *
-	 * @since 1.1.0
+	 * @since n.e.x.t
 	 *
-	 * @var CampaignApi
+	 * @var CampaignStatusService
 	 */
-	protected CampaignApi $campaign_api;
+	protected CampaignStatusService $campaign_status;
 
 	/**
 	 * Constructor.
 	 *
-	 * @since 1.1.0
+	 * @since n.e.x.t
 	 *
-	 * @param CampaignApi $campaign_api Ad campaign lookup.
+	 * @param CampaignStatusService $campaign_status Campaign status service.
 	 */
-	public function __construct( CampaignApi $campaign_api ) {
-		$this->campaign_api = $campaign_api;
+	public function __construct( CampaignStatusService $campaign_status ) {
+		$this->campaign_status = $campaign_status;
 	}
 
 	/**
@@ -80,8 +80,7 @@ class SnapchatAccountController extends RESTBaseController {
 	 * @return WP_REST_Response
 	 */
 	public function get_account_details() {
-		$ad_account_id       = (string) Options::get( OptionDefaults::AD_ACCOUNT_ID );
-		$has_active_campaign = '' !== $ad_account_id && $this->campaign_api->has_active_campaigns( $ad_account_id );
+		$ad_account_id = (string) Options::get( OptionDefaults::AD_ACCOUNT_ID );
 
 		return rest_ensure_response(
 			array(
@@ -90,11 +89,36 @@ class SnapchatAccountController extends RESTBaseController {
 				'ad_acc_id'           => $ad_account_id,
 				'ad_acc_name'         => Options::get( OptionDefaults::AD_ACCOUNT_NAME ),
 				'pixel_id'            => Options::get( OptionDefaults::PIXEL_ID ),
-				'has_active_campaign' => $has_active_campaign,
+				'has_active_campaign' => '' === $ad_account_id ? false : $this->get_campaign_status(),
 			)
 		);
 	}
 
+	/**
+	 * Returns whether the connected ad account has a campaign, checking live on a cache miss.
+	 *
+	 * This value is reported in the `sfw_onboarding_completed` tracking event
+	 * to split completions with and without ads. The cache is cleared when
+	 * onboarding completes, so falling back to the cache-only
+	 * `has_campaigns()` (which assumes true until the background check runs)
+	 * would report nearly every completion as "with ads". The live check only
+	 * runs on a cache miss, and its result is cached for later requests.
+	 *
+	 * @since n.e.x.t
+	 *
+	 * @return bool|null Whether the ad account has a campaign, or null if the
+	 *                   live check failed.
+	 */
+	protected function get_campaign_status(): ?bool {
+		$status = $this->campaign_status->get_cached_status();
+
+		if ( null === $status ) {
+			$this->campaign_status->refresh_cache();
+			$status = $this->campaign_status->get_cached_status();
+		}
+
+		return $status;
+	}
 
 	/**
 	 * Returns the JSON schema for the `/account` REST endpoint.
@@ -133,8 +157,8 @@ class SnapchatAccountController extends RESTBaseController {
 					'type'        => 'string',
 				),
 				'has_active_campaign' => array(
-					'description' => 'Whether the ad account has at least one campaign.',
-					'type'        => 'boolean',
+					'description' => 'Whether the ad account has at least one campaign, or null if the check could not be completed.',
+					'type'        => array( 'boolean', 'null' ),
 				),
 			),
 			'required'   => array( 'org_id', 'org_name', 'ad_acc_id', 'ad_acc_name', 'pixel_id', 'has_active_campaign' ),

@@ -56,7 +56,7 @@ class AdPartnerApi {
 	/**
 	 * Handles ad campaign lookups.
 	 *
-	 * @since 1.2.0
+	 * @since n.e.x.t
 	 * @var CampaignApi
 	 */
 	public CampaignApi $campaign;

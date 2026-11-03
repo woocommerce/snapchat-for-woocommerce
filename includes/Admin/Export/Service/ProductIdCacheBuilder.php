@@ -70,6 +70,12 @@ class ProductIdCacheBuilder implements CacheBuilderInterface {
 			10,
 			2
 		);
+		add_action(
+			'woocommerce_product_data_store_cpt_get_products_query',
+			array( $this, 'query_catalog_visible_products' ),
+			10,
+			2
+		);
 	}
 
 	/**
@@ -135,6 +141,7 @@ class ProductIdCacheBuilder implements CacheBuilderInterface {
 			'status'        => 'publish',
 			'return'        => 'ids',
 			'snap_meta_key' => Helper::with_prefix( ChannelVisibilityMetaBox::CATALOG_ITEM ),
+			'snap_visible'  => true,
 		);
 
 		$query   = new \WC_Product_Query( $query_args );
@@ -199,6 +206,50 @@ class ProductIdCacheBuilder implements CacheBuilderInterface {
 				),
 			);
 		}
+
+		return $query;
+	}
+
+	/**
+	 * Filters the product query to products that are visible in the store catalog.
+	 *
+	 * Matches `WC_Product::is_visible()` outside a search, which the Channel visibility
+	 * meta box uses to tell merchants a product "cannot be shown on any channel": products
+	 * set to Hidden or Search results only both carry the `exclude-from-catalog` term in
+	 * the `product_visibility` taxonomy, so they're left out. When the store hides
+	 * out-of-stock items from the catalog, products with the `outofstock` term are left
+	 * out too.
+	 *
+	 * Filtering in the query, rather than checking each product afterwards, matters because
+	 * {@see self::handle_batch()} treats an empty page as the last one: a page where every
+	 * product was filtered out afterwards would end the scan early.
+	 *
+	 * @since n.e.x.t
+	 *
+	 * @param array $query      WooCommerce Products query args.
+	 * @param array $query_vars Query vars.
+	 *
+	 * @return array
+	 */
+	public function query_catalog_visible_products( $query, $query_vars ) {
+		if ( empty( $query_vars['snap_visible'] ) ) {
+			return $query;
+		}
+
+		$excluded_terms = array( 'exclude-from-catalog' );
+
+		if ( 'yes' === get_option( 'woocommerce_hide_out_of_stock_items' ) ) {
+			$excluded_terms[] = 'outofstock';
+		}
+
+		// Append to any existing tax query rather than replacing it. Excluding a couple of terms is cheap.
+		$query['tax_query']   = isset( $query['tax_query'] ) ? (array) $query['tax_query'] : array(); // phpcs:ignore WordPress.DB.SlowDBQuery.slow_db_query_tax_query
+		$query['tax_query'][] = array(
+			'taxonomy' => 'product_visibility',
+			'field'    => 'slug',
+			'terms'    => $excluded_terms,
+			'operator' => 'NOT IN',
+		);
 
 		return $query;
 	}

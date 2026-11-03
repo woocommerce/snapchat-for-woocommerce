@@ -29,7 +29,7 @@
  * @property {string} ad_acc_id The Snapchat ad account ID.
  * @property {string} ad_acc_name The name of the Snapchat ad account.
  * @property {string} pixel_id The Snapchat pixel ID.
- * @property {boolean} has_active_campaign Whether the Snapchat ad account has at least one campaign.
+ * @property {boolean|null} has_active_campaign Whether the Snapchat ad account has at least one campaign, or null if the check could not be completed.
  */
 
 /**

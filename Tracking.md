@@ -185,9 +185,9 @@ When the merchant is onboarded.
 #### Properties
 | name | type | description |
 | ---- | ---- | ----------- |
-`has_active_campaign` | `boolean` | Whether the connected Snapchat ad account already has a campaign.
+`has_active_campaign` | `boolean\|null` | Whether the connected Snapchat ad account already has a campaign, or null if the check could not be completed.
 #### Emitters
-- [`SetupAccounts`](js/src/pages/onboarding/setup-stepper/setup-accounts/index.js#L34) with `{ has_active_campaign: true }` or `{ has_active_campaign: false }`.
+- [`SetupAccounts`](js/src/pages/onboarding/setup-stepper/setup-accounts/index.js#L34) with `{ has_active_campaign: true }`, `{ has_active_campaign: false }`, or `{ has_active_campaign: null }` when the campaign check could not be completed.
 
 ### [`sfw_regenerate_csv_button_click`](js/src/pages/settings/product-catalog/index.js#L25)
 When the `Regenerate CSV` button is clicked.

@@ -13,10 +13,9 @@
 
 namespace SnapchatForWooCommerce\Admin\MetaBox;
 
-use SnapchatForWooCommerce\API\AdPartner\CampaignApi;
+use SnapchatForWooCommerce\Campaign\CampaignStatusService;
 use SnapchatForWooCommerce\Utils\AssetLoader;
-use SnapchatForWooCommerce\Utils\Storage\Options;
-use SnapchatForWooCommerce\Utils\Storage\OptionDefaults;
+use SnapchatForWooCommerce\Utils\OnboardingStatus;
 
 /**
  * Handles admin script and style enqueues for plugin meta boxes.
@@ -35,25 +34,25 @@ class MetaBoxAssets {
 	protected OrderAttributionData $order_attribution_data;
 
 	/**
-	 * Ad campaign lookup used to determine whether the create-campaign banner should show.
+	 * Campaign status used to determine whether the create-campaign banner should show.
 	 *
-	 * @since 1.2.0
+	 * @since n.e.x.t
 	 *
-	 * @var CampaignApi
+	 * @var CampaignStatusService
 	 */
-	protected CampaignApi $campaign_api;
+	protected CampaignStatusService $campaign_status;
 
 	/**
 	 * Constructor.
 	 *
 	 * @since 1.1.0
 	 *
-	 * @param OrderAttributionData $order_attribution_data Order attribution data resolver.
-	 * @param CampaignApi          $campaign_api           Ad campaign lookup.
+	 * @param OrderAttributionData  $order_attribution_data Order attribution data resolver.
+	 * @param CampaignStatusService $campaign_status        Campaign status service.
 	 */
-	public function __construct( OrderAttributionData $order_attribution_data, CampaignApi $campaign_api ) {
+	public function __construct( OrderAttributionData $order_attribution_data, CampaignStatusService $campaign_status ) {
 		$this->order_attribution_data = $order_attribution_data;
-		$this->campaign_api           = $campaign_api;
+		$this->campaign_status        = $campaign_status;
 	}
 
 	/**
@@ -125,8 +124,8 @@ class MetaBoxAssets {
 			return;
 		}
 
-		$onboarding_complete = Options::get( OptionDefaults::ONBOARDING_STATUS ) === 'connected';
-		$has_campaign        = $this->campaign_api->has_active_campaigns( Options::get( OptionDefaults::AD_ACCOUNT_ID ) );
+		$onboarding_complete = OnboardingStatus::is_setup_completed();
+		$has_campaign        = $onboarding_complete && $this->campaign_status->has_campaigns();
 
 		AssetLoader::enqueue_script( 'order-attribution', 'order-attribution' );
 		AssetLoader::enqueue_style( 'order-attribution', 'order-attribution' );

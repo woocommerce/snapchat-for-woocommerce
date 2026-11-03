@@ -8,7 +8,7 @@
 namespace SnapchatForWooCommerce\Tests\Unit\API\Controllers;
 
 use WP_UnitTestCase;
-use SnapchatForWooCommerce\API\AdPartner\CampaignApi;
+use SnapchatForWooCommerce\Campaign\CampaignStatusService;
 use SnapchatForWooCommerce\API\Site\Controllers\SnapchatAccountController;
 use SnapchatForWooCommerce\Utils\Storage\Options;
 use SnapchatForWooCommerce\Utils\Storage\OptionDefaults;
@@ -27,20 +27,50 @@ class SnapchatAccountControllerTest extends WP_UnitTestCase {
 	}
 
 	/**
-	 * Test: `has_active_campaign` reflects the campaign lookup for the stored ad account.
+	 * Test: a cached campaign result is reported without a live check.
 	 */
-	public function test_account_details_include_active_campaign_flag(): void {
+	public function test_account_details_report_cached_campaign_status(): void {
 		Options::set( OptionDefaults::AD_ACCOUNT_ID, 'test-ad-account' );
 
-		$campaign_api = $this->createMock( CampaignApi::class );
-		$campaign_api->expects( $this->once() )
-			->method( 'has_active_campaigns' )
-			->with( 'test-ad-account' )
-			->willReturn( true );
+		$campaign_status = $this->createMock( CampaignStatusService::class );
+		$campaign_status->expects( $this->once() )->method( 'get_cached_status' )->willReturn( true );
+		$campaign_status->expects( $this->never() )->method( 'refresh_cache' );
 
-		$data = ( new SnapchatAccountController( $campaign_api ) )->get_account_details()->get_data();
+		$data = ( new SnapchatAccountController( $campaign_status ) )->get_account_details()->get_data();
 
 		$this->assertTrue( $data['has_active_campaign'] );
+	}
+
+	/**
+	 * Test: on a cache miss, a live check runs and its result is reported.
+	 */
+	public function test_account_details_refresh_campaign_status_on_cache_miss(): void {
+		Options::set( OptionDefaults::AD_ACCOUNT_ID, 'test-ad-account' );
+
+		$campaign_status = $this->createMock( CampaignStatusService::class );
+		$campaign_status->expects( $this->exactly( 2 ) )
+			->method( 'get_cached_status' )
+			->willReturnOnConsecutiveCalls( null, false );
+		$campaign_status->expects( $this->once() )->method( 'refresh_cache' );
+
+		$data = ( new SnapchatAccountController( $campaign_status ) )->get_account_details()->get_data();
+
+		$this->assertFalse( $data['has_active_campaign'] );
+	}
+
+	/**
+	 * Test: when the live check fails, `has_active_campaign` is null rather than a guess.
+	 */
+	public function test_account_details_report_null_when_campaign_check_fails(): void {
+		Options::set( OptionDefaults::AD_ACCOUNT_ID, 'test-ad-account' );
+
+		$campaign_status = $this->createMock( CampaignStatusService::class );
+		$campaign_status->method( 'get_cached_status' )->willReturn( null );
+		$campaign_status->expects( $this->once() )->method( 'refresh_cache' );
+
+		$data = ( new SnapchatAccountController( $campaign_status ) )->get_account_details()->get_data();
+
+		$this->assertNull( $data['has_active_campaign'] );
 	}
 
 	/**
@@ -49,10 +79,11 @@ class SnapchatAccountControllerTest extends WP_UnitTestCase {
 	public function test_account_details_report_no_campaign_without_ad_account(): void {
 		Options::delete( OptionDefaults::AD_ACCOUNT_ID );
 
-		$campaign_api = $this->createMock( CampaignApi::class );
-		$campaign_api->expects( $this->never() )->method( 'has_active_campaigns' );
+		$campaign_status = $this->createMock( CampaignStatusService::class );
+		$campaign_status->expects( $this->never() )->method( 'get_cached_status' );
+		$campaign_status->expects( $this->never() )->method( 'refresh_cache' );
 
-		$data = ( new SnapchatAccountController( $campaign_api ) )->get_account_details()->get_data();
+		$data = ( new SnapchatAccountController( $campaign_status ) )->get_account_details()->get_data();
 
 		$this->assertFalse( $data['has_active_campaign'] );
 	}
