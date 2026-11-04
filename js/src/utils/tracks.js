@@ -3,10 +3,9 @@
  */
 import { select } from '@wordpress/data';
 import { addQueryArgs } from '@wordpress/url';
-import noop from 'lodash/noop';
-import pick from 'lodash/pick';
 import { getQuery } from '@woocommerce/navigation';
 import { recordEvent, queueRecordEvent } from '@woocommerce/tracks';
+import { noop, pick } from 'lodash';
 
 /**
  * Internal dependencies
