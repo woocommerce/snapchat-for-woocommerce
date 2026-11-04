@@ -59,10 +59,11 @@ class CampaignStatusService {
 	/**
 	 * Registers the background job handler and the connection-change hooks.
 	 *
-	 * The cache is cleared whenever the Snapchat connection changes: on
-	 * `onboarding_complete` (fired at the end of the OAuth config-save flow
-	 * for connect, reconnect, and ad-account change), where the check then
-	 * runs straight away, and on `snapchat_disconnected`, where any queued
+	 * The cache is cleared whenever the Snapchat connection changes. Despite
+	 * its name, `onboarding_complete` fires when the Snapchat account is
+	 * connected (the OAuth config save, for connect, reconnect and ad-account
+	 * change), before the merchant finishes the onboarding steps. There the
+	 * check then runs straight away. On `snapchat_disconnected`, any queued
 	 * background check is also cancelled. The cached result is tagged with
 	 * its ad account, so a change that skips these hooks still never serves
 	 * a stale result.
@@ -73,7 +74,7 @@ class CampaignStatusService {
 	 */
 	public function register_hooks(): void {
 		add_action( Helper::with_prefix( self::ACTION_HOOK ), array( $this, 'refresh_cache' ) );
-		add_action( Helper::with_prefix( 'onboarding_complete' ), array( $this, 'refresh_after_onboarding' ) );
+		add_action( Helper::with_prefix( 'onboarding_complete' ), array( $this, 'refresh_on_connect' ) );
 		add_action( Helper::with_prefix( 'snapchat_disconnected' ), array( $this, 'clear_cache' ) );
 		add_action( Helper::with_prefix( 'snapchat_disconnected' ), array( $this, 'unschedule_refresh' ) );
 	}
@@ -92,16 +93,17 @@ class CampaignStatusService {
 	/**
 	 * Clears the cache and runs the campaign check straight away.
 	 *
-	 * Runs on `onboarding_complete`, so the result for the newly connected ad
-	 * account is usually known by the time the merchant finishes onboarding,
-	 * instead of waiting for the next cache miss. A failed check isn't cached,
-	 * so the next cache miss schedules another one as usual.
+	 * Runs on `onboarding_complete`, which fires when the Snapchat account is
+	 * connected, so the result for the newly connected ad account is usually
+	 * known by the time the merchant clicks Continue on the Set up accounts
+	 * step, instead of waiting for the next cache miss. A failed check isn't
+	 * cached, so the result stays unknown until the next check.
 	 *
 	 * @since n.e.x.t
 	 *
 	 * @return void
 	 */
-	public function refresh_after_onboarding(): void {
+	public function refresh_on_connect(): void {
 		$this->clear_cache();
 		$this->refresh_cache();
 	}

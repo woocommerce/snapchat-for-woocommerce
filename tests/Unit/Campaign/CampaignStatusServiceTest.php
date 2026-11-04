@@ -292,7 +292,7 @@ class CampaignStatusServiceTest extends WP_UnitTestCase {
 	}
 
 	/**
-	 * Test: onboarding completing runs the check straight away and caches the
+	 * Test: connecting (`onboarding_complete`) runs the check straight away and caches the
 	 * result for the connected ad account, replacing any earlier result.
 	 */
 	public function test_onboarding_complete_runs_check_and_caches_result(): void {
@@ -308,7 +308,7 @@ class CampaignStatusServiceTest extends WP_UnitTestCase {
 		do_action( Helper::with_prefix( 'onboarding_complete' ) );
 
 		$this->assertSame( $this->cached_result( 'abc-123', false ), Transients::get( TransientDefaults::HAS_CAMPAIGNS ) );
-		$this->assertFalse( $this->service->get_cached_has_campaigns() );
+		$this->assertFalse( $this->service->get_cached_status() );
 	}
 
 	/**
@@ -327,7 +327,7 @@ class CampaignStatusServiceTest extends WP_UnitTestCase {
 		do_action( Helper::with_prefix( 'onboarding_complete' ) );
 
 		$this->assertSame( '', Transients::get( TransientDefaults::HAS_CAMPAIGNS ) );
-		$this->assertNull( $this->service->get_cached_has_campaigns() );
+		$this->assertNull( $this->service->get_cached_status() );
 	}
 
 	/**
