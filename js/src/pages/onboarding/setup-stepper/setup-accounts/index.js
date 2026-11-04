@@ -38,8 +38,10 @@ const SetupAccounts = ( props ) => {
 		isConnected: isSnapchatConnected,
 		hasFinishedResolution: hasResolvedSnapchatAccount,
 	} = useSnapchatAccount();
-	const { has_active_campaign: hasActiveCampaign = false } =
-		useSnapchatAccountDetails();
+	const {
+		has_active_campaign: hasActiveCampaign = null,
+		hasFinishedResolution: hasResolvedAccountDetails,
+	} = useSnapchatAccountDetails();
 
 	/**
 	 * When jetpack is loading, or when Snapchat account is loading,
@@ -60,7 +62,12 @@ const SetupAccounts = ( props ) => {
 	};
 
 	const isContinueButtonDisabled = ! isJetpackActive || ! isSnapchatConnected;
-	const isSubmitting = false;
+
+	// Account details are refetched after connecting. Wait for them so
+	// `sfw_onboarding_completed` reports the real campaign state rather than
+	// a placeholder.
+	const isLoadingAccountDetails =
+		isSnapchatConnected && ! hasResolvedAccountDetails;
 
 	return (
 		<StepContent>
@@ -91,7 +98,7 @@ const SetupAccounts = ( props ) => {
 					<AppButton
 						isPrimary
 						disabled={ isContinueButtonDisabled }
-						loading={ isSubmitting }
+						loading={ isLoadingAccountDetails }
 						text={ __( 'Continue', 'snapchat-for-woocommerce' ) }
 						onClick={ handleOnClick }
 						eventName="sfw_onboarding_completed"
