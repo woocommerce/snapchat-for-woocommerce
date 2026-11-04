@@ -133,30 +133,33 @@ class CampaignStatusServiceTest extends WP_UnitTestCase {
 	}
 
 	/**
-	 * Test: the cached result for the connected ad account is returned as-is.
+	 * Test: `get_cached_status()` returns null on a cache miss and never schedules a check.
 	 */
-	public function test_get_cached_has_campaigns_returns_cached_value(): void {
-		Transients::set( TransientDefaults::HAS_CAMPAIGNS, $this->cached_result( 'abc-123', true ) );
-		$this->assertTrue( $this->service->get_cached_has_campaigns() );
+	public function test_get_cached_status_returns_null_on_miss_without_scheduling(): void {
+		$this->campaign_api->expects( $this->never() )->method( 'get_campaigns' );
 
-		Transients::set( TransientDefaults::HAS_CAMPAIGNS, $this->cached_result( 'abc-123', false ) );
-		$this->assertFalse( $this->service->get_cached_has_campaigns() );
+		$this->assertNull( $this->service->get_cached_status() );
+		$this->assertFalse( as_has_scheduled_action( Helper::with_prefix( CampaignStatusService::ACTION_HOOK ) ) );
 	}
 
 	/**
-	 * Test: with no usable cached result, null is returned and no check is
-	 * scheduled.
+	 * Test: `get_cached_status()` returns the cached value for the connected ad account.
 	 */
-	public function test_get_cached_has_campaigns_returns_null_without_scheduling(): void {
-		$this->assertNull( $this->service->get_cached_has_campaigns() );
+	public function test_get_cached_status_returns_cached_value(): void {
+		Transients::set( TransientDefaults::HAS_CAMPAIGNS, $this->cached_result( 'abc-123', false ) );
+		$this->assertFalse( $this->service->get_cached_status() );
 
-		Transients::set( TransientDefaults::HAS_CAMPAIGNS, $this->cached_result( 'old-account', false ) );
-		$this->assertNull( $this->service->get_cached_has_campaigns() );
+		Transients::set( TransientDefaults::HAS_CAMPAIGNS, $this->cached_result( 'abc-123', true ) );
+		$this->assertTrue( $this->service->get_cached_status() );
+	}
 
-		Transients::set( TransientDefaults::HAS_CAMPAIGNS, '0' );
-		$this->assertNull( $this->service->get_cached_has_campaigns() );
+	/**
+	 * Test: `get_cached_status()` ignores a result cached for a different ad account.
+	 */
+	public function test_get_cached_status_ignores_other_ad_account(): void {
+		Transients::set( TransientDefaults::HAS_CAMPAIGNS, $this->cached_result( 'old-account', true ) );
 
-		$this->assertFalse( as_has_scheduled_action( Helper::with_prefix( CampaignStatusService::ACTION_HOOK ) ) );
+		$this->assertNull( $this->service->get_cached_status() );
 	}
 
 	/**

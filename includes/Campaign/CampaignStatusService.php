@@ -132,10 +132,10 @@ class CampaignStatusService {
 	 *              result is not known yet.
 	 */
 	public function has_campaigns(): bool {
-		$cached = $this->get_cached_has_campaigns();
+		$status = $this->get_cached_status();
 
-		if ( null !== $cached ) {
-			return $cached;
+		if ( null !== $status ) {
+			return $status;
 		}
 
 		$this->schedule_refresh();
@@ -144,18 +144,18 @@ class CampaignStatusService {
 	}
 
 	/**
-	 * The cached campaign result for the connected ad account, if there is one.
+	 * Returns the cached campaign result for the connected ad account, if known.
 	 *
-	 * Unlike {@see self::has_campaigns()}, this doesn't fall back to true or
-	 * schedule a check, so callers can tell "no campaigns" apart from
-	 * "not known yet".
+	 * Unlike {@see self::has_campaigns()}, this neither schedules a check nor
+	 * falls back to true, so callers that report the result (rather than use it
+	 * to hide a banner) can tell "no campaigns" apart from "not known yet".
 	 *
 	 * @since n.e.x.t
 	 *
-	 * @return bool|null Whether the connected ad account has any campaign, or
-	 *                   null when there's no cached result for that account.
+	 * @return bool|null Whether the ad account has any campaign, or null when
+	 *                   no result is cached for the connected ad account.
 	 */
-	public function get_cached_has_campaigns(): ?bool {
+	public function get_cached_status(): ?bool {
 		$cached = Transients::get( TransientDefaults::HAS_CAMPAIGNS );
 
 		if (
