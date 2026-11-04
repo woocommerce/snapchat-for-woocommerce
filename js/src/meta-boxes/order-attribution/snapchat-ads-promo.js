@@ -1,15 +1,16 @@
 /**
  * External dependencies
  */
-import { Flex, FlexItem, FlexBlock } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
+import { external } from '@wordpress/icons';
 
 /**
  * Internal dependencies
  */
 import AppButton from '~/components/app-button';
-import { getOnboardingUrl } from '~/utils/urls';
-import snapchatLogoURL from '~/images/logo/snapchat.svg';
+import PromoBanner from './promo-banner';
+import useSnapchatAccountDetails from '~/hooks/useSnapchatAccountDetails';
+import { getOnboardingUrl, getCreateCampaignUrl } from '~/utils/urls';
 
 const onboardingUrl = getOnboardingUrl();
 
@@ -20,72 +21,90 @@ const onboardingUrl = getOnboardingUrl();
  */
 
 /**
- * Renders the Snapchat connect-account promo within the Order Attribution meta
- * box, while onboarding is incomplete.
+ * @event sfw_order_attribution_create_campaign_button_click
+ * @property {string} context Indicates from which page the button was clicked. Possible value: 'order-attribution-meta-box'.
+ * @property {string} url The URL the button directs to. Possible value: the create-campaign URL.
+ */
+
+/**
+ * Renders the Snapchat promo within the Order Attribution meta box for
+ * Snapchat-attributed orders.
  *
  * @fires sfw_order_attribution_get_started_button_click When the "Get started" button is clicked.
+ * @fires sfw_order_attribution_create_campaign_button_click When the "Create campaign" button is clicked.
  *
- * @return {JSX.Element|null} The promo, or null when onboarding is complete.
+ * @return {JSX.Element|null} The promo, or null when nothing should render.
  */
 const SnapchatAdsPromo = () => {
-	const { onboardingComplete = false } = window.snapchatAdsMetaBoxData || {};
+	const { onboardingComplete = false, hasCampaign = false } =
+		window.snapchatAdsMetaBoxData || {};
 
-	if ( onboardingComplete ) {
+	const { ad_acc_id: adAccountId } = useSnapchatAccountDetails();
+
+	if ( onboardingComplete && hasCampaign ) {
+		return null;
+	}
+
+	if ( ! onboardingComplete ) {
+		return (
+			<PromoBanner
+				title={ __(
+					'Your next customers are on Snapchat',
+					'snapchat-for-woocommerce'
+				) }
+				body={ __(
+					'Sync your catalog to reach Snapchatters actively discovering new brands and products.',
+					'snapchat-for-woocommerce'
+				) }
+				cta={
+					<AppButton
+						variant="secondary"
+						href={ onboardingUrl }
+						eventName="sfw_order_attribution_get_started_button_click"
+						eventProps={ {
+							context: 'order-attribution-meta-box',
+							url: onboardingUrl,
+						} }
+						text={ __( 'Get started', 'snapchat-for-woocommerce' ) }
+					/>
+				}
+			/>
+		);
+	}
+
+	const createCampaignUrl = getCreateCampaignUrl( adAccountId );
+
+	if ( ! createCampaignUrl ) {
 		return null;
 	}
 
 	return (
-		<Flex
-			direction="column"
-			className="sfw-order-attribution-promo"
-			gap={ 3 }
-		>
-			<FlexBlock>
-				<Flex align="center" gap={ 2 }>
-					<FlexItem>
-						<img
-							src={ snapchatLogoURL }
-							alt={ __(
-								'Snapchat logo',
-								'snapchat-for-woocommerce'
-							) }
-							width="24"
-							height="24"
-						/>
-					</FlexItem>
-					<FlexBlock>
-						<h3 className="sfw-order-attribution-promo__title">
-							{ __(
-								'Your next customers are on Snapchat',
-								'snapchat-for-woocommerce'
-							) }
-						</h3>
-					</FlexBlock>
-				</Flex>
-			</FlexBlock>
-
-			<FlexBlock>
-				<p className="sfw-order-attribution-promo__body">
-					{ __(
-						'Sync your catalog to reach Snapchatters actively discovering new brands and products.',
-						'snapchat-for-woocommerce'
-					) }
-				</p>
-			</FlexBlock>
-
-			<FlexBlock>
+		<PromoBanner
+			title={ __(
+				'Get more sales with Snapchat Ads',
+				'snapchat-for-woocommerce'
+			) }
+			body={ __(
+				'Launch a Snapchat Ads campaign and get your products discovered by highly engaged communities actively looking for what to buy next.',
+				'snapchat-for-woocommerce'
+			) }
+			cta={
 				<AppButton
 					variant="secondary"
-					href={ onboardingUrl }
-					eventName="sfw_order_attribution_get_started_button_click"
+					href={ createCampaignUrl }
+					target="_blank"
+					rel="noopener noreferrer"
+					icon={ external }
+					iconPosition="right"
+					eventName="sfw_order_attribution_create_campaign_button_click"
 					eventProps={ {
 						context: 'order-attribution-meta-box',
-						url: onboardingUrl,
+						url: createCampaignUrl,
 					} }
-					text={ __( 'Get started', 'snapchat-for-woocommerce' ) }
+					text={ __( 'Create campaign', 'snapchat-for-woocommerce' ) }
 				/>
-			</FlexBlock>
-		</Flex>
+			}
+		/>
 	);
 };
 
