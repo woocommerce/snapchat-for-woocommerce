@@ -26,6 +26,8 @@ import './snapchat-ads-promo.scss';
  *
  * @event sfw_ads_promo_shown
  * @property {string} context Context of the Snapchat Ads promo. Possible values: 'channel-visibility-meta-box', 'order-attribution-meta-box'.
+ * @property {boolean} has_onboarded Whether Snapchat onboarding is complete. On the order screen, `false` means the "Get started" promo was shown and `true` the "Create campaign" promo. Always `false` on the product screen, where the promo only shows before onboarding.
+ * @property {boolean} [is_dismissed] Product screen only. Whether the merchant had dismissed the promo, so the compact layout with a small "Get started" button was shown instead of the full promo.
  */
 
 /**
@@ -34,7 +36,7 @@ import './snapchat-ads-promo.scss';
  * Shows the get-started promo while onboarding is incomplete, and the
  * per-product sync control once onboarding is complete.
  *
- * @fires sfw_ads_promo_shown with `{ context: 'channel-visibility-meta-box' }`.
+ * @fires sfw_ads_promo_shown with `{ context: 'channel-visibility-meta-box', has_onboarded: false, is_dismissed: false }` for the full promo, or `{ context: 'channel-visibility-meta-box', has_onboarded: false, is_dismissed: true }` for the compact layout after a dismiss.
  *
  * @return {JSX.Element} The promo or the per-product sync control.
  */
@@ -49,12 +51,16 @@ const SnapchatAdsPromo = () => {
 		}
 
 		if ( ! hasTrackedRef.current ) {
+			// Fired once per page load. Dismissing during this load doesn't
+			// send a second event, but the next load reports `is_dismissed`.
 			recordSfwEvent( 'sfw_ads_promo_shown', {
 				context: CHANNEL_VISIBILITY_CONTEXT,
+				has_onboarded: Boolean( onboardingComplete ),
+				is_dismissed: Boolean( isDismissed ),
 			} );
 			hasTrackedRef.current = true;
 		}
-	}, [ onboardingComplete ] );
+	}, [ onboardingComplete, isDismissed ] );
 
 	if ( onboardingComplete ) {
 		return <ChannelVisibilitySettings />;
