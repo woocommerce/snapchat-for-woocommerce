@@ -46,8 +46,10 @@ jobs:
           extensions: mbstring, mysqli
           tools: composer, phpunit
 
-      - name: Prepare MySQL
-        uses: woocommerce/grow/prepare-mysql@e981c25267d29c39ff6ab1ae4ea09b267efae86c # actions-v3.0.6
+      - name: Start MySQL
+        run: |
+          sudo systemctl start mysql.service
+          mysql --version
 
       - name: Install svn (used for installing WP versions)
         run: sudo apt-get -y install subversion
