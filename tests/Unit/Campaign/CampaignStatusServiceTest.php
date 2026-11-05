@@ -134,6 +134,36 @@ class CampaignStatusServiceTest extends WP_UnitTestCase {
 	}
 
 	/**
+	 * Test: `get_cached_status()` returns null on a cache miss and never schedules a check.
+	 */
+	public function test_get_cached_status_returns_null_on_miss_without_scheduling(): void {
+		$this->campaign_api->expects( $this->never() )->method( 'get_campaigns' );
+
+		$this->assertNull( $this->service->get_cached_status() );
+		$this->assertFalse( as_has_scheduled_action( Helper::with_prefix( CampaignStatusService::ACTION_HOOK ) ) );
+	}
+
+	/**
+	 * Test: `get_cached_status()` returns the cached value for the connected ad account.
+	 */
+	public function test_get_cached_status_returns_cached_value(): void {
+		Transients::set( TransientDefaults::HAS_CAMPAIGNS, $this->cached_result( 'abc-123', false ) );
+		$this->assertFalse( $this->service->get_cached_status() );
+
+		Transients::set( TransientDefaults::HAS_CAMPAIGNS, $this->cached_result( 'abc-123', true ) );
+		$this->assertTrue( $this->service->get_cached_status() );
+	}
+
+	/**
+	 * Test: `get_cached_status()` ignores a result cached for a different ad account.
+	 */
+	public function test_get_cached_status_ignores_other_ad_account(): void {
+		Transients::set( TransientDefaults::HAS_CAMPAIGNS, $this->cached_result( 'old-account', true ) );
+
+		$this->assertNull( $this->service->get_cached_status() );
+	}
+
+	/**
 	 * Test: the refresh is skipped without calling the API when no ad account is connected.
 	 */
 	public function test_refresh_skips_when_no_ad_account(): void {

@@ -29,7 +29,8 @@ import useDispatchCoreNotices from '~/hooks/useDispatchCoreNotices';
  */
 const useUpsertSnapchatConfig = ( configId, productsToken ) => {
 	const { createNotice } = useDispatchCoreNotices();
-	const { fetchSnapchatAccount, fetchSetup } = useAppDispatch();
+	const { fetchSnapchatAccount, fetchSetup, invalidateResolution } =
+		useAppDispatch();
 	const [ loading, setLoading ] = useState( false );
 
 	const [ fetchCreateAccount ] = useApiFetchCallback( {
@@ -57,6 +58,7 @@ const useUpsertSnapchatConfig = ( configId, productsToken ) => {
 		// Update Snapchat account data in the data store after posting an account update.
 		await fetchSnapchatAccount();
 		await fetchSetup();
+		invalidateResolution( 'getSnapchatAccountDetails', [] );
 
 		// Remove the config_id from the URL.
 		getHistory().replace( getOnboardingUrl() );
@@ -67,6 +69,7 @@ const useUpsertSnapchatConfig = ( configId, productsToken ) => {
 		fetchCreateAccount,
 		fetchSnapchatAccount,
 		fetchSetup,
+		invalidateResolution,
 		configId,
 		productsToken,
 	] );
