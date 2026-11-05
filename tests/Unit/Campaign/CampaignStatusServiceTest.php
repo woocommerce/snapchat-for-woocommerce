@@ -5,9 +5,8 @@
  * Covers `has_campaigns()` reading only the cache and scheduling a background
  * check on a miss or an ad account mismatch, `refresh_cache()` checking the
  * live Ad Partner endpoint and caching the result with its ad account ID, and
- * the cache being busted by the
- * `onboarding_complete`/`snapchat_disconnected` hooks, with queued checks
- * cancelled on disconnect.
+ * the check running straight away on `onboarding_complete`, and the cache
+ * being busted on `snapchat_disconnected`, with queued checks cancelled.
  *
  * @package SnapchatForWooCommerce\Tests\Unit\Campaign
  */
@@ -293,19 +292,54 @@ class CampaignStatusServiceTest extends WP_UnitTestCase {
 	}
 
 	/**
-	 * Test: `register_hooks()` wires `clear_cache()` to both connection-change hooks.
+	 * Test: connecting (`onboarding_complete`) runs the check straight away and caches the
+	 * result for the connected ad account, replacing any earlier result.
 	 */
-	public function test_register_hooks_busts_cache_on_onboarding_complete_and_disconnect(): void {
+	public function test_onboarding_complete_runs_check_and_caches_result(): void {
 		Transients::set( TransientDefaults::HAS_CAMPAIGNS, $this->cached_result( 'abc-123', true ) );
+
+		$this->campaign_api->expects( $this->once() )
+			->method( 'get_campaigns' )
+			->with( 'abc-123' )
+			->willReturn( new WP_REST_Response( array( 'campaigns' => array() ), 200 ) );
 
 		$this->service->register_hooks();
 
 		do_action( Helper::with_prefix( 'onboarding_complete' ) );
-		$this->assertSame( '', Transients::get( TransientDefaults::HAS_CAMPAIGNS ) );
 
+		$this->assertSame( $this->cached_result( 'abc-123', false ), Transients::get( TransientDefaults::HAS_CAMPAIGNS ) );
+		$this->assertFalse( $this->service->get_cached_status() );
+	}
+
+	/**
+	 * Test: when the check fails on onboarding complete, the earlier result is
+	 * still cleared and nothing is cached, so the result is unknown.
+	 */
+	public function test_onboarding_complete_failure_leaves_nothing_cached(): void {
 		Transients::set( TransientDefaults::HAS_CAMPAIGNS, $this->cached_result( 'abc-123', true ) );
 
+		$this->campaign_api->method( 'get_campaigns' )->willReturn(
+			new WP_Error( 'http_request_failed', 'cURL error 28: Operation timed out' )
+		);
+
+		$this->service->register_hooks();
+
+		do_action( Helper::with_prefix( 'onboarding_complete' ) );
+
+		$this->assertSame( '', Transients::get( TransientDefaults::HAS_CAMPAIGNS ) );
+		$this->assertNull( $this->service->get_cached_status() );
+	}
+
+	/**
+	 * Test: disconnecting clears the cached result.
+	 */
+	public function test_register_hooks_busts_cache_on_disconnect(): void {
+		Transients::set( TransientDefaults::HAS_CAMPAIGNS, $this->cached_result( 'abc-123', true ) );
+
+		$this->service->register_hooks();
+
 		do_action( Helper::with_prefix( 'snapchat_disconnected' ) );
+
 		$this->assertSame( '', Transients::get( TransientDefaults::HAS_CAMPAIGNS ) );
 	}
 
@@ -328,6 +362,10 @@ class CampaignStatusServiceTest extends WP_UnitTestCase {
 	 * current ad account when it runs.
 	 */
 	public function test_onboarding_complete_keeps_queued_refresh(): void {
+		$this->campaign_api->method( 'get_campaigns' )->willReturn(
+			new WP_REST_Response( array( 'campaigns' => array() ), 200 )
+		);
+
 		$this->service->register_hooks();
 
 		$this->service->schedule_refresh();
