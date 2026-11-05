@@ -29,6 +29,8 @@ const onboardingUrl = withReferrer(
  *
  * @event sfw_ads_promo_shown
  * @property {string} context Context of the Snapchat Ads promo. Possible values: 'channel-visibility-meta-box', 'order-attribution-meta-box'.
+ * @property {boolean} has_onboarded Whether Snapchat onboarding is complete. On the order screen, `false` means the "Get started" promo was shown and `true` the "Create campaign" promo. Always `false` on the product screen, where the promo only shows before onboarding.
+ * @property {boolean} [is_dismissed] Product screen only. Whether the merchant had dismissed the promo, so the compact layout with a small "Get started" button was shown instead of the full promo.
  */
 
 /**
@@ -55,7 +57,7 @@ const onboardingUrl = withReferrer(
  * Renders the Snapchat promo within the Order Attribution meta box for
  * Snapchat-attributed orders.
  *
- * @fires sfw_ads_promo_shown with `{ context: 'order-attribution-meta-box' }`.
+ * @fires sfw_ads_promo_shown with `{ context: 'order-attribution-meta-box', has_onboarded: false }` for the "Get started" promo, or `{ context: 'order-attribution-meta-box', has_onboarded: true }` for the "Create campaign" promo.
  * @fires sfw_ads_promo_get_started_click with `{ context: 'order-attribution-meta-box', href: 'admin.php?page=wc-admin&path=%2Fsnapchat%2Fsetup&referrer_type=in_product_placement&referrer_id=order-attribution-meta-box', referrer_type: 'in_product_placement', referrer_id: 'order-attribution-meta-box' }`.
  * @fires sfw_ads_promo_create_campaign_click with `{ context: 'order-attribution-meta-box', href: 'https://ads.snapchat.com/<ad_account_id>/create-campaign?referrer_type=in_product_placement&referrer_id=order-attribution-meta-box', referrer_type: 'in_product_placement', referrer_id: 'order-attribution-meta-box' }`.
  *
@@ -78,10 +80,11 @@ const SnapchatAdsPromo = () => {
 		if ( ! hasTrackedRef.current && shouldShowPromo ) {
 			recordSfwEvent( 'sfw_ads_promo_shown', {
 				context: ORDER_ATTRIBUTION_CONTEXT,
+				has_onboarded: Boolean( onboardingComplete ),
 			} );
 			hasTrackedRef.current = true;
 		}
-	}, [ shouldShowPromo ] );
+	}, [ shouldShowPromo, onboardingComplete ] );
 
 	if ( ! onboardingComplete ) {
 		return (

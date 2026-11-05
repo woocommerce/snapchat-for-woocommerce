@@ -132,6 +132,57 @@ describe( 'SnapchatAdsPromo', () => {
 		expect( recordSfwEvent ).toHaveBeenCalledTimes( 1 );
 		expect( recordSfwEvent ).toHaveBeenCalledWith( 'sfw_ads_promo_shown', {
 			context: 'order-attribution-meta-box',
+			has_onboarded: false,
+		} );
+	} );
+
+	it( 'records has_onboarded as false when onboarding data is a localized empty string', () => {
+		window.snapchatAdsMetaBoxData = { onboardingComplete: '' };
+
+		renderPromo();
+
+		expect( recordSfwEvent ).toHaveBeenCalledWith( 'sfw_ads_promo_shown', {
+			context: 'order-attribution-meta-box',
+			has_onboarded: false,
+		} );
+	} );
+
+	it( 'records the shown event with has_onboarded true for the create-campaign promo', () => {
+		window.snapchatAdsMetaBoxData = { onboardingComplete: '1' };
+		useSnapchatAccountDetails.mockReturnValue( { ad_acc_id: 'abc123' } );
+
+		renderPromo();
+
+		expect( recordSfwEvent ).toHaveBeenCalledTimes( 1 );
+		expect( recordSfwEvent ).toHaveBeenCalledWith( 'sfw_ads_promo_shown', {
+			context: 'order-attribution-meta-box',
+			has_onboarded: true,
+		} );
+	} );
+
+	it( 'records the create-campaign shown event once when account details load after the first render', () => {
+		window.snapchatAdsMetaBoxData = { onboardingComplete: '1' };
+
+		renderPromo();
+
+		expect( recordSfwEvent ).not.toHaveBeenCalled();
+
+		useSnapchatAccountDetails.mockReturnValue( { ad_acc_id: 'abc123' } );
+
+		// eslint-disable-next-line testing-library/no-unnecessary-act -- `root.render` is React's, not Testing Library's.
+		act( () => {
+			root.render( <SnapchatAdsPromo /> );
+		} );
+
+		// eslint-disable-next-line testing-library/no-unnecessary-act -- `root.render` is React's, not Testing Library's.
+		act( () => {
+			root.render( <SnapchatAdsPromo /> );
+		} );
+
+		expect( recordSfwEvent ).toHaveBeenCalledTimes( 1 );
+		expect( recordSfwEvent ).toHaveBeenCalledWith( 'sfw_ads_promo_shown', {
+			context: 'order-attribution-meta-box',
+			has_onboarded: true,
 		} );
 	} );
 
