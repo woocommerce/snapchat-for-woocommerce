@@ -10,7 +10,7 @@
  *   channel plugin that runs later joins it the same way.
  *
  * @package SnapchatForWooCommerce\Admin\MetaBox
- * @since 1.1.0
+ * @since n.e.x.t
  */
 
 namespace SnapchatForWooCommerce\Admin\MetaBox;
@@ -20,7 +20,7 @@ use SnapchatForWooCommerce\Utils\Helper;
 /**
  * Handles Channel visibility meta box registration on the product edit screen.
  *
- * @since 1.1.0
+ * @since n.e.x.t
  */
 class ChannelVisibilityMetaBox {
 
@@ -30,7 +30,7 @@ class ChannelVisibilityMetaBox {
 	 * Snapchat registers the box under this id when no other plugin has, and
 	 * joins it otherwise.
 	 *
-	 * @since 1.1.0
+	 * @since n.e.x.t
 	 */
 	public const SHARED_BOX_ID = 'channel_visibility';
 
@@ -61,7 +61,7 @@ class ChannelVisibilityMetaBox {
 	/**
 	 * Registers WordPress hooks.
 	 *
-	 * @since 1.1.0
+	 * @since n.e.x.t
 	 *
 	 * @return void
 	 */
@@ -78,7 +78,7 @@ class ChannelVisibilityMetaBox {
 	 * Snapchat's row into the existing box; in standalone mode Snapchat registers the
 	 * shared box, so channel plugins that run later join it instead of adding their own.
 	 *
-	 * @since 1.1.0
+	 * @since n.e.x.t
 	 *
 	 * @param string   $post_type Current post type.
 	 * @param \WP_Post $post      Current post object.
@@ -107,7 +107,7 @@ class ChannelVisibilityMetaBox {
 	/**
 	 * Renders the React mount point for the Channel visibility widget.
 	 *
-	 * @since 1.1.0
+	 * @since n.e.x.t
 	 *
 	 * @return void
 	 */
@@ -146,7 +146,7 @@ class ChannelVisibilityMetaBox {
 	/**
 	 * Checks whether the shared Channel visibility box is already registered for products.
 	 *
-	 * @since 1.1.0
+	 * @since n.e.x.t
 	 *
 	 * @param array $wp_meta_boxes Global meta boxes registry.
 	 * @return bool

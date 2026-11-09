@@ -6,7 +6,7 @@
  * whether the Snapchat meta box promo should be rendered on an order.
  *
  * @package SnapchatForWooCommerce\Admin\MetaBox
- * @since 1.1.0
+ * @since n.e.x.t
  */
 
 namespace SnapchatForWooCommerce\Admin\MetaBox;
@@ -16,7 +16,7 @@ use Automattic\WooCommerce\Utilities\OrderUtil;
 /**
  * Reads order attribution data on the WooCommerce order edit screen.
  *
- * @since 1.1.0
+ * @since n.e.x.t
  */
 class OrderAttributionData {
 
@@ -26,14 +26,14 @@ class OrderAttributionData {
 	 * WooCommerce persists the attribution source under this hidden meta key
 	 * for both HPOS and legacy post-based orders.
 	 *
-	 * @since 1.1.0
+	 * @since n.e.x.t
 	 */
 	public const UTM_SOURCE_META_KEY = '_wc_order_attribution_utm_source';
 
 	/**
 	 * Attribution source value that identifies a Snapchat-attributed order.
 	 *
-	 * @since 1.1.0
+	 * @since n.e.x.t
 	 */
 	public const SNAPCHAT_SOURCE = 'snapchat';
 
@@ -42,7 +42,7 @@ class OrderAttributionData {
 	 *
 	 * Handles both HPOS and legacy post-based order screens.
 	 *
-	 * @since 1.1.0
+	 * @since n.e.x.t
 	 *
 	 * @return bool True when viewing a `shop_order` edit screen.
 	 */
@@ -57,7 +57,7 @@ class OrderAttributionData {
 	 * loads the order, and returns {@see self::SNAPCHAT_SOURCE} only when the
 	 * stored UTM source is an exact Snapchat match.
 	 *
-	 * @since 1.1.0
+	 * @since n.e.x.t
 	 *
 	 * @return string|null The Snapchat source string, or null when not Snapchat-attributed.
 	 */

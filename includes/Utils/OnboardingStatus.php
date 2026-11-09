@@ -3,7 +3,7 @@
  * Shared onboarding / connection status checks.
  *
  * @package SnapchatForWooCommerce\Utils
- * @since 1.1.0
+ * @since n.e.x.t
  */
 
 namespace SnapchatForWooCommerce\Utils;
@@ -14,14 +14,14 @@ use SnapchatForWooCommerce\Utils\Storage\OptionDefaults;
 /**
  * Helpers for setup state used by admin UI and meta boxes.
  *
- * @since 1.1.0
+ * @since n.e.x.t
  */
 final class OnboardingStatus {
 
 	/**
 	 * Whether Snapchat onboarding is complete (connected to Snapchat).
 	 *
-	 * @since 1.1.0
+	 * @since n.e.x.t
 	 *
 	 * @return bool
 	 */

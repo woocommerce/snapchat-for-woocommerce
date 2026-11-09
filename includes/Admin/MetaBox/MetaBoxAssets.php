@@ -8,7 +8,7 @@
  * render.
  *
  * @package SnapchatForWooCommerce\Admin\MetaBox
- * @since 1.1.0
+ * @since n.e.x.t
  */
 
 namespace SnapchatForWooCommerce\Admin\MetaBox;
@@ -20,14 +20,14 @@ use SnapchatForWooCommerce\Utils\OnboardingStatus;
 /**
  * Handles admin script and style enqueues for plugin meta boxes.
  *
- * @since 1.1.0
+ * @since n.e.x.t
  */
 class MetaBoxAssets {
 
 	/**
 	 * Order attribution data resolver.
 	 *
-	 * @since 1.1.0
+	 * @since n.e.x.t
 	 *
 	 * @var OrderAttributionData
 	 */
@@ -45,7 +45,7 @@ class MetaBoxAssets {
 	/**
 	 * Constructor.
 	 *
-	 * @since 1.1.0
+	 * @since n.e.x.t
 	 *
 	 * @param OrderAttributionData  $order_attribution_data Order attribution data resolver.
 	 * @param CampaignStatusService $campaign_status        Campaign status service.
@@ -58,7 +58,7 @@ class MetaBoxAssets {
 	/**
 	 * Registers WordPress admin-side hooks.
 	 *
-	 * @since 1.1.0
+	 * @since n.e.x.t
 	 *
 	 * @return void
 	 */
@@ -69,7 +69,7 @@ class MetaBoxAssets {
 	/**
 	 * Enqueues the plugin meta box assets on their respective edit screens.
 	 *
-	 * @since 1.1.0
+	 * @since n.e.x.t
 	 *
 	 * @return void
 	 */
@@ -81,7 +81,7 @@ class MetaBoxAssets {
 	/**
 	 * Enqueues the channel-visibility bundle and localizes its data on the product edit screen.
 	 *
-	 * @since 1.1.0
+	 * @since n.e.x.t
 	 *
 	 * @return void
 	 */
@@ -115,7 +115,7 @@ class MetaBoxAssets {
 	/**
 	 * Enqueues the order-attribution meta box assets on the edit screen of a Snapchat-attributed order.
 	 *
-	 * @since 1.1.0
+	 * @since n.e.x.t
 	 *
 	 * @return void
 	 */
