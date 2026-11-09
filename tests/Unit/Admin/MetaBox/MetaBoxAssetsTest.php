@@ -189,6 +189,28 @@ final class MetaBoxAssetsTest extends WP_UnitTestCase {
 	}
 
 	/**
+	 * Both bundles' admin payloads carry the base tracking data the main admin payload carries.
+	 */
+	public function test_admin_payloads_include_tracking_base_data(): void {
+		Options::set( OptionDefaults::ONBOARDING_STATUS, 'connected' );
+		Options::set( OptionDefaults::AD_ACCOUNT_ID, 'test-ad-account' );
+		$this->place_product_on_edit_screen();
+
+		$data = $this->createMock( OrderAttributionData::class );
+		$data->method( 'is_wc_order_edit_screen' )->willReturn( true );
+		$data->method( 'get_order_attribution_source_for_edit_screen' )->willReturn( 'snapchat' );
+
+		( new MetaBoxAssets( $data, $this->make_campaign_status_mock() ) )->enqueue_assets();
+
+		foreach ( array( Config::ASSET_HANDLE_PREFIX . self::SCRIPT_BASENAME, self::ORDER_HANDLE ) as $handle ) {
+			$inline = (string) wp_scripts()->get_data( $handle, 'data' );
+
+			$this->assertStringContainsString( '"adAccountId":"test-ad-account"', $inline, $handle );
+			$this->assertStringContainsString( '"sandboxMode":', $inline, $handle );
+		}
+	}
+
+	/**
 	 * Builds a stub `CampaignStatusService` so these tests don't hit the live Ad Partner endpoint.
 	 *
 	 * @param bool $has_campaign Value `has_campaigns()` should return.
