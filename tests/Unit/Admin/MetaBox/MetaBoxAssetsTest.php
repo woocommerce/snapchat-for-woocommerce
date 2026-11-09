@@ -26,6 +26,25 @@ final class MetaBoxAssetsTest extends WP_UnitTestCase {
 
 	private const ORDER_HANDLE = Config::ASSET_HANDLE_PREFIX . self::ORDER_SCRIPT_BASENAME;
 
+	/**
+	 * Fixture files written to the build directory, keyed by file name.
+	 */
+	private const FIXTURES = array(
+		self::SCRIPT_BASENAME . '.js'                 => '// test script',
+		self::SCRIPT_BASENAME . '.asset.php'          => '<?php return [ "dependencies" => [], "version" => "1.0.0" ];',
+		self::ORDER_SCRIPT_BASENAME                   => '// fallback for filemtime',
+		self::ORDER_SCRIPT_BASENAME . '.js'           => '// dummy script',
+		self::ORDER_SCRIPT_BASENAME . '.css'          => '/* dummy style */',
+		self::ORDER_SCRIPT_BASENAME . '.js.asset.php' => '<?php return [ "dependencies" => [], "version" => "1.0.0" ];',
+	);
+
+	/**
+	 * Contents of build files that existed before the fixtures replaced them, keyed by path.
+	 *
+	 * @var string[]
+	 */
+	private array $original_build_files = array();
+
 	public function set_up(): void {
 		parent::set_up();
 
@@ -33,33 +52,36 @@ final class MetaBoxAssetsTest extends WP_UnitTestCase {
 			require_once ABSPATH . 'wp-admin/includes/screen.php';
 		}
 
+		// The fixtures share the real build directory, so keep any built file to restore in tear_down().
 		wp_mkdir_p( SNAPCHAT_FOR_WOOCOMMERCE_PLUGIN_BUILD_PATH );
 
-		file_put_contents( SNAPCHAT_FOR_WOOCOMMERCE_PLUGIN_BUILD_PATH . self::SCRIPT_BASENAME . '.js', '// test script' );
-		file_put_contents(
-			SNAPCHAT_FOR_WOOCOMMERCE_PLUGIN_BUILD_PATH . self::SCRIPT_BASENAME . '.asset.php',
-			'<?php return [ "dependencies" => [], "version" => "1.0.0" ];'
-		);
+		foreach ( self::FIXTURES as $file_name => $contents ) {
+			$path = SNAPCHAT_FOR_WOOCOMMERCE_PLUGIN_BUILD_PATH . $file_name;
 
-		file_put_contents( SNAPCHAT_FOR_WOOCOMMERCE_PLUGIN_BUILD_PATH . self::ORDER_SCRIPT_BASENAME, '// fallback for filemtime' );
-		file_put_contents( SNAPCHAT_FOR_WOOCOMMERCE_PLUGIN_BUILD_PATH . self::ORDER_SCRIPT_BASENAME . '.js', '// dummy script' );
-		file_put_contents( SNAPCHAT_FOR_WOOCOMMERCE_PLUGIN_BUILD_PATH . self::ORDER_SCRIPT_BASENAME . '.css', '/* dummy style */' );
-		file_put_contents(
-			SNAPCHAT_FOR_WOOCOMMERCE_PLUGIN_BUILD_PATH . self::ORDER_SCRIPT_BASENAME . '.js.asset.php',
-			'<?php return [ "dependencies" => [], "version" => "1.0.0" ];'
-		);
+			if ( file_exists( $path ) ) {
+				$this->original_build_files[ $path ] = file_get_contents( $path );
+			}
+
+			file_put_contents( $path, $contents );
+		}
 
 		$this->purge_script_registration();
 	}
 
 	public function tear_down(): void {
 		$this->purge_script_registration();
-		@unlink( SNAPCHAT_FOR_WOOCOMMERCE_PLUGIN_BUILD_PATH . self::SCRIPT_BASENAME . '.js' ); // phpcs:ignore WordPress.PHP.NoSilencedErrors.Discouraged
-		@unlink( SNAPCHAT_FOR_WOOCOMMERCE_PLUGIN_BUILD_PATH . self::SCRIPT_BASENAME . '.asset.php' ); // phpcs:ignore WordPress.PHP.NoSilencedErrors.Discouraged
-		@unlink( SNAPCHAT_FOR_WOOCOMMERCE_PLUGIN_BUILD_PATH . self::ORDER_SCRIPT_BASENAME ); // phpcs:ignore WordPress.PHP.NoSilencedErrors.Discouraged
-		@unlink( SNAPCHAT_FOR_WOOCOMMERCE_PLUGIN_BUILD_PATH . self::ORDER_SCRIPT_BASENAME . '.js' ); // phpcs:ignore WordPress.PHP.NoSilencedErrors.Discouraged
-		@unlink( SNAPCHAT_FOR_WOOCOMMERCE_PLUGIN_BUILD_PATH . self::ORDER_SCRIPT_BASENAME . '.css' ); // phpcs:ignore WordPress.PHP.NoSilencedErrors.Discouraged
-		@unlink( SNAPCHAT_FOR_WOOCOMMERCE_PLUGIN_BUILD_PATH . self::ORDER_SCRIPT_BASENAME . '.js.asset.php' ); // phpcs:ignore WordPress.PHP.NoSilencedErrors.Discouraged
+
+		foreach ( array_keys( self::FIXTURES ) as $file_name ) {
+			$path = SNAPCHAT_FOR_WOOCOMMERCE_PLUGIN_BUILD_PATH . $file_name;
+
+			if ( isset( $this->original_build_files[ $path ] ) ) {
+				file_put_contents( $path, $this->original_build_files[ $path ] );
+			} else {
+				@unlink( $path ); // phpcs:ignore WordPress.PHP.NoSilencedErrors.Discouraged
+			}
+		}
+
+		$this->original_build_files = array();
 		unset( $GLOBALS['post'] );
 		set_current_screen( 'front' );
 		parent::tear_down();
