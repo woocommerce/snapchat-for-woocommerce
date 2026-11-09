@@ -113,7 +113,7 @@ class MetaBoxAssets {
 	}
 
 	/**
-	 * Enqueues the order-attribution meta box assets on the order edit screen.
+	 * Enqueues the order-attribution meta box assets on the edit screen of a Snapchat-attributed order.
 	 *
 	 * @since 1.1.0
 	 *
@@ -121,6 +121,12 @@ class MetaBoxAssets {
 	 */
 	protected function enqueue_order_attribution_assets(): void {
 		if ( ! $this->order_attribution_data->is_wc_order_edit_screen() ) {
+			return;
+		}
+
+		$attribution_source = $this->order_attribution_data->get_order_attribution_source_for_edit_screen();
+
+		if ( OrderAttributionData::SNAPCHAT_SOURCE !== $attribution_source ) {
 			return;
 		}
 
@@ -144,7 +150,7 @@ class MetaBoxAssets {
 			'MetaBoxData',
 			array(
 				'onboardingComplete'     => $onboarding_complete,
-				'orderAttributionSource' => $this->order_attribution_data->get_order_attribution_source_for_edit_screen(),
+				'orderAttributionSource' => $attribution_source,
 				'hasCampaign'            => $has_campaign,
 			)
 		);

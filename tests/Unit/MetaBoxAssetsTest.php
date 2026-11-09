@@ -61,11 +61,29 @@ final class MetaBoxAssetsTest extends WP_UnitTestCase {
 		$this->assertFalse( wp_script_is( self::HANDLE, 'enqueued' ) );
 	}
 
+	public function test_does_not_enqueue_when_order_not_snapchat_attributed(): void {
+		Options::set( OptionDefaults::ONBOARDING_STATUS, 'connected' );
+
+		$data = $this->createMock( OrderAttributionData::class );
+		$data->method( 'is_wc_order_edit_screen' )->willReturn( true );
+		$data->method( 'get_order_attribution_source_for_edit_screen' )->willReturn( null );
+
+		$campaign_status = $this->createMock( CampaignStatusService::class );
+		$campaign_status->expects( $this->never() )->method( 'has_campaigns' );
+
+		$assets = new MetaBoxAssets( $data, $campaign_status );
+		$assets->enqueue_assets();
+
+		$this->assertFalse( wp_script_is( self::HANDLE, 'enqueued' ) );
+		$this->assertFalse( wp_style_is( self::HANDLE, 'enqueued' ) );
+	}
+
 	public function test_does_not_check_campaigns_when_onboarding_incomplete(): void {
 		Options::set( OptionDefaults::ONBOARDING_STATUS, 'incomplete' );
 
 		$data = $this->createMock( OrderAttributionData::class );
 		$data->method( 'is_wc_order_edit_screen' )->willReturn( true );
+		$data->method( 'get_order_attribution_source_for_edit_screen' )->willReturn( 'snapchat' );
 
 		$campaign_status = $this->createMock( CampaignStatusService::class );
 		$campaign_status->expects( $this->never() )->method( 'has_campaigns' );
