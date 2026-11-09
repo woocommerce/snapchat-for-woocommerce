@@ -265,7 +265,7 @@ class SnapchatBusinessExtensionControllerTest extends WP_UnitTestCase {
 		$request->set_param( 'referrer_type', 'in_product_placement' );
 		$request->set_param( 'referrer_id', 'order-attribution-meta-box' );
 
-		$expected_return_url = admin_url( 'admin.php?page=wc-admin&path=/snapchat/setup&referrer_type=in_product_placement&referrer_id=order-attribution-meta-box' );
+		$expected_return_url = admin_url( 'admin.php?page=wc-admin&path=%2Fsnapchat%2Fsetup&referrer_type=in_product_placement&referrer_id=order-attribution-meta-box' );
 
 		$response = $this->make_oauth_controller( $expected_return_url )->initiate_oauth( $request );
 

@@ -29,7 +29,7 @@ class JetpackAccountControllerTest extends WP_UnitTestCase {
 
 		$this->run_connect(
 			$request,
-			admin_url( 'admin.php?page=wc-admin&path=/snapchat/setup&referrer_type=in_product_placement&referrer_id=channel-visibility-meta-box' )
+			admin_url( 'admin.php?page=wc-admin&path=%2Fsnapchat%2Fsetup&referrer_type=in_product_placement&referrer_id=channel-visibility-meta-box' )
 		);
 	}
 
