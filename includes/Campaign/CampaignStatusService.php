@@ -2,10 +2,12 @@
 /**
  * Service for checking whether the connected ad account has any campaigns.
  *
- * The check runs in a background Action Scheduler job and its result is
- * cached in a transient, so the order edit screen only ever reads the cache
- * and is never delayed by a slow or failing WooCommerce Connect Server (WCS)
- * request. The cache is busted on Snapchat connection changes (see
+ * The result is cached in a transient. The check against the WooCommerce
+ * Connect Server (WCS) runs in a background Action Scheduler job on a cache
+ * miss, straight away when the Snapchat account is connected, and live from
+ * the `/account` REST endpoint on a cache miss. The order edit screen's PHP
+ * render only reads the cache, so a slow or failing WCS request never delays
+ * the page itself. The cache is busted on Snapchat connection changes (see
  * {@see self::register_hooks()}).
  *
  * @since n.e.x.t
@@ -191,10 +193,12 @@ class CampaignStatusService {
 	/**
 	 * Checks whether the connected ad account has any campaigns and caches the result.
 	 *
-	 * Runs via Action Scheduler. The result is cached together with the ad
+	 * Runs synchronously. It is called from the background Action Scheduler
+	 * job, from {@see self::refresh_on_connect()}, and by the `/account` REST
+	 * endpoint on a cache miss. The result is cached together with the ad
 	 * account ID it was checked for, so a result for a previous account is
 	 * never used after the account changes. Failures and unexpected responses
-	 * are not cached, so the next cache miss schedules another check.
+	 * are not cached, so the next cache miss runs another check.
 	 *
 	 * @since n.e.x.t
 	 *
