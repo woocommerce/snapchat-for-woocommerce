@@ -2,10 +2,10 @@
 /**
  * Unit test for OrderAttributionData class.
  *
- * @package SnapchatForWooCommerce\Tests\Unit
+ * @package SnapchatForWooCommerce\Tests\Unit\Admin\MetaBox
  */
 
-namespace SnapchatForWooCommerce\Tests\Unit;
+namespace SnapchatForWooCommerce\Tests\Unit\Admin\MetaBox;
 
 use WP_UnitTestCase;
 use WC_Helper_Order;

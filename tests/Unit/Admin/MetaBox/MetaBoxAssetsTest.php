@@ -22,6 +22,10 @@ final class MetaBoxAssetsTest extends WP_UnitTestCase {
 
 	private const SCRIPT_BASENAME = 'channel-visibility-meta-box';
 
+	private const ORDER_SCRIPT_BASENAME = 'order-attribution';
+
+	private const ORDER_HANDLE = Config::ASSET_HANDLE_PREFIX . self::ORDER_SCRIPT_BASENAME;
+
 	public function set_up(): void {
 		parent::set_up();
 
@@ -37,6 +41,14 @@ final class MetaBoxAssetsTest extends WP_UnitTestCase {
 			'<?php return [ "dependencies" => [], "version" => "1.0.0" ];'
 		);
 
+		file_put_contents( SNAPCHAT_FOR_WOOCOMMERCE_PLUGIN_BUILD_PATH . self::ORDER_SCRIPT_BASENAME, '// fallback for filemtime' );
+		file_put_contents( SNAPCHAT_FOR_WOOCOMMERCE_PLUGIN_BUILD_PATH . self::ORDER_SCRIPT_BASENAME . '.js', '// dummy script' );
+		file_put_contents( SNAPCHAT_FOR_WOOCOMMERCE_PLUGIN_BUILD_PATH . self::ORDER_SCRIPT_BASENAME . '.css', '/* dummy style */' );
+		file_put_contents(
+			SNAPCHAT_FOR_WOOCOMMERCE_PLUGIN_BUILD_PATH . self::ORDER_SCRIPT_BASENAME . '.js.asset.php',
+			'<?php return [ "dependencies" => [], "version" => "1.0.0" ];'
+		);
+
 		$this->purge_script_registration();
 	}
 
@@ -44,6 +56,10 @@ final class MetaBoxAssetsTest extends WP_UnitTestCase {
 		$this->purge_script_registration();
 		@unlink( SNAPCHAT_FOR_WOOCOMMERCE_PLUGIN_BUILD_PATH . self::SCRIPT_BASENAME . '.js' ); // phpcs:ignore WordPress.PHP.NoSilencedErrors.Discouraged
 		@unlink( SNAPCHAT_FOR_WOOCOMMERCE_PLUGIN_BUILD_PATH . self::SCRIPT_BASENAME . '.asset.php' ); // phpcs:ignore WordPress.PHP.NoSilencedErrors.Discouraged
+		@unlink( SNAPCHAT_FOR_WOOCOMMERCE_PLUGIN_BUILD_PATH . self::ORDER_SCRIPT_BASENAME ); // phpcs:ignore WordPress.PHP.NoSilencedErrors.Discouraged
+		@unlink( SNAPCHAT_FOR_WOOCOMMERCE_PLUGIN_BUILD_PATH . self::ORDER_SCRIPT_BASENAME . '.js' ); // phpcs:ignore WordPress.PHP.NoSilencedErrors.Discouraged
+		@unlink( SNAPCHAT_FOR_WOOCOMMERCE_PLUGIN_BUILD_PATH . self::ORDER_SCRIPT_BASENAME . '.css' ); // phpcs:ignore WordPress.PHP.NoSilencedErrors.Discouraged
+		@unlink( SNAPCHAT_FOR_WOOCOMMERCE_PLUGIN_BUILD_PATH . self::ORDER_SCRIPT_BASENAME . '.js.asset.php' ); // phpcs:ignore WordPress.PHP.NoSilencedErrors.Discouraged
 		unset( $GLOBALS['post'] );
 		set_current_screen( 'front' );
 		parent::tear_down();
@@ -94,6 +110,85 @@ final class MetaBoxAssetsTest extends WP_UnitTestCase {
 	}
 
 	/**
+	 * The order bundle is not enqueued away from the order edit screen.
+	 */
+	public function test_order_bundle_not_enqueued_off_order_edit_screen(): void {
+		$data = $this->createMock( OrderAttributionData::class );
+		$data->method( 'is_wc_order_edit_screen' )->willReturn( false );
+
+		$campaign_status = $this->createMock( CampaignStatusService::class );
+		$campaign_status->expects( $this->never() )->method( 'has_campaigns' );
+
+		( new MetaBoxAssets( $data, $campaign_status ) )->enqueue_assets();
+
+		$this->assertFalse( wp_script_is( self::ORDER_HANDLE, 'enqueued' ) );
+	}
+
+	/**
+	 * The order bundle is not enqueued for an order that Snapchat did not refer.
+	 */
+	public function test_order_bundle_not_enqueued_when_order_not_snapchat_attributed(): void {
+		Options::set( OptionDefaults::ONBOARDING_STATUS, 'connected' );
+
+		$data = $this->createMock( OrderAttributionData::class );
+		$data->method( 'is_wc_order_edit_screen' )->willReturn( true );
+		$data->method( 'get_order_attribution_source_for_edit_screen' )->willReturn( null );
+
+		$campaign_status = $this->createMock( CampaignStatusService::class );
+		$campaign_status->expects( $this->never() )->method( 'has_campaigns' );
+
+		( new MetaBoxAssets( $data, $campaign_status ) )->enqueue_assets();
+
+		$this->assertFalse( wp_script_is( self::ORDER_HANDLE, 'enqueued' ) );
+		$this->assertFalse( wp_style_is( self::ORDER_HANDLE, 'enqueued' ) );
+	}
+
+	/**
+	 * The campaign check is skipped while onboarding is incomplete.
+	 */
+	public function test_order_bundle_skips_campaign_check_when_onboarding_incomplete(): void {
+		Options::set( OptionDefaults::ONBOARDING_STATUS, 'incomplete' );
+
+		$data = $this->createMock( OrderAttributionData::class );
+		$data->method( 'is_wc_order_edit_screen' )->willReturn( true );
+		$data->method( 'get_order_attribution_source_for_edit_screen' )->willReturn( 'snapchat' );
+
+		$campaign_status = $this->createMock( CampaignStatusService::class );
+		$campaign_status->expects( $this->never() )->method( 'has_campaigns' );
+
+		( new MetaBoxAssets( $data, $campaign_status ) )->enqueue_assets();
+
+		$this->assertTrue( wp_script_is( self::ORDER_HANDLE, 'enqueued' ) );
+	}
+
+	/**
+	 * The order bundle is enqueued and localized for a Snapchat-attributed order.
+	 */
+	public function test_order_bundle_enqueued_and_localized_for_snapchat_order(): void {
+		Options::set( OptionDefaults::ONBOARDING_STATUS, 'connected' );
+
+		$data = $this->createMock( OrderAttributionData::class );
+		$data->method( 'is_wc_order_edit_screen' )->willReturn( true );
+		$data->method( 'get_order_attribution_source_for_edit_screen' )->willReturn( 'snapchat' );
+
+		$campaign_status = $this->createMock( CampaignStatusService::class );
+		$campaign_status->expects( $this->once() )->method( 'has_campaigns' )->willReturn( true );
+
+		( new MetaBoxAssets( $data, $campaign_status ) )->enqueue_assets();
+
+		$this->assertTrue( wp_script_is( self::ORDER_HANDLE, 'enqueued' ) );
+		$this->assertTrue( wp_style_is( self::ORDER_HANDLE, 'enqueued' ) );
+
+		$inline = wp_scripts()->get_data( self::ORDER_HANDLE, 'data' );
+
+		$this->assertStringContainsString( 'snapchatAdsMetaBoxData', $inline );
+		$this->assertStringContainsString( 'orderAttributionSource', $inline );
+		$this->assertStringContainsString( 'snapchat', $inline );
+		$this->assertStringContainsString( 'snapchatAdsAdminData', $inline );
+		$this->assertStringContainsString( 'hasCampaign', $inline );
+	}
+
+	/**
 	 * Builds a stub `CampaignStatusService` so these tests don't hit the live Ad Partner endpoint.
 	 *
 	 * @param bool $has_campaign Value `has_campaigns()` should return.
@@ -120,12 +215,17 @@ final class MetaBoxAssetsTest extends WP_UnitTestCase {
 	}
 
 	/**
-	 * Deregisters the bundle so each test observes a clean enqueue.
+	 * Deregisters both bundles so each test observes a clean enqueue.
 	 */
 	private function purge_script_registration(): void {
 		$handle = Config::ASSET_HANDLE_PREFIX . self::SCRIPT_BASENAME;
 		wp_dequeue_script( $handle );
 		wp_deregister_script( $handle );
+
+		wp_dequeue_script( self::ORDER_HANDLE );
+		wp_deregister_script( self::ORDER_HANDLE );
+		wp_dequeue_style( self::ORDER_HANDLE );
+		wp_deregister_style( self::ORDER_HANDLE );
 	}
 
 	/**
