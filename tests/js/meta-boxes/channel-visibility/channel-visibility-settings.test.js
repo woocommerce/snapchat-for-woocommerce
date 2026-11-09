@@ -22,9 +22,9 @@ const HIDDEN_NOTICE =
 function setChannelVisibilityData( overrides = {} ) {
 	window.snapchatAdsMetaBoxData = {
 		onboardingComplete: '1',
-		field_name: FIELD_NAME,
-		product_catalog_item: '1',
-		product_is_visible: '1',
+		fieldName: FIELD_NAME,
+		productCatalogItem: '1',
+		productIsVisible: '1',
 		...overrides,
 	};
 }
@@ -51,7 +51,7 @@ describe( 'ChannelVisibilitySettings', () => {
 	} );
 
 	test( "Renders an unchecked toggle when set to don't sync and show", () => {
-		setChannelVisibilityData( { product_catalog_item: '0' } );
+		setChannelVisibilityData( { productCatalogItem: '0' } );
 		const { container } = render( <ChannelVisibilitySettings /> );
 
 		const hiddenInput = container.querySelector(
@@ -62,8 +62,8 @@ describe( 'ChannelVisibilitySettings', () => {
 		expect( hiddenInput ).toHaveValue( '0' );
 	} );
 
-	test( 'Defaults to checked when product_catalog_item is unset', () => {
-		setChannelVisibilityData( { product_catalog_item: undefined } );
+	test( 'Defaults to checked when productCatalogItem is unset', () => {
+		setChannelVisibilityData( { productCatalogItem: undefined } );
 		render( <ChannelVisibilitySettings /> );
 
 		expect( screen.getByRole( 'checkbox' ) ).toBeChecked();
@@ -88,7 +88,7 @@ describe( 'ChannelVisibilitySettings', () => {
 	} );
 
 	test( 'Unchecks and disables the toggle and shows a notice when the product is hidden from the catalog', () => {
-		setChannelVisibilityData( { product_is_visible: '' } );
+		setChannelVisibilityData( { productIsVisible: '' } );
 		const { container } = render( <ChannelVisibilitySettings /> );
 
 		const toggle = screen.getByRole( 'checkbox' );
@@ -102,8 +102,8 @@ describe( 'ChannelVisibilitySettings', () => {
 
 	test( 'Disables the hidden input when the product is hidden from the catalog, so saving keeps the stored opt-in', () => {
 		setChannelVisibilityData( {
-			product_is_visible: '',
-			product_catalog_item: '1',
+			productIsVisible: '',
+			productCatalogItem: '1',
 		} );
 		const { container } = render( <ChannelVisibilitySettings /> );
 

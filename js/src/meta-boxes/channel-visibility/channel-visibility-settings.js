@@ -25,11 +25,8 @@ import snapchatLogoURL from '~/images/logo/snapchat.svg';
  * @return {JSX.Element} The Channel Visibility Settings component.
  */
 const ChannelVisibilitySettings = () => {
-	const {
-		field_name: fieldName,
-		product_catalog_item: productCatalogItem,
-		product_is_visible: productIsVisible,
-	} = window.snapchatAdsMetaBoxData || {};
+	const { fieldName, productCatalogItem, productIsVisible } =
+		window.snapchatAdsMetaBoxData || {};
 	const catalogValue = productCatalogItem || '1';
 	const defaultChecked = productIsVisible && catalogValue === '1';
 

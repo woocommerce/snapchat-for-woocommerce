@@ -21,7 +21,7 @@ use WP_Post;
 final class ProductChannelVisibilityData {
 
 	/**
-	 * Builds the `channelVisibility` payload for `window.snapchatAdsMetaBoxData`.
+	 * Builds the payload that the channel-visibility bundle reads from `window.snapchatAdsMetaBoxData`.
 	 *
 	 * @since n.e.x.t
 	 *
@@ -55,10 +55,10 @@ final class ProductChannelVisibilityData {
 		$catalog    = is_string( $raw_meta ) && '' !== $raw_meta ? $raw_meta : '1';
 
 		return array(
-			'onboardingComplete'   => OnboardingStatus::is_setup_completed(),
-			'field_name'           => $field_name,
-			'product_catalog_item' => $catalog,
-			'product_is_visible'   => $product->is_visible(),
+			'onboardingComplete' => OnboardingStatus::is_setup_completed(),
+			'fieldName'          => $field_name,
+			'productCatalogItem' => $catalog,
+			'productIsVisible'   => $product->is_visible(),
 		);
 	}
 }

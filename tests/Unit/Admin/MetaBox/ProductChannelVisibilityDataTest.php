@@ -82,9 +82,9 @@ final class ProductChannelVisibilityDataTest extends WP_UnitTestCase {
 		$block = ProductChannelVisibilityData::get_channel_visibility_inline_block();
 
 		$this->assertIsArray( $block );
-		$this->assertSame( $this->field_name, $block['field_name'] );
-		$this->assertSame( '1', $block['product_catalog_item'] );
-		$this->assertTrue( $block['product_is_visible'] );
+		$this->assertSame( $this->field_name, $block['fieldName'] );
+		$this->assertSame( '1', $block['productCatalogItem'] );
+		$this->assertTrue( $block['productIsVisible'] );
 		$this->assertArrayNotHasKey( 'options', $block );
 	}
 
@@ -102,7 +102,7 @@ final class ProductChannelVisibilityDataTest extends WP_UnitTestCase {
 
 		$block = ProductChannelVisibilityData::get_channel_visibility_inline_block();
 
-		$this->assertSame( '0', $block['product_catalog_item'] );
+		$this->assertSame( '0', $block['productCatalogItem'] );
 	}
 
 	/**
