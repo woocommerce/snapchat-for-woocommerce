@@ -5,7 +5,7 @@
  * This class is responsible for displaying admin notices for the plugin.
  *
  * @package SnapchatForWooCommerce\Admin
- * @since x.x.x
+ * @since 1.0.1
  */
 
 namespace SnapchatForWooCommerce\Admin;
@@ -17,7 +17,7 @@ use SnapchatForWooCommerce\Utils\Helper;
  *
  * Registers the `admin_notices` action to display admin notices for the plugin.
  *
- * @since x.x.x
+ * @since 1.0.1
  */
 class Notices {
 
@@ -26,7 +26,7 @@ class Notices {
 	 *
 	 * Hooks into `admin_notices` to display admin notices for the plugin.
 	 *
-	 * @since x.x.x
+	 * @since 1.0.1
 	 *
 	 * @return void
 	 */
@@ -37,7 +37,7 @@ class Notices {
 	/**
 	 * Displays a notice for the uninstall the legacy Snapchat plugin.
 	 *
-	 * @since x.x.x
+	 * @since 1.0.1
 	 *
 	 * @return void
 	 */
