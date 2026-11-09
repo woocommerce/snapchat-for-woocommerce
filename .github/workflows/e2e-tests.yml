@@ -77,16 +77,16 @@ jobs:
         env:
           INPUT_WP_RC_VERSION: ${{ github.event.inputs.wp-rc-version }}
         run: |
-          npm run -- wp-env run tests-cli -- wp core update --version="${INPUT_WP_RC_VERSION}"
-          npm run -- wp-env run tests-cli -- wp core update-db
+          npx wp-env run tests-cli -- wp core update --version="${INPUT_WP_RC_VERSION}"
+          npx wp-env run tests-cli -- wp core update-db
 
       - name: Install WooCommerce release candidate (optional)
         if: github.event.inputs.wc-rc-version != ''
         env:
           INPUT_WC_RC_VERSION: ${{ github.event.inputs.wc-rc-version }}
         run: |
-          npm run -- wp-env run tests-cli -- wp plugin update woocommerce --version="${INPUT_WC_RC_VERSION}"
-          npm run -- wp-env run tests-cli -- wp wc update
+          npx wp-env run tests-cli -- wp plugin update woocommerce --version="${INPUT_WC_RC_VERSION}"
+          npx wp-env run tests-cli -- wp wc update
 
       - name: Check if the site is running
         run: curl -I http://localhost:8889
