@@ -25,6 +25,25 @@ const onboardingUrl = withReferrer(
 );
 
 /**
+ * Snapchat Ads promo is shown.
+ *
+ * @event sfw_ads_promo_shown
+ * @property {string} context Context of the Snapchat Ads promo. Possible values: 'channel-visibility-meta-box', 'order-attribution-meta-box'.
+ * @property {boolean} has_onboarded Whether Snapchat onboarding is complete. On the order screen, `false` means the "Get started" promo was shown and `true` the "Create campaign" promo. Always `false` on the product screen, where the promo only shows before onboarding.
+ * @property {boolean} [is_dismissed] Product screen only. Whether the merchant had dismissed the promo, so the compact layout with a small "Get started" button was shown instead of the full promo.
+ */
+
+/**
+ * Snapchat Ads promo "Get started" button is clicked.
+ *
+ * @event sfw_ads_promo_get_started_click
+ * @property {string} context       Context of the Snapchat Ads promo. Possible values: 'channel-visibility-meta-box', 'order-attribution-meta-box'.
+ * @property {string} href          URL of the "Get started" button, including the referrer params.
+ * @property {string} referrer_type Type of the referring surface. Possible value: 'in_product_placement'.
+ * @property {string} referrer_id   Identifier of the referring placement. Same value as `context`.
+ */
+
+/**
  * Snapchat Ads promo "Create campaign" button is clicked.
  *
  * @event sfw_ads_promo_create_campaign_click
