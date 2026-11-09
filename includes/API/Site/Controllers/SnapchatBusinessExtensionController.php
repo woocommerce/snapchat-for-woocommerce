@@ -15,6 +15,7 @@
 
 namespace SnapchatForWooCommerce\API\Site\Controllers;
 
+use WP_REST_Request;
 use WP_REST_Response;
 use WP_Error;
 use SnapchatForWooCommerce\Config;
@@ -32,6 +33,8 @@ use SnapchatForWooCommerce\API\AdPartner\AdPartnerApi;
  * @since 0.1.0
  */
 class SnapchatBusinessExtensionController extends RESTBaseController {
+
+	use ReferrerParamsTrait;
 
 	/**
 	 * WCS proxy request client.
@@ -69,6 +72,7 @@ class SnapchatBusinessExtensionController extends RESTBaseController {
 				'methods'             => 'GET',
 				'callback'            => array( $this, 'initiate_oauth' ),
 				'permission_callback' => array( $this, 'permissions_check' ),
+				'args'                => $this->get_referrer_params(),
 			)
 		);
 
@@ -268,10 +272,20 @@ class SnapchatBusinessExtensionController extends RESTBaseController {
 	/**
 	 * Starts the OAuth flow.
 	 *
+	 * @since 0.1.0
+	 * @since n.e.x.t Accepts the request, to carry its referrer params into the return URL.
+	 *
+	 * @param WP_REST_Request|null $request REST request, carrying optional referrer params.
 	 * @return WP_REST_Response
 	 */
-	public function initiate_oauth() {
-		$return_url = rawurlencode( admin_url( 'admin.php?page=wc-admin&path=/snapchat/setup' ) );
+	public function initiate_oauth( ?WP_REST_Request $request = null ) {
+		$return_url = admin_url( 'admin.php?page=wc-admin&path=/snapchat/setup' );
+
+		if ( null !== $request ) {
+			$return_url = $this->append_referrer_args( $return_url, $request );
+		}
+
+		$return_url = rawurlencode( $return_url );
 		$response   = $this->start_connection( $return_url );
 
 		if ( is_wp_error( $response ) ) {

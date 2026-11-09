@@ -3,6 +3,7 @@
  */
 import { getHistory } from '@woocommerce/navigation';
 import { useCallback, useState } from '@wordpress/element';
+import { addQueryArgs } from '@wordpress/url';
 
 /**
  * Internal dependencies
@@ -12,6 +13,7 @@ import { API_NAMESPACE } from '~/data/constants';
 import { getOnboardingUrl } from '~/utils/urls';
 import useApiFetchCallback from './useApiFetchCallback';
 import useDispatchCoreNotices from '~/hooks/useDispatchCoreNotices';
+import { getReferrerQueryParams } from '~/utils/tracks';
 
 /**
  * @typedef {Object} UpsertSnapchatConfig
@@ -60,8 +62,11 @@ const useUpsertSnapchatConfig = ( configId, productsToken ) => {
 		await fetchSetup();
 		invalidateResolution( 'getSnapchatAccountDetails', [] );
 
-		// Remove the config_id from the URL.
-		getHistory().replace( getOnboardingUrl() );
+		// Remove the config_id from the URL, but keep the placement referrer
+		// so events fired later in onboarding are still attributed to it.
+		getHistory().replace(
+			addQueryArgs( getOnboardingUrl(), getReferrerQueryParams() )
+		);
 
 		setLoading( false );
 	}, [
