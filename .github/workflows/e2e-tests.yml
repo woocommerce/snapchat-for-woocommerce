@@ -75,12 +75,14 @@ jobs:
           INPUT_WC_RC_VERSION: ${{ github.event.inputs.wc-rc-version }}
         # wp-env bind-mounts plugins into the container, so `wp plugin update`
         # cannot replace WooCommerce in place. Point wp-env at the requested
-        # WooCommerce zip before the environment starts instead.
+        # WooCommerce zip before the environment starts instead. Use the GitHub
+        # release asset because wp-env names the plugin directory after the zip
+        # filename, and it must stay `woocommerce`.
         run: |
-          jq --arg url "https://downloads.wordpress.org/plugin/woocommerce.${INPUT_WC_RC_VERSION}.zip" \
+          jq --arg url "https://github.com/woocommerce/woocommerce/releases/download/${INPUT_WC_RC_VERSION}/woocommerce.zip" \
             '{plugins: (.plugins | map(if . == "https://downloads.wordpress.org/plugin/woocommerce.zip" then $url else . end))}' \
             .wp-env.json > .wp-env.override.json
-          grep -q "woocommerce.${INPUT_WC_RC_VERSION}.zip" .wp-env.override.json
+          grep -q "download/${INPUT_WC_RC_VERSION}/woocommerce.zip" .wp-env.override.json
           cat .wp-env.override.json
 
       - name: Setup WP environment
