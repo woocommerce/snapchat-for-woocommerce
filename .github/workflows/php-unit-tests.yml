@@ -17,6 +17,13 @@ on:
       - composer.lock
       - .github/workflows/php-unit-tests.yml
 
+  workflow_dispatch:
+    inputs:
+      wc-version:
+        description: 'WooCommerce version or git tag to test against (e.g. 11.3.0-beta.2) — leave blank for the latest stable release'
+        required: false
+        type: string
+
 jobs:
   phpunit:
     runs-on: ubuntu-latest
@@ -33,6 +40,7 @@ jobs:
       DB_PASS: root
       DB_HOST: 127.0.0.1
       WP_VERSION: latest
+      WC_VERSION: ${{ github.event.inputs.wc-version || 'latest' }}
       CI: true
 
     steps:
@@ -59,7 +67,7 @@ jobs:
 
       - name: Install WordPress test suite (with WooCommerce)
         run: |
-          bash bin/install-wp-tests.sh $DB_NAME $DB_USER $DB_PASS $DB_HOST $WP_VERSION
+          bash bin/install-wp-tests.sh $DB_NAME $DB_USER $DB_PASS $DB_HOST $WP_VERSION $WC_VERSION
 
       - name: Run PHPUnit tests
         run: ./vendor/bin/phpunit
