@@ -15,6 +15,7 @@ import useUpsertSnapchatConfig from '~/hooks/useUpsertSnapchatConfig';
 import AccountCard, { APPEARANCE } from '~/components/account-card';
 import useDispatchCoreNotices from '~/hooks/useDispatchCoreNotices';
 import useApiFetchCallback from '~/hooks/useApiFetchCallback';
+import { getReferrerQueryParams } from '~/utils/tracks';
 
 /**
  * Clicking on the button to connect a Snapchat account.
@@ -37,7 +38,10 @@ const ConnectSnapchatAccountCard = ( {
 	const nextPageName = sfwData?.setupComplete
 		? 'reconnect'
 		: 'setup-snapchat';
-	const query = { next_page_name: nextPageName };
+	const query = {
+		next_page_name: nextPageName,
+		...getReferrerQueryParams(),
+	};
 	const path = addQueryArgs( `${ API_NAMESPACE }/snapchat/connect`, query );
 	const [ fetchSnapchatConnect, { loading, data } ] = useApiFetchCallback( {
 		path,
