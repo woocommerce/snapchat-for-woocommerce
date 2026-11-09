@@ -21,17 +21,6 @@ use WP_Post;
 final class ProductChannelVisibilityData {
 
 	/**
-	 * Whether to enqueue the channel-visibility bundle on this request.
-	 *
-	 * @since n.e.x.t
-	 *
-	 * @return bool
-	 */
-	public static function should_enqueue_channel_visibility_bundle(): bool {
-		return null !== self::get_channel_visibility_inline_block();
-	}
-
-	/**
 	 * Builds the `channelVisibility` payload for `window.snapchatAdsMetaBoxData`.
 	 *
 	 * @since n.e.x.t

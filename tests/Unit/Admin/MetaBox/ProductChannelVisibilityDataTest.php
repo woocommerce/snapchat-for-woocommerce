@@ -50,13 +50,12 @@ final class ProductChannelVisibilityDataTest extends WP_UnitTestCase {
 	}
 
 	/**
-	 * Off the product edit screen there is no payload and the bundle is not enqueued.
+	 * Off the product edit screen there is no payload.
 	 */
 	public function test_returns_null_off_product_screen(): void {
 		set_current_screen( 'dashboard' );
 
 		$this->assertNull( ProductChannelVisibilityData::get_channel_visibility_inline_block() );
-		$this->assertFalse( ProductChannelVisibilityData::should_enqueue_channel_visibility_bundle() );
 	}
 
 	/**
@@ -87,8 +86,6 @@ final class ProductChannelVisibilityDataTest extends WP_UnitTestCase {
 		$this->assertSame( '1', $block['product_catalog_item'] );
 		$this->assertTrue( $block['product_is_visible'] );
 		$this->assertArrayNotHasKey( 'options', $block );
-
-		$this->assertTrue( ProductChannelVisibilityData::should_enqueue_channel_visibility_bundle() );
 	}
 
 	/**
