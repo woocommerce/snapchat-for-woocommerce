@@ -14,8 +14,11 @@
 namespace SnapchatForWooCommerce\Admin\MetaBox;
 
 use SnapchatForWooCommerce\Campaign\CampaignStatusService;
+use SnapchatForWooCommerce\SandboxMode;
 use SnapchatForWooCommerce\Utils\AssetLoader;
 use SnapchatForWooCommerce\Utils\OnboardingStatus;
+use SnapchatForWooCommerce\Utils\Storage\Options;
+use SnapchatForWooCommerce\Utils\Storage\OptionDefaults;
 
 /**
  * Handles admin script and style enqueues for plugin meta boxes.
@@ -100,8 +103,10 @@ class MetaBoxAssets {
 			'channel-visibility-meta-box',
 			'AdminData',
 			array(
+				'sandboxMode'   => SandboxMode::is_enabled(),
 				'slug'          => 'snapwoo',
 				'pluginVersion' => SNAPCHAT_FOR_WOOCOMMERCE_VERSION,
+				'adAccountId'   => Options::get( OptionDefaults::AD_ACCOUNT_ID ),
 			)
 		);
 
@@ -140,8 +145,10 @@ class MetaBoxAssets {
 			'order-attribution',
 			'AdminData',
 			array(
+				'sandboxMode'   => SandboxMode::is_enabled(),
 				'slug'          => 'snapwoo',
 				'pluginVersion' => SNAPCHAT_FOR_WOOCOMMERCE_VERSION,
+				'adAccountId'   => Options::get( OptionDefaults::AD_ACCOUNT_ID ),
 			)
 		);
 
