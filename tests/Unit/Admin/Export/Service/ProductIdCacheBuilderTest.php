@@ -180,6 +180,20 @@ class ProductIdCacheBuilderTest extends WP_UnitTestCase {
 	}
 
 	/**
+	 * The scan completes on the first page when no products are eligible, so the export still runs.
+	 */
+	public function test_completes_on_first_page_when_no_products_are_eligible(): void {
+		$this->create_product( array( 'catalog_visibility' => 'hidden' ) );
+
+		$completed = did_action( Helper::with_prefix( 'export_products_cache_completed' ) );
+
+		$this->sut->handle_batch( 1 );
+
+		$this->assertSame( $completed + 1, did_action( Helper::with_prefix( 'export_products_cache_completed' ) ) );
+		$this->assertFalse( as_has_scheduled_action( Helper::with_prefix( ProductIdCacheBuilder::ACTION_HOOK ) ) );
+	}
+
+	/**
 	 * Runs the first page of the scan and returns the cached product IDs, sorted.
 	 *
 	 * @return int[]

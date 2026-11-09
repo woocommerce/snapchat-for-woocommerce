@@ -134,9 +134,22 @@ class BatchExportJob {
 		$ids = $this->provider->get_ids( $offset, self::BATCH_SIZE );
 
 		if ( empty( $ids ) ) {
+			if ( ! $is_first_batch ) {
+				return array(
+					'file_path' => $existing_file ?? '',
+					'file_url'  => '',
+					'complete'  => true,
+				);
+			}
+
+			// Nothing is eligible for export. Replace the previous file anyway, since the
+			// feed keeps fetching it and would otherwise still list excluded products.
+			$file_path = $this->writer->create_file();
+			$this->writer->write_header( $file_path );
+
 			return array(
-				'file_path' => $existing_file ?? '',
-				'file_url'  => '',
+				'file_path' => $file_path,
+				'file_url'  => $this->writer->generate_url( $file_path ),
 				'complete'  => true,
 			);
 		}
