@@ -41,12 +41,18 @@ document.addEventListener( 'DOMContentLoaded', () => {
 	}
 
 	onSingleAddToCartClick( ( event ) => {
-		const eventId = document.querySelector(
-			`[name=${ TRACKING_DATA_VAR.event_id_el_name }]`
-		).value;
+		if ( ! isPixelEnabled ) {
+			return;
+		}
 
-		if ( isPixelEnabled ) {
-			singleAddToCartClick( event, eventId );
+		const eventIdField = document.querySelector(
+			`[name=${ TRACKING_DATA_VAR.event_id_el_name }]`
+		);
+
+		// Without the field there is no ID to deduplicate against the
+		// Conversions API event, so sending a pixel event would double-count.
+		if ( eventIdField ) {
+			singleAddToCartClick( event, eventIdField.value );
 		}
 	} );
 
