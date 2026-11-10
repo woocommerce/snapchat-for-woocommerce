@@ -19,6 +19,10 @@ on:
 
   workflow_dispatch:
     inputs:
+      wp-version:
+        description: 'WordPress version to test against (e.g. 7.1.4, 7.2-RC1, or nightly for trunk) — leave blank for the latest stable release'
+        required: false
+        type: string
       wc-version:
         description: 'WooCommerce version or git tag to test against (e.g. 11.3.0-beta.2) — leave blank for the latest stable release'
         required: false
@@ -39,7 +43,7 @@ jobs:
       DB_USER: root
       DB_PASS: root
       DB_HOST: 127.0.0.1
-      WP_VERSION: latest
+      WP_VERSION: ${{ github.event.inputs.wp-version || 'latest' }}
       WC_VERSION: ${{ github.event.inputs.wc-version || 'latest' }}
       CI: true
 
