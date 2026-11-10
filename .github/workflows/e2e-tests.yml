@@ -77,11 +77,15 @@ jobs:
         # cannot replace WooCommerce in place. Point wp-env at the requested
         # WooCommerce zip before the environment starts instead. Use the GitHub
         # release asset because wp-env names the plugin directory after the zip
-        # filename, and it must stay `woocommerce`.
+        # filename, and it must stay `woocommerce`. Update only `plugins` so any
+        # override an earlier step wrote (e.g. WordPress `core`) is kept.
         run: |
+          [ -f .wp-env.override.json ] || echo '{}' > .wp-env.override.json
           jq --arg url "https://github.com/woocommerce/woocommerce/releases/download/${INPUT_WC_RC_VERSION}/woocommerce.zip" \
-            '{plugins: (.plugins | map(if . == "https://downloads.wordpress.org/plugin/woocommerce.zip" then $url else . end))}' \
-            .wp-env.json > .wp-env.override.json
+            --slurpfile base .wp-env.json \
+            '.plugins = ((.plugins // $base[0].plugins) | map(if . == "https://downloads.wordpress.org/plugin/woocommerce.zip" then $url else . end))' \
+            .wp-env.override.json > .wp-env.override.json.tmp
+          mv .wp-env.override.json.tmp .wp-env.override.json
           grep -q "download/${INPUT_WC_RC_VERSION}/woocommerce.zip" .wp-env.override.json
           cat .wp-env.override.json
 
