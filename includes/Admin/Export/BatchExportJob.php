@@ -142,8 +142,8 @@ class BatchExportJob {
 				);
 			}
 
-			// Nothing is eligible for export. Replace the previous file anyway, since the
-			// feed keeps fetching it and would otherwise still list excluded products.
+			// Nothing is eligible for export. Write an empty file anyway, so the export
+			// completes and the feed URL still resolves.
 			$file_path = $this->writer->create_file();
 			$this->writer->write_header( $file_path );
 
