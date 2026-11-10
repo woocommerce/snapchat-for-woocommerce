@@ -78,7 +78,7 @@ class CsvExportWriterTest extends WP_UnitTestCase {
 		$file = $this->writer->create_file();
 		$url  = $this->writer->generate_url( $file );
 
-		$this->assertStringContainsString( '/wp-content/uploads/snapchat/', $url );
+		$this->assertStringStartsWith( trailingslashit( wp_upload_dir()['baseurl'] ) . 'snapchat/', $url );
 		$this->assertStringEndsWith( '.csv', $url );
 
 		// Clean up
