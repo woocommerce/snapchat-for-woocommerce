@@ -124,8 +124,8 @@ class ProductIdCacheBuilder implements CacheBuilderInterface {
 	 * IDs that match the export eligibility meta key, appends them to the cached list,
 	 * and enqueues the next page.
 	 *
-	 * If the current page is empty and not the first, it fires a custom action to
-	 * indicate that the caching process has completed.
+	 * When the current page is empty, it fires a custom action to indicate that the
+	 * caching process has completed, including when no products are eligible at all.
 	 *
 	 * @since 0.1.0
 	 *
@@ -148,21 +148,21 @@ class ProductIdCacheBuilder implements CacheBuilderInterface {
 		$results = $query->get_products();
 
 		if ( empty( $results ) ) {
-			if ( 1 !== $page ) {
-				/**
-				 * Fires when exportable product IDs have been cached and export can begin.
-				 *
-				 * This hook is triggered after the cache builder has finished scanning and storing
-				 * the list of product IDs to be exported. It signals that the export writing process
-				 * (e.g., CSV generation) can now be initiated.
-				 *
-				 * @since 0.1.0
-				 *
-				 * @hook snapchat_for_woocommerce_export_products_cache_completed
-				 */
-				// phpcs:ignore WordPress.NamingConventions.PrefixAllGlobals.DynamicHooknameFound -- Prefixed via Helper::with_prefix().
-				do_action( Helper::with_prefix( 'export_products_cache_completed' ) );
-			}
+			/**
+			 * Fires when exportable product IDs have been cached and export can begin.
+			 *
+			 * This hook is triggered after the cache builder has finished scanning and storing
+			 * the list of product IDs to be exported. It signals that the export writing process
+			 * (e.g., CSV generation) can now be initiated. The list may be empty when no
+			 * products are eligible for export.
+			 *
+			 * @since 0.1.0
+			 * @since n.e.x.t Also fires when no products are eligible for export.
+			 *
+			 * @hook snapchat_for_woocommerce_export_products_cache_completed
+			 */
+			// phpcs:ignore WordPress.NamingConventions.PrefixAllGlobals.DynamicHooknameFound -- Prefixed via Helper::with_prefix().
+			do_action( Helper::with_prefix( 'export_products_cache_completed' ) );
 			return;
 		}
 

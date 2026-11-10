@@ -202,4 +202,33 @@ class ProductExportServiceTest extends WP_UnitTestCase {
 		Options::delete( OptionDefaults::EXPORT_FILE_URL );
 		Options::delete( OptionDefaults::EXPORT_PRODUCT_IDS );
 	}
+
+	/**
+	 * Tests that handle_batch() replaces the previous export file and stores its URL
+	 * when no products are eligible, so the feed stops listing excluded products.
+	 */
+	public function test_handle_batch_replaces_previous_file_when_no_products_are_eligible(): void {
+		$writer    = new CsvExportWriter();
+		$file_path = $writer->create_file();
+		file_put_contents( $file_path, "id,title\n123,Previously exported product\n" );
+
+		Options::set( OptionDefaults::EXPORT_PRODUCT_IDS, array() );
+
+		$job     = new BatchExportJob( $this->cache_builder, new ProductEntityProvider(), new ProductRowBuilder(), $writer, $this->api );
+		$service = new ProductExportService( $job );
+
+		$service->handle_batch( 0 );
+
+		$this->assertSame( $file_path, Options::get( OptionDefaults::EXPORT_FILE_PATH ) );
+		$this->assertSame( $writer->generate_url( $file_path ), Options::get( OptionDefaults::EXPORT_FILE_URL ) );
+		$this->assertSame( '', file_get_contents( $file_path ) );
+		$this->assertFalse(
+			as_has_scheduled_action( Helper::with_prefix( ProductExportService::ACTION_HOOK ) )
+		);
+
+		unlink( $file_path );
+		Options::delete( OptionDefaults::EXPORT_FILE_PATH );
+		Options::delete( OptionDefaults::EXPORT_FILE_URL );
+		Options::delete( OptionDefaults::EXPORT_PRODUCT_IDS );
+	}
 }
