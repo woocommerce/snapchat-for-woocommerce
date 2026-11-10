@@ -256,4 +256,46 @@ class SnapchatBusinessExtensionControllerTest extends WP_UnitTestCase {
 		$this->assertSame( 'existing-id', $data['catalog_id'] );
 		$this->assertSame( 'existing-id', Options::get( OptionDefaults::CATALOG_ID ) );
 	}
+
+	/**
+	 * Test: the OAuth return URL carries the referrer params from the connect request.
+	 */
+	public function test_initiate_oauth_appends_referrer_to_return_url(): void {
+		$request = new WP_REST_Request( 'GET', '/wc/sfw/snapchat/connect' );
+		$request->set_param( 'referrer_type', 'in_product_placement' );
+		$request->set_param( 'referrer_id', 'order-attribution-meta-box' );
+
+		$expected_return_url = admin_url( 'admin.php?page=wc-admin&path=%2Fsnapchat%2Fsetup&referrer_type=in_product_placement&referrer_id=order-attribution-meta-box' );
+
+		$response = $this->make_oauth_controller( $expected_return_url )->initiate_oauth( $request );
+
+		$this->assertSame( 'https://example.com/oauth', $response->get_data()['url'] );
+	}
+
+	/**
+	 * Test: without referrer params, the OAuth return URL is unchanged.
+	 */
+	public function test_initiate_oauth_keeps_return_url_without_referrer(): void {
+		$request = new WP_REST_Request( 'GET', '/wc/sfw/snapchat/connect' );
+
+		$expected_return_url = admin_url( 'admin.php?page=wc-admin&path=/snapchat/setup' );
+
+		$this->make_oauth_controller( $expected_return_url )->initiate_oauth( $request );
+	}
+
+	/**
+	 * Builds a controller whose WCS client expects the given OAuth return URL.
+	 *
+	 * @param string $expected_return_url Return URL the connect request should send, before encoding.
+	 * @return SnapchatBusinessExtensionController
+	 */
+	private function make_oauth_controller( string $expected_return_url ): SnapchatBusinessExtensionController {
+		$wcs = $this->createMock( WcsClient::class );
+		$wcs->expects( $this->once() )
+			->method( 'proxy_get' )
+			->with( 'connection/connect', array( 'return_url' => rawurlencode( $expected_return_url ) ) )
+			->willReturn( new WP_REST_Response( array( 'oauth_url' => 'https://example.com/oauth' ) ) );
+
+		return new SnapchatBusinessExtensionController( $wcs, $this->createMock( AdPartnerApi::class ) );
+	}
 }

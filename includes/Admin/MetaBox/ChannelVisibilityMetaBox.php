@@ -1,0 +1,169 @@
+<?php
+/**
+ * Registers the Channel visibility meta box on the Edit Product screen.
+ *
+ * Every channel plugin uses the same `channel_visibility` meta box id, so there
+ * is only ever one box, whichever plugins are active:
+ * - Cohabit: another channel plugin has already registered the shared box;
+ *   Snapchat's row is injected into that box via React.
+ * - Standalone: no shared box exists yet, so Snapchat registers it, and any
+ *   channel plugin that runs later joins it the same way.
+ *
+ * @package SnapchatForWooCommerce\Admin\MetaBox
+ * @since n.e.x.t
+ */
+
+namespace SnapchatForWooCommerce\Admin\MetaBox;
+
+use SnapchatForWooCommerce\Utils\Helper;
+
+/**
+ * Handles Channel visibility meta box registration on the product edit screen.
+ *
+ * @since n.e.x.t
+ */
+class ChannelVisibilityMetaBox {
+
+	/**
+	 * Shared meta box id, used by every channel plugin for the Channel visibility box.
+	 *
+	 * Snapchat registers the box under this id when no other plugin has, and
+	 * joins it otherwise.
+	 *
+	 * @since n.e.x.t
+	 */
+	public const SHARED_BOX_ID = 'channel_visibility';
+
+	/**
+	 * Priority of the `add_meta_boxes` callback that registers the shared box.
+	 *
+	 * Late enough that channel plugins registering at the default priority have
+	 * already claimed the shared box, and one ahead of the common 999 so plugins
+	 * that only look for the shared box at 999 find it and join it.
+	 *
+	 * @since n.e.x.t
+	 */
+	public const REGISTER_PRIORITY = 998;
+
+	/**
+	 * Meta key (unprefixed) that flags whether a product is synced to the Snapchat catalog.
+	 *
+	 * Stored as `'1'` (synced) or `'0'` (not synced). A missing value is treated as synced.
+	 *
+	 * Used by:
+	 * - {@see ProductChannelVisibilityData} to seed the Channel visibility toggle.
+	 * - {@see \SnapchatForWooCommerce\Admin\Export\Service\ProductIdCacheBuilder} to filter exportable product IDs.
+	 *
+	 * @since n.e.x.t
+	 */
+	public const CATALOG_ITEM = 'product_catalog_item';
+
+	/**
+	 * Registers WordPress hooks.
+	 *
+	 * @since n.e.x.t
+	 *
+	 * @return void
+	 */
+	public function register_hooks(): void {
+		add_action( 'add_meta_boxes', array( $this, 'maybe_register' ), self::REGISTER_PRIORITY, 2 );
+		add_action( 'woocommerce_process_product_meta', array( $this, 'save_meta' ) );
+	}
+
+	/**
+	 * Registers the shared Channel visibility meta box only when it doesn't exist yet.
+	 *
+	 * Runs at {@see self::REGISTER_PRIORITY} so channel plugins registering at their
+	 * default priority have already claimed the shared box. In cohabit mode the React bundle injects
+	 * Snapchat's row into the existing box; in standalone mode Snapchat registers the
+	 * shared box, so channel plugins that run later join it instead of adding their own.
+	 *
+	 * @since n.e.x.t
+	 *
+	 * @param string   $post_type Current post type.
+	 * @param \WP_Post $post      Current post object.
+	 * @return void
+	 */
+	public function maybe_register( string $post_type, $post ): void { // phpcs:ignore Generic.CodeAnalysis.UnusedFunctionParameter.FoundAfterLastUsed
+		global $wp_meta_boxes;
+
+		if ( 'product' !== $post_type ) {
+			return;
+		}
+
+		if ( $this->box_registered( (array) $wp_meta_boxes ) ) {
+			return;
+		}
+
+		add_meta_box(
+			self::SHARED_BOX_ID,
+			__( 'Channel visibility', 'snapchat-for-woocommerce' ),
+			array( $this, 'render' ),
+			'product',
+			'side'
+		);
+	}
+
+	/**
+	 * Renders the React mount point for the Channel visibility widget.
+	 *
+	 * @since n.e.x.t
+	 *
+	 * @return void
+	 */
+	public function render(): void {
+		// `data-service` lets each extension sharing this meta box place its box alphabetically
+		// (see insertAlphabetically() in js/src/meta-boxes/channel-visibility/utils.js).
+		echo '<div id="snapchat-channel-visibility-box" data-service="snapchat"></div>';
+	}
+
+	/**
+	 * Saves the Snapchat catalog sync flag when the product is saved.
+	 *
+	 * Only writes when the Channel visibility toggle submitted a value. The toggle is not
+	 * rendered before onboarding is complete, so a missing field leaves the stored value untouched.
+	 *
+	 * @since n.e.x.t
+	 *
+	 * @param int $post_id The ID of the product being saved.
+	 * @return void
+	 */
+	public function save_meta( $post_id ): void {
+		$meta_key = Helper::with_prefix( self::CATALOG_ITEM );
+
+		// Nonce verification done in the Woo Core parent method.
+		// phpcs:ignore WordPress.Security.NonceVerification.Missing
+		if ( ! isset( $_POST[ $meta_key ] ) ) {
+			return;
+		}
+
+		// phpcs:ignore WordPress.Security.NonceVerification.Missing
+		$value = sanitize_text_field( wp_unslash( $_POST[ $meta_key ] ) );
+
+		update_post_meta( absint( $post_id ), $meta_key, '1' === $value ? '1' : '0' );
+	}
+
+	/**
+	 * Checks whether the shared Channel visibility box is already registered for products.
+	 *
+	 * @since n.e.x.t
+	 *
+	 * @param array $wp_meta_boxes Global meta boxes registry.
+	 * @return bool
+	 */
+	private function box_registered( array $wp_meta_boxes ): bool {
+		if ( empty( $wp_meta_boxes['product'] ) ) {
+			return false;
+		}
+
+		foreach ( $wp_meta_boxes['product'] as $contexts ) {
+			foreach ( $contexts as $priorities ) {
+				if ( array_key_exists( self::SHARED_BOX_ID, $priorities ) ) {
+					return true;
+				}
+			}
+		}
+
+		return false;
+	}
+}

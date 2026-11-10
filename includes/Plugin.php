@@ -74,6 +74,7 @@ final class Plugin {
 		ServiceContainer::get( ServiceKey::PIXEL_TRACKING )->register_hooks();
 		ServiceContainer::get( ServiceKey::CONVERSION_TRACKING )->register_hooks();
 		ServiceContainer::get( ServiceKey::PRODUCT_EXPORT_SERVICE )->register_hooks();
+		ServiceContainer::get( ServiceKey::CAMPAIGN_STATUS_SERVICE )->register_hooks();
 		Marketing::register_hooks();
 		Compatibility::register_hooks();
 	}

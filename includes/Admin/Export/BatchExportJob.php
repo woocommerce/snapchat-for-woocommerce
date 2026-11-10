@@ -134,9 +134,22 @@ class BatchExportJob {
 		$ids = $this->provider->get_ids( $offset, self::BATCH_SIZE );
 
 		if ( empty( $ids ) ) {
+			if ( ! $is_first_batch ) {
+				return array(
+					'file_path' => $existing_file ?? '',
+					'file_url'  => '',
+					'complete'  => true,
+				);
+			}
+
+			// Nothing is eligible for export. Write an empty file anyway, so the export
+			// completes and the feed URL still resolves.
+			$file_path = $this->writer->create_file();
+			$this->writer->write_header( $file_path );
+
 			return array(
-				'file_path' => $existing_file ?? '',
-				'file_url'  => '',
+				'file_path' => $file_path,
+				'file_url'  => $this->writer->generate_url( $file_path ),
 				'complete'  => true,
 			);
 		}

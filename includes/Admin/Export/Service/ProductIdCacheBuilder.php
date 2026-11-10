@@ -17,7 +17,7 @@ namespace SnapchatForWooCommerce\Admin\Export\Service;
 
 use SnapchatForWooCommerce\Admin\Export\Contract\CacheBuilderInterface;
 use SnapchatForWooCommerce\Config;
-use SnapchatForWooCommerce\Admin\ProductMeta\ProductMetaFields;
+use SnapchatForWooCommerce\Admin\MetaBox\ChannelVisibilityMetaBox;
 use SnapchatForWooCommerce\Utils\Helper;
 use SnapchatForWooCommerce\Utils\Storage\Options;
 use SnapchatForWooCommerce\Utils\Storage\OptionDefaults;
@@ -70,6 +70,12 @@ class ProductIdCacheBuilder implements CacheBuilderInterface {
 			10,
 			2
 		);
+		add_action(
+			'woocommerce_product_data_store_cpt_get_products_query',
+			array( $this, 'query_catalog_visible_products' ),
+			10,
+			2
+		);
 	}
 
 	/**
@@ -118,8 +124,8 @@ class ProductIdCacheBuilder implements CacheBuilderInterface {
 	 * IDs that match the export eligibility meta key, appends them to the cached list,
 	 * and enqueues the next page.
 	 *
-	 * If the current page is empty and not the first, it fires a custom action to
-	 * indicate that the caching process has completed.
+	 * When the current page is empty, it fires a custom action to indicate that the
+	 * caching process has completed, including when no products are eligible at all.
 	 *
 	 * @since 0.1.0
 	 *
@@ -134,28 +140,29 @@ class ProductIdCacheBuilder implements CacheBuilderInterface {
 			'page'          => $page,
 			'status'        => 'publish',
 			'return'        => 'ids',
-			'snap_meta_key' => Helper::with_prefix( ProductMetaFields::CATALOG_ITEM ),
+			'snap_meta_key' => Helper::with_prefix( ChannelVisibilityMetaBox::CATALOG_ITEM ),
+			'snap_visible'  => true,
 		);
 
 		$query   = new \WC_Product_Query( $query_args );
 		$results = $query->get_products();
 
 		if ( empty( $results ) ) {
-			if ( 1 !== $page ) {
-				/**
-				 * Fires when exportable product IDs have been cached and export can begin.
-				 *
-				 * This hook is triggered after the cache builder has finished scanning and storing
-				 * the list of product IDs to be exported. It signals that the export writing process
-				 * (e.g., CSV generation) can now be initiated.
-				 *
-				 * @since 0.1.0
-				 *
-				 * @hook snapchat_for_woocommerce_export_products_cache_completed
-				 */
-				// phpcs:ignore WordPress.NamingConventions.PrefixAllGlobals.DynamicHooknameFound -- Prefixed via Helper::with_prefix().
-				do_action( Helper::with_prefix( 'export_products_cache_completed' ) );
-			}
+			/**
+			 * Fires when exportable product IDs have been cached and export can begin.
+			 *
+			 * This hook is triggered after the cache builder has finished scanning and storing
+			 * the list of product IDs to be exported. It signals that the export writing process
+			 * (e.g., CSV generation) can now be initiated. The list may be empty when no
+			 * products are eligible for export.
+			 *
+			 * @since 0.1.0
+			 * @since n.e.x.t Also fires when no products are eligible for export.
+			 *
+			 * @hook snapchat_for_woocommerce_export_products_cache_completed
+			 */
+			// phpcs:ignore WordPress.NamingConventions.PrefixAllGlobals.DynamicHooknameFound -- Prefixed via Helper::with_prefix().
+			do_action( Helper::with_prefix( 'export_products_cache_completed' ) );
 			return;
 		}
 
@@ -199,6 +206,50 @@ class ProductIdCacheBuilder implements CacheBuilderInterface {
 				),
 			);
 		}
+
+		return $query;
+	}
+
+	/**
+	 * Filters the product query to products that are visible in the store catalog.
+	 *
+	 * Matches `WC_Product::is_visible()` outside a search, which the Channel visibility
+	 * meta box uses to tell merchants a product "cannot be shown on any channel": products
+	 * set to Hidden or Search results only both carry the `exclude-from-catalog` term in
+	 * the `product_visibility` taxonomy, so they're left out. When the store hides
+	 * out-of-stock items from the catalog, products with the `outofstock` term are left
+	 * out too.
+	 *
+	 * Filtering in the query, rather than checking each product afterwards, matters because
+	 * {@see self::handle_batch()} treats an empty page as the last one: a page where every
+	 * product was filtered out afterwards would end the scan early.
+	 *
+	 * @since n.e.x.t
+	 *
+	 * @param array $query      WooCommerce Products query args.
+	 * @param array $query_vars Query vars.
+	 *
+	 * @return array
+	 */
+	public function query_catalog_visible_products( $query, $query_vars ) {
+		if ( empty( $query_vars['snap_visible'] ) ) {
+			return $query;
+		}
+
+		$excluded_terms = array( 'exclude-from-catalog' );
+
+		if ( 'yes' === get_option( 'woocommerce_hide_out_of_stock_items' ) ) {
+			$excluded_terms[] = 'outofstock';
+		}
+
+		// Append to any existing tax query rather than replacing it. Excluding a couple of terms is cheap.
+		$query['tax_query']   = isset( $query['tax_query'] ) ? (array) $query['tax_query'] : array(); // phpcs:ignore WordPress.DB.SlowDBQuery.slow_db_query_tax_query
+		$query['tax_query'][] = array(
+			'taxonomy' => 'product_visibility',
+			'field'    => 'slug',
+			'terms'    => $excluded_terms,
+			'operator' => 'NOT IN',
+		);
 
 		return $query;
 	}

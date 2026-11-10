@@ -1,0 +1,134 @@
+/**
+ * External dependencies
+ */
+import { Flex, FlexBlock, FlexItem } from '@wordpress/components';
+import { useEffect, useRef } from '@wordpress/element';
+import { __ } from '@wordpress/i18n';
+import classnames from 'classnames';
+
+/**
+ * Internal dependencies
+ */
+import usePreference from '~/hooks/usePreference';
+import snapchatLogoURL from '~/images/logo/snapchat.svg';
+import { recordSfwEvent } from '~/utils/tracks';
+import ChannelVisibilitySettings from './channel-visibility-settings';
+import {
+	CHANNEL_VISIBILITY_CONTEXT,
+	CHANNEL_VISIBILITY_PROMO_KEY,
+} from './constants';
+import GetStartedCTA from './get-started-cta';
+import PromoCTA from './promo-cta';
+import './snapchat-ads-promo.scss';
+
+/**
+ * Snapchat Ads promo is shown.
+ *
+ * @event sfw_ads_promo_shown
+ * @property {string} context Context of the Snapchat Ads promo. Possible values: 'channel-visibility-meta-box', 'order-attribution-meta-box'.
+ * @property {boolean} has_onboarded Whether Snapchat onboarding is complete. On the order screen, `false` means the "Get started" promo was shown and `true` the "Create campaign" promo. Always `false` on the product screen, where the promo only shows before onboarding.
+ * @property {boolean} [is_dismissed] Product screen only. Whether the merchant had dismissed the promo, so the compact layout with a small "Get started" button was shown instead of the full promo.
+ */
+
+/**
+ * Snapchat entry in the Channel visibility widget.
+ *
+ * Shows the get-started promo while onboarding is incomplete, and the
+ * per-product sync control once onboarding is complete.
+ *
+ * @fires sfw_ads_promo_shown with `{ context: 'channel-visibility-meta-box', has_onboarded: false, is_dismissed: false }` for the full promo, or `{ context: 'channel-visibility-meta-box', has_onboarded: false, is_dismissed: true }` for the compact layout after a dismiss.
+ *
+ * @return {JSX.Element} The promo or the per-product sync control.
+ */
+const SnapchatAdsPromo = () => {
+	const { onboardingComplete = false } = window.snapchatAdsMetaBoxData || {};
+	const isDismissed = usePreference( CHANNEL_VISIBILITY_PROMO_KEY );
+	const hasTrackedRef = useRef( false );
+
+	useEffect( () => {
+		if ( onboardingComplete ) {
+			return;
+		}
+
+		if ( ! hasTrackedRef.current ) {
+			// Fired once per page load. Dismissing during this load doesn't
+			// send a second event, but the next load reports `is_dismissed`.
+			recordSfwEvent( 'sfw_ads_promo_shown', {
+				context: CHANNEL_VISIBILITY_CONTEXT,
+				has_onboarded: Boolean( onboardingComplete ),
+				is_dismissed: Boolean( isDismissed ),
+			} );
+			hasTrackedRef.current = true;
+		}
+	}, [ onboardingComplete, isDismissed ] );
+
+	if ( onboardingComplete ) {
+		return <ChannelVisibilitySettings />;
+	}
+
+	return (
+		<Flex
+			className={ classnames( 'sfw-channel-visibility', {
+				'sfw-channel-visibility--dismissed': isDismissed,
+			} ) }
+			direction="column"
+			gap={ 5 }
+			justify="center"
+		>
+			<FlexBlock>
+				<Flex gap={ 2 } align="center" justify="flex-start">
+					<FlexItem>
+						<img
+							className="sfw-channel-visibility__logo"
+							src={ snapchatLogoURL }
+							alt={ __(
+								'Snapchat Logo',
+								'snapchat-for-woocommerce'
+							) }
+							width={ 16 }
+							height={ 16 }
+						/>
+					</FlexItem>
+					<FlexItem>
+						{ __( 'Snapchat', 'snapchat-for-woocommerce' ) }
+					</FlexItem>
+					{ isDismissed && (
+						<FlexItem className="sfw-channel-visibility__get-started--is-dismissed">
+							<GetStartedCTA />
+						</FlexItem>
+					) }
+				</Flex>
+			</FlexBlock>
+
+			{ ! isDismissed && (
+				<Flex
+					className="sfw-channel-visibility__content"
+					direction="column"
+					gap={ 3 }
+				>
+					<FlexBlock>
+						<h3 className="sfw-channel-visibility__title">
+							{ __(
+								'Get your products on Snapchat',
+								'snapchat-for-woocommerce'
+							) }
+						</h3>
+					</FlexBlock>
+					<FlexBlock>
+						<p>
+							{ __(
+								'Sync your products to reach customers as they watch, browse and shop across Snapchat',
+								'snapchat-for-woocommerce'
+							) }
+						</p>
+					</FlexBlock>
+					<FlexBlock>
+						<PromoCTA />
+					</FlexBlock>
+				</Flex>
+			) }
+		</Flex>
+	);
+};
+
+export default SnapchatAdsPromo;

@@ -12,6 +12,7 @@ import AppButton from '~/components/app-button';
 import AppSpinner from '~/components/app-spinner';
 import useJetpackAccount from '~/hooks/useJetpackAccount';
 import useSnapchatAccount from '~/hooks/useSnapchatAccount';
+import useSnapchatAccountDetails from '~/hooks/useSnapchatAccountDetails';
 import StepContent from '~/components/stepper/step-content';
 import WPComAccountCard from '~/components/wpcom-account-card';
 import SnapchatAccountCard from '~/components/snapchat-account-card';
@@ -24,10 +25,11 @@ import './index.scss';
  * When the merchant is onboarded.
  *
  * @event sfw_onboarding_completed
+ * @property {boolean|null} has_active_campaign Whether the connected Snapchat ad account already has a campaign, or null if the check could not be completed.
  */
 
 /**
- * @fires sfw_onboarding_completed
+ * @fires sfw_onboarding_completed with `{ has_active_campaign: true }`, `{ has_active_campaign: false }`, or `{ has_active_campaign: null }` when the campaign check could not be completed.
  */
 const SetupAccounts = ( props ) => {
 	const { onContinue = noop } = props;
@@ -36,6 +38,10 @@ const SetupAccounts = ( props ) => {
 		isConnected: isSnapchatConnected,
 		hasFinishedResolution: hasResolvedSnapchatAccount,
 	} = useSnapchatAccount();
+	const {
+		has_active_campaign: hasActiveCampaign = null,
+		hasFinishedResolution: hasResolvedAccountDetails,
+	} = useSnapchatAccountDetails();
 
 	/**
 	 * When jetpack is loading, or when Snapchat account is loading,
@@ -56,7 +62,12 @@ const SetupAccounts = ( props ) => {
 	};
 
 	const isContinueButtonDisabled = ! isJetpackActive || ! isSnapchatConnected;
-	const isSubmitting = false;
+
+	// Account details are refetched after connecting. Wait for them so
+	// `sfw_onboarding_completed` reports the real campaign state rather than
+	// a placeholder.
+	const isLoadingAccountDetails =
+		isSnapchatConnected && ! hasResolvedAccountDetails;
 
 	return (
 		<StepContent>
@@ -87,10 +98,13 @@ const SetupAccounts = ( props ) => {
 					<AppButton
 						isPrimary
 						disabled={ isContinueButtonDisabled }
-						loading={ isSubmitting }
+						loading={ isLoadingAccountDetails }
 						text={ __( 'Continue', 'snapchat-for-woocommerce' ) }
 						onClick={ handleOnClick }
 						eventName="sfw_onboarding_completed"
+						eventProps={ {
+							has_active_campaign: hasActiveCampaign,
+						} }
 					/>
 				</StepContentActions>
 			</StepContentFooter>

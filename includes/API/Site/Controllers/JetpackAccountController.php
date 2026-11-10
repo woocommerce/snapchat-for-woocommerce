@@ -25,6 +25,8 @@ use WP_REST_Request as Request;
  */
 class JetpackAccountController extends RESTBaseController {
 
+	use ReferrerParamsTrait;
+
 	/**
 	 * WCS proxy request client.
 	 *
@@ -125,7 +127,7 @@ class JetpackAccountController extends RESTBaseController {
 
 			$next     = $request->get_param( 'next_page_name' );
 			$path     = self::NEXT_PATH_MAPPING[ $next ];
-			$redirect = admin_url( "admin.php?page=wc-admin&path={$path}" );
+			$redirect = $this->append_referrer_args( admin_url( "admin.php?page=wc-admin&path={$path}" ), $request );
 			$auth_url = $this->manager->get_authorization_url( null, $redirect );
 
 			$auth_url = esc_url(
@@ -176,7 +178,7 @@ class JetpackAccountController extends RESTBaseController {
 				'enum'              => array_keys( self::NEXT_PATH_MAPPING ),
 				'validate_callback' => 'rest_validate_request_arg',
 			),
-		);
+		) + $this->get_referrer_params();
 	}
 
 	/**
