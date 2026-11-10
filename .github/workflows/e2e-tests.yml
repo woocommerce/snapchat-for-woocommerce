@@ -69,6 +69,26 @@ jobs:
         if: "${{ contains(github.event.pull_request.labels.*.name, 'needs: WP RC test') }}"
         run: ./tests/e2e/bin/set-core-version.js WordPress/WordPress#master
 
+      - name: Use WooCommerce release candidate (optional)
+        if: ${{ github.event.inputs.wc-rc-version != '' }}
+        env:
+          INPUT_WC_RC_VERSION: ${{ github.event.inputs.wc-rc-version }}
+        # wp-env bind-mounts plugins into the container, so `wp plugin update`
+        # cannot replace WooCommerce in place. Point wp-env at the requested
+        # WooCommerce zip before the environment starts instead. Use the GitHub
+        # release asset because wp-env names the plugin directory after the zip
+        # filename, and it must stay `woocommerce`. Update only `plugins` so any
+        # override an earlier step wrote (e.g. WordPress `core`) is kept.
+        run: |
+          [ -f .wp-env.override.json ] || echo '{}' > .wp-env.override.json
+          jq --arg url "https://github.com/woocommerce/woocommerce/releases/download/${INPUT_WC_RC_VERSION}/woocommerce.zip" \
+            --slurpfile base .wp-env.json \
+            '.plugins = ((.plugins // $base[0].plugins) | map(if . == "https://downloads.wordpress.org/plugin/woocommerce.zip" then $url else . end))' \
+            .wp-env.override.json > .wp-env.override.json.tmp
+          mv .wp-env.override.json.tmp .wp-env.override.json
+          grep -q "download/${INPUT_WC_RC_VERSION}/woocommerce.zip" .wp-env.override.json
+          cat .wp-env.override.json
+
       - name: Setup WP environment
         run: npm run env:start
 
@@ -77,16 +97,17 @@ jobs:
         env:
           INPUT_WP_RC_VERSION: ${{ github.event.inputs.wp-rc-version }}
         run: |
-          npm run -- wp-env run tests-cli -- wp core update --version="${INPUT_WP_RC_VERSION}"
-          npm run -- wp-env run tests-cli -- wp core update-db
+          npx wp-env run tests-cli -- wp core update --version="${INPUT_WP_RC_VERSION}"
+          npx wp-env run tests-cli -- wp core update-db
 
-      - name: Install WooCommerce release candidate (optional)
-        if: github.event.inputs.wc-rc-version != ''
+      - name: Verify WooCommerce release candidate (optional)
+        if: ${{ github.event.inputs.wc-rc-version != '' }}
         env:
           INPUT_WC_RC_VERSION: ${{ github.event.inputs.wc-rc-version }}
         run: |
-          npm run -- wp-env run tests-cli -- wp plugin update woocommerce --version="${INPUT_WC_RC_VERSION}"
-          npm run -- wp-env run tests-cli -- wp wc update
+          INSTALLED="$(npx wp-env run tests-cli -- wp plugin get woocommerce --field=version 2>/dev/null | grep -Eo '^[0-9]+\.[0-9]+\.[0-9]+(-[A-Za-z0-9.]+)?' | tail -n 1)"
+          echo "Installed WooCommerce version: ${INSTALLED}"
+          test "${INSTALLED}" = "${INPUT_WC_RC_VERSION}"
 
       - name: Check if the site is running
         run: curl -I http://localhost:8889
