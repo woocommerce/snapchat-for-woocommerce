@@ -13,6 +13,7 @@ node_modules export-ignore
 composer.lock export-ignore
 phpunit.xml.dist export-ignore
 webpack.config.js export-ignore
+jest.config.js export-ignore
 eslint.config.mjs export-ignore
 snapchat-for-woocommerce.zip export-ignore
 .editorconfig export-ignore
