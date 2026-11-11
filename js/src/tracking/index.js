@@ -48,9 +48,14 @@ document.addEventListener( 'DOMContentLoaded', () => {
 
 		// Without the field there is no ID to deduplicate against the
 		// Conversions API event, so sending a pixel event would double-count.
-		if ( eventIdField ) {
-			singleAddToCartClick( event, eventIdField.value );
+		if ( ! eventIdField ) {
+			console.info(
+				'[Snapchat] Event ID field not found. Pixel ADD_CART skipped to avoid double counting.'
+			);
+			return;
 		}
+
+		singleAddToCartClick( event, eventIdField.value );
 	} );
 
 	onLoopAddToCartClick( ( event ) => {
