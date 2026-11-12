@@ -258,6 +258,46 @@ class SnapchatBusinessExtensionControllerTest extends WP_UnitTestCase {
 	}
 
 	/**
+	 * Test: starting the OAuth flow stores a state for the current user and sends it in the return URL.
+	 */
+	public function test_initiate_oauth_adds_state_to_return_url(): void {
+		Transients::delete( TransientDefaults::OAUTH_STATE );
+
+		$requested_url = '';
+
+		$this->jetpack_client
+			->method( 'remote_request' )
+			->willReturnCallback(
+				function ( $args ) use ( &$requested_url ) {
+					$requested_url = $args['url'];
+
+					return array(
+						'response' => array( 'code' => 200, 'message' => 'OK' ),
+						'headers'  => array(),
+						'body'     => wp_json_encode( array( 'oauth_url' => 'https://example.com/oauth' ) ),
+					);
+				}
+			);
+
+		$response = $this->server->dispatch( new WP_REST_Request( 'GET', '/wc/sfw/snapchat/connect' ) );
+
+		$this->assertSame( 200, $response->get_status() );
+		$this->assertSame( 'https://example.com/oauth', $response->get_data()['url'] );
+
+		parse_str( (string) wp_parse_url( $requested_url, PHP_URL_QUERY ), $wcs_query );
+		parse_str( (string) wp_parse_url( $wcs_query['return_url'], PHP_URL_QUERY ), $return_query );
+
+		$this->assertSame( 'wc-admin', $return_query['page'] );
+		$this->assertSame( '/snapchat/setup', $return_query['path'] );
+		$this->assertMatchesRegularExpression( '/^[A-Za-z0-9]{32}$/', $return_query['sfw_oauth_state'] );
+
+		$stored = Transients::get( TransientDefaults::OAUTH_STATE );
+
+		$this->assertSame( get_current_user_id(), $stored['user_id'] );
+		$this->assertSame( hash( 'sha256', $return_query['sfw_oauth_state'] ), $stored['hash'] );
+	}
+
+	/**
 	 * Test: a failed configuration lookup keeps the saved connection unchanged.
 	 */
 	public function test_set_config_keeps_existing_options_when_lookup_fails(): void {

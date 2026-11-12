@@ -34,6 +34,13 @@ use SnapchatForWooCommerce\API\AdPartner\AdPartnerApi;
 class SnapchatBusinessExtensionController extends RESTBaseController {
 
 	/**
+	 * Query arg that carries the OAuth state on the setup page return URL.
+	 *
+	 * @since x.x.x
+	 */
+	private const OAUTH_STATE_QUERY_ARG = 'sfw_oauth_state';
+
+	/**
 	 * WCS proxy request client.
 	 *
 	 * @var WcsClient
@@ -272,8 +279,14 @@ class SnapchatBusinessExtensionController extends RESTBaseController {
 	 * @return WP_REST_Response
 	 */
 	public function initiate_oauth() {
-		$return_url = rawurlencode( admin_url( 'admin.php?page=wc-admin&path=/snapchat/setup' ) );
-		$response   = $this->start_connection( $return_url );
+		$return_url = add_query_arg(
+			self::OAUTH_STATE_QUERY_ARG,
+			$this->create_oauth_state(),
+			admin_url( 'admin.php?page=wc-admin&path=/snapchat/setup' )
+		);
+
+		// `WcsClient` adds query values without encoding them, so encode the whole return URL here.
+		$response = $this->start_connection( rawurlencode( $return_url ) );
 
 		if ( is_wp_error( $response ) ) {
 			return new WP_REST_Response(
@@ -299,6 +312,29 @@ class SnapchatBusinessExtensionController extends RESTBaseController {
 		return rest_ensure_response(
 			array( 'url' => esc_url_raw( $data['oauth_url'] ) )
 		);
+	}
+
+	/**
+	 * Creates a one-time OAuth state for the current user and stores its hash.
+	 *
+	 * Starting a new connection replaces any state that is still pending.
+	 *
+	 * @since x.x.x
+	 *
+	 * @return string The raw state value to send with the return URL.
+	 */
+	private function create_oauth_state(): string {
+		$state = wp_generate_password( 32, false );
+
+		Transients::set(
+			TransientDefaults::OAUTH_STATE,
+			array(
+				'user_id' => get_current_user_id(),
+				'hash'    => hash( 'sha256', $state ),
+			)
+		);
+
+		return $state;
 	}
 
 	/**
