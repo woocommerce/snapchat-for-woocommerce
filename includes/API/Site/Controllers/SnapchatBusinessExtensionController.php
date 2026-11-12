@@ -165,8 +165,10 @@ class SnapchatBusinessExtensionController extends RESTBaseController {
 	/**
 	 * Saves the selected Snapchat Business Extension configuration.
 	 *
-	 * Fetches the configuration details using the provided config ID and stores
-	 * the related Organization ID, Ad Account ID, Pixel ID, and Conversion API token.
+	 * Uses up the OAuth state issued when the connection started, and returns a 403
+	 * error without saving anything if it doesn't match. Then fetches the configuration
+	 * details using the provided config ID and stores the related Organization ID,
+	 * Ad Account ID, Pixel ID, and Conversion API token.
 	 *
 	 * @since 0.1.0
 	 *
