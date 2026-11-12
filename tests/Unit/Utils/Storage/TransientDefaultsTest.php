@@ -32,6 +32,10 @@ class TransientDefaultsTest extends TestCase {
 		$this->assertSame( MONTH_IN_SECONDS, $ttl );
 	}
 
+	public function test_oauth_state_expires_after_fifteen_minutes(): void {
+		$this->assertSame( 15 * MINUTE_IN_SECONDS, TransientDefaults::get_ttl( TransientDefaults::OAUTH_STATE ) );
+	}
+
 	public function test_get_ttl_returns_fallback_if_key_missing(): void {
 		$ttl = TransientDefaults::get_ttl( 'nonexistent_key' );
 

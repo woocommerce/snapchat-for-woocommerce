@@ -12,7 +12,11 @@ import ConnectSnapchatAccountCard from './connect-snapchat-account-card';
 
 const SnapchatAccountCard = ( { disabled = false } ) => {
 	const { isConnected } = useSnapchatAccount();
-	const { config_id: configId, products_token: productsToken } = getQuery();
+	const {
+		config_id: configId,
+		products_token: productsToken,
+		sfw_oauth_state: oauthState,
+	} = getQuery();
 
 	if ( isConnected ) {
 		return <ConnectedSnapchatAccountCard />;
@@ -23,6 +27,7 @@ const SnapchatAccountCard = ( { disabled = false } ) => {
 			disabled={ disabled }
 			configId={ configId }
 			productsToken={ productsToken }
+			oauthState={ oauthState }
 		/>
 	);
 };

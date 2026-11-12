@@ -34,6 +34,13 @@ use SnapchatForWooCommerce\API\AdPartner\AdPartnerApi;
 class SnapchatBusinessExtensionController extends RESTBaseController {
 
 	/**
+	 * Query arg that carries the OAuth state on the setup page return URL.
+	 *
+	 * @since x.x.x
+	 */
+	private const OAUTH_STATE_QUERY_ARG = 'sfw_oauth_state';
+
+	/**
 	 * WCS proxy request client.
 	 *
 	 * @var WcsClient
@@ -108,6 +115,11 @@ class SnapchatBusinessExtensionController extends RESTBaseController {
 							'type'        => 'string',
 							'required'    => true,
 						),
+						'state'          => array(
+							'description' => 'The OAuth state issued when the connection was started.',
+							'type'        => 'string',
+							'required'    => true,
+						),
 					),
 				),
 				'schema' => array( $this, 'config_schema' ),
@@ -153,8 +165,10 @@ class SnapchatBusinessExtensionController extends RESTBaseController {
 	/**
 	 * Saves the selected Snapchat Business Extension configuration.
 	 *
-	 * Fetches the configuration details using the provided config ID and stores
-	 * the related Organization ID, Ad Account ID, Pixel ID, and Conversion API token.
+	 * Uses up the OAuth state issued when the connection started, and returns a 403
+	 * error without saving anything if it doesn't match. Then fetches the configuration
+	 * details using the provided config ID and stores the related Organization ID,
+	 * Ad Account ID, Pixel ID, and Conversion API token.
 	 *
 	 * @since 0.1.0
 	 *
@@ -163,6 +177,14 @@ class SnapchatBusinessExtensionController extends RESTBaseController {
 	 * @return WP_REST_Response|WP_Error
 	 */
 	public function set_config( $request ) {
+		if ( ! $this->consume_oauth_state( (string) $request['state'] ) ) {
+			return new WP_Error(
+				Helper::with_prefix( 'invalid_oauth_state' ),
+				__( 'Your Snapchat connection request has expired or is not valid. Please connect your account again.', 'snapchat-for-woocommerce' ),
+				array( 'status' => 403 )
+			);
+		}
+
 		$config_id      = sanitize_text_field( $request['id'] );
 		$products_token = sanitize_text_field( $request['products_token'] );
 
@@ -170,17 +192,11 @@ class SnapchatBusinessExtensionController extends RESTBaseController {
 			return rest_ensure_response( ( array( 'id' => '' ) ) );
 		}
 
-		Options::set( OptionDefaults::CONFIG_ID, $config_id );
-
-		if ( empty( $products_token ) ) {
-			if ( Helper::is_logging_enabled() ) {
-				$logger = wc_get_logger();
-				$logger->warning(
-					'products_token not set. Auto product feed creation will fail.'
-				);
-			}
-		} else {
-			Options::set( OptionDefaults::WCS_PRODUCTS_TOKEN, $products_token );
+		if ( empty( $products_token ) && Helper::is_logging_enabled() ) {
+			$logger = wc_get_logger();
+			$logger->warning(
+				'products_token not set. Auto product feed creation will fail.'
+			);
 		}
 
 		$response = $this->wcs->proxy_get( '/ads/v1/business_extension_configurations/' . $config_id );
@@ -193,6 +209,13 @@ class SnapchatBusinessExtensionController extends RESTBaseController {
 				),
 				500
 			);
+		}
+
+		// Saved only after WCS confirms the configuration, so a failed lookup keeps the existing connection.
+		Options::set( OptionDefaults::CONFIG_ID, $config_id );
+
+		if ( ! empty( $products_token ) ) {
+			Options::set( OptionDefaults::WCS_PRODUCTS_TOKEN, $products_token );
 		}
 
 		$data        = $response->get_data();
@@ -271,8 +294,14 @@ class SnapchatBusinessExtensionController extends RESTBaseController {
 	 * @return WP_REST_Response
 	 */
 	public function initiate_oauth() {
-		$return_url = rawurlencode( admin_url( 'admin.php?page=wc-admin&path=/snapchat/setup' ) );
-		$response   = $this->start_connection( $return_url );
+		$return_url = add_query_arg(
+			self::OAUTH_STATE_QUERY_ARG,
+			$this->create_oauth_state(),
+			admin_url( 'admin.php?page=wc-admin&path=/snapchat/setup' )
+		);
+
+		// `WcsClient` adds query values without encoding them, so encode the whole return URL here.
+		$response = $this->start_connection( rawurlencode( $return_url ) );
 
 		if ( is_wp_error( $response ) ) {
 			return new WP_REST_Response(
@@ -298,6 +327,56 @@ class SnapchatBusinessExtensionController extends RESTBaseController {
 		return rest_ensure_response(
 			array( 'url' => esc_url_raw( $data['oauth_url'] ) )
 		);
+	}
+
+	/**
+	 * Creates a one-time OAuth state for the current user and stores its hash.
+	 *
+	 * Starting a new connection replaces any state that is still pending.
+	 *
+	 * @since x.x.x
+	 *
+	 * @return string The raw state value to send with the return URL.
+	 */
+	private function create_oauth_state(): string {
+		$state = wp_generate_password( 32, false );
+
+		Transients::set(
+			TransientDefaults::OAUTH_STATE,
+			array(
+				'user_id' => get_current_user_id(),
+				'hash'    => hash( 'sha256', $state ),
+			)
+		);
+
+		return $state;
+	}
+
+	/**
+	 * Checks a returned OAuth state against the pending one and uses it up.
+	 *
+	 * Deletes the pending state on every attempt, so each state works at most once.
+	 *
+	 * @since x.x.x
+	 *
+	 * @param string $state Raw state value from the return URL.
+	 *
+	 * @return bool True when the state matches the one issued to the current user.
+	 */
+	private function consume_oauth_state( string $state ): bool {
+		$pending = Transients::get( TransientDefaults::OAUTH_STATE );
+
+		Transients::delete( TransientDefaults::OAUTH_STATE );
+
+		if ( '' === $state || ! is_array( $pending ) || empty( $pending['hash'] ) || empty( $pending['user_id'] ) ) {
+			return false;
+		}
+
+		if ( get_current_user_id() !== (int) $pending['user_id'] ) {
+			return false;
+		}
+
+		return hash_equals( (string) $pending['hash'], hash( 'sha256', $state ) );
 	}
 
 	/**

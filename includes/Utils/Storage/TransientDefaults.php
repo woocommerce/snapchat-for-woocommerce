@@ -33,6 +33,13 @@ final class TransientDefaults {
 	public const PIXEL_SCRIPT = 'ads_pixel_script';
 
 	/**
+	 * Transient key for the pending Snapchat OAuth state: the initiating user ID and a hash of the state value.
+	 *
+	 * @since x.x.x
+	 */
+	public const OAUTH_STATE = 'oauth_state';
+
+	/**
 	 * Returns defaults for all known Ad Partner transients.
 	 *
 	 * Used by {@see TransientStorage} when saving values.
@@ -44,6 +51,7 @@ final class TransientDefaults {
 	public static function get_all(): array {
 		return array(
 			self::PIXEL_SCRIPT => '',
+			self::OAUTH_STATE  => array(),
 		);
 	}
 
@@ -57,6 +65,7 @@ final class TransientDefaults {
 	private static function get_ttls(): array {
 		return array(
 			self::PIXEL_SCRIPT => MONTH_IN_SECONDS,
+			self::OAUTH_STATE  => 15 * MINUTE_IN_SECONDS,
 		);
 	}
 
