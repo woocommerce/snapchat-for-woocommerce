@@ -119,6 +119,12 @@ const trackAddToCartEvent = ( product, quantity = 1, eventId = null ) => {
  * @param {string} [eventId=''] Optional unique event ID.
  */
 export const singleAddToCartClick = function ( event, eventId = '' ) {
+	// Pixel data is missing when the shopper hasn't consented, or when a cache
+	// or script optimiser drops the inline script that adds it.
+	if ( ! TRACKING_DATA_VAR.pixel_data ) {
+		return;
+	}
+
 	const cartForm = event.target.closest( 'form.cart' );
 
 	if ( ! cartForm ) {
@@ -153,6 +159,10 @@ export const singleAddToCartClick = function ( event, eventId = '' ) {
  * @param {string} [eventId=''] Optional unique event ID.
  */
 export const addToCartClick = function ( event, eventId = '' ) {
+	if ( ! TRACKING_DATA_VAR.pixel_data ) {
+		return;
+	}
+
 	const data = event.currentTarget.dataset;
 	const product = getProductObject( { id: data.product_id } );
 
@@ -167,11 +177,13 @@ export const addToCartClick = function ( event, eventId = '' ) {
  * @param {Object} variation Variation object containing a `variation_id` and `display_price`.
  */
 export const retrievedVariation = ( variation ) => {
-	if ( ! variation?.variation_id ) {
+	const products = TRACKING_DATA_VAR.pixel_data?.products;
+
+	if ( ! variation?.variation_id || ! products ) {
 		return;
 	}
 
-	TRACKING_DATA_VAR.pixel_data.products[ variation.variation_id ] = {
+	products[ variation.variation_id ] = {
 		price: variation.display_price,
 	};
 };
