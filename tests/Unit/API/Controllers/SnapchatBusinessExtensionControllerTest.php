@@ -256,4 +256,39 @@ class SnapchatBusinessExtensionControllerTest extends WP_UnitTestCase {
 		$this->assertSame( 'existing-id', $data['catalog_id'] );
 		$this->assertSame( 'existing-id', Options::get( OptionDefaults::CATALOG_ID ) );
 	}
+
+	/**
+	 * Test: a failed configuration lookup keeps the saved connection unchanged.
+	 */
+	public function test_set_config_keeps_existing_options_when_lookup_fails(): void {
+		Options::set( OptionDefaults::CONFIG_ID, 'previous-config-id' );
+		Options::set( OptionDefaults::WCS_PRODUCTS_TOKEN, 'previous-products-token' );
+		Options::set( OptionDefaults::ORGANIZATION_ID, 'previous-org-id' );
+		Options::set( OptionDefaults::ONBOARDING_STATUS, 'connected' );
+
+		$this->jetpack_client
+			->method( 'remote_request' )
+			->willReturn( array(
+				'response' => array( 'code' => 500, 'message' => 'Internal Server Error' ),
+				'headers'  => array(),
+				'body'     => wp_json_encode( array( 'message' => 'Lookup failed' ) ),
+			) );
+
+		$request = new WP_REST_Request( 'POST', '/wc/sfw/snapchat/config' );
+		$request->set_header( 'Content-Type', 'application/json' );
+		$request->set_body(
+			wp_json_encode(
+				array( 'id' => 'new-config-id', 'products_token' => 'new-products-token' )
+			)
+		);
+
+		$response = $this->server->dispatch( $request );
+
+		$this->assertSame( 500, $response->get_status() );
+		$this->assertSame( 'error', $response->get_data()['status'] );
+		$this->assertSame( 'previous-config-id', Options::get( OptionDefaults::CONFIG_ID ) );
+		$this->assertSame( 'previous-products-token', Options::get( OptionDefaults::WCS_PRODUCTS_TOKEN ) );
+		$this->assertSame( 'previous-org-id', Options::get( OptionDefaults::ORGANIZATION_ID ) );
+		$this->assertSame( 'connected', Options::get( OptionDefaults::ONBOARDING_STATUS ) );
+	}
 }

@@ -170,17 +170,11 @@ class SnapchatBusinessExtensionController extends RESTBaseController {
 			return rest_ensure_response( ( array( 'id' => '' ) ) );
 		}
 
-		Options::set( OptionDefaults::CONFIG_ID, $config_id );
-
-		if ( empty( $products_token ) ) {
-			if ( Helper::is_logging_enabled() ) {
-				$logger = wc_get_logger();
-				$logger->warning(
-					'products_token not set. Auto product feed creation will fail.'
-				);
-			}
-		} else {
-			Options::set( OptionDefaults::WCS_PRODUCTS_TOKEN, $products_token );
+		if ( empty( $products_token ) && Helper::is_logging_enabled() ) {
+			$logger = wc_get_logger();
+			$logger->warning(
+				'products_token not set. Auto product feed creation will fail.'
+			);
 		}
 
 		$response = $this->wcs->proxy_get( '/ads/v1/business_extension_configurations/' . $config_id );
@@ -193,6 +187,13 @@ class SnapchatBusinessExtensionController extends RESTBaseController {
 				),
 				500
 			);
+		}
+
+		// Saved only after WCS confirms the configuration, so a failed lookup keeps the existing connection.
+		Options::set( OptionDefaults::CONFIG_ID, $config_id );
+
+		if ( ! empty( $products_token ) ) {
+			Options::set( OptionDefaults::WCS_PRODUCTS_TOKEN, $products_token );
 		}
 
 		$data        = $response->get_data();
