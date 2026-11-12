@@ -53,7 +53,7 @@ const useUpsertSnapchatConfig = ( configId, productsToken, oauthState ) => {
 		setLoading( true );
 
 		try {
-			await fetchCreateAccount( { parse: false } );
+			await fetchCreateAccount();
 		} catch ( e ) {
 			createNotice( 'error', e.message );
 		}
