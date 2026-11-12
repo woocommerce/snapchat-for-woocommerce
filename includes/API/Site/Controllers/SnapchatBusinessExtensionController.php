@@ -115,6 +115,11 @@ class SnapchatBusinessExtensionController extends RESTBaseController {
 							'type'        => 'string',
 							'required'    => true,
 						),
+						'state'          => array(
+							'description' => 'The OAuth state issued when the connection was started.',
+							'type'        => 'string',
+							'required'    => true,
+						),
 					),
 				),
 				'schema' => array( $this, 'config_schema' ),
@@ -170,6 +175,14 @@ class SnapchatBusinessExtensionController extends RESTBaseController {
 	 * @return WP_REST_Response|WP_Error
 	 */
 	public function set_config( $request ) {
+		if ( ! $this->consume_oauth_state( (string) $request['state'] ) ) {
+			return new WP_Error(
+				Helper::with_prefix( 'invalid_oauth_state' ),
+				__( 'Your Snapchat connection request has expired or is not valid. Please connect your account again.', 'snapchat-for-woocommerce' ),
+				array( 'status' => 403 )
+			);
+		}
+
 		$config_id      = sanitize_text_field( $request['id'] );
 		$products_token = sanitize_text_field( $request['products_token'] );
 
@@ -335,6 +348,33 @@ class SnapchatBusinessExtensionController extends RESTBaseController {
 		);
 
 		return $state;
+	}
+
+	/**
+	 * Checks a returned OAuth state against the pending one and uses it up.
+	 *
+	 * Deletes the pending state on every attempt, so each state works at most once.
+	 *
+	 * @since x.x.x
+	 *
+	 * @param string $state Raw state value from the return URL.
+	 *
+	 * @return bool True when the state matches the one issued to the current user.
+	 */
+	private function consume_oauth_state( string $state ): bool {
+		$pending = Transients::get( TransientDefaults::OAUTH_STATE );
+
+		Transients::delete( TransientDefaults::OAUTH_STATE );
+
+		if ( '' === $state || ! is_array( $pending ) || empty( $pending['hash'] ) || empty( $pending['user_id'] ) ) {
+			return false;
+		}
+
+		if ( get_current_user_id() !== (int) $pending['user_id'] ) {
+			return false;
+		}
+
+		return hash_equals( (string) $pending['hash'], hash( 'sha256', $state ) );
 	}
 
 	/**

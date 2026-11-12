@@ -155,7 +155,7 @@ class SnapchatBusinessExtensionControllerTest extends WP_UnitTestCase {
 		$data = $response->get_data();
 
 		$this->assertSame( 'rest_missing_callback_param', $data['code'] );
-		$this->assertSame( 'Missing parameter(s): id, products_token', $data['message'] );
+		$this->assertSame( 'Missing parameter(s): id, products_token, state', $data['message'] );
 	}
 
 	/**
@@ -174,7 +174,7 @@ class SnapchatBusinessExtensionControllerTest extends WP_UnitTestCase {
 		$request->set_header( 'Content-Type', 'application/json' );
 		$request->set_body(
 			wp_json_encode(
-				array( 'id' => 'hello', 'products_token' => 'abc123' )
+				array( 'id' => 'hello', 'products_token' => 'abc123', 'state' => $this->issue_oauth_state() )
 			)
 		);
 
@@ -248,6 +248,7 @@ class SnapchatBusinessExtensionControllerTest extends WP_UnitTestCase {
 		$request = new WP_REST_Request( 'POST', '/wc/sfw/snapchat/config' );
 		$request['id']             = 'hello';
 		$request['products_token'] = 'abc123';
+		$request['state']          = $this->issue_oauth_state();
 
 		$response = $controller->set_config( $request );
 
@@ -306,6 +307,8 @@ class SnapchatBusinessExtensionControllerTest extends WP_UnitTestCase {
 		Options::set( OptionDefaults::ORGANIZATION_ID, 'previous-org-id' );
 		Options::set( OptionDefaults::ONBOARDING_STATUS, 'connected' );
 
+		$state = $this->issue_oauth_state();
+
 		$this->jetpack_client
 			->method( 'remote_request' )
 			->willReturn( array(
@@ -318,7 +321,7 @@ class SnapchatBusinessExtensionControllerTest extends WP_UnitTestCase {
 		$request->set_header( 'Content-Type', 'application/json' );
 		$request->set_body(
 			wp_json_encode(
-				array( 'id' => 'new-config-id', 'products_token' => 'new-products-token' )
+				array( 'id' => 'new-config-id', 'products_token' => 'new-products-token', 'state' => $state )
 			)
 		);
 
@@ -330,5 +333,131 @@ class SnapchatBusinessExtensionControllerTest extends WP_UnitTestCase {
 		$this->assertSame( 'previous-products-token', Options::get( OptionDefaults::WCS_PRODUCTS_TOKEN ) );
 		$this->assertSame( 'previous-org-id', Options::get( OptionDefaults::ORGANIZATION_ID ) );
 		$this->assertSame( 'connected', Options::get( OptionDefaults::ONBOARDING_STATUS ) );
+	}
+
+	/**
+	 * Test: a valid state saves the configuration and can't be used again.
+	 */
+	public function test_set_config_consumes_valid_state(): void {
+		$this->jetpack_client
+			->method( 'remote_request' )
+			->willReturn( array(
+				'response' => array( 'code' => 200, 'message' => 'OK' ),
+				'headers'  => array(),
+				'body'     => file_get_contents( $this->mock_fixture ),
+			) );
+
+		$state = $this->issue_oauth_state();
+
+		$response = $this->dispatch_config( $state );
+
+		$this->assertSame( 200, $response->get_status() );
+		$this->assertSame( 'hello', Options::get( OptionDefaults::CONFIG_ID ) );
+		$this->assertSame( array(), Transients::get( TransientDefaults::OAUTH_STATE ) );
+
+		Options::set( OptionDefaults::CONFIG_ID, 'saved-config-id' );
+
+		$replay = $this->dispatch_config( $state );
+
+		$this->assertSame( 403, $replay->get_status() );
+		$this->assertSame( 'saved-config-id', Options::get( OptionDefaults::CONFIG_ID ) );
+	}
+
+	/**
+	 * Test: an empty state is rejected before any option write or WCS request.
+	 */
+	public function test_set_config_rejects_empty_state(): void {
+		$this->issue_oauth_state();
+
+		$this->assert_config_rejected( '' );
+	}
+
+	/**
+	 * Test: a state that doesn't match the pending one is rejected.
+	 */
+	public function test_set_config_rejects_wrong_state(): void {
+		$this->issue_oauth_state();
+
+		$this->assert_config_rejected( 'not-the-issued-state' );
+	}
+
+	/**
+	 * Test: a state is rejected when nothing is pending, for example once it has expired.
+	 */
+	public function test_set_config_rejects_state_without_pending_flow(): void {
+		Transients::delete( TransientDefaults::OAUTH_STATE );
+
+		$this->assert_config_rejected( 'expired-or-never-issued' );
+	}
+
+	/**
+	 * Test: a state issued to another user is rejected and used up.
+	 */
+	public function test_set_config_rejects_state_issued_to_another_user(): void {
+		$state = $this->issue_oauth_state();
+
+		wp_set_current_user( $this->factory->user->create( array( 'role' => 'administrator' ) ) );
+
+		$this->assert_config_rejected( $state );
+		$this->assertSame( array(), Transients::get( TransientDefaults::OAUTH_STATE ) );
+	}
+
+	/**
+	 * Stores a pending OAuth state for the current user, as starting the connection does.
+	 *
+	 * @return string Raw state value.
+	 */
+	private function issue_oauth_state(): string {
+		$state = wp_generate_password( 32, false );
+
+		Transients::set(
+			TransientDefaults::OAUTH_STATE,
+			array(
+				'user_id' => get_current_user_id(),
+				'hash'    => hash( 'sha256', $state ),
+			)
+		);
+
+		return $state;
+	}
+
+	/**
+	 * Sends a config request with fixed identifiers and the given state.
+	 *
+	 * @param string $state Raw state value.
+	 *
+	 * @return WP_REST_Response
+	 */
+	private function dispatch_config( string $state ): WP_REST_Response {
+		$request = new WP_REST_Request( 'POST', '/wc/sfw/snapchat/config' );
+		$request->set_header( 'Content-Type', 'application/json' );
+		$request->set_body(
+			wp_json_encode(
+				array( 'id' => 'hello', 'products_token' => 'abc123', 'state' => $state )
+			)
+		);
+
+		return $this->server->dispatch( $request );
+	}
+
+	/**
+	 * Asserts that a config request with this state is refused without side effects.
+	 *
+	 * @param string $state Raw state value.
+	 */
+	private function assert_config_rejected( string $state ): void {
+		Options::set( OptionDefaults::CONFIG_ID, 'saved-config-id' );
+		Options::set( OptionDefaults::WCS_PRODUCTS_TOKEN, 'saved-products-token' );
+
+		$this->jetpack_client->expects( $this->never() )->method( 'remote_request' );
+
+		$response = $this->dispatch_config( $state );
+
+		$this->assertSame( 403, $response->get_status() );
+		$this->assertSame( 'snapchat_for_woocommerce_invalid_oauth_state', $response->get_data()['code'] );
+		$this->assertSame( 'saved-config-id', Options::get( OptionDefaults::CONFIG_ID ) );
+		$this->assertSame( 'saved-products-token', Options::get( OptionDefaults::WCS_PRODUCTS_TOKEN ) );
+		$this->assertSame( '', Options::get( OptionDefaults::ORGANIZATION_ID ) );
+		$this->assertNotSame( 'connected', Options::get( OptionDefaults::ONBOARDING_STATUS ) );
 	}
 }

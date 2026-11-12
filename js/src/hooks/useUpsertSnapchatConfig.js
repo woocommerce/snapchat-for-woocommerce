@@ -23,11 +23,14 @@ import useDispatchCoreNotices from '~/hooks/useDispatchCoreNotices';
  * Set up a Snapchat account.
  * It fetches the Snapchat account configuration from the API and updates the state in the data store.
  *
+ * @param {string} configId Configuration ID from the OAuth return URL.
+ * @param {string} productsToken Products token from the OAuth return URL.
+ * @param {string} oauthState One-time state issued when the connection was started.
  * @return {UpsertSnapchatConfig} An array containing the upsert function and a loading state.
  *
  * @see useApiFetchCallback
  */
-const useUpsertSnapchatConfig = ( configId, productsToken ) => {
+const useUpsertSnapchatConfig = ( configId, productsToken, oauthState ) => {
 	const { createNotice } = useDispatchCoreNotices();
 	const { fetchSnapchatAccount, fetchSetup } = useAppDispatch();
 	const [ loading, setLoading ] = useState( false );
@@ -38,11 +41,12 @@ const useUpsertSnapchatConfig = ( configId, productsToken ) => {
 		data: {
 			id: configId,
 			products_token: productsToken,
+			state: oauthState,
 		},
 	} );
 
 	const upsertSnapchatConfig = useCallback( async () => {
-		if ( ! configId || ! productsToken ) {
+		if ( ! configId || ! productsToken || ! oauthState ) {
 			return false;
 		}
 
@@ -58,7 +62,7 @@ const useUpsertSnapchatConfig = ( configId, productsToken ) => {
 		await fetchSnapchatAccount();
 		await fetchSetup();
 
-		// Remove the config_id from the URL.
+		// Remove the OAuth return args from the URL so a refresh doesn't resubmit them.
 		getHistory().replace( getOnboardingUrl() );
 
 		setLoading( false );
@@ -69,6 +73,7 @@ const useUpsertSnapchatConfig = ( configId, productsToken ) => {
 		fetchSetup,
 		configId,
 		productsToken,
+		oauthState,
 	] );
 
 	return { upsertSnapchatConfig, loading };
