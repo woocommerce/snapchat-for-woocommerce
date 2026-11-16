@@ -12,12 +12,9 @@ import {
 	onSingleProductPageVisit,
 	onCheckoutPageVisit,
 	onPageView,
+	onFoundVariation,
 } from './utils';
-import {
-	singleAddToCartClick,
-	addToCartClick,
-	retrievedVariation,
-} from './pixel/utils';
+import { singleAddToCartClick, addToCartClick } from './pixel/utils';
 import { sendCapiEvent } from './conversions/utils';
 import { SnapchatEvent } from './pixel/events';
 
@@ -41,13 +38,24 @@ document.addEventListener( 'DOMContentLoaded', () => {
 	}
 
 	onSingleAddToCartClick( ( event ) => {
-		const eventId = document.querySelector(
-			`[name=${ TRACKING_DATA_VAR.event_id_el_name }]`
-		).value;
-
-		if ( isPixelEnabled ) {
-			singleAddToCartClick( event, eventId );
+		if ( ! isPixelEnabled ) {
+			return;
 		}
+
+		const eventIdField = document.querySelector(
+			`[name=${ TRACKING_DATA_VAR.event_id_el_name }]`
+		);
+
+		// Without the field there is no ID to deduplicate against the
+		// Conversions API event, so sending a pixel event would double-count.
+		if ( ! eventIdField ) {
+			console.info(
+				'[Snapchat] Event ID field not found. Pixel ADD_CART skipped to avoid double counting.'
+			);
+			return;
+		}
+
+		singleAddToCartClick( event, eventIdField.value );
 	} );
 
 	onLoopAddToCartClick( ( event ) => {
@@ -96,15 +104,13 @@ document.addEventListener( 'wp_listen_for_consent_change', ( e ) => {
  * The `found_variation` event is triggered by WooCommerce when a user selects
  * a variation on the product page. This provides the full variation object,
  * including updated price, SKU, and availability data.
- *
- * This implementation forwards the variation data to `retrievedVariation()`.
  */
 if ( typeof jQuery === 'function' ) {
 	jQuery( document ).on(
 		'found_variation',
 		'form.cart',
 		function ( event, variation ) {
-			retrievedVariation( variation );
+			onFoundVariation( variation );
 		}
 	);
 }
