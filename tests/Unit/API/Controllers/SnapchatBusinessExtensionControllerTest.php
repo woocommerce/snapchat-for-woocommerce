@@ -554,6 +554,64 @@ class SnapchatBusinessExtensionControllerTest extends WP_UnitTestCase {
 	}
 
 	/**
+	 * Test: disconnecting sends the stored config ID as one encoded path segment.
+	 *
+	 * @dataProvider provide_stored_config_ids
+	 *
+	 * @param string $stored_id       Config ID saved in the options.
+	 * @param string $expected_suffix Path the DELETE request must end with.
+	 */
+	public function test_delete_connection_encodes_stored_config_id( string $stored_id, string $expected_suffix ): void {
+		Options::set( OptionDefaults::CONFIG_ID, $stored_id );
+
+		$requests = array();
+
+		$this->jetpack_client
+			->expects( $this->once() )
+			->method( 'remote_request' )
+			->willReturnCallback(
+				function ( $args ) use ( &$requests ) {
+					$requests[] = $args;
+
+					return array(
+						'response' => array( 'code' => 500, 'message' => 'Internal Server Error' ),
+						'headers'  => array(),
+						'body'     => wp_json_encode( array( 'message' => 'Stop after the DELETE' ) ),
+					);
+				}
+			);
+
+		$this->server->dispatch( new WP_REST_Request( 'DELETE', '/wc/sfw/snapchat/connection' ) );
+
+		$this->assertCount( 1, $requests );
+		$this->assertSame( 'DELETE', $requests[0]['method'] );
+		$this->assertStringEndsWith( $expected_suffix, $requests[0]['url'] );
+		$this->assertStringNotContainsString( 'connection/disconnect', $requests[0]['url'] );
+	}
+
+	/**
+	 * Stored config IDs and the DELETE path each must produce.
+	 *
+	 * @return array<string, array{0: string, 1: string}>
+	 */
+	public function provide_stored_config_ids(): array {
+		return array(
+			'real config ID'         => array(
+				'7f1c1447-2a51-44b5-b75a-e92e3bb3d8c9',
+				'/ads/v1/business_extension_configurations/7f1c1447-2a51-44b5-b75a-e92e3bb3d8c9',
+			),
+			'traversal-shaped value' => array(
+				'../../../connection/disconnect',
+				'/ads/v1/business_extension_configurations/..%2F..%2F..%2Fconnection%2Fdisconnect',
+			),
+			'query and fragment'     => array(
+				'abc?x=1#y',
+				'/ads/v1/business_extension_configurations/abc%3Fx%3D1%23y',
+			),
+		);
+	}
+
+	/**
 	 * Response bodies that don't carry a configuration.
 	 *
 	 * @return array<string, array{0: string}>

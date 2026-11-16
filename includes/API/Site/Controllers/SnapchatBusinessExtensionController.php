@@ -452,8 +452,9 @@ class SnapchatBusinessExtensionController extends RESTBaseController {
 		$config_id = Options::get( OptionDefaults::CONFIG_ID );
 
 		if ( $config_id ) {
+			// The stored ID may predate format checks, so encode it to keep it inside one path segment.
 			$response = $this->wcs->proxy_delete(
-				'/ads/v1/business_extension_configurations/' . $config_id
+				'/ads/v1/business_extension_configurations/' . rawurlencode( (string) $config_id )
 			);
 
 			if ( is_wp_error( $response ) ) {
