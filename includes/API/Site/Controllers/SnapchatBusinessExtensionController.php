@@ -227,15 +227,26 @@ class SnapchatBusinessExtensionController extends RESTBaseController {
 			);
 		}
 
+		$data        = $response->get_data();
+		$client_data = is_array( $data ) ? ( $data['business_extension_configuration'] ?? null ) : null;
+
+		// A successful status code alone doesn't confirm the configuration, so check the body before saving anything.
+		if ( ! is_array( $client_data ) ) {
+			return new WP_REST_Response(
+				array(
+					'status'  => 'error',
+					'message' => __( 'Snapchat did not return your account configuration. Please connect your account again.', 'snapchat-for-woocommerce' ),
+				),
+				500
+			);
+		}
+
 		// Saved only after WCS confirms the configuration, so a failed lookup keeps the existing connection.
 		Options::set( OptionDefaults::CONFIG_ID, $config_id );
 
 		if ( ! empty( $products_token ) ) {
 			Options::set( OptionDefaults::WCS_PRODUCTS_TOKEN, $products_token );
 		}
-
-		$data        = $response->get_data();
-		$client_data = $data['business_extension_configuration'];
 
 		if ( ! empty( $client_data['organization_id'] ) ) {
 			Options::set( OptionDefaults::ORGANIZATION_ID, $client_data['organization_id'] );

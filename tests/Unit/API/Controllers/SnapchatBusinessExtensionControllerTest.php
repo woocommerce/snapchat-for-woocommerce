@@ -517,6 +517,58 @@ class SnapchatBusinessExtensionControllerTest extends WP_UnitTestCase {
 	}
 
 	/**
+	 * Test: a successful lookup without configuration data returns an error and
+	 * leaves the saved connection unchanged.
+	 *
+	 * @dataProvider provide_unexpected_lookup_bodies
+	 *
+	 * @param string $body Raw response body returned by WCS with a 200 status.
+	 */
+	public function test_set_config_keeps_existing_options_when_lookup_has_no_configuration( string $body ): void {
+		Options::set( OptionDefaults::CONFIG_ID, 'previous-config-id' );
+		Options::set( OptionDefaults::WCS_PRODUCTS_TOKEN, 'previous-products-token' );
+		Options::set( OptionDefaults::ORGANIZATION_ID, 'previous-org-id' );
+
+		$this->jetpack_client
+			->expects( $this->once() )
+			->method( 'remote_request' )
+			->willReturn( array(
+				'response' => array( 'code' => 200, 'message' => 'OK' ),
+				'headers'  => array(),
+				'body'     => $body,
+			) );
+
+		$completed = did_action( Helper::with_prefix( 'onboarding_complete' ) );
+
+		$response = $this->dispatch_config( $this->issue_oauth_state() );
+
+		$this->assertSame( 500, $response->get_status() );
+		$this->assertSame( 'error', $response->get_data()['status'] );
+		$this->assertNotEmpty( $response->get_data()['message'] );
+		$this->assertSame( 'previous-config-id', Options::get( OptionDefaults::CONFIG_ID ) );
+		$this->assertSame( 'previous-products-token', Options::get( OptionDefaults::WCS_PRODUCTS_TOKEN ) );
+		$this->assertSame( 'previous-org-id', Options::get( OptionDefaults::ORGANIZATION_ID ) );
+		$this->assertSame( '', Options::get( OptionDefaults::CATALOG_ID ) );
+		$this->assertNotSame( 'connected', Options::get( OptionDefaults::ONBOARDING_STATUS ) );
+		$this->assertSame( $completed, did_action( Helper::with_prefix( 'onboarding_complete' ) ) );
+	}
+
+	/**
+	 * Response bodies that don't carry a configuration.
+	 *
+	 * @return array<string, array{0: string}>
+	 */
+	public function provide_unexpected_lookup_bodies(): array {
+		return array(
+			'missing configuration key'  => array( wp_json_encode( array( 'request_status' => 'SUCCESS' ) ) ),
+			'configuration not an array' => array( wp_json_encode( array( 'business_extension_configuration' => 'unexpected' ) ) ),
+			'configuration is null'      => array( wp_json_encode( array( 'business_extension_configuration' => null ) ) ),
+			'empty object'               => array( '{}' ),
+			'not JSON'                   => array( 'not json' ),
+		);
+	}
+
+	/**
 	 * Stores a pending OAuth state for the current user, as starting the connection does.
 	 *
 	 * @return string Raw state value.
