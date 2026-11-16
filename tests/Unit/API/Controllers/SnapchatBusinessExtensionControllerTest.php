@@ -621,6 +621,7 @@ class SnapchatBusinessExtensionControllerTest extends WP_UnitTestCase {
 			'missing configuration key'  => array( wp_json_encode( array( 'request_status' => 'SUCCESS' ) ) ),
 			'configuration not an array' => array( wp_json_encode( array( 'business_extension_configuration' => 'unexpected' ) ) ),
 			'configuration is null'      => array( wp_json_encode( array( 'business_extension_configuration' => null ) ) ),
+			'empty configuration'        => array( '{"business_extension_configuration":{}}' ),
 			'empty object'               => array( '{}' ),
 			'not JSON'                   => array( 'not json' ),
 		);

@@ -231,7 +231,7 @@ class SnapchatBusinessExtensionController extends RESTBaseController {
 		$client_data = is_array( $data ) ? ( $data['business_extension_configuration'] ?? null ) : null;
 
 		// A successful status code alone doesn't confirm the configuration, so check the body before saving anything.
-		if ( ! is_array( $client_data ) ) {
+		if ( empty( $client_data ) || ! is_array( $client_data ) ) {
 			return new WP_REST_Response(
 				array(
 					'status'  => 'error',
