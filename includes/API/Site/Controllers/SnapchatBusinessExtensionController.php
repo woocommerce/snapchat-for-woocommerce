@@ -41,6 +41,16 @@ class SnapchatBusinessExtensionController extends RESTBaseController {
 	private const OAUTH_STATE_QUERY_ARG = 'sfw_oauth_state';
 
 	/**
+	 * Allowed format for the config ID and products token returned after connecting.
+	 *
+	 * The config ID goes into a WCS request path and the products token into the feed
+	 * filename, so separators, dots, and percent signs are never allowed.
+	 *
+	 * @since x.x.x
+	 */
+	private const IDENTIFIER_PATTERN = '^[A-Za-z0-9_-]{1,128}$';
+
+	/**
 	 * WCS proxy request client.
 	 *
 	 * @var WcsClient
@@ -106,14 +116,20 @@ class SnapchatBusinessExtensionController extends RESTBaseController {
 					'permission_callback' => array( $this, 'permissions_check' ),
 					'args'                => array(
 						'id'             => array(
-							'description' => 'The config_id returned by Snapchat.',
-							'type'        => 'string',
-							'required'    => true,
+							'description'       => 'The config_id returned by Snapchat.',
+							'type'              => 'string',
+							'required'          => true,
+							'pattern'           => self::IDENTIFIER_PATTERN,
+							'maxLength'         => 128,
+							'validate_callback' => 'rest_validate_request_arg',
 						),
 						'products_token' => array(
-							'description' => 'The products_token returned by WCS.',
-							'type'        => 'string',
-							'required'    => true,
+							'description'       => 'The products_token returned by WCS.',
+							'type'              => 'string',
+							'required'          => true,
+							'pattern'           => self::IDENTIFIER_PATTERN,
+							'maxLength'         => 128,
+							'validate_callback' => 'rest_validate_request_arg',
 						),
 						'state'          => array(
 							'description' => 'The OAuth state issued when the connection was started.',
@@ -199,7 +215,7 @@ class SnapchatBusinessExtensionController extends RESTBaseController {
 			);
 		}
 
-		$response = $this->wcs->proxy_get( '/ads/v1/business_extension_configurations/' . $config_id );
+		$response = $this->wcs->proxy_get( '/ads/v1/business_extension_configurations/' . rawurlencode( $config_id ) );
 
 		if ( is_wp_error( $response ) ) {
 			return new WP_REST_Response(

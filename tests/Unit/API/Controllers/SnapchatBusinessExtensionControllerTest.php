@@ -403,6 +403,120 @@ class SnapchatBusinessExtensionControllerTest extends WP_UnitTestCase {
 	}
 
 	/**
+	 * Test: a config ID or products token outside the allowed format is rejected
+	 * before any option write or WCS request.
+	 *
+	 * @dataProvider provide_invalid_identifiers
+	 *
+	 * @param string $field Request field to set to the invalid value.
+	 * @param string $value Invalid value.
+	 */
+	public function test_set_config_rejects_invalid_identifier( string $field, string $value ): void {
+		Options::set( OptionDefaults::CONFIG_ID, 'saved-config-id' );
+		Options::set( OptionDefaults::WCS_PRODUCTS_TOKEN, 'saved-products-token' );
+
+		$this->jetpack_client->expects( $this->never() )->method( 'remote_request' );
+
+		$body           = array(
+			'id'             => '7f1c1447-2a51-44b5-b75a-e92e3bb3d8c9',
+			'products_token' => 'p86jT4oj',
+			'state'          => $this->issue_oauth_state(),
+		);
+		$body[ $field ] = $value;
+
+		$request = new WP_REST_Request( 'POST', '/wc/sfw/snapchat/config' );
+		$request->set_header( 'Content-Type', 'application/json' );
+		$request->set_body( wp_json_encode( $body ) );
+
+		$response = $this->server->dispatch( $request );
+
+		$this->assertSame( 400, $response->get_status() );
+		$this->assertSame( 'rest_invalid_param', $response->get_data()['code'] );
+		$this->assertSame( 'saved-config-id', Options::get( OptionDefaults::CONFIG_ID ) );
+		$this->assertSame( 'saved-products-token', Options::get( OptionDefaults::WCS_PRODUCTS_TOKEN ) );
+		$this->assertSame( '', Options::get( OptionDefaults::ORGANIZATION_ID ) );
+		$this->assertNotSame( 'connected', Options::get( OptionDefaults::ONBOARDING_STATUS ) );
+	}
+
+	/**
+	 * Values that must never reach the WCS request path or the feed filename.
+	 *
+	 * @return array<string, array{0: string, 1: string}>
+	 */
+	public function provide_invalid_identifiers(): array {
+		$cases = array();
+
+		$values = array(
+			'dot segments to another endpoint' => '../../../connection/disconnect',
+			'parent segment'                   => '..',
+			'current segment'                  => '.',
+			'slash'                            => 'abc/def',
+			'backslash'                        => 'abc\\def',
+			'encoded dot segment'              => '%2e%2e',
+			'encoded slash'                    => 'abc%2Fdef',
+			'null byte'                        => "abc\0def",
+			'tab'                              => "abc\tdef",
+			'query delimiter'                  => 'abc?def=1',
+			'fragment delimiter'               => 'abc#def',
+			'space'                            => 'abc def',
+			'too long'                         => str_repeat( 'a', 129 ),
+			'empty'                            => '',
+		);
+
+		foreach ( array( 'id', 'products_token' ) as $field ) {
+			foreach ( $values as $label => $value ) {
+				$cases[ "{$field}: {$label}" ] = array( $field, $value );
+			}
+		}
+
+		return $cases;
+	}
+
+	/**
+	 * Test: a valid config ID is sent to WCS as one path segment.
+	 */
+	public function test_set_config_requests_config_id_as_single_path_segment(): void {
+		$requested_url = '';
+
+		$this->jetpack_client
+			->expects( $this->once() )
+			->method( 'remote_request' )
+			->willReturnCallback(
+				function ( $args ) use ( &$requested_url ) {
+					$requested_url = $args['url'];
+
+					return array(
+						'response' => array( 'code' => 200, 'message' => 'OK' ),
+						'headers'  => array(),
+						'body'     => file_get_contents( $this->mock_fixture ),
+					);
+				}
+			);
+
+		$request = new WP_REST_Request( 'POST', '/wc/sfw/snapchat/config' );
+		$request->set_header( 'Content-Type', 'application/json' );
+		$request->set_body(
+			wp_json_encode(
+				array(
+					'id'             => '7f1c1447-2a51-44b5-b75a-e92e3bb3d8c9',
+					'products_token' => 'p86jT4oj',
+					'state'          => $this->issue_oauth_state(),
+				)
+			)
+		);
+
+		$response = $this->server->dispatch( $request );
+
+		$this->assertSame( 200, $response->get_status() );
+		$this->assertStringEndsWith(
+			'/ads/v1/business_extension_configurations/7f1c1447-2a51-44b5-b75a-e92e3bb3d8c9',
+			$requested_url
+		);
+		$this->assertSame( '7f1c1447-2a51-44b5-b75a-e92e3bb3d8c9', Options::get( OptionDefaults::CONFIG_ID ) );
+		$this->assertSame( 'p86jT4oj', Options::get( OptionDefaults::WCS_PRODUCTS_TOKEN ) );
+	}
+
+	/**
 	 * Stores a pending OAuth state for the current user, as starting the connection does.
 	 *
 	 * @return string Raw state value.
