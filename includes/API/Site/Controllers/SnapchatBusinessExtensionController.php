@@ -36,7 +36,7 @@ class SnapchatBusinessExtensionController extends RESTBaseController {
 	/**
 	 * Query arg that carries the OAuth state on the setup page return URL.
 	 *
-	 * @since x.x.x
+	 * @since n.e.x.t
 	 */
 	private const OAUTH_STATE_QUERY_ARG = 'sfw_oauth_state';
 
@@ -334,7 +334,7 @@ class SnapchatBusinessExtensionController extends RESTBaseController {
 	 *
 	 * Starting a new connection replaces any state that is still pending.
 	 *
-	 * @since x.x.x
+	 * @since n.e.x.t
 	 *
 	 * @return string The raw state value to send with the return URL.
 	 */
@@ -357,7 +357,7 @@ class SnapchatBusinessExtensionController extends RESTBaseController {
 	 *
 	 * Deletes the pending state on every attempt, so each state works at most once.
 	 *
-	 * @since x.x.x
+	 * @since n.e.x.t
 	 *
 	 * @param string $state Raw state value from the return URL.
 	 *

@@ -35,7 +35,7 @@ final class TransientDefaults {
 	/**
 	 * Transient key for the pending Snapchat OAuth state: the initiating user ID and a hash of the state value.
 	 *
-	 * @since x.x.x
+	 * @since n.e.x.t
 	 */
 	public const OAUTH_STATE = 'oauth_state';
 
