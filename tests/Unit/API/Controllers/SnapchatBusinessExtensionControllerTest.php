@@ -373,12 +373,14 @@ class SnapchatBusinessExtensionControllerTest extends WP_UnitTestCase {
 	}
 
 	/**
-	 * Test: a state that doesn't match the pending one is rejected.
+	 * Test: a state that doesn't match the pending one is rejected and leaves the pending state in place.
 	 */
 	public function test_set_config_rejects_wrong_state(): void {
 		$this->issue_oauth_state();
+		$pending = Transients::get( TransientDefaults::OAUTH_STATE );
 
 		$this->assert_config_rejected( 'not-the-issued-state' );
+		$this->assertSame( $pending, Transients::get( TransientDefaults::OAUTH_STATE ) );
 	}
 
 	/**
@@ -391,15 +393,16 @@ class SnapchatBusinessExtensionControllerTest extends WP_UnitTestCase {
 	}
 
 	/**
-	 * Test: a state issued to another user is rejected and used up.
+	 * Test: a state issued to another user is rejected and stays pending for that user.
 	 */
 	public function test_set_config_rejects_state_issued_to_another_user(): void {
-		$state = $this->issue_oauth_state();
+		$state   = $this->issue_oauth_state();
+		$pending = Transients::get( TransientDefaults::OAUTH_STATE );
 
 		wp_set_current_user( $this->factory->user->create( array( 'role' => 'administrator' ) ) );
 
 		$this->assert_config_rejected( $state );
-		$this->assertSame( array(), Transients::get( TransientDefaults::OAUTH_STATE ) );
+		$this->assertSame( $pending, Transients::get( TransientDefaults::OAUTH_STATE ) );
 	}
 
 	/**

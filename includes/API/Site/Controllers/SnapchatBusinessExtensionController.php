@@ -355,7 +355,8 @@ class SnapchatBusinessExtensionController extends RESTBaseController {
 	/**
 	 * Checks a returned OAuth state against the pending one and uses it up.
 	 *
-	 * Deletes the pending state on every attempt, so each state works at most once.
+	 * Deletes the pending state only when it matches, so each state works at most once,
+	 * and a wrong state can't cancel a connection that is still in progress.
 	 *
 	 * @since n.e.x.t
 	 *
@@ -366,8 +367,6 @@ class SnapchatBusinessExtensionController extends RESTBaseController {
 	private function consume_oauth_state( string $state ): bool {
 		$pending = Transients::get( TransientDefaults::OAUTH_STATE );
 
-		Transients::delete( TransientDefaults::OAUTH_STATE );
-
 		if ( '' === $state || ! is_array( $pending ) || empty( $pending['hash'] ) || empty( $pending['user_id'] ) ) {
 			return false;
 		}
@@ -376,7 +375,13 @@ class SnapchatBusinessExtensionController extends RESTBaseController {
 			return false;
 		}
 
-		return hash_equals( (string) $pending['hash'], hash( 'sha256', $state ) );
+		if ( ! hash_equals( (string) $pending['hash'], hash( 'sha256', $state ) ) ) {
+			return false;
+		}
+
+		Transients::delete( TransientDefaults::OAUTH_STATE );
+
+		return true;
 	}
 
 	/**
