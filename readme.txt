@@ -2,7 +2,7 @@
 Contributors: automattic, woocommerce
 Tags: woocommerce, woo, snapchat, product feed, ads
 Tested up to: 7.1
-Stable tag: 1.0.6
+Stable tag: 1.0.9
 License: GPLv3
 License URI: https://www.gnu.org/licenses/gpl-3.0.html
 
@@ -25,19 +25,17 @@ Yes, it uses a [Jetpack](https://jetpack.com/) account to connect and communicat
 
 == Changelog ==
 
-= 1.0.6 - 2026-09-29 =
-* Add - Sandbox mode to preview settings without connecting to Snapchat.
+= 1.0.9 - 2026-11-16 =
+* Fix - Variation forms no longer stay stuck loading when Snapchat tracking data is missing from the page.
+* Tweak - Bump WooCommerce "tested up to" version to 11.3.
 
-= 1.0.5 - 2026-09-08 =
-* Fix - Ensure product export batches write CSV rows in the correct product order.
-* Fix - Purchase pixel no longer exposes order details and hashed billing data on unauthenticated order-received requests.
-* Tweak - Bump WooCommerce "tested up to" version to 11.1.
+= 1.0.8 - 2026-11-03 =
+* Dev - Tested with PHP 8.5.
+* Fix - Retry Purchase conversions that fail to send, and stop counting them as sent until Snapchat accepts them.
+* Fix - Send the store currency with Pixel ADD_CART events.
+* Tweak - Update the WordPress.com logo on the account connection card.
 
-= 1.0.4 - 2026-08-19 =
-* Fix – Resolved potential transaction ID collisions in purchase event deduplication by using order ID as the event_id instead.
-* Fix - Corrected invalid nested HTML in Conversions API settings.
-* Dev - Update WPCS to 3.4.1 to fix CVE-2026-45293, an arbitrary code execution vulnerability in WordPress Coding Standards.
-* Tweak - Bump WordPress "Tested up to" version to 7.1
-* Tweak - Bump WordPress "Requires at least" version to 6.9
+= 1.0.7 - 2026-10-08 =
+* Tweak - Bump WooCommerce "tested up to" version to 11.2.
 
 [See changelog for all versions](https://raw.githubusercontent.com/woocommerce/snapchat-for-woocommerce/trunk/changelog.txt).

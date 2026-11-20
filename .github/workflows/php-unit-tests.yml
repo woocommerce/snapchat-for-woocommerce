@@ -17,13 +17,24 @@ on:
       - composer.lock
       - .github/workflows/php-unit-tests.yml
 
+  workflow_dispatch:
+    inputs:
+      wp-version:
+        description: 'WordPress version to test against (e.g. 7.1.4, 7.2-RC1, or nightly for trunk) — leave blank for the latest stable release'
+        required: false
+        type: string
+      wc-version:
+        description: 'WooCommerce version or git tag to test against (e.g. 11.3.0-beta.2) — leave blank for the latest stable release'
+        required: false
+        type: string
+
 jobs:
   phpunit:
     runs-on: ubuntu-latest
     timeout-minutes: 10
     strategy:
       matrix:
-        php-version: [7.4, 8.0, 8.2, 8.3, 8.4]
+        php-version: [7.4, 8.0, 8.2, 8.3, 8.4, 8.5]
 
     env:
       WP_CORE_DIR: /tmp/wordpress
@@ -32,7 +43,8 @@ jobs:
       DB_USER: root
       DB_PASS: root
       DB_HOST: 127.0.0.1
-      WP_VERSION: latest
+      WP_VERSION: ${{ github.event.inputs.wp-version || 'latest' }}
+      WC_VERSION: ${{ github.event.inputs.wc-version || 'latest' }}
       CI: true
 
     steps:
@@ -40,14 +52,16 @@ jobs:
         uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
 
       - name: Set up PHP ${{ matrix.php-version }}
-        uses: shivammathur/setup-php@f3e473d116dcccaddc5834248c87452386958240 # v2
+        uses: shivammathur/setup-php@eb7c497e18156a6bbabfef1d3a82760b9eda3962 # v2
         with:
           php-version: ${{ matrix.php-version }}
           extensions: mbstring, mysqli
           tools: composer, phpunit
 
-      - name: Prepare MySQL
-        uses: woocommerce/grow/prepare-mysql@e981c25267d29c39ff6ab1ae4ea09b267efae86c # actions-v3.0.6
+      - name: Start MySQL
+        run: |
+          sudo systemctl start mysql.service
+          mysql --version
 
       - name: Install svn (used for installing WP versions)
         run: sudo apt-get -y install subversion
@@ -57,7 +71,7 @@ jobs:
 
       - name: Install WordPress test suite (with WooCommerce)
         run: |
-          bash bin/install-wp-tests.sh $DB_NAME $DB_USER $DB_PASS $DB_HOST $WP_VERSION
+          bash bin/install-wp-tests.sh $DB_NAME $DB_USER $DB_PASS $DB_HOST $WP_VERSION $WC_VERSION
 
       - name: Run PHPUnit tests
         run: ./vendor/bin/phpunit

@@ -2,7 +2,7 @@
 	"name": "snapchat-for-woocommerce",
 	"title": "Snapchat for WooCommerce",
 	"description": "Snapchat for WooCommerce",
-	"version": "1.0.6",
+	"version": "1.0.9",
 	"author": "The WordPress Contributors",
 	"license": "GPL-3.0+",
 	"keywords": [
@@ -41,7 +41,7 @@
 		"@woocommerce/dependency-extraction-webpack-plugin": "^5.1.0",
 		"@woocommerce/e2e-utils-playwright": "^0.5.1",
 		"@woocommerce/eslint-plugin": "^4.0.0",
-		"@wordpress/env": "^11.16.0",
+		"@wordpress/env": "^12.0.0",
 		"@wordpress/prettier-config": "^4.56.0",
 		"@wordpress/scripts": "^36.0.0",
 		"eslint": "^10.0.0",

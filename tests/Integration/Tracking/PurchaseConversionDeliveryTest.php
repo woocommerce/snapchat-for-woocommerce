@@ -1,0 +1,464 @@
+<?php
+/**
+ * End-to-end tests for delivering Purchase conversion events through Action Scheduler.
+ *
+ * @package SnapchatForWooCommerce\Tests\Tracking
+ */
+
+namespace SnapchatForWooCommerce\Tests\Tracking;
+
+use ActionScheduler;
+use ActionScheduler_Store;
+use WP_Error;
+use WP_REST_Response;
+use WP_UnitTestCase;
+use SnapchatForWooCommerce\Config;
+use SnapchatForWooCommerce\Connection\WcsClient;
+use SnapchatForWooCommerce\ServiceContainer;
+use SnapchatForWooCommerce\ServiceKey;
+use SnapchatForWooCommerce\Tracking\ConversionEventLogger;
+use SnapchatForWooCommerce\Tracking\ConversionTrackingService;
+use SnapchatForWooCommerce\Tracking\RemoteConversionTracker;
+use SnapchatForWooCommerce\Utils\Helper;
+use SnapchatForWooCommerce\Utils\Storage\OptionDefaults;
+use SnapchatForWooCommerce\Utils\Storage\Options;
+
+/**
+ * @covers \SnapchatForWooCommerce\Tracking\ConversionTrackingService
+ * @covers \SnapchatForWooCommerce\Tracking\RemoteConversionTracker
+ */
+class PurchaseConversionDeliveryTest extends WP_UnitTestCase {
+
+	use ConversionSendTestHelpers;
+
+	/**
+	 * WCS client mock.
+	 *
+	 * @var \PHPUnit\Framework\MockObject\MockObject&WcsClient
+	 */
+	protected $client;
+
+	/**
+	 * Tracker wired to the mocked client.
+	 *
+	 * @var RemoteConversionTracker
+	 */
+	protected $tracker;
+
+	/**
+	 * $_SERVER as it was before the test.
+	 *
+	 * @var array
+	 */
+	protected $server;
+
+	/**
+	 * Set up test environment.
+	 *
+	 * The plugin's own ConversionTrackingService is already hooked during bootstrap. Its callbacks
+	 * are removed so only the service under test, wired to the mocked client, handles the hooks.
+	 * WP_UnitTestCase restores every hook after each test.
+	 */
+	public function set_up(): void {
+		parent::set_up();
+
+		$this->server = $_SERVER;
+
+		$container_service = ServiceContainer::get( ServiceKey::CONVERSION_TRACKING );
+		foreach ( array( 'send_conversion_event', 'conversion_sent', 'conversion_failed' ) as $suffix ) {
+			remove_all_actions( Helper::with_prefix( $suffix ) );
+		}
+		remove_action( 'action_scheduler_begin_execute', array( $container_service, 'start_queued_send' ) );
+		remove_action( 'action_scheduler_after_execute', array( $container_service, 'end_queued_send' ) );
+		remove_action( 'action_scheduler_failed_execution', array( $container_service, 'end_queued_send' ) );
+
+		Options::set( OptionDefaults::CONVERSION_ACCESS_TOKEN, 'token_abc' );
+		Options::set( OptionDefaults::PIXEL_ID, 'pixel_456' );
+
+		$this->client  = $this->createMock( WcsClient::class );
+		$this->tracker = new RemoteConversionTracker( $this->client, new ConversionEventLogger( wc_get_logger() ) );
+		( new ConversionTrackingService( $this->tracker ) )->register_hooks();
+	}
+
+	/**
+	 * Tear down test environment.
+	 */
+	public function tear_down(): void {
+		$_SERVER = $this->server;
+		as_unschedule_all_actions( Helper::with_prefix( 'send_conversion_event' ), null, Config::PLUGIN_SLUG );
+		parent::tear_down();
+	}
+
+	/**
+	 * Test that a failed Purchase ends Failed, stays untracked and isn't resent automatically.
+	 *
+	 * @dataProvider send_error_provider
+	 *
+	 * @param WP_Error $error Error returned by the WCS client.
+	 */
+	public function test_failed_purchase_fails_without_automatic_resend( WP_Error $error ): void {
+		$this->client->expects( $this->once() )->method( 'proxy_post' )->willReturn( $error );
+		$order_id  = wc_create_order()->get_id();
+		$action_id = $this->queue_purchase( $order_id );
+
+		$this->run_action( $action_id );
+
+		$order = wc_get_order( $order_id );
+		$this->assertSame( ActionScheduler_Store::STATUS_FAILED, $this->status( $action_id ) );
+		$this->assertEmpty( $order->get_meta( RemoteConversionTracker::ORDER_CONVERSION_TRACKED_META_KEY ) );
+		$this->assertEmpty( $order->get_meta( RemoteConversionTracker::ORDER_CONVERSION_QUEUED_META_KEY ) );
+		$this->assertCount( 0, $this->pending_sends() );
+	}
+
+	/**
+	 * Errors a Purchase send can fail with.
+	 *
+	 * @return array
+	 */
+	public function send_error_provider(): array {
+		return array(
+			'timeout'          => array( $this->transport_error() ),
+			'HTTP 400'         => array( $this->http_error( 400 ) ),
+			'HTTP 429'         => array( $this->http_error( 429 ) ),
+			'HTTP 503'         => array( $this->http_error( 503 ) ),
+			'sandbox block'    => array( new WP_Error( 'snapchat_sandbox_remote_request_blocked', 'Blocked', array( 'status' => 403 ) ) ),
+			'no Jetpack token' => array( new WP_Error( 'missing_token' ) ),
+		);
+	}
+
+	/**
+	 * Test that a queued Purchase action keeps the visitor's IP address and user agent on the order, not in its args.
+	 */
+	public function test_queued_purchase_action_omits_ip_and_user_agent(): void {
+		$_SERVER['REMOTE_ADDR']     = '203.0.113.7';
+		$_SERVER['HTTP_USER_AGENT'] = 'Shopper UA';
+		$order_id                   = wc_create_order()->get_id();
+
+		$action_id = $this->queue_purchase( $order_id );
+
+		$stored = ActionScheduler::store()->fetch_action( $action_id )->get_args()['event_payload']['user_data'];
+		$this->assertArrayNotHasKey( 'client_ip_address', $stored );
+		$this->assertArrayNotHasKey( 'client_user_agent', $stored );
+		$order = wc_get_order( $order_id );
+		$this->assertSame( '203.0.113.7', $order->get_meta( RemoteConversionTracker::ORDER_CLIENT_IP_ADDRESS_META_KEY ) );
+		$this->assertSame( 'Shopper UA', $order->get_meta( RemoteConversionTracker::ORDER_CLIENT_USER_AGENT_META_KEY ) );
+	}
+
+	/**
+	 * Test that a Purchase is sent with the confirmation page visitor's IP address and user agent, not the order's.
+	 *
+	 * An order created in wp-admin stores the admin's IP address and user agent, while the
+	 * customer who pays for it loads the confirmation page.
+	 */
+	public function test_purchase_is_sent_with_confirmation_request_ip_and_user_agent(): void {
+		$order = wc_create_order();
+		$order->set_customer_ip_address( '198.51.100.1' );
+		$order->set_customer_user_agent( 'Admin UA' );
+		$order->save();
+		$_SERVER['HTTP_CF_CONNECTING_IP'] = '203.0.113.7';
+		$_SERVER['HTTP_USER_AGENT']       = 'Shopper UA';
+		$this->client->expects( $this->once() )
+			->method( 'proxy_post' )
+			->with(
+				$this->anything(),
+				$this->callback(
+					fn( $payload ) => '203.0.113.7' === ( $payload['data'][0]['user_data']['client_ip_address'] ?? null )
+						&& 'Shopper UA' === ( $payload['data'][0]['user_data']['client_user_agent'] ?? null )
+				)
+			)
+			->willReturn( new WP_REST_Response( array(), 200 ) );
+
+		$this->run_action( $this->queue_purchase( $order->get_id() ) );
+
+		$order = wc_get_order( $order->get_id() );
+		$this->assertEmpty( $order->get_meta( RemoteConversionTracker::ORDER_CLIENT_IP_ADDRESS_META_KEY ) );
+		$this->assertEmpty( $order->get_meta( RemoteConversionTracker::ORDER_CLIENT_USER_AGENT_META_KEY ) );
+	}
+
+	/**
+	 * Test that erasing an order's personal data removes the visitor data kept for its Purchase.
+	 */
+	public function test_order_personal_data_eraser_removes_client_data(): void {
+		$_SERVER['REMOTE_ADDR']     = '203.0.113.7';
+		$_SERVER['HTTP_USER_AGENT'] = 'Shopper UA';
+		$order_id                   = wc_create_order()->get_id();
+		$this->queue_purchase( $order_id );
+
+		\WC_Privacy_Erasers::remove_order_personal_data( wc_get_order( $order_id ) );
+
+		$order = wc_get_order( $order_id );
+		$this->assertEmpty( $order->get_meta( RemoteConversionTracker::ORDER_CLIENT_IP_ADDRESS_META_KEY ) );
+		$this->assertEmpty( $order->get_meta( RemoteConversionTracker::ORDER_CLIENT_USER_AGENT_META_KEY ) );
+	}
+
+	/**
+	 * Test that the order personal data export includes the visitor data kept for its Purchase.
+	 */
+	public function test_order_personal_data_export_includes_client_data(): void {
+		$meta = apply_filters( 'woocommerce_privacy_export_order_personal_data_meta', array() );
+
+		$this->assertArrayHasKey( RemoteConversionTracker::ORDER_CLIENT_IP_ADDRESS_META_KEY, $meta );
+		$this->assertArrayHasKey( RemoteConversionTracker::ORDER_CLIENT_USER_AGENT_META_KEY, $meta );
+	}
+
+	/**
+	 * Test that a Purchase queued with its IP address and user agent sends the stored values.
+	 */
+	public function test_purchase_queued_with_ip_keeps_stored_values(): void {
+		$order = wc_create_order();
+		$order->update_meta_data( RemoteConversionTracker::ORDER_CLIENT_IP_ADDRESS_META_KEY, '203.0.113.7' );
+		$order->save_meta_data();
+		$this->client->expects( $this->once() )
+			->method( 'proxy_post' )
+			->with(
+				$this->anything(),
+				$this->callback( fn( $payload ) => '198.51.100.1' === ( $payload['data'][0]['user_data']['client_ip_address'] ?? null ) )
+			)
+			->willReturn( new WP_REST_Response( array(), 200 ) );
+		$action_id = as_enqueue_async_action(
+			Helper::with_prefix( 'send_conversion_event' ),
+			array(
+				'event_payload' => array(
+					'event_name' => 'PURCHASE',
+					'user_data'  => array( 'client_ip_address' => '198.51.100.1' ),
+				),
+				'args'          => array( 'order_id' => $order->get_id() ),
+			),
+			Config::PLUGIN_SLUG
+		);
+
+		$this->run_action( $action_id );
+	}
+
+	/**
+	 * Test that loading the order confirmation page after a failed send queues the Purchase again.
+	 */
+	public function test_reload_after_failed_send_queues_purchase_again(): void {
+		$this->client->method( 'proxy_post' )->willReturnOnConsecutiveCalls(
+			$this->transport_error(),
+			new WP_REST_Response( array(), 200 )
+		);
+		$order_id = wc_create_order()->get_id();
+		$this->run_action( $this->queue_purchase( $order_id ) );
+
+		$resend = $this->queue_purchase( $order_id );
+
+		$this->assertNotSame( 0, $resend );
+		$this->assertCount( 1, $this->pending_sends( $order_id ) );
+
+		$this->run_action( $resend );
+
+		$this->assertSame( ActionScheduler_Store::STATUS_COMPLETE, $this->status( $resend ) );
+		$this->assertSame( '1', (string) wc_get_order( $order_id )->get_meta( RemoteConversionTracker::ORDER_CONVERSION_TRACKED_META_KEY ) );
+	}
+
+	/**
+	 * Test that a Purchase whose send ended without reaching Snapchat is queued again once its reservation expires.
+	 */
+	public function test_unsent_purchase_is_queued_again_after_reservation_expires(): void {
+		$this->client->expects( $this->never() )->method( 'proxy_post' );
+		$order_id  = wc_create_order()->get_id();
+		$action_id = $this->queue_purchase( $order_id );
+		Options::set( OptionDefaults::CONVERSION_ACCESS_TOKEN, '' );
+
+		$this->run_action( $action_id );
+
+		$this->assertSame( ActionScheduler_Store::STATUS_COMPLETE, $this->status( $action_id ) );
+		$this->assertSame( 0, $this->queue_purchase( $order_id ) );
+
+		$order = wc_get_order( $order_id );
+		$order->update_meta_data( RemoteConversionTracker::ORDER_CONVERSION_QUEUED_META_KEY, time() - HOUR_IN_SECONDS );
+		$order->save_meta_data();
+
+		$this->assertNotSame( 0, $this->queue_purchase( $order_id ) );
+	}
+
+	/**
+	 * Test that a failed non-Purchase send completes even when its args carry an order ID.
+	 */
+	public function test_failed_non_purchase_send_with_order_id_completes(): void {
+		$this->client->expects( $this->once() )->method( 'proxy_post' )->willReturn( $this->transport_error() );
+		$order_id  = wc_create_order()->get_id();
+		$action_id = as_enqueue_async_action(
+			Helper::with_prefix( 'send_conversion_event' ),
+			array(
+				'event_payload' => array( 'event_name' => 'ADD_CART' ),
+				'args'          => array( 'order_id' => $order_id ),
+			),
+			Config::PLUGIN_SLUG
+		);
+
+		$this->run_action( $action_id );
+
+		$this->assertSame( ActionScheduler_Store::STATUS_COMPLETE, $this->status( $action_id ) );
+	}
+
+	/**
+	 * Test that a failed Purchase action still runs every other callback on the send hook.
+	 */
+	public function test_failed_purchase_runs_later_callbacks(): void {
+		$this->client->method( 'proxy_post' )->willReturn( $this->transport_error() );
+		$later_calls = 0;
+		add_action(
+			Helper::with_prefix( 'send_conversion_event' ),
+			function () use ( &$later_calls ) {
+				++$later_calls;
+			},
+			20
+		);
+		$action_id = $this->queue_purchase( wc_create_order()->get_id() );
+
+		$this->run_action( $action_id );
+
+		$this->assertSame( 1, $later_calls );
+		$this->assertSame( ActionScheduler_Store::STATUS_FAILED, $this->status( $action_id ) );
+	}
+
+	/**
+	 * Test that a conversion_failed call without a WP_Error doesn't fail the queued action.
+	 */
+	public function test_failure_hook_without_wp_error_is_ignored(): void {
+		$this->client->method( 'proxy_post' )->willReturn( new WP_REST_Response( array(), 200 ) );
+		add_action(
+			Helper::with_prefix( 'send_conversion_event' ),
+			function ( $event_payload, $args ) {
+				do_action( Helper::with_prefix( 'conversion_failed' ), $event_payload, $args, 'timeout' );
+			},
+			5,
+			2
+		);
+		$action_id = $this->queue_purchase( wc_create_order()->get_id() );
+
+		$this->run_action( $action_id );
+
+		$this->assertSame( ActionScheduler_Store::STATUS_COMPLETE, $this->status( $action_id ) );
+	}
+
+	/**
+	 * Test that firing the send hook directly never throws and still runs later callbacks.
+	 */
+	public function test_direct_send_hook_never_throws(): void {
+		$this->client->expects( $this->once() )->method( 'proxy_post' )->willReturn( $this->transport_error() );
+		$order_id    = wc_create_order()->get_id();
+		$later_calls = 0;
+		add_action(
+			Helper::with_prefix( 'send_conversion_event' ),
+			function () use ( &$later_calls ) {
+				++$later_calls;
+			},
+			20
+		);
+
+		do_action( Helper::with_prefix( 'send_conversion_event' ), array( 'event_name' => 'PURCHASE' ), array( 'order_id' => $order_id ) );
+
+		$this->assertSame( 1, $later_calls );
+	}
+
+	/**
+	 * Test that firing the send hook directly after a queued run in the same request never throws.
+	 *
+	 * @dataProvider queued_run_result_provider
+	 *
+	 * @param bool $queued_run_fails Whether the earlier queued send fails.
+	 */
+	public function test_direct_send_hook_after_queued_run_never_throws( bool $queued_run_fails ): void {
+		$this->client->expects( $this->exactly( 2 ) )->method( 'proxy_post' )->willReturnOnConsecutiveCalls(
+			$queued_run_fails ? $this->transport_error() : new WP_REST_Response( array(), 200 ),
+			$this->transport_error()
+		);
+		$this->run_action( $this->queue_purchase( wc_create_order()->get_id() ) );
+
+		do_action( Helper::with_prefix( 'send_conversion_event' ), array( 'event_name' => 'PURCHASE' ), array( 'order_id' => wc_create_order()->get_id() ) );
+
+		$this->addToAssertionCount( 1 );
+	}
+
+	/**
+	 * Outcomes of the queued send that runs before the direct hook call.
+	 *
+	 * @return array
+	 */
+	public function queued_run_result_provider(): array {
+		return array(
+			'after a failed queued send'     => array( true ),
+			'after a successful queued send' => array( false ),
+		);
+	}
+
+	/**
+	 * Test that the failure message names the order and status without the access token.
+	 *
+	 * The error carries the request URL, as a real WcsClient error can, so a message built
+	 * from the error's text or data would leak the token.
+	 */
+	public function test_failure_message_omits_access_token(): void {
+		$error = new WP_Error(
+			Helper::with_prefix( 'request_failed' ),
+			'Request to /conversions/v3/pixel_456/events?access_token=token_abc failed',
+			array(
+				'response' => array(
+					'code'    => 400,
+					'message' => '',
+				),
+				'body'     => '',
+				'url'      => 'https://example.com/conversions/v3/pixel_456/events?access_token=token_abc',
+			)
+		);
+		$this->client->method( 'proxy_post' )->willReturn( $error );
+		$order_id  = wc_create_order()->get_id();
+		$action_id = $this->queue_purchase( $order_id );
+
+		$this->run_action( $action_id );
+
+		$log = $this->failure_log( $action_id );
+		$this->assertStringContainsString( "order {$order_id}", $log );
+		$this->assertStringContainsString( 'HTTP 400', $log );
+		$this->assertStringNotContainsString( 'token_abc', $log );
+	}
+
+	/**
+	 * Queues a Purchase send through the tracker and returns its action ID.
+	 *
+	 * @param int $order_id WooCommerce order ID.
+	 * @return int
+	 */
+	private function queue_purchase( int $order_id ): int {
+		$this->tracker->track_purchase( $order_id );
+
+		return (int) key( $this->pending_sends( $order_id ) );
+	}
+
+	/**
+	 * Runs an action through the Action Scheduler queue runner.
+	 *
+	 * @param int $action_id Action ID.
+	 */
+	private function run_action( int $action_id ): void {
+		ActionScheduler::runner()->process_action( $action_id, 'PHPUnit' );
+	}
+
+	/**
+	 * Returns an action's status.
+	 *
+	 * @param int $action_id Action ID.
+	 * @return string
+	 */
+	private function status( int $action_id ): string {
+		return ActionScheduler::store()->get_status( $action_id );
+	}
+
+	/**
+	 * Returns the Action Scheduler log messages for an action.
+	 *
+	 * @param int $action_id Action ID.
+	 * @return string
+	 */
+	private function failure_log( int $action_id ): string {
+		$messages = array_map(
+			fn( $entry ) => $entry->get_message(),
+			\ActionScheduler_Logger::instance()->get_logs( $action_id )
+		);
+
+		return implode( "\n", $messages );
+	}
+}
