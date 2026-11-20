@@ -67,7 +67,10 @@
 		"colord": "^2.9.4",
 		"qs": "^6.16.0",
 		"@babel/runtime": "^7.26.10",
-		"uuid@<11": "^11.1.1"
+		"uuid@<11": "^11.1.1",
+		"@wp-playground/storage": {
+			"isomorphic-git": "~1.38.6"
+		}
 	},
 	"scripts": {
 		"prebuild": "composer install --no-dev",
