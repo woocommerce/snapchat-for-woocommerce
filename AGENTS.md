@@ -5,6 +5,10 @@ Guidelines for AI coding agents working in this repository (the `snapchat-for-wo
 -   **Namespace root:** `SnapchatForWooCommerce\` (`includes/`)
 -   **Text domain / slug:** `snapchat-for-woocommerce`
 
+## Docblocks
+
+-   **`@since` version placeholder.** When adding a new `@since` tag (or updating one) in a PHP or JS docblock for new/changed code, write `@since n.e.x.t` instead of guessing a version number. The release workflow (`bump-versions.yml`) replaces every `@since n.e.x.t` occurrence under `includes/` and `js/src/` with the real release version as part of the version-bump commit, so the tag is accurate once the code ships. This is a convention, not a lint-enforced rule: writing a real guessed version instead won't be blocked, it just won't be caught by the automated replacement.
+
 ## PR Workflow
 
 Applies to every PR opened against this repository.
