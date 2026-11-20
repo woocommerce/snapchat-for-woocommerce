@@ -27,12 +27,18 @@ export default class SetupPage extends MockRequests {
 	/**
 	 * Go to the setup page.
 	 *
+	 * @param {Object<string, string>} [query={}] Extra query args, e.g. the args an OAuth return adds.
 	 * @return {Promise<void>}
 	 */
-	async goto() {
-		await this.page.goto(
-			'/wp-admin/admin.php?page=wc-admin&path=%2Fsnapchat%2Fsetup',
-			{ waitUntil: 'domcontentloaded' }
-		);
+	async goto( query = {} ) {
+		const params = new URLSearchParams( {
+			page: 'wc-admin',
+			path: '/snapchat/setup',
+			...query,
+		} );
+
+		await this.page.goto( `/wp-admin/admin.php?${ params }`, {
+			waitUntil: 'domcontentloaded',
+		} );
 	}
 }

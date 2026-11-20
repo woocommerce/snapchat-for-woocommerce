@@ -30,10 +30,11 @@ const ConnectSnapchatAccountCard = ( {
 	disabled,
 	configId,
 	productsToken,
+	oauthState,
 } ) => {
 	const { createNotice } = useDispatchCoreNotices();
 	const { upsertSnapchatConfig, loading: loadingUpsertSnapchatConfig } =
-		useUpsertSnapchatConfig( configId, productsToken );
+		useUpsertSnapchatConfig( configId, productsToken, oauthState );
 	const nextPageName = sfwData?.setupComplete
 		? 'reconnect'
 		: 'setup-snapchat';
@@ -44,10 +45,10 @@ const ConnectSnapchatAccountCard = ( {
 	} );
 
 	useEffect( () => {
-		if ( configId ) {
-			upsertSnapchatConfig( configId );
+		if ( configId && productsToken && oauthState ) {
+			upsertSnapchatConfig();
 		}
-	}, [ configId, productsToken, upsertSnapchatConfig ] );
+	}, [ configId, productsToken, oauthState, upsertSnapchatConfig ] );
 
 	const handleConnectClick = async () => {
 		try {

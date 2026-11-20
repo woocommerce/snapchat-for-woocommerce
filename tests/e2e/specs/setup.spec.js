@@ -76,6 +76,57 @@ test.describe( 'Merchant Onboarding', () => {
 		expect( page.url() ).toMatch( `${ baseURL }/snap_auth_url` );
 	} );
 
+	test( 'Snapchat return without OAuth state sends no config request', async () => {
+		const configRequests = [];
+		const trackConfigRequest = ( request ) => {
+			if ( /\/wc\/sfw\/snapchat\/config\b/.test( request.url() ) ) {
+				configRequests.push( request );
+			}
+		};
+
+		await setupPage.mockJetpackConnected();
+		await setupPage.mockSnapchatConnection( { status: 'disconnected' } );
+		await setupPage.mockSnapchatConfig( {} );
+
+		page.on( 'request', trackConfigRequest );
+
+		await setupPage.goto( {
+			config_id: 'crafted-config-id',
+			products_token: 'crafted-products-token',
+		} );
+
+		await expect( locator.getSnapchatConnectButton() ).toBeEnabled();
+		await page.waitForLoadState( 'networkidle' );
+
+		page.off( 'request', trackConfigRequest );
+
+		expect( configRequests ).toHaveLength( 0 );
+	} );
+
+	test( 'Snapchat return with OAuth state sends it with the config request', async () => {
+		await setupPage.mockJetpackConnected();
+		await setupPage.mockSnapchatConnection( { status: 'disconnected' } );
+		await setupPage.mockSnapchatConfig( {} );
+
+		const configRequest = page.waitForRequest(
+			( request ) =>
+				/\/wc\/sfw\/snapchat\/config\b/.test( request.url() ) &&
+				request.method() === 'POST'
+		);
+
+		await setupPage.goto( {
+			config_id: 'returned-config-id',
+			products_token: 'returned-products-token',
+			sfw_oauth_state: 'returned-state',
+		} );
+
+		expect( ( await configRequest ).postDataJSON() ).toEqual( {
+			id: 'returned-config-id',
+			products_token: 'returned-products-token',
+			state: 'returned-state',
+		} );
+	} );
+
 	test( 'Snapchat connected card state', async () => {
 		await setupPage.mockJetpackConnected();
 		await setupPage.mockSnapchatConnection( { status: 'connected' } );
