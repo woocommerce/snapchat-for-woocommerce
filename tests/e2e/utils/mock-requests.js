@@ -155,6 +155,22 @@ export default class MockRequests {
 	}
 
 	/**
+	 * Mock the request that saves the Snapchat configuration after the OAuth return.
+	 *
+	 * @param {Object} payload The response payload.
+	 * @param {number} [status=200] HTTP status code.
+	 * @return {Promise<void>}
+	 */
+	async mockSnapchatConfig( payload, status = 200 ) {
+		await this.fulfillRequest(
+			/\/wc\/sfw\/snapchat\/config\b/,
+			payload,
+			status,
+			[ 'POST' ]
+		);
+	}
+
+	/**
 	 * Mock the current Snapchat connection status.
 	 *
 	 * @param {Object} payload The response payload to return for the connection status.
