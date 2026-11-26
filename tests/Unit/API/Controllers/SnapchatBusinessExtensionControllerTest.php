@@ -517,6 +517,49 @@ class SnapchatBusinessExtensionControllerTest extends WP_UnitTestCase {
 	}
 
 	/**
+	 * Test: a config ID and products token of "0" match the format and are saved,
+	 * even though PHP treats "0" as empty.
+	 */
+	public function test_set_config_saves_zero_identifiers(): void {
+		$requested_url = '';
+
+		$this->jetpack_client
+			->expects( $this->once() )
+			->method( 'remote_request' )
+			->willReturnCallback(
+				function ( $args ) use ( &$requested_url ) {
+					$requested_url = $args['url'];
+
+					return array(
+						'response' => array( 'code' => 200, 'message' => 'OK' ),
+						'headers'  => array(),
+						'body'     => file_get_contents( $this->mock_fixture ),
+					);
+				}
+			);
+
+		$request = new WP_REST_Request( 'POST', '/wc/sfw/snapchat/config' );
+		$request->set_header( 'Content-Type', 'application/json' );
+		$request->set_body(
+			wp_json_encode(
+				array(
+					'id'             => '0',
+					'products_token' => '0',
+					'state'          => $this->issue_oauth_state(),
+				)
+			)
+		);
+
+		$response = $this->server->dispatch( $request );
+
+		$this->assertSame( 200, $response->get_status() );
+		$this->assertStringEndsWith( '/ads/v1/business_extension_configurations/0', $requested_url );
+		$this->assertSame( '0', Options::get( OptionDefaults::CONFIG_ID ) );
+		$this->assertSame( '0', Options::get( OptionDefaults::WCS_PRODUCTS_TOKEN ) );
+		$this->assertSame( 'connected', Options::get( OptionDefaults::ONBOARDING_STATUS ) );
+	}
+
+	/**
 	 * Test: a successful lookup without configuration data returns an error and
 	 * leaves the saved connection unchanged.
 	 *
