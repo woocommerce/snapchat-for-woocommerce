@@ -19,7 +19,7 @@ import { queueRecordSfwEvent } from '~/utils/tracks';
  * Accounts are disconnected from the Setting page
  *
  * @event sfw_disconnected_accounts
- * @property {string} context (`all-accounts`|`snapchat-account`) - indicate which accounts have been disconnected.
+ * @property {string} context (`snapchat-account`) - indicate which accounts have been disconnected.
  */
 
 /**

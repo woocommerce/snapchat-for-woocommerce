@@ -67,17 +67,17 @@ When the "Disconnect Snapchat account" button is clicked.
 #### Emitters
 - [`exports`](js/src/pages/settings/linked-accounts.js#L35)
 
-### [`sfw_disconnect_snapchat_confirm_modal_button_click`](js/src/pages/settings/disconnect-modal/confirm-modal.js#L63)
+### [`sfw_disconnect_snapchat_confirm_modal_button_click`](js/src/pages/settings/disconnect-modal/confirm-modal.js#L41)
 When the confirm "Disconnect Snapchat account" button is clicked inside the modal.
 #### Emitters
-- [`exports`](js/src/pages/settings/disconnect-modal/confirm-modal.js#L72)
+- [`exports`](js/src/pages/settings/disconnect-modal/confirm-modal.js#L50)
 
 ### [`sfw_disconnected_accounts`](js/src/pages/settings/linked-accounts.js#L18)
 Accounts are disconnected from the Setting page
 #### Properties
 | name | type | description |
 | ---- | ---- | ----------- |
-`context` | `string` | (`all-accounts`\|`snapchat-account`) - indicate which accounts have been disconnected.
+`context` | `string` | (`snapchat-account`) - indicate which accounts have been disconnected.
 #### Emitters
 - [`exports`](js/src/pages/settings/linked-accounts.js#L35)
 
@@ -135,7 +135,7 @@ Clicking on the button to connect a Snapchat account.
 ### [`sfw_snapchat_account_connect_different_account_button_click`](js/src/components/snapchat-account-card/switch-account-button.js#L12)
 Clicking on the "connect to a different Snapchat account" button.
 #### Emitters
-- [`SwitchAccountButton`](js/src/components/snapchat-account-card/switch-account-button.js#L25)
+- [`SwitchAccountButton`](js/src/components/snapchat-account-card/switch-account-button.js#L26)
 
 ### [`sfw_wordpress_account_connect_button_click`](js/src/components/wpcom-account-card/connect-wpcom-account-card.js#L17)
 Clicking on the button to connect WordPress.com account.

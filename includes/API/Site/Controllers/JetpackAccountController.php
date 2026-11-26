@@ -2,8 +2,8 @@
 /**
  * REST controller for managing Jetpack connection state.
  *
- * This controller allows connecting, disconnecting, and verifying
- * Jetpack (WordPress.com) connection status. It supports routing merchants
+ * This controller allows connecting to Jetpack (WordPress.com) and
+ * verifying the connection status. It supports routing merchants
  * to appropriate authorization URLs and stores consent state in WordPress options.
  *
  * @package SnapchatForWooCommerce\API\Site\Controllers
@@ -80,11 +80,6 @@ class JetpackAccountController extends RESTBaseController {
 					'callback'            => $this->get_connect_callback(),
 					'permission_callback' => array( $this, 'permissions_check' ),
 					'args'                => $this->get_connect_params(),
-				),
-				array(
-					'methods'             => 'DELETE',
-					'callback'            => $this->get_disconnect_callback(),
-					'permission_callback' => array( $this, 'permissions_check' ),
 				),
 				'schema' => array( $this, 'connect_callback_schema' ),
 			)
@@ -177,26 +172,6 @@ class JetpackAccountController extends RESTBaseController {
 				'validate_callback' => 'rest_validate_request_arg',
 			),
 		);
-	}
-
-	/**
-	 * Returns callback to disconnect from Jetpack.
-	 *
-	 * @return callable
-	 */
-	protected function get_disconnect_callback(): callable {
-		return function () {
-			$this->manager->remove_connection();
-			Options::delete( OptionDefaults::WP_TOS_ACCEPTED );
-			Options::delete( OptionDefaults::IS_JETPACK_CONNECTED );
-
-			return rest_ensure_response(
-				array(
-					'status'  => 'success',
-					'message' => __( 'Successfully disconnected.', 'snapchat-for-woocommerce' ),
-				)
-			);
-		};
 	}
 
 	/**

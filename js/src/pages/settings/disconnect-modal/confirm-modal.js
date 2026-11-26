@@ -12,31 +12,9 @@ import AppModal from '~/components/app-modal';
 import AppButton from '~/components/app-button';
 import WarningIcon from '~/components/warning-icon';
 import { useAppDispatch } from '~/data';
-import { ALL_ACCOUNTS, SNAPCHAT_ACCOUNT } from './constants';
+import { SNAPCHAT_ACCOUNT } from './constants';
 
 const textDict = {
-	[ ALL_ACCOUNTS ]: {
-		title: __( 'Disconnect all accounts', 'snapchat-for-woocommerce' ),
-		confirmButton: __(
-			'Disconnect all accounts',
-			'snapchat-for-woocommerce'
-		),
-		confirmation: __(
-			'Yes, I want to disconnect all my accounts.',
-			'snapchat-for-woocommerce'
-		),
-		contents: [
-			__(
-				'I understand that I am disconnecting any WordPress.com account and Snapchat account connected to this extension.',
-				'snapchat-for-woocommerce'
-			),
-			__( 'Lorem ipsum', 'snapchat-for-woocommerce' ),
-			__(
-				'Dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.',
-				'snapchat-for-woocommerce'
-			),
-		],
-	},
 	[ SNAPCHAT_ACCOUNT ]: {
 		title: __( 'Disconnect Snapchat account?', 'snapchat-for-woocommerce' ),
 		confirmButton: __(
@@ -90,14 +68,8 @@ export default function ConfirmModal( {
 	};
 
 	const handleConfirmClick = () => {
-		let disconnect =
-			disconnectTarget === ALL_ACCOUNTS
-				? dispatcher.disconnectAllAccounts
-				: dispatcher.disconnectSnapchatAccount;
-
-		if ( disconnectAction ) {
-			disconnect = disconnectAction;
-		}
+		const disconnect =
+			disconnectAction || dispatcher.disconnectSnapchatAccount;
 
 		setDisconnecting( true );
 		disconnect()
