@@ -103,10 +103,37 @@ jobs:
           VERSION: ${{ inputs.version }}
         run: 'sed -i "s/^Stable tag: .*/Stable tag: ${VERSION}/" readme.txt'
 
+      - name: Replace @since n.e.x.t placeholders
+        env:
+          VERSION: ${{ inputs.version }}
+        run: |
+          python3 - <<'PYEOF'
+          import os
+          import re
+
+          version = os.environ["VERSION"]
+          pattern = re.compile(r"@since\s+n\.e\.x\.t")
+          extensions = (".php", ".js", ".jsx", ".ts", ".tsx")
+          roots = ("includes", "js/src")
+
+          for root in roots:
+              for dirpath, _dirnames, filenames in os.walk(root):
+                  for filename in filenames:
+                      if not filename.endswith(extensions):
+                          continue
+
+                      path = os.path.join(dirpath, filename)
+                      content = open(path, "r", encoding="utf-8").read()
+                      new_content = pattern.sub(f"@since {version}", content)
+
+                      if new_content != content:
+                          open(path, "w", encoding="utf-8").write(new_content)
+          PYEOF
+
       - name: Commit and push
         env:
           VERSION: ${{ inputs.version }}
         run: |
-          git add snapchat-for-woocommerce.php package.json package-lock.json readme.txt
+          git add snapchat-for-woocommerce.php package.json package-lock.json readme.txt includes js/src
           git commit -m "Release: Bump version to ${VERSION}."
           git push origin "${RELEASE_BRANCH}"
