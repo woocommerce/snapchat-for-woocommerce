@@ -13,7 +13,7 @@ import { sendCapiEvent } from './conversions/utils';
  * on plain HTTP sites a version 4 UUID is built from `crypto.getRandomValues()`,
  * which is available in every context.
  *
- * @since x.x.x
+ * @since n.e.x.t
  *
  * @return {string} A version 4 UUID.
  */
