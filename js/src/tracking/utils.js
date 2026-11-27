@@ -7,6 +7,45 @@ import { retrievedVariation, sendPixelEvent } from './pixel/utils';
 import { sendCapiEvent } from './conversions/utils';
 
 /**
+ * Generates a unique event ID shared by the Pixel and Conversions API events.
+ *
+ * `crypto.randomUUID()` only exists in secure contexts (HTTPS or localhost), so
+ * on plain HTTP sites a version 4 UUID is built from `crypto.getRandomValues()`,
+ * which is available in every context.
+ *
+ * @since n.e.x.t
+ *
+ * @return {string} A version 4 UUID.
+ */
+export function generateEventId() {
+	const { crypto } = window;
+
+	if ( typeof crypto.randomUUID === 'function' ) {
+		return crypto.randomUUID();
+	}
+
+	const bytes = crypto.getRandomValues( new Uint8Array( 16 ) );
+
+	// Set the version (4) and variant (10xx) bits, as randomUUID() does.
+	/* eslint-disable no-bitwise -- UUID bit masks. */
+	bytes[ 6 ] = ( bytes[ 6 ] & 0x0f ) | 0x40;
+	bytes[ 8 ] = ( bytes[ 8 ] & 0x3f ) | 0x80;
+	/* eslint-enable no-bitwise */
+
+	const hex = Array.from( bytes, ( byte ) =>
+		byte.toString( 16 ).padStart( 2, '0' )
+	).join( '' );
+
+	return [
+		hex.slice( 0, 8 ),
+		hex.slice( 8, 12 ),
+		hex.slice( 12, 16 ),
+		hex.slice( 16, 20 ),
+		hex.slice( 20 ),
+	].join( '-' );
+}
+
+/**
  * Internal utility to register click event listeners for given selectors.
  *
  * Hooks are attached after DOMContentLoaded to ensure all target elements
@@ -196,7 +235,7 @@ export function isFreshPageVisit() {
  */
 export const onSingleProductPageVisit = () => {
 	if ( isFreshPageVisit() && TRACKING_DATA_VAR.VIEW_CONTENT ) {
-		const eventId = window.crypto.randomUUID();
+		const eventId = generateEventId();
 
 		const eventData = {
 			...TRACKING_DATA_VAR.VIEW_CONTENT,
@@ -231,7 +270,7 @@ export const onSingleProductPageVisit = () => {
  */
 export const onCheckoutPageVisit = () => {
 	if ( isFreshPageVisit() && TRACKING_DATA_VAR.START_CHECKOUT ) {
-		const eventId = window.crypto.randomUUID();
+		const eventId = generateEventId();
 
 		const eventData = {
 			...TRACKING_DATA_VAR.START_CHECKOUT,
@@ -265,7 +304,7 @@ export const onCheckoutPageVisit = () => {
  */
 export const onPageView = () => {
 	if ( isFreshPageVisit() && TRACKING_DATA_VAR.PAGE_VIEW ) {
-		const eventId = window.crypto.randomUUID();
+		const eventId = generateEventId();
 
 		const eventData = {
 			event_id: eventId,

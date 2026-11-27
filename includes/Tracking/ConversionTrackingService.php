@@ -167,7 +167,7 @@ class ConversionTrackingService implements ServiceStatusInterface {
 		 *
 		 * For synchronous form submissions (on single product pages), we inject an `event_id` hidden field
 		 * via `render_event_id_field()`, and also add inline JavaScript that assigns a freshly generated
-		 * `crypto.randomUUID()` into the field. This ensures every click on the Add to Cart button
+		 * UUID into the field. This ensures every click on the Add to Cart button
 		 * generates a new unique ID, even though the page reloads afterward.
 		 *
 		 * For asynchronous flows (AJAX or REST), this logic is different. There is *no* page reload,
