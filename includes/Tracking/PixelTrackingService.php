@@ -272,8 +272,9 @@ final class PixelTrackingService implements ServiceStatusInterface {
 	 * This is used to inject a unique UUID per Add to Cart action, enabling
 	 * deduplication between Pixel and CAPI events.
 	 *
-	 * Also injects inline JavaScript that generates a `window.crypto.randomUUID()` and
-	 * assigns it to the hidden field.
+	 * Also injects inline JavaScript that generates a UUID and assigns it to the hidden
+	 * field. `crypto.randomUUID()` only exists in secure contexts (HTTPS or localhost),
+	 * so on plain HTTP sites the UUID is built from `crypto.getRandomValues()` instead.
 	 *
 	 * @since 0.1.0
 	 *
@@ -289,7 +290,24 @@ final class PixelTrackingService implements ServiceStatusInterface {
 
 		wp_print_inline_script_tag(
 			sprintf(
-				'document.querySelector("[name=%s]").value = window.crypto.randomUUID()',
+				'(function () {
+					var field = document.querySelector( "[name=%s]" );
+					var c = window.crypto;
+					if ( ! field ) {
+						return;
+					}
+					if ( typeof c.randomUUID === "function" ) {
+						field.value = c.randomUUID();
+						return;
+					}
+					var b = c.getRandomValues( new Uint8Array( 16 ) );
+					b[6] = ( b[6] & 15 ) | 64;
+					b[8] = ( b[8] & 63 ) | 128;
+					var h = Array.prototype.map.call( b, function ( x ) {
+						return ( x + 256 ).toString( 16 ).slice( 1 );
+					} ).join( "" );
+					field.value = h.slice( 0, 8 ) + "-" + h.slice( 8, 12 ) + "-" + h.slice( 12, 16 ) + "-" + h.slice( 16, 20 ) + "-" + h.slice( 20 );
+				} )();',
 				esc_attr( $attr )
 			)
 		);

@@ -13,6 +13,7 @@ import {
 	onCheckoutPageVisit,
 	onPageView,
 	onFoundVariation,
+	generateEventId,
 } from './utils';
 import { singleAddToCartClick, addToCartClick } from './pixel/utils';
 import { sendCapiEvent } from './conversions/utils';
@@ -59,7 +60,7 @@ document.addEventListener( 'DOMContentLoaded', () => {
 	} );
 
 	onLoopAddToCartClick( ( event ) => {
-		const eventId = window.crypto.randomUUID();
+		const eventId = generateEventId();
 
 		if ( isPixelEnabled ) {
 			addToCartClick( event, eventId );
